@@ -12,11 +12,14 @@
  * rather than duplicating them. The reset deletes EVERY user and all academic
  * data, so only ever point it at a development or dedicated demo database.
  */
+import { randomUUID } from "node:crypto";
+
 import { hashSync } from "bcryptjs";
 
-import type { PrismaClient } from "../../../generated/prisma";
+import type { Prisma, PrismaClient } from "../../../generated/prisma";
 import { DEMO_PASSWORD } from "./accounts";
 import { GRADE10_SUBJECTS, type DemoSubject } from "./grade10";
+import { UNIT_QUIZZES } from "./grade10-quiz";
 
 /**
  * The seed was written as a script against one module-level client. Rather
@@ -492,6 +495,9 @@ async function build() {
   // --- Curriculum -----------------------------------------------------------
   // Every subject: units 1-3 finished, unit 4 being taught now, the rest
   // still to come. Each lesson has a reading and a self-check to answer.
+  // Rows are built in memory with their ids and inserted in bulk: the demo
+  // reset must finish inside the hosting time limit, and one round trip per
+  // row would not.
   const sectionsOf: Record<DemoSubject["key"], string[]> = {
     SCI: [bioSec1.id, bioSec2.id, anatSec.id],
     MATH: [precalcSec.id],
@@ -500,72 +506,199 @@ async function build() {
     AP: [apushSec.id],
   };
   const unitsBy = new Map<DemoSubject["key"], Array<{ id: string }>>();
+  const unitRows: Prisma.UnitCreateManyInput[] = [];
+  const lessonRows: Prisma.LessonCreateManyInput[] = [];
+  const lessonSectionRows: Prisma.LessonSectionCreateManyInput[] = [];
+  const pacingRows: Prisma.SectionPacingCreateManyInput[] = [];
 
   for (const subject of GRADE10_SUBJECTS) {
     const created = [];
     for (const [index, plan] of subject.units.entries()) {
-      const unit = await db.unit.create({
-        data: {
-          courseId: courses.get(subject.key)!,
-          order: index + 1,
-          title: `Unit ${index + 1}: ${plan.title}`,
-          description: plan.description,
-          examDate: index === 3 ? at(9, 8, 0) : undefined,
-        },
+      const unitId = randomUUID();
+      unitRows.push({
+        id: unitId,
+        courseId: courses.get(subject.key)!,
+        order: index + 1,
+        title: `Unit ${index + 1}: ${plan.title}`,
+        description: plan.description,
+        examDate: index === 3 ? at(9, 8, 0) : undefined,
       });
-      created.push(unit);
+      created.push({ id: unitId });
 
       for (const [lessonIndex, item] of plan.lessons.entries()) {
-        await db.lesson.create({
-          data: {
-            unitId: unit.id,
-            order: lessonIndex + 1,
-            title: item.title,
-            summary: item.summary,
-            estimatedMinutes: 40,
-            sections: {
-              create: [
-                {
-                  kind: "READING",
-                  order: 0,
-                  title: "Reading",
-                  body: item.reading,
-                },
-                {
-                  kind: "SELF_CHECK",
-                  order: 1,
-                  title: "Self-Check",
-                  body: item.questions
-                    .map((question, n) => `${n + 1}. ${question}`)
-                    .join("\n"),
-                },
-              ],
-            },
-          },
+        const lessonId = randomUUID();
+        lessonRows.push({
+          id: lessonId,
+          unitId,
+          order: lessonIndex + 1,
+          title: item.title,
+          summary: item.summary,
+          estimatedMinutes: 40,
         });
+        lessonSectionRows.push(
+          {
+            lessonId,
+            kind: "READING",
+            order: 0,
+            title: "Reading",
+            body: item.reading,
+          },
+          {
+            lessonId,
+            kind: "SELF_CHECK",
+            order: 1,
+            title: "Self-Check",
+            body: item.questions
+              .map((question, n) => `${n + 1}. ${question}`)
+              .join("\n"),
+          },
+        );
       }
 
       for (const sectionId of sectionsOf[subject.key]) {
-        await db.sectionPacing.create({
-          data: {
-            sectionId,
-            unitId: unit.id,
-            status:
-              index < 3
-                ? "COMPLETED"
-                : index === 3
-                  ? "IN_PROGRESS"
-                  : "NOT_STARTED",
-            startedAt: index <= 3 ? at(-30 + index * 6) : null,
-            completedAt: index < 3 ? at(-25 + index * 6) : null,
-          },
+        pacingRows.push({
+          sectionId,
+          unitId,
+          status:
+            index < 3
+              ? "COMPLETED"
+              : index === 3
+                ? "IN_PROGRESS"
+                : "NOT_STARTED",
+          startedAt: index <= 3 ? at(-30 + index * 6) : null,
+          completedAt: index < 3 ? at(-25 + index * 6) : null,
         });
       }
     }
     unitsBy.set(subject.key, created);
   }
+  await db.unit.createMany({ data: unitRows });
+  await db.lesson.createMany({ data: lessonRows });
+  await db.lessonSection.createMany({ data: lessonSectionRows });
+  await db.sectionPacing.createMany({ data: pacingRows });
+
   const unit4 = unitsBy.get("SCI")![3]!;
   const currentUnit = (key: DemoSubject["key"]) => unitsBy.get(key)![3]!.id;
+
+  // --- Unit questions -------------------------------------------------------
+  // Every unit ends with five multiple-choice questions, answered after its
+  // discussion. Finished units already have every student's result; in the
+  // current unit the first two students on each roster have answered.
+  const LABELS = ["A", "B", "C", "D"];
+  const rosterRows = await db.enrollment.findMany({
+    orderBy: { seatNo: "asc" },
+    select: { sectionId: true, studentId: true, currentPercent: true },
+  });
+  const quizRows: Prisma.AssessmentCreateManyInput[] = [];
+  const questionRows: Prisma.QuestionCreateManyInput[] = [];
+  const optionRows: Prisma.QuestionOptionCreateManyInput[] = [];
+  const attemptRows: Prisma.AssessmentAttemptCreateManyInput[] = [];
+  const responseRows: Prisma.QuestionResponseCreateManyInput[] = [];
+
+  for (const subject of GRADE10_SUBJECTS) {
+    for (const [unitIndex, unit] of unitsBy.get(subject.key)!.entries()) {
+      const quiz = UNIT_QUIZZES[subject.key][unitIndex];
+      if (!quiz) continue;
+
+      for (const sectionId of sectionsOf[subject.key]) {
+        const assessmentId = randomUUID();
+        quizRows.push({
+          id: assessmentId,
+          sectionId,
+          unitId: unit.id,
+          title: `Unit ${unitIndex + 1} Questions`,
+          instructions:
+            "Read the unit discussion first, then answer all five questions. You have two tries; your best score counts.",
+          totalPoints: quiz.length,
+          maxAttempts: 2,
+          allowScratchpad: false,
+          publishedAt: at(-40),
+        });
+
+        // Per question: its id, the right option and one wrong option.
+        const keys = quiz.map((question, n) => {
+          const questionId = randomUUID();
+          questionRows.push({
+            id: questionId,
+            assessmentId,
+            order: n + 1,
+            type: "MULTIPLE_CHOICE",
+            prompt: question.q,
+            points: 1,
+            explanation: question.why,
+          });
+          // Spread the right answer across A-D instead of always A.
+          const correctAt = (unitIndex + n * 3) % 4;
+          const choices = question.choices.filter(
+            (_, k) => k !== question.answer,
+          );
+          choices.splice(correctAt, 0, question.choices[question.answer]);
+          const optionIds = choices.map((text, k) => {
+            const optionId = randomUUID();
+            optionRows.push({
+              id: optionId,
+              questionId,
+              label: LABELS[k]!,
+              text,
+              isCorrect: k === correctAt,
+              order: k,
+            });
+            return optionId;
+          });
+          return {
+            questionId,
+            right: optionIds[correctAt]!,
+            wrong: optionIds[(correctAt + 1) % 4]!,
+          };
+        });
+
+        if (unitIndex > 3) continue;
+        const roster = rosterRows.filter((row) => row.sectionId === sectionId);
+        const answered = unitIndex < 3 ? roster : roster.slice(0, 2);
+        for (const [seat, entry] of answered.entries()) {
+          const percent = entry.currentPercent ?? 80;
+          const correctCount = Math.max(
+            2,
+            Math.min(5, Math.round(percent / 20) - ((unitIndex + seat) % 2)),
+          );
+          const submittedAt = at(
+            -25 + unitIndex * 6 - (unitIndex === 3 ? 0 : 1),
+            19,
+            seat * 7,
+          );
+          const attemptId = randomUUID();
+          attemptRows.push({
+            id: attemptId,
+            assessmentId,
+            studentId: entry.studentId,
+            attempt: 1,
+            status: "GRADED",
+            startedAt: new Date(submittedAt.getTime() - 9 * 60_000),
+            submittedAt,
+            autoScore: correctCount,
+            totalScore: correctCount,
+          });
+          for (const [n, key] of keys.entries()) {
+            const right = n < correctCount;
+            responseRows.push({
+              attemptId,
+              questionId: key.questionId,
+              selectedOptionIds: [right ? key.right : key.wrong],
+              isAnswered: true,
+              isCorrect: right,
+              pointsAwarded: right ? 1 : 0,
+              answeredAt: submittedAt,
+            });
+          }
+        }
+      }
+    }
+  }
+  await db.assessment.createMany({ data: quizRows });
+  await db.question.createMany({ data: questionRows });
+  await db.questionOption.createMany({ data: optionRows });
+  await db.assessmentAttempt.createMany({ data: attemptRows });
+  await db.questionResponse.createMany({ data: responseRows });
 
   const lesson41 = await db.lesson.create({
     data: {

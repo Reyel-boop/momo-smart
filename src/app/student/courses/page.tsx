@@ -13,6 +13,10 @@ import { LecturePlayer } from "./_components/lecture-player";
 import { LessonContent } from "./_components/lesson-content";
 import { LessonHeader, LockedLesson } from "./_components/lesson-header";
 import { UnitPlan } from "./_components/unit-plan";
+import {
+  AllUnits,
+  UnitQuestionsCallout,
+} from "./_components/unit-questions-links";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
 
@@ -57,15 +61,19 @@ export default async function StudentCourses({
 
   const section =
     sections.find((s) => s.course.id === lesson.unit.course.id) ?? null;
-  const [viewers, officeHours, sectionWork] = await Promise.all([
-    api.lesson.liveViewerCount({ lessonId: lesson.id }),
-    section
-      ? api.calendar.officeHours({ teacherId: section.teacher.id })
-      : Promise.resolve([]),
-    section
-      ? api.assignment.listForSection({ sectionId: section.id })
-      : Promise.resolve([]),
-  ]);
+  const [viewers, officeHours, sectionWork, units, unitQuizzes] =
+    await Promise.all([
+      api.lesson.liveViewerCount({ lessonId: lesson.id }),
+      section
+        ? api.calendar.officeHours({ teacherId: section.teacher.id })
+        : Promise.resolve([]),
+      section
+        ? api.assignment.listForSection({ sectionId: section.id })
+        : Promise.resolve([]),
+      api.course.syllabus({ courseId: lesson.unit.course.id }),
+      api.assessment.unitQuizzes({ courseId: lesson.unit.course.id }),
+    ]);
+  const unitQuiz = unitQuizzes.find((quiz) => quiz.unitId === lesson.unit.id);
   const unitWork = sectionWork.filter(
     (work) => work.unit?.id === lesson.unit.id,
   );
@@ -128,12 +136,23 @@ export default async function StudentCourses({
                 viewers={viewers}
               />
               <LessonContent lesson={lesson} />
+              {unitQuiz && (
+                <UnitQuestionsCallout
+                  unitTitle={lesson.unit.title}
+                  quiz={unitQuiz}
+                />
+              )}
             </>
           )}
         </div>
 
         <div className="min-w-0 space-y-6">
           <UnitPlan lesson={lesson} unitWork={unitWork} now={now} />
+          <AllUnits
+            units={units}
+            quizzes={unitQuizzes}
+            currentUnitId={lesson.unit.id}
+          />
           {section && (
             <InstructorCard
               section={section}

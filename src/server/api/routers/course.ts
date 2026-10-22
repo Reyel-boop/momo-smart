@@ -164,6 +164,33 @@ export const courseRouter = createTRPCRouter({
                 sectionId: true,
               },
             },
+            // "Unit Questions": untimed quizzes with no gradebook assignment.
+            assessments: {
+              where: { sectionId: { in: sectionIds }, assignmentId: null },
+              select: {
+                id: true,
+                sectionId: true,
+                totalPoints: true,
+                maxAttempts: true,
+                questions: {
+                  orderBy: { order: "asc" },
+                  select: {
+                    id: true,
+                    order: true,
+                    prompt: true,
+                    explanation: true,
+                    options: {
+                      orderBy: { order: "asc" },
+                      select: { label: true, text: true, isCorrect: true },
+                    },
+                  },
+                },
+                attempts: {
+                  where: { status: "GRADED" },
+                  select: { studentId: true, totalScore: true },
+                },
+              },
+            },
           },
         },
       },
@@ -185,7 +212,37 @@ export const courseRouter = createTRPCRouter({
               : statuses.includes("COMPLETED")
                 ? "IN_PROGRESS"
                 : "NOT_STARTED";
-        return { ...unit, status };
+        // Every section answers the same questions; list them once, then
+        // each section's results (best try per student).
+        const { assessments, ...rest } = unit;
+        const questions = assessments[0]?.questions ?? [];
+        const results = assessments.map((quiz) => {
+          const best = new Map<string, number>();
+          for (const attempt of quiz.attempts) {
+            const score = attempt.totalScore ?? 0;
+            best.set(
+              attempt.studentId,
+              Math.max(best.get(attempt.studentId) ?? 0, score),
+            );
+          }
+          const scores = [...best.values()];
+          const section = courseSections.find((s) => s.id === quiz.sectionId);
+          return {
+            assessmentId: quiz.id,
+            sectionCode: section?.code ?? "",
+            studentCount: section?._count.enrollments ?? 0,
+            answered: scores.length,
+            average:
+              scores.length > 0
+                ? Math.round(
+                    (scores.reduce((sum, s) => sum + s, 0) / scores.length) *
+                      10,
+                  ) / 10
+                : null,
+            totalPoints: quiz.totalPoints,
+          };
+        });
+        return { ...rest, status, questions, results };
       });
 
       return {

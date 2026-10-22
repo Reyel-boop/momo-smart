@@ -293,6 +293,13 @@ export default async function CoursesPage({
                               </p>
                             )}
                           </div>
+
+                          {unit.questions.length > 0 && (
+                            <UnitQuestions
+                              questions={unit.questions}
+                              results={unit.results}
+                            />
+                          )}
                         </div>
                       </details>
                     </li>
@@ -317,6 +324,84 @@ export default async function CoursesPage({
           </Card>
         </>
       )}
+    </div>
+  );
+}
+
+type Unit = Awaited<
+  ReturnType<typeof api.course.teachingUnits>
+>[number]["units"][number];
+
+/** The unit's closing questions, each section's results and the answer key. */
+function UnitQuestions({
+  questions,
+  results,
+}: {
+  questions: Unit["questions"];
+  results: Unit["results"];
+}) {
+  return (
+    <div className="border-line bg-surface rounded-xl border lg:col-span-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <div>
+          <p className="text-ink flex items-center gap-1.5 text-sm font-bold">
+            <ClipboardIcon className="text-brand size-4" />
+            Unit Questions · {questions.length} items
+          </p>
+          <p className="text-muted mt-0.5 text-xs">
+            Students answer these after the discussion. Two tries, best score
+            counts.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {results.map((result) => (
+            <span
+              key={result.assessmentId}
+              className="bg-canvas text-ink rounded-lg px-3 py-1.5 text-xs font-semibold"
+            >
+              {result.sectionCode}: {result.answered}/{result.studentCount}{" "}
+              answered
+              {result.average !== null &&
+                ` · avg ${result.average}/${result.totalPoints}`}
+            </span>
+          ))}
+        </div>
+      </div>
+      <details className="group/questions border-line border-t">
+        <summary className="text-brand flex cursor-pointer list-none items-center gap-1 px-4 py-2.5 text-xs font-bold [&::-webkit-details-marker]:hidden">
+          Show questions and answer key
+          <ChevronDownIcon className="size-3.5 transition group-open/questions:rotate-180" />
+        </summary>
+        <ol className="space-y-3 px-4 pb-4">
+          {questions.map((question) => (
+            <li key={question.id} className="text-sm">
+              <p className="text-ink font-semibold">
+                {question.order}. {question.prompt}
+              </p>
+              <ul className="mt-1.5 grid gap-1 sm:grid-cols-2">
+                {question.options.map((option) => (
+                  <li
+                    key={option.label}
+                    className={`rounded-lg px-2.5 py-1.5 text-xs ${
+                      option.isCorrect
+                        ? "bg-emerald-50 font-bold text-emerald-700"
+                        : "text-muted"
+                    }`}
+                  >
+                    {option.label}. {option.text}
+                    {option.isCorrect && " ✓"}
+                  </li>
+                ))}
+              </ul>
+              {question.explanation && (
+                <p className="text-muted mt-1 text-xs italic">
+                  {question.explanation}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </details>
     </div>
   );
 }

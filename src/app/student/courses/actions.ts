@@ -34,3 +34,27 @@ export async function addLessonNote(
   });
   revalidatePath("/student/courses");
 }
+
+/** Submits one try at a unit's questions; returns the score or the reason it failed. */
+export async function submitUnitQuestions(
+  assessmentId: string,
+  answers: Record<string, string>,
+): Promise<
+  | { ok: true; score: number; totalPoints: number; triesLeft: number }
+  | { ok: false; error: string }
+> {
+  try {
+    const result = await api.assessment.submitUnitQuiz({
+      assessmentId,
+      answers,
+    });
+    revalidatePath("/student", "layout");
+    return { ok: true, ...result };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error ? error.message : "Could not submit answers.",
+    };
+  }
+}

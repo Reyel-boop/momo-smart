@@ -757,6 +757,245 @@ export const assessmentRouter = createTRPCRouter({
       return attempt;
     }),
 
+  // --- Unit questions (untimed, auto-scored, answered after a unit) ---------
+
+  /** The "Unit Questions" of each unit in a course, with the caller's best score. */
+  unitQuizzes: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const quizzes = await ctx.db.assessment.findMany({
+        where: {
+          unitId: { not: null },
+          assignmentId: null,
+          publishedAt: { not: null },
+          unit: { courseId: input.courseId },
+          section: {
+            enrollments: {
+              some: { studentId: ctx.studentId, status: "ACTIVE" },
+            },
+          },
+        },
+        orderBy: { unit: { order: "asc" } },
+        select: {
+          id: true,
+          unitId: true,
+          title: true,
+          totalPoints: true,
+          maxAttempts: true,
+          _count: { select: { questions: true } },
+          attempts: {
+            where: { studentId: ctx.studentId, status: "GRADED" },
+            select: { totalScore: true },
+          },
+        },
+      });
+
+      return quizzes.map(({ attempts, _count, ...quiz }) => ({
+        ...quiz,
+        questionCount: _count.questions,
+        attemptsUsed: attempts.length,
+        bestScore:
+          attempts.length > 0
+            ? Math.max(...attempts.map((a) => a.totalScore ?? 0))
+            : null,
+      }));
+    }),
+
+  /**
+   * One unit's questions for the student. Correct answers and explanations
+   * are only included once every try has been used.
+   */
+  unitQuiz: studentProcedure
+    .input(z.object({ assessmentId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const quiz = await ctx.db.assessment.findFirst({
+        where: {
+          id: input.assessmentId,
+          unitId: { not: null },
+          assignmentId: null,
+          publishedAt: { not: null },
+        },
+        select: {
+          id: true,
+          sectionId: true,
+          title: true,
+          instructions: true,
+          totalPoints: true,
+          maxAttempts: true,
+          unit: {
+            select: {
+              id: true,
+              order: true,
+              title: true,
+              course: { select: { id: true, name: true } },
+              lessons: {
+                where: { isPublished: true },
+                orderBy: { order: "asc" },
+                select: { id: true, order: true, title: true },
+              },
+            },
+          },
+          questions: {
+            orderBy: { order: "asc" },
+            select: {
+              id: true,
+              order: true,
+              prompt: true,
+              points: true,
+              explanation: true,
+              options: {
+                orderBy: { order: "asc" },
+                select: { id: true, label: true, text: true, isCorrect: true },
+              },
+            },
+          },
+          attempts: {
+            where: { studentId: ctx.studentId, status: "GRADED" },
+            orderBy: { attempt: "desc" },
+            select: {
+              id: true,
+              attempt: true,
+              totalScore: true,
+              submittedAt: true,
+              responses: {
+                select: {
+                  questionId: true,
+                  selectedOptionIds: true,
+                  isCorrect: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!quiz?.unit) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Quiz not found." });
+      }
+      await assertEnrolled(ctx.db, ctx.session.user, quiz.sectionId);
+
+      const triesLeft = Math.max(0, quiz.maxAttempts - quiz.attempts.length);
+      const reveal = triesLeft === 0;
+      const { attempts, unit, ...rest } = quiz;
+
+      return {
+        ...rest,
+        unit,
+        triesLeft,
+        revealed: reveal,
+        bestScore:
+          attempts.length > 0
+            ? Math.max(...attempts.map((a) => a.totalScore ?? 0))
+            : null,
+        latest: attempts[0] ?? null,
+        questions: quiz.questions.map((question) => ({
+          ...question,
+          explanation: reveal ? question.explanation : null,
+          options: question.options.map(({ isCorrect, ...option }) => ({
+            ...option,
+            isCorrect: reveal ? isCorrect : null,
+          })),
+        })),
+      };
+    }),
+
+  /** Scores a whole set of unit answers in one go and records the try. */
+  submitUnitQuiz: studentProcedure
+    .input(
+      z.object({
+        assessmentId: z.string(),
+        answers: z.record(z.string(), z.string()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const quiz = await ctx.db.assessment.findFirst({
+        where: {
+          id: input.assessmentId,
+          unitId: { not: null },
+          assignmentId: null,
+          publishedAt: { not: null },
+        },
+        select: {
+          id: true,
+          sectionId: true,
+          maxAttempts: true,
+          totalPoints: true,
+          questions: {
+            select: {
+              id: true,
+              points: true,
+              options: { select: { id: true, isCorrect: true } },
+            },
+          },
+          _count: {
+            select: { attempts: { where: { studentId: ctx.studentId } } },
+          },
+        },
+      });
+      if (!quiz) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Quiz not found." });
+      }
+      await assertEnrolled(ctx.db, ctx.session.user, quiz.sectionId);
+
+      const used = quiz._count.attempts;
+      if (used >= quiz.maxAttempts) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You have used all your tries for these questions.",
+        });
+      }
+      const missing = quiz.questions.filter((q) => !input.answers[q.id]);
+      if (missing.length > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Answer all questions first (${missing.length} left).`,
+        });
+      }
+
+      const now = new Date();
+      let score = 0;
+      const responses = quiz.questions.map((question) => {
+        const chosen = input.answers[question.id]!;
+        const option = question.options.find((o) => o.id === chosen);
+        if (!option) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "An answer does not belong to its question.",
+          });
+        }
+        const points = option.isCorrect ? question.points : 0;
+        score += points;
+        return {
+          questionId: question.id,
+          selectedOptionIds: [chosen],
+          isAnswered: true,
+          isCorrect: option.isCorrect,
+          pointsAwarded: points,
+          answeredAt: now,
+        };
+      });
+
+      const totalScore = round(score, 2);
+      await ctx.db.assessmentAttempt.create({
+        data: {
+          assessmentId: quiz.id,
+          studentId: ctx.studentId,
+          attempt: used + 1,
+          status: "GRADED",
+          startedAt: now,
+          submittedAt: now,
+          autoScore: totalScore,
+          totalScore,
+          responses: { create: responses },
+        },
+      });
+
+      return {
+        score: totalScore,
+        totalPoints: quiz.totalPoints,
+        triesLeft: quiz.maxAttempts - used - 1,
+      };
+    }),
+
   // --- Teacher side ---------------------------------------------------------
 
   create: teacherProcedure
