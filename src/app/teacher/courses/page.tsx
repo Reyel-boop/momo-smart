@@ -15,6 +15,7 @@ import { api } from "~/trpc/server";
 import { humanise, longDate } from "~/app/_components/format";
 import { PageHeader } from "../_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
+import { LectureEditor } from "./_components/lecture-editor";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -242,6 +243,11 @@ export default async function CoursesPage({
                                         </span>
                                       )}
                                     </p>
+                                    <LectureEditor
+                                      lessonId={lesson.id}
+                                      videoUrl={lesson.videoUrl}
+                                      lecture={lesson.sections[0]?.body ?? null}
+                                    />
                                   </li>
                                 ))}
                               </ul>

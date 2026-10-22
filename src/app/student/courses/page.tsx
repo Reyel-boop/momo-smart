@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ChevronRightIcon } from "~/app/_components/icons";
 import { Card, EmptyState } from "~/app/_components/ui";
 import { teacherFullName } from "~/app/student/_components/format";
+import { youTubeId } from "~/lib/video";
 import { api } from "~/trpc/server";
 import type { RouterOutputs } from "~/trpc/react";
 import { InstructorCard } from "./_components/instructor-card";
@@ -17,6 +18,7 @@ import {
   AllUnits,
   UnitQuestionsCallout,
 } from "./_components/unit-questions-links";
+import { YouTubeLecture } from "./_components/youtube-lecture";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
 
@@ -80,6 +82,11 @@ export default async function StudentCourses({
   const now = new Date();
   const lessonNumber = `${lesson.unit.order}.${lesson.order}`;
   const teacher = section ? teacherFullName(section.teacher.user) : null;
+  const lectureHeading = `${lesson.unit.course.name} · Lesson ${lessonNumber}: ${lesson.title}`;
+  const lectureBadge = section
+    ? `Lecture • ${section.teacher.user.name?.split(" ").slice(-1)[0] ?? "Instructor"}`
+    : "Lecture";
+  const youTubeVideo = youTubeId(lesson.videoUrl);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
@@ -118,15 +125,24 @@ export default async function StudentCourses({
             <LockedLesson lesson={lesson} />
           ) : (
             <>
+              {youTubeVideo ? (
+                <YouTubeLecture
+                  key={lesson.id}
+                  lessonId={lesson.id}
+                  videoId={youTubeVideo}
+                  heading={lectureHeading}
+                  badge={lectureBadge}
+                  startAt={lesson.myProgress?.positionSeconds ?? 0}
+                  markers={lesson.markers}
+                  notes={lesson.myNotes}
+                  viewers={viewers}
+                />
+              ) : (
               <LecturePlayer
                 key={lesson.id}
                 lessonId={lesson.id}
-                heading={`${lesson.unit.course.name} · Lesson ${lessonNumber}: ${lesson.title}`}
-                badge={
-                  section
-                    ? `Lecture Stream • ${section.teacher.user.name?.split(" ").slice(-1)[0] ?? "Instructor"}`
-                    : "Lecture Stream"
-                }
+                heading={lectureHeading}
+                badge={lectureBadge}
                 videoUrl={lesson.videoUrl}
                 transcriptUrl={lesson.transcriptUrl}
                 durationSeconds={lesson.videoDurationSeconds}
@@ -135,6 +151,7 @@ export default async function StudentCourses({
                 notes={lesson.myNotes}
                 viewers={viewers}
               />
+              )}
               <LessonContent lesson={lesson} />
               {unitQuiz && (
                 <UnitQuestionsCallout

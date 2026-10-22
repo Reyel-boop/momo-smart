@@ -12,8 +12,13 @@ import { api } from "~/trpc/server";
 export async function saveLessonProgress(
   lessonId: string,
   positionSeconds: number,
+  durationSeconds: number | null = null,
 ) {
-  await api.lesson.saveProgress({ lessonId, positionSeconds });
+  await api.lesson.saveProgress({
+    lessonId,
+    positionSeconds,
+    durationSeconds: durationSeconds ?? undefined,
+  });
 }
 
 /** The "Mark as Completed" checkbox; also moves the dashboard and syllabus. */

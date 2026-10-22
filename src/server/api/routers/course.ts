@@ -7,6 +7,7 @@ import {
   protectedProcedure,
   teacherProcedure,
 } from "~/server/api/trpc";
+import { LECTURE_SECTION_TITLE } from "~/lib/video";
 import {
   assertSectionAccess,
   assertTeachesSection,
@@ -149,6 +150,12 @@ export const courseRouter = createTRPCRouter({
                 summary: true,
                 estimatedMinutes: true,
                 isPublished: true,
+                videoUrl: true,
+                sections: {
+                  where: { title: LECTURE_SECTION_TITLE },
+                  take: 1,
+                  select: { body: true },
+                },
                 _count: { select: { sections: true } },
               },
             },

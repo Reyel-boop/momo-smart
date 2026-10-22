@@ -20,6 +20,8 @@ import type { Prisma, PrismaClient } from "../../../generated/prisma";
 import { DEMO_PASSWORD } from "./accounts";
 import { GRADE10_SUBJECTS, type DemoSubject } from "./grade10";
 import { UNIT_QUIZZES } from "./grade10-quiz";
+import { GRADE10_LECTURES, lectureVideoUrl } from "./lectures";
+import { LECTURE_SECTION_TITLE } from "../../lib/video";
 
 /**
  * The seed was written as a script against one module-level client. Rather
@@ -41,6 +43,24 @@ const at = (days: number, hours = 0, minutes = 0) => {
 };
 const dateOnly = (date: Date) =>
   new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+
+/** Lecture video and written-lecture tab for a lesson written out by hand. */
+const demoLecture = (title: string) => {
+  const lecture = GRADE10_LECTURES[title];
+  if (!lecture) throw new Error(`No demo lecture for "${title}".`);
+  return lecture;
+};
+const lectureUrlFor = (title: string) => lectureVideoUrl(demoLecture(title));
+const lectureSection = (title: string) => ({
+  kind: "READING" as const,
+  order: -1,
+  title: LECTURE_SECTION_TITLE,
+  body: demoLecture(title).lecture,
+});
+const lectureFields = (title: string) => ({
+  videoUrl: lectureUrlFor(title),
+  sections: { create: [lectureSection(title)] },
+});
 
 const DAYS = [
   "SUNDAY",
@@ -494,7 +514,8 @@ async function build() {
 
   // --- Curriculum -----------------------------------------------------------
   // Every subject: units 1-3 finished, unit 4 being taught now, the rest
-  // still to come. Each lesson has a reading and a self-check to answer.
+  // still to come. Each lesson has a lecture (video + written lecture), a
+  // reading and a self-check to answer.
   // Rows are built in memory with their ids and inserted in bulk: the demo
   // reset must finish inside the hosting time limit, and one round trip per
   // row would not.
@@ -527,6 +548,7 @@ async function build() {
 
       for (const [lessonIndex, item] of plan.lessons.entries()) {
         const lessonId = randomUUID();
+        const lecture = GRADE10_LECTURES[item.title];
         lessonRows.push({
           id: lessonId,
           unitId,
@@ -534,19 +556,29 @@ async function build() {
           title: item.title,
           summary: item.summary,
           estimatedMinutes: 40,
+          videoUrl: lecture ? lectureVideoUrl(lecture) : null,
         });
+        if (lecture) {
+          lessonSectionRows.push({
+            lessonId,
+            kind: "READING",
+            order: 0,
+            title: LECTURE_SECTION_TITLE,
+            body: lecture.lecture,
+          });
+        }
         lessonSectionRows.push(
           {
             lessonId,
             kind: "READING",
-            order: 0,
+            order: 1,
             title: "Reading",
             body: item.reading,
           },
           {
             lessonId,
             kind: "SELF_CHECK",
-            order: 1,
+            order: 2,
             title: "Self-Check",
             body: item.questions
               .map((question, n) => `${n + 1}. ${question}`)
@@ -707,8 +739,7 @@ async function build() {
       title: "Intro to Energetics",
       summary: "Enzymatic kinetics, free energy, Gibbs law.",
       estimatedMinutes: 35,
-      videoUrl: "https://media.momosmart.edu/apbio/4-1.m3u8",
-      videoDurationSeconds: 2100,
+      ...lectureFields("Intro to Energetics"),
     },
   });
 
@@ -719,11 +750,10 @@ async function build() {
       title: "Glycolysis and the Citric Acid Cycle",
       summary: "Substrate-level phosphorylation, NADH generation.",
       estimatedMinutes: 45,
-      videoUrl: "https://media.momosmart.edu/apbio/4-2.m3u8",
-      videoDurationSeconds: 1450,
-      transcriptUrl: "https://media.momosmart.edu/apbio/4-2.vtt",
+      videoUrl: lectureUrlFor("Glycolysis and the Citric Acid Cycle"),
       sections: {
         create: [
+          lectureSection("Glycolysis and the Citric Acid Cycle"),
           {
             kind: "READING",
             order: 0,
@@ -758,12 +788,6 @@ async function build() {
           },
         ],
       },
-      markers: {
-        create: [
-          { label: "Substrate-Level Phosphorylation", positionSeconds: 855 },
-          { label: "Citric Acid Cycle Overview", positionSeconds: 1120 },
-        ],
-      },
     },
   });
 
@@ -774,8 +798,7 @@ async function build() {
       title: "Electron Transport Chain",
       summary: "Chemiosmosis, proton gradient, oxidative phosphorylation.",
       estimatedMinutes: 50,
-      videoUrl: "https://media.momosmart.edu/apbio/4-3.m3u8",
-      videoDurationSeconds: 3000,
+      ...lectureFields("Electron Transport Chain"),
       // Gated behind completing 4.2.
       prerequisiteId: lesson42.id,
     },

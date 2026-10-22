@@ -7,6 +7,7 @@ import {
   studentProcedure,
   teacherProcedure,
 } from "~/server/api/trpc";
+import { LECTURE_SECTION_TITLE, normaliseLectureUrl } from "~/lib/video";
 import { assertLessonAccess } from "~/server/lib/permissions";
 import type { PrismaClient } from "../../../../generated/prisma";
 
@@ -459,6 +460,82 @@ export const lessonRouter = createTRPCRouter({
       return id
         ? ctx.db.lessonSection.update({ where: { id }, data })
         : ctx.db.lessonSection.create({ data });
+    }),
+
+  /**
+   * The teacher's lecture for a lesson: a video link (YouTube or a video
+   * file) and the written lecture shown as the first lesson tab. Empty
+   * values remove them.
+   */
+  setLecture: teacherProcedure
+    .input(
+      z.object({
+        lessonId: z.string(),
+        videoUrl: z.string().trim().max(2000),
+        lecture: z.string().trim().max(50_000),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertLessonAccess(ctx.db, ctx.session.user, input.lessonId);
+
+      let videoUrl: string | null = null;
+      if (input.videoUrl) {
+        videoUrl = normaliseLectureUrl(input.videoUrl);
+        if (!videoUrl) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Paste a YouTube link, or a direct link to a video file (.mp4, .webm).",
+          });
+        }
+      }
+
+      const current = await ctx.db.lesson.findUniqueOrThrow({
+        where: { id: input.lessonId },
+        select: {
+          videoUrl: true,
+          sections: { select: { id: true, title: true, order: true } },
+        },
+      });
+      const existing = current.sections.find(
+        (section) => section.title === LECTURE_SECTION_TITLE,
+      );
+      // A new lecture goes before every other tab.
+      const firstOrder = Math.min(0, ...current.sections.map((s) => s.order));
+
+      await ctx.db.$transaction([
+        ctx.db.lesson.update({
+          where: { id: input.lessonId },
+          // The old video's length and captions don't belong to a new one.
+          data:
+            videoUrl === current.videoUrl
+              ? {}
+              : { videoUrl, videoDurationSeconds: null, transcriptUrl: null },
+        }),
+        ...(existing
+          ? [
+              input.lecture
+                ? ctx.db.lessonSection.update({
+                    where: { id: existing.id },
+                    data: { body: input.lecture },
+                  })
+                : ctx.db.lessonSection.delete({ where: { id: existing.id } }),
+            ]
+          : input.lecture
+            ? [
+                ctx.db.lessonSection.create({
+                  data: {
+                    lessonId: input.lessonId,
+                    kind: "READING",
+                    title: LECTURE_SECTION_TITLE,
+                    body: input.lecture,
+                    order: firstOrder - 1,
+                  },
+                }),
+              ]
+            : []),
+      ]);
+      return { videoUrl };
     }),
 
   addResource: teacherProcedure
