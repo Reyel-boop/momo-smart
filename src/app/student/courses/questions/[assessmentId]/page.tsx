@@ -60,7 +60,10 @@ export default async function UnitQuestionsPage({
             )}
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
-            <Pill tone="blue">{quiz.questions.length} questions</Pill>
+            <Pill tone="blue">
+              {quiz.questionCount} questions · {quiz.questionSeconds / 60} min
+              each
+            </Pill>
             <Pill tone={quiz.triesLeft > 0 ? "slate" : "amber"}>
               {quiz.triesLeft} of {quiz.maxAttempts} tries left
             </Pill>
@@ -95,14 +98,7 @@ export default async function UnitQuestionsPage({
       </Card>
 
       <UnitQuestionsForm
-        key={quiz.latest?.id ?? "new"}
-        assessmentId={quiz.id}
-        questions={quiz.questions}
-        latest={quiz.latest}
-        totalPoints={quiz.totalPoints}
-        triesLeft={quiz.triesLeft}
-        maxAttempts={quiz.maxAttempts}
-        revealed={quiz.revealed}
+        quiz={quiz}
         courseHref={`/student/courses?course=${unit.course.id}`}
       />
     </div>

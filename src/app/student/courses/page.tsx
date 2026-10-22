@@ -138,19 +138,19 @@ export default async function StudentCourses({
                   viewers={viewers}
                 />
               ) : (
-              <LecturePlayer
-                key={lesson.id}
-                lessonId={lesson.id}
-                heading={lectureHeading}
-                badge={lectureBadge}
-                videoUrl={lesson.videoUrl}
-                transcriptUrl={lesson.transcriptUrl}
-                durationSeconds={lesson.videoDurationSeconds}
-                startAt={lesson.myProgress?.positionSeconds ?? 0}
-                markers={lesson.markers}
-                notes={lesson.myNotes}
-                viewers={viewers}
-              />
+                <LecturePlayer
+                  key={lesson.id}
+                  lessonId={lesson.id}
+                  heading={lectureHeading}
+                  badge={lectureBadge}
+                  videoUrl={lesson.videoUrl}
+                  transcriptUrl={lesson.transcriptUrl}
+                  durationSeconds={lesson.videoDurationSeconds}
+                  startAt={lesson.myProgress?.positionSeconds ?? 0}
+                  markers={lesson.markers}
+                  notes={lesson.myNotes}
+                  viewers={viewers}
+                />
               )}
               <LessonContent lesson={lesson} />
               {unitQuiz && (

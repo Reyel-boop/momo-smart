@@ -757,7 +757,7 @@ export const assessmentRouter = createTRPCRouter({
       return attempt;
     }),
 
-  // --- Unit questions (untimed, auto-scored, answered after a unit) ---------
+  // --- Unit questions (2 minutes each, auto-scored, after a unit) ----------
 
   /** The "Unit Questions" of each unit in a course, with the caller's best score. */
   unitQuizzes: studentProcedure
@@ -802,8 +802,12 @@ export const assessmentRouter = createTRPCRouter({
     }),
 
   /**
-   * One unit's questions for the student. Correct answers and explanations
-   * are only included once every try has been used.
+   * One unit's questions for the student, answered one at a time against a
+   * per-question clock (see openUnitQuestion / answerUnitQuestion).
+   *
+   * Before a try is finished only the open question is sent, without its
+   * answer. Once the student has finished a try, the review of that try
+   * includes the correct choices and each question's rationale.
    */
   unitQuiz: studentProcedure
     .input(z.object({ assessmentId: z.string() }))
@@ -850,18 +854,25 @@ export const assessmentRouter = createTRPCRouter({
             },
           },
           attempts: {
-            where: { studentId: ctx.studentId, status: "GRADED" },
+            where: { studentId: ctx.studentId },
             orderBy: { attempt: "desc" },
             select: {
               id: true,
               attempt: true,
+              status: true,
               totalScore: true,
               submittedAt: true,
+              lastAutosaveAt: true,
               responses: {
                 select: {
                   questionId: true,
                   selectedOptionIds: true,
                   isCorrect: true,
+                },
+              },
+              _count: {
+                select: {
+                  proctorEvents: { where: { type: "TAB_SWITCH" } },
                 },
               },
             },
@@ -873,39 +884,74 @@ export const assessmentRouter = createTRPCRouter({
       }
       await assertEnrolled(ctx.db, ctx.session.user, quiz.sectionId);
 
-      const triesLeft = Math.max(0, quiz.maxAttempts - quiz.attempts.length);
-      const reveal = triesLeft === 0;
-      const { attempts, unit, ...rest } = quiz;
+      const { attempts, unit, questions, ...rest } = quiz;
+      const graded = attempts.filter((a) => a.status === "GRADED");
+      const running = attempts.find((a) => a.status === "IN_PROGRESS") ?? null;
+      const triesLeft = Math.max(0, quiz.maxAttempts - attempts.length);
+
+      // The question the running try is on: the first one not yet answered.
+      let current = null;
+      if (running) {
+        const answered = new Set(running.responses.map((r) => r.questionId));
+        const index = questions.findIndex((q) => !answered.has(q.id));
+        const question = questions[index];
+        if (question) {
+          const openedAt = running.lastAutosaveAt;
+          current = {
+            number: index + 1,
+            // Shown only once opened, so the clock is running while it's read.
+            question: openedAt
+              ? {
+                  id: question.id,
+                  prompt: question.prompt,
+                  options: question.options.map(({ isCorrect: _, ...o }) => o),
+                }
+              : null,
+            secondsLeft: openedAt ? secondsLeft(openedAt) : QUESTION_SECONDS,
+          };
+        }
+      }
 
       return {
         ...rest,
         unit,
+        questionCount: questions.length,
+        questionSeconds: QUESTION_SECONDS,
         triesLeft,
-        revealed: reveal,
         bestScore:
-          attempts.length > 0
-            ? Math.max(...attempts.map((a) => a.totalScore ?? 0))
+          graded.length > 0
+            ? Math.max(...graded.map((a) => a.totalScore ?? 0))
             : null,
-        latest: attempts[0] ?? null,
-        questions: quiz.questions.map((question) => ({
-          ...question,
-          explanation: reveal ? question.explanation : null,
-          options: question.options.map(({ isCorrect, ...option }) => ({
-            ...option,
-            isCorrect: reveal ? isCorrect : null,
-          })),
-        })),
+        running: running
+          ? {
+              id: running.id,
+              attempt: running.attempt,
+              answeredCount: running.responses.length,
+              score: running.responses.filter((r) => r.isCorrect).length,
+              focusLosses: running._count.proctorEvents,
+              current,
+            }
+          : null,
+        // The finished try under review, with answers and rationales.
+        latest: graded[0]
+          ? {
+              id: graded[0].id,
+              attempt: graded[0].attempt,
+              totalScore: graded[0].totalScore,
+              focusLosses: graded[0]._count.proctorEvents,
+              responses: graded[0].responses,
+            }
+          : null,
+        questions: graded.length > 0 ? questions : [],
       };
     }),
 
-  /** Scores a whole set of unit answers in one go and records the try. */
-  submitUnitQuiz: studentProcedure
-    .input(
-      z.object({
-        assessmentId: z.string(),
-        answers: z.record(z.string(), z.string()),
-      }),
-    )
+  /**
+   * Starts a try at a unit's questions, or returns the one already running.
+   * Starting does not open a question; the student does that when ready.
+   */
+  startUnitQuiz: studentProcedure
+    .input(z.object({ assessmentId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const quiz = await ctx.db.assessment.findFirst({
         where: {
@@ -918,16 +964,10 @@ export const assessmentRouter = createTRPCRouter({
           id: true,
           sectionId: true,
           maxAttempts: true,
-          totalPoints: true,
-          questions: {
-            select: {
-              id: true,
-              points: true,
-              options: { select: { id: true, isCorrect: true } },
-            },
-          },
-          _count: {
-            select: { attempts: { where: { studentId: ctx.studentId } } },
+          _count: { select: { questions: true } },
+          attempts: {
+            where: { studentId: ctx.studentId },
+            select: { id: true, status: true },
           },
         },
       });
@@ -936,64 +976,160 @@ export const assessmentRouter = createTRPCRouter({
       }
       await assertEnrolled(ctx.db, ctx.session.user, quiz.sectionId);
 
-      const used = quiz._count.attempts;
-      if (used >= quiz.maxAttempts) {
+      const running = quiz.attempts.find((a) => a.status === "IN_PROGRESS");
+      if (running) return { attemptId: running.id };
+      if (quiz.attempts.length >= quiz.maxAttempts) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You have used all your tries for these questions.",
         });
       }
-      const missing = quiz.questions.filter((q) => !input.answers[q.id]);
-      if (missing.length > 0) {
+
+      const attempt = await ctx.db.assessmentAttempt.create({
+        data: {
+          assessmentId: quiz.id,
+          studentId: ctx.studentId,
+          attempt: quiz.attempts.length + 1,
+          status: "IN_PROGRESS",
+        },
+        select: { id: true },
+      });
+      return { attemptId: attempt.id };
+    }),
+
+  /**
+   * Opens the next unanswered question and starts its clock. Opening the
+   * question that is already open keeps its original start time, so
+   * reloading the page never resets the clock.
+   */
+  openUnitQuestion: studentProcedure
+    .input(z.object({ attemptId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const attempt = await runningUnitAttempt(
+        ctx.db,
+        ctx.studentId,
+        input.attemptId,
+      );
+      if (!attempt.lastAutosaveAt) {
+        await ctx.db.assessmentAttempt.update({
+          where: { id: attempt.id },
+          data: { lastAutosaveAt: new Date() },
+        });
+      }
+      return { ok: true };
+    }),
+
+  /**
+   * Records the answer to the open question and returns whether it was
+   * right, the correct choice and the rationale. An answer that arrives after
+   * the question's time is up (or no answer at all) scores zero. Answering
+   * the last question finishes the try.
+   */
+  answerUnitQuestion: studentProcedure
+    .input(
+      z.object({
+        attemptId: z.string(),
+        questionId: z.string(),
+        optionId: z.string().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const attempt = await runningUnitAttempt(
+        ctx.db,
+        ctx.studentId,
+        input.attemptId,
+      );
+      const openedAt = attempt.lastAutosaveAt;
+      if (!openedAt) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Answer all questions first (${missing.length} left).`,
+          message: "Open the question before answering it.",
+        });
+      }
+      const { questions } = attempt.assessment;
+      const answered = new Set(attempt.responses.map((r) => r.questionId));
+      const index = questions.findIndex((q) => !answered.has(q.id));
+      const question = questions[index];
+      if (question?.id !== input.questionId) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "That question has already been answered.",
         });
       }
 
       const now = new Date();
-      let score = 0;
-      const responses = quiz.questions.map((question) => {
-        const chosen = input.answers[question.id]!;
-        const option = question.options.find((o) => o.id === chosen);
-        if (!option) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "An answer does not belong to its question.",
-          });
-        }
-        const points = option.isCorrect ? question.points : 0;
-        score += points;
-        return {
-          questionId: question.id,
-          selectedOptionIds: [chosen],
-          isAnswered: true,
-          isCorrect: option.isCorrect,
-          pointsAwarded: points,
-          answeredAt: now,
-        };
-      });
+      const timedOut =
+        now.getTime() - openedAt.getTime() >
+        (QUESTION_SECONDS + GRACE_SECONDS) * 1000;
+      const option =
+        !timedOut && input.optionId
+          ? question.options.find((o) => o.id === input.optionId)
+          : undefined;
+      if (input.optionId && !timedOut && !option) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "That answer does not belong to this question.",
+        });
+      }
+      const isCorrect = option?.isCorrect ?? false;
+      const points = isCorrect ? question.points : 0;
+      const finished = index === questions.length - 1;
 
-      const totalScore = round(score, 2);
-      await ctx.db.assessmentAttempt.create({
-        data: {
-          assessmentId: quiz.id,
-          studentId: ctx.studentId,
-          attempt: used + 1,
-          status: "GRADED",
-          startedAt: now,
-          submittedAt: now,
-          autoScore: totalScore,
-          totalScore,
-          responses: { create: responses },
-        },
-      });
+      const earned =
+        attempt.responses.reduce((sum, r) => sum + (r.pointsAwarded ?? 0), 0) +
+        points;
+      await ctx.db.$transaction([
+        ctx.db.questionResponse.create({
+          data: {
+            attemptId: attempt.id,
+            questionId: question.id,
+            selectedOptionIds: option ? [option.id] : [],
+            isAnswered: Boolean(option),
+            isCorrect,
+            pointsAwarded: points,
+            answeredAt: now,
+          },
+        }),
+        ctx.db.assessmentAttempt.update({
+          where: { id: attempt.id },
+          data: finished
+            ? {
+                lastAutosaveAt: null,
+                status: "GRADED",
+                submittedAt: now,
+                autoScore: round(earned, 2),
+                totalScore: round(earned, 2),
+              }
+            : { lastAutosaveAt: null },
+        }),
+      ]);
 
+      const correct = question.options.find((o) => o.isCorrect);
       return {
-        score: totalScore,
-        totalPoints: quiz.totalPoints,
-        triesLeft: quiz.maxAttempts - used - 1,
+        isCorrect,
+        timedOut: timedOut || !input.optionId,
+        chosen: option ? { label: option.label, text: option.text } : null,
+        correct: correct ? { label: correct.label, text: correct.text } : null,
+        explanation: question.explanation,
+        finished,
+        score: round(earned, 2),
+        totalPoints: attempt.assessment.totalPoints,
       };
+    }),
+
+  /** Logs the student leaving the quiz screen (another tab or window). */
+  reportUnitQuizFocusLoss: studentProcedure
+    .input(z.object({ attemptId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const attempt = await runningUnitAttempt(
+        ctx.db,
+        ctx.studentId,
+        input.attemptId,
+      );
+      await ctx.db.proctorEvent.create({
+        data: { attemptId: attempt.id, type: "TAB_SWITCH" },
+      });
+      return { ok: true };
     }),
 
   // --- Teacher side ---------------------------------------------------------
@@ -1420,4 +1556,67 @@ async function postAttemptToGradebook(
       `Assessment: ${assignment.title}`,
     );
   }
+}
+
+/** Each unit question must be answered within this many seconds. */
+const QUESTION_SECONDS = 120;
+/** Allowance for network delay before a late answer stops counting. */
+const GRACE_SECONDS = 5;
+
+/** Seconds left on a unit question opened at `openedAt`. */
+function secondsLeft(openedAt: Date) {
+  const elapsed = Math.floor((Date.now() - openedAt.getTime()) / 1000);
+  return Math.max(0, QUESTION_SECONDS - elapsed);
+}
+
+/**
+ * The student's running try at a unit's questions, with what scoring needs.
+ * `lastAutosaveAt` holds when the open question was shown; it is null
+ * between questions.
+ */
+async function runningUnitAttempt(
+  db: PrismaClient,
+  studentId: string,
+  attemptId: string,
+) {
+  const attempt = await db.assessmentAttempt.findFirst({
+    where: {
+      id: attemptId,
+      studentId,
+      assessment: { unitId: { not: null }, assignmentId: null },
+    },
+    select: {
+      id: true,
+      status: true,
+      lastAutosaveAt: true,
+      responses: { select: { questionId: true, pointsAwarded: true } },
+      assessment: {
+        select: {
+          totalPoints: true,
+          questions: {
+            orderBy: { order: "asc" },
+            select: {
+              id: true,
+              points: true,
+              explanation: true,
+              options: {
+                orderBy: { order: "asc" },
+                select: { id: true, label: true, text: true, isCorrect: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  if (!attempt) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Try not found." });
+  }
+  if (attempt.status !== "IN_PROGRESS") {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message: "This try is already finished.",
+    });
+  }
+  return attempt;
 }

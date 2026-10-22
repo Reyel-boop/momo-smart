@@ -207,10 +207,7 @@ export function YouTubeLecture({
       </div>
 
       <div className="relative aspect-video w-full bg-black">
-        <div
-          ref={mountRef}
-          className="absolute inset-0 [&_iframe]:size-full"
-        />
+        <div ref={mountRef} className="absolute inset-0 [&_iframe]:size-full" />
         {failed && (
           <div className="absolute inset-0 flex items-center justify-center p-6">
             <p className="rounded-lg bg-black/60 px-3 py-1.5 text-center text-xs text-white/85">

@@ -194,7 +194,15 @@ export const courseRouter = createTRPCRouter({
                 },
                 attempts: {
                   where: { status: "GRADED" },
-                  select: { studentId: true, totalScore: true },
+                  select: {
+                    studentId: true,
+                    totalScore: true,
+                    _count: {
+                      select: {
+                        proctorEvents: { where: { type: "TAB_SWITCH" } },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -247,6 +255,11 @@ export const courseRouter = createTRPCRouter({
                   ) / 10
                 : null,
             totalPoints: quiz.totalPoints,
+            // Times students left the screen mid-question (focus mode).
+            focusLosses: quiz.attempts.reduce(
+              (sum, a) => sum + a._count.proctorEvents,
+              0,
+            ),
           };
         });
         return { ...rest, status, questions, results };

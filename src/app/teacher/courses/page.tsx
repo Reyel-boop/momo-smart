@@ -355,8 +355,9 @@ function UnitQuestions({
             Unit Questions · {questions.length} items
           </p>
           <p className="text-muted mt-0.5 text-xs">
-            Students answer these after the discussion. Two tries, best score
-            counts.
+            Students answer these after the discussion, one at a time with 2
+            minutes each, and see the rationale after every answer. Two tries,
+            best score counts.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -369,6 +370,11 @@ function UnitQuestions({
               answered
               {result.average !== null &&
                 ` · avg ${result.average}/${result.totalPoints}`}
+              {result.focusLosses > 0 && (
+                <span className="ml-1 text-amber-700">
+                  · left the screen {result.focusLosses}×
+                </span>
+              )}
             </span>
           ))}
         </div>

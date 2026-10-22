@@ -40,26 +40,67 @@ export async function addLessonNote(
   revalidatePath("/student/courses");
 }
 
-/** Submits one try at a unit's questions; returns the score or the reason it failed. */
-export async function submitUnitQuestions(
+type Result<T> = ({ ok: true } & T) | { ok: false; error: string };
+
+const failure = (error: unknown, fallback: string) => ({
+  ok: false as const,
+  error: error instanceof Error ? error.message : fallback,
+});
+
+/** Starts (or resumes) a try at a unit's questions and opens question 1. */
+export async function startUnitQuestions(
   assessmentId: string,
-  answers: Record<string, string>,
-): Promise<
-  | { ok: true; score: number; totalPoints: number; triesLeft: number }
-  | { ok: false; error: string }
-> {
+): Promise<Result<{ attemptId: string }>> {
   try {
-    const result = await api.assessment.submitUnitQuiz({
-      assessmentId,
-      answers,
-    });
-    revalidatePath("/student", "layout");
-    return { ok: true, ...result };
+    const { attemptId } = await api.assessment.startUnitQuiz({ assessmentId });
+    await api.assessment.openUnitQuestion({ attemptId });
+    return { ok: true, attemptId };
   } catch (error) {
-    return {
-      ok: false,
-      error:
-        error instanceof Error ? error.message : "Could not submit answers.",
-    };
+    return failure(error, "Could not start the questions.");
+  }
+}
+
+/** Opens the next question of a running try; its 2-minute clock starts now. */
+export async function openNextUnitQuestion(
+  attemptId: string,
+): Promise<Result<object>> {
+  try {
+    await api.assessment.openUnitQuestion({ attemptId });
+    return { ok: true };
+  } catch (error) {
+    return failure(error, "Could not open the next question.");
+  }
+}
+
+type Feedback = Awaited<ReturnType<typeof api.assessment.answerUnitQuestion>>;
+
+/**
+ * Answers the open question (null when its time ran out) and returns the
+ * verdict, the correct choice and the rationale.
+ */
+export async function answerUnitQuestion(
+  attemptId: string,
+  questionId: string,
+  optionId: string | null,
+): Promise<Result<{ feedback: Feedback }>> {
+  try {
+    const feedback = await api.assessment.answerUnitQuestion({
+      attemptId,
+      questionId,
+      optionId,
+    });
+    if (feedback.finished) revalidatePath("/student", "layout");
+    return { ok: true, feedback };
+  } catch (error) {
+    return failure(error, "Your answer could not be saved.");
+  }
+}
+
+/** Records that the student left the quiz screen. */
+export async function reportUnitQuizFocusLoss(attemptId: string) {
+  try {
+    await api.assessment.reportUnitQuizFocusLoss({ attemptId });
+  } catch {
+    // Best effort: a failed report must never interrupt the student.
   }
 }
