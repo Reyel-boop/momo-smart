@@ -96,6 +96,111 @@ export const courseRouter = createTRPCRouter({
       }));
     }),
 
+  /**
+   * The teacher's subjects this term, each with its sections and its units in
+   * order: lessons to read, activities to answer, and how far each section
+   * has got. Powers the teacher Courses page.
+   */
+  teachingUnits: teacherProcedure.query(async ({ ctx }) => {
+    const term = await ctx.db.term.findFirst({
+      where: { isCurrent: true },
+      select: { id: true },
+    });
+    if (!term) return [];
+
+    const sections = await ctx.db.section.findMany({
+      where: { termId: term.id, teacherId: ctx.session.user.teacherId ?? "" },
+      orderBy: [{ course: { name: "asc" } }, { code: "asc" }],
+      select: {
+        id: true,
+        code: true,
+        courseId: true,
+        _count: { select: { enrollments: { where: { status: "ACTIVE" } } } },
+        pacing: { select: { unitId: true, status: true } },
+      },
+    });
+    if (sections.length === 0) return [];
+
+    const sectionIds = sections.map((s) => s.id);
+    const courses = await ctx.db.course.findMany({
+      where: { id: { in: [...new Set(sections.map((s) => s.courseId))] } },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        colorToken: true,
+        department: { select: { name: true } },
+        units: {
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            order: true,
+            title: true,
+            description: true,
+            examDate: true,
+            lessons: {
+              orderBy: { order: "asc" },
+              select: {
+                id: true,
+                order: true,
+                title: true,
+                summary: true,
+                estimatedMinutes: true,
+                isPublished: true,
+                _count: { select: { sections: true } },
+              },
+            },
+            assignments: {
+              where: { sectionId: { in: sectionIds } },
+              orderBy: { dueAt: "asc" },
+              select: {
+                id: true,
+                title: true,
+                type: true,
+                dueAt: true,
+                pointsPossible: true,
+                sectionId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return courses.map((course) => {
+      const courseSections = sections.filter((s) => s.courseId === course.id);
+      const units = course.units.map((unit) => {
+        // Furthest-behind section wins, so "Completed" means every section.
+        const statuses = courseSections.map(
+          (s) =>
+            s.pacing.find((p) => p.unitId === unit.id)?.status ?? "NOT_STARTED",
+        );
+        const status: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED" =
+          statuses.includes("IN_PROGRESS")
+            ? "IN_PROGRESS"
+            : statuses.length > 0 && statuses.every((s) => s === "COMPLETED")
+              ? "COMPLETED"
+              : statuses.includes("COMPLETED")
+                ? "IN_PROGRESS"
+                : "NOT_STARTED";
+        return { ...unit, status };
+      });
+
+      return {
+        ...course,
+        units,
+        sections: courseSections.map((s) => ({
+          id: s.id,
+          code: s.code,
+          studentCount: s._count.enrollments,
+        })),
+        completedUnits: units.filter((u) => u.status === "COMPLETED").length,
+      };
+    });
+  }),
+
   /** Section detail with roster counts, meetings and syllabus pacing. */
   sectionDetail: protectedProcedure
     .input(z.object({ sectionId: z.string() }))

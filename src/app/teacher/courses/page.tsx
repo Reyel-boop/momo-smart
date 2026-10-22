@@ -3,173 +3,319 @@ import Link from "next/link";
 
 import {
   ArrowRightIcon,
-  CapIcon,
+  BookOpenIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ClipboardIcon,
   ClockIcon,
   UsersIcon,
 } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
-import { clock } from "~/app/_components/format";
+import { humanise, longDate } from "~/app/_components/format";
 import { PageHeader } from "../_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
 export const dynamic = "force-dynamic";
 
-const DAY_SHORT: Record<string, string> = {
-  MONDAY: "Mon",
-  TUESDAY: "Tue",
-  WEDNESDAY: "Wed",
-  THURSDAY: "Thu",
-  FRIDAY: "Fri",
-  SATURDAY: "Sat",
-  SUNDAY: "Sun",
-};
+type SearchParams = Record<string, string | string[] | undefined>;
 
-const LEVEL_TONE = {
-  AP: "violet",
-  IB: "violet",
-  HONORS: "amber",
-  REGULAR: "slate",
-  ELECTIVE: "slate",
+const STATUS = {
+  COMPLETED: { label: "Completed", tone: "green" },
+  IN_PROGRESS: { label: "In progress", tone: "blue" },
+  NOT_STARTED: { label: "Upcoming", tone: "slate" },
 } as const;
 
-export default async function CoursesPage() {
-  const [sections, performance] = await Promise.all([
-    api.course.mySections(),
-    api.dashboard.sectionPerformance(),
-  ]);
+/** Core subjects in the order the school lists them; anything else after. */
+const SUBJECT_ORDER = ["MATH", "SCI", "FIL", "ENG", "AP"];
+const subjectRank = (code: string) => {
+  const index = SUBJECT_ORDER.indexOf(code.split(" ")[0]!.toUpperCase());
+  return index === -1 ? SUBJECT_ORDER.length : index;
+};
 
-  // Performance is keyed by section, so fold it onto the roster listing.
-  const stats = new Map(performance.map((row) => [row.sectionId, row]));
-  const totalStudents = sections.reduce((sum, s) => sum + s.studentCount, 0);
-  const courses = new Set(sections.map((s) => s.course.id));
+export default async function CoursesPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const requested =
+    typeof params.subject === "string" ? params.subject : undefined;
+  const subjects = (await api.course.teachingUnits()).sort(
+    (a, b) => subjectRank(a.code) - subjectRank(b.code),
+  );
+
+  const active =
+    subjects.find((subject) => subject.id === requested) ?? subjects[0];
+  const totalUnits = subjects.reduce((sum, s) => sum + s.units.length, 0);
+  const sectionCount = new Set(
+    subjects.flatMap((s) => s.sections.map((section) => section.id)),
+  ).size;
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageHeader
         title="Courses"
-        subtitle={`${sections.length} section${sections.length === 1 ? "" : "s"} across ${courses.size} course${courses.size === 1 ? "" : "s"} • ${totalStudents} enrolled students this term.`}
+        subtitle={`${subjects.length} subject${subjects.length === 1 ? "" : "s"} • ${totalUnits} units • ${sectionCount} class section${sectionCount === 1 ? "" : "s"} this quarter. Open a unit to see its lessons and the activities students answer.`}
       />
 
-      {sections.length === 0 ? (
+      {!active ? (
         <Card>
-          <EmptyState>No sections are assigned to you this term.</EmptyState>
+          <EmptyState>No subjects are assigned to you this term.</EmptyState>
         </Card>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {sections.map((section) => {
-            const stat = stats.get(section.id);
-            const level = section.course.level;
+        <>
+          <nav
+            aria-label="Subjects"
+            className="flex gap-2 overflow-x-auto pb-1"
+          >
+            {subjects.map((subject) => {
+              const isActive = subject.id === active.id;
+              return (
+                <Link
+                  key={subject.id}
+                  href={`/teacher/courses?subject=${subject.id}`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`shrink-0 rounded-xl border px-4 py-2.5 text-left transition ${
+                    isActive
+                      ? "border-navy-deep bg-navy-deep text-white shadow-sm"
+                      : "border-line bg-surface text-ink hover:border-brand"
+                  }`}
+                >
+                  <span className="block text-sm font-extrabold uppercase">
+                    {subject.name}
+                  </span>
+                  <span
+                    className={`block text-[11px] font-semibold ${isActive ? "text-white/70" : "text-muted"}`}
+                  >
+                    {subject.units.length} units · {subject.completedUnits}{" "}
+                    completed
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
 
-            return (
-              <Card key={section.id} className="flex flex-col overflow-hidden">
-                <div className="bg-navy-deep relative overflow-hidden px-5 py-5">
-                  <div
-                    aria-hidden="true"
-                    className="bg-brand/30 absolute -top-16 -right-10 size-40 rounded-full blur-2xl"
-                  />
-                  <div className="relative flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-bold tracking-[0.14em] text-white/60 uppercase">
-                        {section.course.code} • {section.code}
-                      </p>
-                      <h2 className="mt-1 truncate text-xl font-extrabold text-white">
-                        {section.course.name}
-                      </h2>
-                      <p className="mt-1 text-xs text-white/60">
-                        {section.course.department.name}
-                      </p>
-                    </div>
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white">
-                      <CapIcon className="size-5" />
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-1 flex-col gap-4 p-5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Pill tone={LEVEL_TONE[level] ?? "slate"}>{level}</Pill>
-                    <Pill tone="blue">Period {section.period}</Pill>
-                    {section.room && <Pill tone="slate">{section.room}</Pill>}
-                  </div>
-
-                  <dl className="grid grid-cols-2 gap-3">
-                    <div className="border-line bg-canvas rounded-xl border px-3 py-2.5">
-                      <dt className="text-muted flex items-center gap-1 text-[11px] font-semibold">
-                        <UsersIcon className="size-3.5" />
-                        Enrolled
-                      </dt>
-                      <dd className="text-ink mt-0.5 text-xl font-extrabold">
-                        {section.studentCount}
-                        <span className="text-muted text-xs font-semibold">
-                          {" "}
-                          / {section.capacity}
-                        </span>
-                      </dd>
-                    </div>
-                    <div className="border-line bg-canvas rounded-xl border px-3 py-2.5">
-                      <dt className="text-muted text-[11px] font-semibold">
-                        Class average
-                      </dt>
-                      <dd className="text-ink mt-0.5 text-xl font-extrabold">
-                        {stat?.classAverage === null ||
-                        stat?.classAverage === undefined
-                          ? "—"
-                          : `${stat.classAverage}%`}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  {section.meetings.length > 0 && (
-                    <div>
-                      <p className="text-muted text-[10px] font-bold tracking-wider uppercase">
-                        Meets
-                      </p>
-                      <ul className="mt-1.5 space-y-1">
-                        {section.meetings.map((meeting, index) => (
-                          <li
-                            key={`${meeting.dayOfWeek}-${meeting.startTime}-${index}`}
-                            className="text-muted flex items-center gap-1.5 text-xs"
-                          >
-                            <ClockIcon className="size-3.5 shrink-0" />
-                            {DAY_SHORT[meeting.dayOfWeek] ??
-                              meeting.dayOfWeek}{" "}
-                            {clock(meeting.startTime)} –{" "}
-                            {clock(meeting.endTime)}
-                            {meeting.room && ` • ${meeting.room}`}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div className="mt-auto">
-                    <p className="text-muted truncate text-xs">
-                      {stat?.currentUnit
-                        ? `Now teaching: ${stat.currentUnit.title}`
-                        : "No unit in progress"}
+          <Card className="overflow-hidden">
+            <div className="bg-navy-deep relative overflow-hidden px-6 py-6">
+              <div
+                aria-hidden="true"
+                className="bg-brand/30 absolute -top-16 -right-10 size-48 rounded-full blur-2xl"
+              />
+              <div className="relative flex flex-wrap items-end justify-between gap-5">
+                <div className="max-w-2xl min-w-0">
+                  <p className="text-[10px] font-bold tracking-[0.14em] text-white/60 uppercase">
+                    {active.code} • {active.department.name}
+                  </p>
+                  <h2 className="mt-1 text-2xl font-extrabold text-white uppercase">
+                    {active.name}
+                  </h2>
+                  {active.description && (
+                    <p className="mt-1.5 text-sm text-white/70">
+                      {active.description}
                     </p>
-                    <div className="border-line mt-3 flex items-center justify-between gap-2 border-t pt-3">
-                      <Link
-                        href={`/teacher/grades?section=${section.id}`}
-                        className="text-brand inline-flex items-center gap-1 text-xs font-bold hover:underline"
+                  )}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {active.sections.map((section) => (
+                      <span
+                        key={section.id}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white"
                       >
-                        Open gradebook
-                        <ArrowRightIcon className="size-3.5" />
-                      </Link>
-                      <Link
-                        href={`/teacher/assignments?section=${section.id}`}
-                        className="text-muted hover:text-ink text-xs font-semibold transition"
-                      >
-                        Assignments
-                      </Link>
-                    </div>
+                        <UsersIcon className="size-3.5" />
+                        {section.code} · {section.studentCount} students
+                      </span>
+                    ))}
                   </div>
                 </div>
-              </Card>
-            );
-          })}
-        </div>
+                <div className="w-full max-w-60">
+                  <p className="text-xs font-semibold text-white/70">
+                    {active.completedUnits} of {active.units.length} units
+                    completed
+                  </p>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/15">
+                    <div
+                      className="bg-brand h-full rounded-full"
+                      style={{
+                        width: `${active.units.length ? Math.round((active.completedUnits / active.units.length) * 100) : 0}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {active.units.length === 0 ? (
+              <EmptyState>
+                No units have been added to this subject yet.
+              </EmptyState>
+            ) : (
+              <ol className="divide-line divide-y">
+                {active.units.map((unit) => {
+                  const status = STATUS[unit.status];
+                  return (
+                    <li key={unit.id}>
+                      <details
+                        className="group"
+                        open={unit.status === "IN_PROGRESS"}
+                      >
+                        <summary className="hover:bg-canvas flex cursor-pointer list-none items-center gap-4 px-6 py-4 [&::-webkit-details-marker]:hidden">
+                          <span
+                            className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold ${
+                              unit.status === "COMPLETED"
+                                ? "bg-emerald-50 text-emerald-700"
+                                : unit.status === "IN_PROGRESS"
+                                  ? "bg-brand-soft text-brand"
+                                  : "bg-canvas text-muted"
+                            }`}
+                          >
+                            {unit.status === "COMPLETED" ? (
+                              <CheckCircleIcon className="size-5" />
+                            ) : (
+                              unit.order
+                            )}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="text-ink block font-bold">
+                              {unit.title}
+                            </span>
+                            {unit.description && (
+                              <span className="text-muted mt-0.5 block truncate text-xs">
+                                {unit.description}
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-muted hidden shrink-0 items-center gap-3 text-xs font-semibold sm:flex">
+                            <span className="inline-flex items-center gap-1">
+                              <BookOpenIcon className="size-3.5" />
+                              {unit.lessons.length} lesson
+                              {unit.lessons.length === 1 ? "" : "s"}
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                              <ClipboardIcon className="size-3.5" />
+                              {unit.assignments.length} activit
+                              {unit.assignments.length === 1 ? "y" : "ies"}
+                            </span>
+                          </span>
+                          <Pill tone={status.tone}>{status.label}</Pill>
+                          <ChevronDownIcon className="text-muted size-4 shrink-0 transition group-open:rotate-180" />
+                        </summary>
+
+                        <div className="bg-canvas/60 grid gap-5 px-6 pt-1 pb-5 lg:grid-cols-[3fr_2fr]">
+                          <div>
+                            <p className="text-muted text-[10px] font-bold tracking-wider uppercase">
+                              Lessons
+                            </p>
+                            {unit.lessons.length === 0 ? (
+                              <p className="text-muted mt-2 text-sm">
+                                No lessons yet.
+                              </p>
+                            ) : (
+                              <ul className="mt-2 space-y-2">
+                                {unit.lessons.map((lesson) => (
+                                  <li
+                                    key={lesson.id}
+                                    className="border-line bg-surface rounded-xl border px-4 py-3"
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <p className="text-ink text-sm font-bold">
+                                        {unit.order}.{lesson.order}{" "}
+                                        {lesson.title}
+                                      </p>
+                                      {!lesson.isPublished && (
+                                        <Pill tone="amber">Draft</Pill>
+                                      )}
+                                    </div>
+                                    {lesson.summary && (
+                                      <p className="text-muted mt-0.5 text-xs">
+                                        {lesson.summary}
+                                      </p>
+                                    )}
+                                    <p className="text-muted mt-1.5 flex items-center gap-3 text-[11px] font-semibold">
+                                      <span className="inline-flex items-center gap-1">
+                                        <ClockIcon className="size-3" />
+                                        {lesson.estimatedMinutes} min
+                                      </span>
+                                      {lesson._count.sections > 0 && (
+                                        <span>
+                                          Reading + self-check questions
+                                        </span>
+                                      )}
+                                    </p>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+
+                          <div>
+                            <p className="text-muted text-[10px] font-bold tracking-wider uppercase">
+                              Activities to answer
+                            </p>
+                            {unit.assignments.length === 0 ? (
+                              <p className="text-muted mt-2 text-sm">
+                                {unit.status === "NOT_STARTED"
+                                  ? "Activities open when the unit starts."
+                                  : "Students answer the self-check in each lesson."}
+                              </p>
+                            ) : (
+                              <ul className="mt-2 space-y-2">
+                                {unit.assignments.map((assignment) => (
+                                  <li key={assignment.id}>
+                                    <Link
+                                      href={`/teacher/assignments?section=${assignment.sectionId}`}
+                                      className="border-line bg-surface hover:border-brand block rounded-xl border px-4 py-3 transition"
+                                    >
+                                      <p className="text-ink text-sm font-bold">
+                                        {assignment.title}
+                                      </p>
+                                      <p className="text-muted mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold">
+                                        <span>{humanise(assignment.type)}</span>
+                                        <span>
+                                          {assignment.pointsPossible} pts
+                                        </span>
+                                        {assignment.dueAt && (
+                                          <span className="inline-flex items-center gap-1">
+                                            <CalendarIcon className="size-3" />
+                                            Due {longDate(assignment.dueAt)}
+                                          </span>
+                                        )}
+                                      </p>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                            {unit.examDate && (
+                              <p className="text-muted mt-3 inline-flex items-center gap-1.5 text-xs font-semibold">
+                                <CalendarIcon className="size-3.5" />
+                                Unit exam: {longDate(unit.examDate)}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </details>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+
+            <div className="border-line flex flex-wrap items-center gap-4 border-t px-6 py-4">
+              {active.sections.map((section) => (
+                <span key={section.id} className="flex items-center gap-3">
+                  <Link
+                    href={`/teacher/grades?section=${section.id}`}
+                    className="text-brand inline-flex items-center gap-1 text-xs font-bold hover:underline"
+                  >
+                    {section.code} gradebook
+                    <ArrowRightIcon className="size-3.5" />
+                  </Link>
+                </span>
+              ))}
+            </div>
+          </Card>
+        </>
       )}
     </div>
   );

@@ -1,10 +1,11 @@
 /**
  * Demo school seed for the Momo Smart LMS.
  *
- * Builds one coherent slice of a school: a science department, an AP Biology
- * course with three sections taught by Dr. Aris Chen, a full unit of lessons,
- * a rubric-graded lab report, a timed formative assessment, attendance for the
- * day, and the at-risk students that drive the intervention panel.
+ * Builds one coherent slice of a Grade 10 class: the five core subjects
+ * (Mathematics, Science, Filipino, English and Araling Panlipunan 10) taught by
+ * Dr. Aris Chen, their units and lessons (see grade10.ts), a rubric-graded lab
+ * report, a timed formative assessment, attendance for the day, and the
+ * at-risk students that drive the intervention panel.
  *
  * Run by `npm run db:seed` (prisma/seed.ts) and by the scheduled demo reset
  * (/api/demo/reset). It is idempotent — re-running resets the seeded rows
@@ -15,6 +16,7 @@ import { hashSync } from "bcryptjs";
 
 import type { PrismaClient } from "../../../generated/prisma";
 import { DEMO_PASSWORD } from "./accounts";
+import { GRADE10_SUBJECTS, type DemoSubject } from "./grade10";
 
 /**
  * The seed was written as a script against one module-level client. Rather
@@ -130,24 +132,19 @@ async function reset() {
 
 async function build() {
   // --- Departments and term -------------------------------------------------
-  const science = await db.department.create({
-    data: { name: "Science Department", code: "SCI" },
-  });
-  const social = await db.department.create({
-    data: { name: "Social Studies", code: "SOC" },
-  });
-  const math = await db.department.create({
-    data: { name: "Mathematics", code: "MATH" },
-  });
-  const english = await db.department.create({
-    data: { name: "English Language", code: "ENG" },
-  });
+  const departments = new Map<DemoSubject["key"], string>();
+  for (const subject of GRADE10_SUBJECTS) {
+    const department = await db.department.create({
+      data: { name: subject.department, code: subject.key },
+    });
+    departments.set(subject.key, department.id);
+  }
 
   const term = await db.term.create({
     data: {
-      name: "Fall 2024 – Term 1",
-      schoolYear: "2024-2025",
-      // Week 9 of the term as of "today".
+      name: "S.Y. 2026–2027 · Quarter 2",
+      schoolYear: "2026-2027",
+      // Week 9 of the quarter as of "today".
       startDate: at(-56, 8, 0),
       endDate: at(45, 16, 0),
       isCurrent: true,
@@ -165,57 +162,15 @@ async function build() {
       teacherProfile: {
         create: {
           employeeNumber: "EMP-1042",
-          departmentId: science.id,
-          officeLocation: "BioLab 204",
-          bio: "AP Biology Lead Instructor, Department of Natural Sciences.",
+          departmentId: departments.get("SCI")!,
+          officeLocation: "Science Room 204",
+          bio: "Grade 10 adviser, St. Joseph. Teaches the Grade 10 core subjects.",
         },
       },
     },
     include: { teacherProfile: true },
   });
   const chen = chenUser.teacherProfile!;
-
-  const davisUser = await db.user.create({
-    data: {
-      name: "Marcus Davis",
-      title: "Mr.",
-      email: "m.davis@momosmart.edu",
-      role: "TEACHER",
-      passwordHash: DEMO_HASH,
-      teacherProfile: {
-        create: { employeeNumber: "EMP-1088", departmentId: social.id },
-      },
-    },
-    include: { teacherProfile: true },
-  });
-
-  const patelUser = await db.user.create({
-    data: {
-      name: "Rina Patel",
-      title: "Dr.",
-      email: "r.patel@momosmart.edu",
-      role: "TEACHER",
-      passwordHash: DEMO_HASH,
-      teacherProfile: {
-        create: { employeeNumber: "EMP-1120", departmentId: math.id },
-      },
-    },
-    include: { teacherProfile: true },
-  });
-
-  const vanceUser = await db.user.create({
-    data: {
-      name: "Helen Vance",
-      title: "Mrs.",
-      email: "h.vance@momosmart.edu",
-      role: "TEACHER",
-      passwordHash: DEMO_HASH,
-      teacherProfile: {
-        create: { employeeNumber: "EMP-1150", departmentId: english.id },
-      },
-    },
-    include: { teacherProfile: true },
-  });
 
   await db.user.create({
     data: {
@@ -226,116 +181,75 @@ async function build() {
     },
   });
 
-  // --- Courses --------------------------------------------------------------
-  const apBio = await db.course.create({
-    data: {
-      code: "AP-BIO",
-      name: "AP Biology",
-      description:
-        "College-level biology covering cellular energetics, genetics and evolution.",
-      level: "AP",
-      credits: 1,
-      departmentId: science.id,
-      colorToken: "emerald",
-    },
-  });
-
-  const anatomy = await db.course.create({
-    data: {
-      code: "HON-ANAT",
-      name: "Honors Anatomy",
-      level: "HONORS",
-      credits: 1,
-      departmentId: science.id,
-      colorToken: "amber",
-    },
-  });
-
-  const apush = await db.course.create({
-    data: {
-      code: "AP-USH",
-      name: "AP US History",
-      level: "AP",
-      credits: 1,
-      departmentId: social.id,
-      colorToken: "orange",
-    },
-  });
-
-  const precalc = await db.course.create({
-    data: {
-      code: "HON-PRECALC",
-      name: "Pre-Calculus Honors",
-      level: "HONORS",
-      credits: 1,
-      departmentId: math.id,
-      colorToken: "indigo",
-    },
-  });
-
-  const englit = await db.course.create({
-    data: {
-      code: "ENG-11",
-      name: "English Literature 11",
-      level: "REGULAR",
-      credits: 1,
-      departmentId: english.id,
-      colorToken: "blue",
-    },
-  });
+  // --- Courses: the five Grade 10 core subjects ------------------------------
+  const courses = new Map<DemoSubject["key"], string>();
+  for (const subject of GRADE10_SUBJECTS) {
+    const course = await db.course.create({
+      data: {
+        code: subject.code,
+        name: subject.name,
+        description: subject.description,
+        level: "REGULAR",
+        credits: 1,
+        departmentId: departments.get(subject.key)!,
+        colorToken: subject.colorToken,
+      },
+    });
+    courses.set(subject.key, course.id);
+  }
 
   // --- Sections -------------------------------------------------------------
+  // Science runs in three Grade 10 sections; St. Joseph (the advisory class)
+  // also takes the other four subjects from the same teacher.
+  const scienceCategories = {
+    create: [
+      { name: "Labs", weightPercent: 40 },
+      { name: "Assessments", weightPercent: 40 },
+      { name: "Homework", weightPercent: 20 },
+    ],
+  };
+
   const bioSec1 = await db.section.create({
     data: {
-      courseId: apBio.id,
+      courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
-      code: "Sec 1",
+      code: "St. Anne",
       period: 1,
       room: "Room 304",
-      capacity: 34,
+      capacity: 40,
       meetings: { create: meetsOn("THURSDAY", "08:15", "09:45", "Room 304") },
-      gradeCategories: {
-        create: [
-          { name: "Labs", weightPercent: 40 },
-          { name: "Assessments", weightPercent: 40 },
-          { name: "Homework", weightPercent: 20 },
-        ],
-      },
+      gradeCategories: scienceCategories,
     },
     include: { gradeCategories: true },
   });
 
   const bioSec2 = await db.section.create({
     data: {
-      courseId: apBio.id,
+      courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
-      code: "Sec 2",
+      code: "St. Joseph",
       period: 3,
-      room: "Lab B",
-      capacity: 32,
-      meetings: { create: meetsOn("THURSDAY", "10:00", "11:30", "Lab B") },
-      gradeCategories: {
-        create: [
-          { name: "Labs", weightPercent: 40 },
-          { name: "Assessments", weightPercent: 40 },
-          { name: "Homework", weightPercent: 20 },
-        ],
+      room: "Science Lab",
+      capacity: 40,
+      meetings: {
+        create: meetsOn("THURSDAY", "10:00", "11:30", "Science Lab"),
       },
+      gradeCategories: scienceCategories,
     },
     include: { gradeCategories: true },
   });
 
   const anatSec = await db.section.create({
     data: {
-      courseId: anatomy.id,
+      courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
-      code: "Sec 4",
+      code: "St. Luke",
       period: 5,
       room: "Room 304",
-      capacity: 30,
+      capacity: 40,
       meetings: { create: meetsOn("THURSDAY", "13:15", "14:45", "Room 304") },
       gradeCategories: {
         create: [
@@ -348,115 +262,64 @@ async function build() {
     include: { gradeCategories: true },
   });
 
-  const bioSec3 = await db.section.create({
-    data: {
-      courseId: apBio.id,
-      termId: term.id,
-      teacherId: chen.id,
-      code: "Sec 3",
-      period: 7,
-      room: "Lab B",
-      capacity: 30,
-      meetings: {
-        create: [
-          {
-            dayOfWeek: "FRIDAY",
-            rotation: "ALL",
-            startTime: "14:00",
-            endTime: "15:30",
-            room: "Lab B",
-          },
-        ],
+  // The other St. Joseph subjects meet on a day that is neither today nor
+  // Thursday, so they never clash with the science periods on the roster.
+  const otherDay = DAYS.slice(1, 6).find(
+    (day) => day !== TODAY_DOW && day !== "THURSDAY",
+  )!;
+  const josephSection = (
+    key: DemoSubject["key"],
+    period: number,
+    startTime: string,
+    endTime: string,
+  ) =>
+    db.section.create({
+      data: {
+        courseId: courses.get(key)!,
+        termId: term.id,
+        teacherId: chen.id,
+        code: "St. Joseph",
+        period,
+        room: "Room 210",
+        capacity: 40,
+        meetings: {
+          create: [
+            {
+              dayOfWeek: otherDay,
+              rotation: "ALL",
+              startTime,
+              endTime,
+              room: "Room 210",
+            },
+          ],
+        },
       },
-    },
-  });
+    });
 
-  const apushSec = await db.section.create({
-    data: {
-      courseId: apush.id,
-      termId: term.id,
-      teacherId: davisUser.teacherProfile!.id,
-      code: "Sec 1",
-      period: 1,
-      room: "Room 118",
-      meetings: {
-        create: [
-          {
-            dayOfWeek: "THURSDAY",
-            rotation: "ALL",
-            startTime: "08:15",
-            endTime: "09:45",
-            room: "Room 118",
-          },
-        ],
-      },
-    },
-  });
-
-  const precalcSec = await db.section.create({
-    data: {
-      courseId: precalc.id,
-      termId: term.id,
-      teacherId: patelUser.teacherProfile!.id,
-      code: "Sec 2",
-      period: 4,
-      room: "Room 302",
-      meetings: {
-        create: [
-          {
-            dayOfWeek: "THURSDAY",
-            rotation: "ALL",
-            startTime: "12:00",
-            endTime: "13:00",
-            room: "Room 302",
-          },
-        ],
-      },
-    },
-  });
-
-  const englitSec = await db.section.create({
-    data: {
-      courseId: englit.id,
-      termId: term.id,
-      teacherId: vanceUser.teacherProfile!.id,
-      code: "Sec 1",
-      period: 6,
-      room: "Room 105",
-      meetings: {
-        create: [
-          {
-            dayOfWeek: "THURSDAY",
-            rotation: "ALL",
-            startTime: "15:00",
-            endTime: "16:00",
-            room: "Room 105",
-          },
-        ],
-      },
-    },
-  });
+  const precalcSec = await josephSection("MATH", 2, "08:15", "09:15");
+  const englitSec = await josephSection("ENG", 6, "10:45", "11:45");
+  const filSec = await josephSection("FIL", 4, "09:30", "10:30");
+  const apushSec = await josephSection("AP", 7, "13:00", "14:00");
 
   // --- Students -------------------------------------------------------------
   const studentSeeds = [
     {
       name: "Alex Rivera",
       number: "OHS-28491",
-      grade: 11,
       gpa: 3.84,
       percentile: 95,
     },
-    { name: "Marcus Rivera", number: "OHS-2026-88", grade: 11, gpa: 3.5 },
-    { name: "Maya Lin", number: "OHS-94021", grade: 11, gpa: 3.9 },
-    { name: "Marcus Vance", number: "OHS-94119", grade: 11, gpa: 3.4 },
-    { name: "Sofia Ramirez", number: "OHS-94302", grade: 11, gpa: 3.6 },
-    { name: "Lucas Bennet", number: "OHS-94088", grade: 12, gpa: 3.2 },
-    { name: "Ethan Brooks", number: "OHS-94155", grade: 11, gpa: 2.1 },
-    { name: "Chloe Nguyen", number: "OHS-94177", grade: 12, gpa: 2.6 },
-    { name: "Jordan Rivera", number: "OHS-94190", grade: 11, gpa: 2.9 },
-    { name: "Priya Anand", number: "OHS-94210", grade: 11, gpa: 3.7 },
-    { name: "Noah Kim", number: "OHS-94222", grade: 11, gpa: 3.1 },
-    { name: "Grace Okafor", number: "OHS-94240", grade: 11, gpa: 3.95 },
+    { name: "Marcus Rivera", number: "OHS-2026-88", gpa: 3.5 },
+    { name: "Maya Lin", number: "OHS-94021", gpa: 3.9 },
+    { name: "Marcus Vance", number: "OHS-94119", gpa: 3.4 },
+    { name: "Sofia Ramirez", number: "OHS-94302", gpa: 3.6 },
+    { name: "Lucas Bennet", number: "OHS-94088", gpa: 3.2 },
+    { name: "Ethan Brooks", number: "OHS-94155", gpa: 2.1 },
+    { name: "Chloe Nguyen", number: "OHS-94177", gpa: 2.6 },
+    { name: "Jordan Rivera", number: "OHS-94190", gpa: 2.9 },
+    { name: "Priya Anand", number: "OHS-94210", gpa: 3.7 },
+    { name: "Noah Kim", number: "OHS-94222", gpa: 3.1 },
+    { name: "Grace Okafor", number: "OHS-94240", gpa: 3.95 },
   ];
 
   const students = new Map<string, { id: string; userId: string }>();
@@ -470,8 +333,8 @@ async function build() {
         studentProfile: {
           create: {
             studentNumber: seed.number,
-            gradeLevel: seed.grade,
-            graduationYear: seed.grade === 12 ? 2025 : 2026,
+            gradeLevel: 10,
+            graduationYear: 2029,
             cumulativeGpa: seed.gpa,
             gpaPercentile: seed.percentile,
           },
@@ -493,7 +356,7 @@ async function build() {
       studentId: studentId("Chloe Nguyen"),
       type: "EXTENDED_TIME",
       multiplier: 1.5,
-      notes: "504 plan — time and a half on timed assessments.",
+      notes: "Learner support plan — time and a half on timed assessments.",
     },
   });
 
@@ -502,7 +365,7 @@ async function build() {
     data: {
       name: "Denise Brooks",
       email: "d.brooks@example.com",
-      phone: "+1-555-0142",
+      phone: "+63 917 555 0142",
       relationship: "MOTHER",
     },
   });
@@ -555,23 +418,20 @@ async function build() {
     },
   );
 
-  await enroll(
-    bioSec2.id,
-    [
-      "Alex Rivera",
-      "Marcus Rivera",
-      "Maya Lin",
-      "Sofia Ramirez",
-      "Ethan Brooks",
-    ],
-    {
-      "Alex Rivera": 88.0,
-      "Marcus Rivera": 85.3,
-      "Maya Lin": 91.2,
-      "Sofia Ramirez": 86.7,
-      "Ethan Brooks": 68.4,
-    },
-  );
+  const josephClass = [
+    "Alex Rivera",
+    "Marcus Rivera",
+    "Maya Lin",
+    "Sofia Ramirez",
+    "Ethan Brooks",
+  ];
+  await enroll(bioSec2.id, josephClass, {
+    "Alex Rivera": 88.0,
+    "Marcus Rivera": 85.3,
+    "Maya Lin": 91.2,
+    "Sofia Ramirez": 86.7,
+    "Ethan Brooks": 68.4,
+  });
 
   await enroll(anatSec.id, ["Lucas Bennet", "Chloe Nguyen", "Grace Okafor"], {
     "Lucas Bennet": 89.4,
@@ -579,14 +439,34 @@ async function build() {
     "Grace Okafor": 94.8,
   });
 
-  await enroll(bioSec3.id, ["Noah Kim", "Priya Anand"], {
-    "Noah Kim": 81.0,
-    "Priya Anand": 90.5,
+  await enroll(precalcSec.id, josephClass, {
+    "Alex Rivera": 91,
+    "Marcus Rivera": 84,
+    "Maya Lin": 93.5,
+    "Sofia Ramirez": 85,
+    "Ethan Brooks": 70.5,
   });
-
-  await enroll(apushSec.id, ["Alex Rivera"], { "Alex Rivera": 94 });
-  await enroll(precalcSec.id, ["Alex Rivera"], { "Alex Rivera": 91 });
-  await enroll(englitSec.id, ["Alex Rivera"], { "Alex Rivera": 96 });
+  await enroll(englitSec.id, josephClass, {
+    "Alex Rivera": 96,
+    "Marcus Rivera": 87,
+    "Maya Lin": 92,
+    "Sofia Ramirez": 89.5,
+    "Ethan Brooks": 74,
+  });
+  await enroll(filSec.id, josephClass, {
+    "Alex Rivera": 93,
+    "Marcus Rivera": 88.5,
+    "Maya Lin": 90,
+    "Sofia Ramirez": 91,
+    "Ethan Brooks": 76,
+  });
+  await enroll(apushSec.id, josephClass, {
+    "Alex Rivera": 94,
+    "Marcus Rivera": 86,
+    "Maya Lin": 92.5,
+    "Sofia Ramirez": 88,
+    "Ethan Brooks": 72,
+  });
 
   // Grade history for Jordan Rivera: 86% → 73.5% triggers the drop alert.
   const jordanEnrollment = await db.enrollment.findFirstOrThrow({
@@ -610,57 +490,82 @@ async function build() {
   });
 
   // --- Curriculum -----------------------------------------------------------
-  const unitTitles = [
-    "Unit 1: Chemistry of Life",
-    "Unit 2: Cell Structure & Function",
-    "Unit 3: Cell Biology & Transport",
-    "Unit 4: Cellular Energetics",
-    "Unit 5: Cell Communication",
-    "Unit 6: Gene Expression",
-    "Unit 7: Natural Selection",
-    "Unit 8: Ecology",
-    "Unit 9: Systems Biology",
-    "Unit 10: Exam Review",
-  ];
+  // Every subject: units 1-3 finished, unit 4 being taught now, the rest
+  // still to come. Each lesson has a reading and a self-check to answer.
+  const sectionsOf: Record<DemoSubject["key"], string[]> = {
+    SCI: [bioSec1.id, bioSec2.id, anatSec.id],
+    MATH: [precalcSec.id],
+    ENG: [englitSec.id],
+    FIL: [filSec.id],
+    AP: [apushSec.id],
+  };
+  const unitsBy = new Map<DemoSubject["key"], Array<{ id: string }>>();
 
-  const units = [];
-  for (const [index, title] of unitTitles.entries()) {
-    units.push(
-      await db.unit.create({
+  for (const subject of GRADE10_SUBJECTS) {
+    const created = [];
+    for (const [index, plan] of subject.units.entries()) {
+      const unit = await db.unit.create({
         data: {
-          courseId: apBio.id,
+          courseId: courses.get(subject.key)!,
           order: index + 1,
-          title,
-          description:
-            index === 3
-              ? "Glycolysis, the citric acid cycle and oxidative phosphorylation."
-              : undefined,
+          title: `Unit ${index + 1}: ${plan.title}`,
+          description: plan.description,
           examDate: index === 3 ? at(9, 8, 0) : undefined,
         },
-      }),
-    );
-  }
-  const unit4 = units[3]!;
-
-  // Pacing: units 1-3 finished, unit 4 (cellular energetics) being taught now.
-  for (const [index, unit] of units.entries()) {
-    for (const sectionId of [bioSec1.id, bioSec2.id]) {
-      await db.sectionPacing.create({
-        data: {
-          sectionId,
-          unitId: unit.id,
-          status:
-            index < 3
-              ? "COMPLETED"
-              : index === 3
-                ? "IN_PROGRESS"
-                : "NOT_STARTED",
-          startedAt: index <= 3 ? at(-30 + index * 6) : null,
-          completedAt: index < 3 ? at(-25 + index * 6) : null,
-        },
       });
+      created.push(unit);
+
+      for (const [lessonIndex, item] of plan.lessons.entries()) {
+        await db.lesson.create({
+          data: {
+            unitId: unit.id,
+            order: lessonIndex + 1,
+            title: item.title,
+            summary: item.summary,
+            estimatedMinutes: 40,
+            sections: {
+              create: [
+                {
+                  kind: "READING",
+                  order: 0,
+                  title: "Reading",
+                  body: item.reading,
+                },
+                {
+                  kind: "SELF_CHECK",
+                  order: 1,
+                  title: "Self-Check",
+                  body: item.questions
+                    .map((question, n) => `${n + 1}. ${question}`)
+                    .join("\n"),
+                },
+              ],
+            },
+          },
+        });
+      }
+
+      for (const sectionId of sectionsOf[subject.key]) {
+        await db.sectionPacing.create({
+          data: {
+            sectionId,
+            unitId: unit.id,
+            status:
+              index < 3
+                ? "COMPLETED"
+                : index === 3
+                  ? "IN_PROGRESS"
+                  : "NOT_STARTED",
+            startedAt: index <= 3 ? at(-30 + index * 6) : null,
+            completedAt: index < 3 ? at(-25 + index * 6) : null,
+          },
+        });
+      }
     }
+    unitsBy.set(subject.key, created);
   }
+  const unit4 = unitsBy.get("SCI")![3]!;
+  const currentUnit = (key: DemoSubject["key"]) => unitsBy.get(key)![3]!.id;
 
   const lesson41 = await db.lesson.create({
     data: {
@@ -848,7 +753,7 @@ async function build() {
   // --- Rubric and assignments ----------------------------------------------
   const labRubric = await db.rubric.create({
     data: {
-      title: "AP Bio Lab Report Rubric",
+      title: "Science Lab Report Rubric",
       description: "Standard four-criterion rubric for formal lab write-ups.",
       type: "STANDARD",
       totalPoints: 50,
@@ -966,7 +871,7 @@ async function build() {
       sectionId: anatSec.id,
       categoryId: practicumCategory.id,
       rubricId: manualRubric.id,
-      title: "Skeletal System Practicum Diagram",
+      title: "Reproductive System Practicum Diagram",
       type: "DIAGRAM",
       format: "FILE_UPLOAD",
       pointsPossible: 40,
@@ -1009,10 +914,10 @@ async function build() {
     "seed/lab4-maya.pdf",
   );
   const lucasFile = await makeFile(
-    "Skeletal_Diagram_LucasBennet.png",
+    "Reproductive_Diagram_LucasBennet.png",
     "image/png",
     6_291_456,
-    "seed/skeletal-lucas.png",
+    "seed/reproductive-lucas.png",
   );
 
   const queued: Array<{
@@ -1121,7 +1026,8 @@ async function build() {
     data: [
       {
         sectionId: apushSec.id,
-        title: "DBQ Outline: Antebellum Era",
+        unitId: currentUnit("AP"),
+        title: "Gawain 4: Sanaysay sa Migrasyon ng mga OFW",
         type: "ESSAY",
         format: "FILE_UPLOAD",
         pointsPossible: 30,
@@ -1130,28 +1036,48 @@ async function build() {
       },
       {
         sectionId: precalcSec.id,
-        title: "Trigonometric Identities #9",
+        unitId: currentUnit("MATH"),
+        title: "Unit 4 Problem Set: Polynomial Equations",
         type: "PROBLEM_SET",
-        format: "EXTERNAL_LINK",
+        format: "TEXT_ENTRY",
         pointsPossible: 25,
         dueAt: at(3, 23, 59),
         publishedAt: at(-4),
       },
       {
         sectionId: englitSec.id,
-        title: "Gatsby Socratic Seminar",
-        type: "DISCUSSION",
-        format: "ON_PAPER",
+        unitId: currentUnit("ENG"),
+        title: "Unit 4 Activity: Persuasive Essay Draft",
+        type: "ESSAY",
+        format: "TEXT_ENTRY",
         pointsPossible: 20,
-        dueAt: at(12, 15, 0),
+        dueAt: at(6, 23, 59),
         publishedAt: at(-6),
+      },
+      {
+        sectionId: filSec.id,
+        unitId: currentUnit("FIL"),
+        title: "Gawain 4: Pagsusuri ng Tula",
+        type: "ESSAY",
+        format: "TEXT_ENTRY",
+        pointsPossible: 20,
+        dueAt: at(5, 23, 59),
+        publishedAt: at(-3),
       },
     ],
   });
 
   // Released quiz and test grades. Students earn one star per point on these,
-  // so they drive the Star Points card; the AP Bio ones cover all of Sec 2 so
+  // so they drive the Star Points card; they cover all of St. Joseph so
   // the grade-level rank has peers to compare against.
+  const josephScores = (points: number, scores: number[]) =>
+    Object.fromEntries(
+      josephClass.map((name, index) => [
+        name,
+        Math.min(points, scores[index]!),
+      ]),
+    );
+
   const gradedHistory: Array<{
     sectionId: string;
     categoryId?: string;
@@ -1166,7 +1092,7 @@ async function build() {
       sectionId: bioSec2.id,
       categoryId: assessmentCategory2.id,
       graderId: chenUser.id,
-      title: "Unit 3 Cellular Bio Test",
+      title: "Unit 3 Light: Mirrors and Lenses Test",
       type: "EXAM",
       points: 100,
       daysAgo: 1,
@@ -1182,7 +1108,7 @@ async function build() {
       sectionId: bioSec2.id,
       categoryId: assessmentCategory2.id,
       graderId: chenUser.id,
-      title: "Photosynthesis Speed Quiz",
+      title: "Electromagnetic Spectrum Quiz",
       type: "QUIZ",
       points: 20,
       daysAgo: 3,
@@ -1196,27 +1122,36 @@ async function build() {
     },
     {
       sectionId: precalcSec.id,
-      graderId: patelUser.id,
-      title: "Trigonometry Quiz #4",
+      graderId: chenUser.id,
+      title: "Quiz 3: Remainder and Factor Theorems",
       type: "QUIZ",
       points: 20,
       daysAgo: 5,
-      scores: { "Alex Rivera": 18 },
+      scores: josephScores(20, [18, 16, 19, 17, 13]),
     },
     {
       sectionId: apushSec.id,
-      graderId: davisUser.id,
-      title: "Market Revolution Quiz",
+      graderId: chenUser.id,
+      title: "Quiz 3: Globalisasyon",
       type: "QUIZ",
       points: 25,
       daysAgo: 9,
-      scores: { "Alex Rivera": 24 },
+      scores: josephScores(25, [24, 21, 23, 22, 17]),
+    },
+    {
+      sectionId: filSec.id,
+      graderId: chenUser.id,
+      title: "Pagsusulit 3: Epiko at Nobela",
+      type: "QUIZ",
+      points: 20,
+      daysAgo: 7,
+      scores: josephScores(20, [19, 17, 18, 18, 14]),
     },
     {
       sectionId: bioSec2.id,
       categoryId: assessmentCategory2.id,
       graderId: chenUser.id,
-      title: "Unit 2 Cell Structure Test",
+      title: "Unit 2 Electromagnetic Spectrum Test",
       type: "EXAM",
       points: 100,
       daysAgo: 14,
@@ -1230,45 +1165,54 @@ async function build() {
     },
     {
       sectionId: apushSec.id,
-      graderId: davisUser.id,
-      title: "Colonial Era Unit Test",
+      graderId: chenUser.id,
+      title: "Unit 2 Test: Disaster Risk Reduction",
       type: "EXAM",
       points: 100,
       daysAgo: 17,
-      scores: { "Alex Rivera": 96 },
+      scores: josephScores(100, [96, 85, 93, 88, 71]),
     },
     {
       sectionId: englitSec.id,
-      graderId: vanceUser.id,
-      title: "Puritan Literature Test",
+      graderId: chenUser.id,
+      title: "Unit 2 Test: Reading for Information",
       type: "EXAM",
       points: 100,
       daysAgo: 19,
-      scores: { "Alex Rivera": 97 },
+      scores: josephScores(100, [97, 86, 91, 90, 73]),
     },
     {
       sectionId: precalcSec.id,
-      graderId: patelUser.id,
-      title: "Functions & Graphs Test",
+      graderId: chenUser.id,
+      title: "Unit 2 Test: Geometric Sequences",
       type: "EXAM",
       points: 100,
       daysAgo: 22,
-      scores: { "Alex Rivera": 90 },
+      scores: josephScores(100, [90, 83, 94, 84, 69]),
+    },
+    {
+      sectionId: filSec.id,
+      graderId: chenUser.id,
+      title: "Ikalawang Pagsusulit: Parabula at Sanaysay",
+      type: "EXAM",
+      points: 100,
+      daysAgo: 21,
+      scores: josephScores(100, [93, 89, 90, 92, 75]),
     },
     {
       sectionId: englitSec.id,
-      graderId: vanceUser.id,
+      graderId: chenUser.id,
       title: "Vocabulary Quiz 3",
       type: "QUIZ",
       points: 20,
       daysAgo: 24,
-      scores: { "Alex Rivera": 19 },
+      scores: josephScores(20, [19, 17, 18, 18, 15]),
     },
     {
       sectionId: bioSec2.id,
       categoryId: assessmentCategory2.id,
       graderId: chenUser.id,
-      title: "Unit 1 Chemistry of Life Test",
+      title: "Unit 1 Plate Tectonics Test",
       type: "EXAM",
       points: 100,
       daysAgo: 28,
@@ -1284,12 +1228,12 @@ async function build() {
 
   // Written feedback on a few of Alex's released grades.
   const alexFeedback: Record<string, string> = {
-    "Unit 3 Cellular Bio Test":
-      "Strong free-response on membrane transport. Review the sodium-potassium pump question.",
-    "Photosynthesis Speed Quiz":
-      "Perfect score — clean reasoning on the light-dependent reactions.",
-    "Market Revolution Quiz":
-      "Excellent use of the Lowell mill documents as evidence.",
+    "Unit 3 Light: Mirrors and Lenses Test":
+      "Strong ray diagrams. Review the sign convention in the lens equation.",
+    "Electromagnetic Spectrum Quiz":
+      "Perfect score — clear ordering of the EM waves by frequency.",
+    "Quiz 3: Globalisasyon":
+      "Mahusay ang mga halimbawa ng globalisasyong kultural.",
   };
 
   for (const entry of gradedHistory) {
@@ -1340,7 +1284,8 @@ async function build() {
       title: "Unit 4 Formative Assessment: Cellular Respiration & ATP Yield",
       instructions:
         "Select the single best answer for each question. Show supporting work in the scratchpad where useful.",
-      standards: "Aligns with College Board AP Bio Standard 3.1 & 3.3.",
+      standards:
+        "Aligns with the DepEd Science 10 learning competencies (Matter: biomolecules).",
       totalPoints: 40,
       timeLimitMinutes: 30,
       maxAttempts: 1,
@@ -1635,15 +1580,15 @@ async function build() {
       {
         authorId: registrar.id,
         scope: "SCHOOL",
-        title: "Spirit Week Pep Rally schedule updated",
-        body: "Gymnasium session begins at 1:45 PM on Thursday. Modified bell schedules posted.",
+        title: "Intramurals schedule updated",
+        body: "Opening program begins at 1:45 PM on Thursday at the covered court. Modified class schedules posted.",
         publishedAt: new Date(NOW.getTime() - 2 * 60 * 60 * 1000),
       },
       {
         authorId: registrar.id,
         scope: "SCHOOL",
-        title: "PSAT sign-up deadline Friday",
-        body: "All juniors must verify their test registration with Guidance Office in Room 102.",
+        title: "Quarterly exam schedule posted",
+        body: "Grade 10 quarterly assessments start next week. Check the schedule on the bulletin board near the Guidance Office.",
         publishedAt: new Date(NOW.getTime() - 5 * 60 * 60 * 1000),
       },
     ],
@@ -1654,7 +1599,7 @@ async function build() {
       authorId: chenUser.id,
       scope: "SECTION",
       sectionId: bioSec2.id,
-      title: "Unit 4 exam moved to Oct 24",
+      title: "Unit 4 exam moved to next week",
       body: "We will use Thursday's lab period for review. Bring your data tables.",
       isPinned: true,
     },
@@ -1670,11 +1615,11 @@ async function build() {
         createdById: registrar.id,
       },
       {
-        title: "Unit 4 Exam — Cellular Energetics",
+        title: "Unit 4 Exam — Biomolecules and Cellular Energy",
         type: "EXAM",
         startAt: at(9, 10, 0),
         endAt: at(9, 11, 30),
-        location: "Lab B",
+        location: "Science Lab",
         sectionId: bioSec2.id,
         createdById: chenUser.id,
       },
@@ -1688,7 +1633,7 @@ async function build() {
       startTime: "15:00",
       endTime: "16:15",
       mode: "HYBRID",
-      location: "Lab Room 304",
+      location: "Room 304",
       meetingUrl: "https://zoom.momosmart.edu/j/room4",
       capacity: 8,
       label: "Drop-in Help",
@@ -1750,7 +1695,7 @@ async function build() {
       messages: [
         {
           from: "teacher",
-          body: "Ethan, I have three missing items for you in AP Bio Sec 2. Can you come to office hours today at 3:00 so we can build a catch-up plan?",
+          body: "Ethan, I have three missing items for you in Science 10 – St. Joseph. Can you come to office hours today at 3:00 so we can build a catch-up plan?",
           minutesAgo: 55,
         },
       ],
@@ -1800,7 +1745,15 @@ async function build() {
 
   return {
     term: term.name,
-    sections: [bioSec1, bioSec2, anatSec, bioSec3].length,
+    sections: [
+      bioSec1,
+      bioSec2,
+      anatSec,
+      precalcSec,
+      englitSec,
+      filSec,
+      apushSec,
+    ].length,
   };
 }
 

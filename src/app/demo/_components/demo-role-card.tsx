@@ -18,7 +18,7 @@ const ROLES = {
     icon: ClipboardIcon,
     eyebrow: "Teacher mode",
     title: "Teacher Command Center",
-    persona: "Dr. Aris Chen · AP Biology, 4 sections",
+    persona: "Dr. Aris Chen · Grade 10, 5 subjects",
     points: [
       "Work through a live priority grading queue with rubrics",
       "See the three students flagged by early-intervention alerts",
@@ -32,7 +32,7 @@ const ROLES = {
     icon: BookIcon,
     eyebrow: "Student mode",
     title: "Student Dashboard",
-    persona: "Alex Rivera · Grade 11",
+    persona: "Alex Rivera · Grade 10 – St. Joseph",
     points: [
       "Check what is due soon, ranked by deadline",
       "Resume a lecture where you left off and take notes",

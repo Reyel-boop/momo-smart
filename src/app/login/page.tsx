@@ -42,7 +42,7 @@ export default async function LoginPage() {
 
         <div className="relative max-w-md">
           <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-white/80 uppercase">
-            Fall 2024 · Term 1
+            S.Y. 2026–2027 · Quarter 2
           </p>
           <h2 className="mt-6 text-4xl leading-[1.1] font-extrabold tracking-tight text-white">
             Everything a school day needs, on one screen.

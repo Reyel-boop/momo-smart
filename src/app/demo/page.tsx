@@ -64,7 +64,7 @@ export default function DemoPage() {
               Explore a real school day in Momo Smart.
             </h1>
             <p className="text-muted mt-5 text-lg">
-              Step into a working demo school: Dr. Aris Chen&apos;s AP Biology
+              Step into a working demo school: Dr. Aris Chen&apos;s Grade 10
               sections, a full grading queue, a timed quiz mid-attempt and the
               students the early-warning system has flagged.
             </p>
