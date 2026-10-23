@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { Wordmark } from "~/app/_components/brand";
 import { CheckIcon } from "~/app/_components/icons";
+import { env } from "~/env";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
 import { LoginForm } from "./login-form";
@@ -74,7 +75,7 @@ export default async function LoginPage() {
         </div>
 
         <div className="flex flex-1 items-center justify-center py-10">
-          <LoginForm />
+          <LoginForm showDemoAccounts={env.DEMO_MODE} />
         </div>
 
         <p className="text-muted text-center text-sm">

@@ -9,6 +9,11 @@ const link = "text-brand font-semibold hover:underline";
 
 const TOPICS: HelpTopic[] = [
   {
+    question: "How do I join a class?",
+    answer:
+      "Ask your teacher for the class code. Open Courses and enter it under Join a class. You can also enter it when you create your account.",
+  },
+  {
     question: "How do I study a lesson?",
     answer: (
       <>

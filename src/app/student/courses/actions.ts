@@ -104,3 +104,20 @@ export async function reportUnitQuizFocusLoss(attemptId: string) {
     // Best effort: a failed report must never interrupt the student.
   }
 }
+
+/** Joins a class with the code the teacher shared. */
+export async function joinClass(
+  code: string,
+): Promise<{ ok: true; name: string } | { ok: false; error: string }> {
+  try {
+    const joined = await api.course.joinByCode({ code });
+    revalidatePath("/student", "layout");
+    return { ok: true, name: joined.name };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error ? error.message : "Could not join the class.",
+    };
+  }
+}

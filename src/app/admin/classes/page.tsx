@@ -53,6 +53,7 @@ export default async function ClassesPage() {
                 <tr>
                   <th className="px-5 py-2.5">Course</th>
                   <th className="px-4 py-2.5">Section</th>
+                  <th className="px-4 py-2.5">Class code</th>
                   <th className="px-4 py-2.5">Teacher</th>
                   <th className="px-4 py-2.5">Period / room</th>
                   <th className="px-5 py-2.5 text-right">Students</th>
@@ -71,6 +72,9 @@ export default async function ClassesPage() {
                       <p className="text-muted text-xs">{c.course.code}</p>
                     </td>
                     <td className="text-ink px-4 py-3">{c.code}</td>
+                    <td className="text-ink px-4 py-3 font-mono font-bold tracking-wider">
+                      {c.joinCode}
+                    </td>
                     <td className="text-muted px-4 py-3">
                       {[c.teacher.user.title, c.teacher.user.name]
                         .filter(Boolean)

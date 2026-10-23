@@ -9,6 +9,11 @@ const link = "text-brand font-semibold hover:underline";
 
 const TOPICS: HelpTopic[] = [
   {
+    question: "How do students join my class?",
+    answer:
+      "Each class has a class code, shown on your Courses page next to the section name. Share it with your students: they enter it when they create their account, or later with Join a class on their Courses page. The registrar can also add students for you.",
+  },
+  {
     question: "How do I add or change a lecture?",
     answer: (
       <>

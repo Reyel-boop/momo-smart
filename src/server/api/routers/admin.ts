@@ -354,6 +354,7 @@ export const adminRouter = createTRPCRouter({
       select: {
         id: true,
         code: true,
+        joinCode: true,
         period: true,
         room: true,
         capacity: true,
@@ -375,6 +376,7 @@ export const adminRouter = createTRPCRouter({
         select: {
           id: true,
           code: true,
+          joinCode: true,
           period: true,
           room: true,
           capacity: true,

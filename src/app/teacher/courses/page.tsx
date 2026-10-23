@@ -135,7 +135,11 @@ export default async function CoursesPage({
                         className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white"
                       >
                         <UsersIcon className="size-3.5" />
-                        {section.code} · {section.studentCount} students
+                        {section.code} · {section.studentCount} students · Class
+                        code{" "}
+                        <span className="font-mono font-bold tracking-wider">
+                          {section.joinCode}
+                        </span>
                       </span>
                     ))}
                   </div>

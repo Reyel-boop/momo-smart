@@ -5,15 +5,24 @@ import {
   adminProcedure,
   createTRPCRouter,
   protectedProcedure,
+  studentProcedure,
   teacherProcedure,
 } from "~/server/api/trpc";
 import { LECTURE_SECTION_TITLE } from "~/lib/video";
+import { joinClassByCode } from "~/server/lib/join-class";
 import {
   assertSectionAccess,
   assertTeachesSection,
 } from "~/server/lib/permissions";
 
 export const courseRouter = createTRPCRouter({
+  /** A student joins a class with the code their teacher shared. */
+  joinByCode: studentProcedure
+    .input(z.object({ code: z.string().trim().min(1).max(20) }))
+    .mutation(({ ctx, input }) =>
+      joinClassByCode(ctx.db, ctx.studentId, input.code),
+    ),
+
   /**
    * Every section the caller is attached to this term — enrolled sections for a
    * student, taught sections for a teacher. Powers the "Active Courses" grid
@@ -117,6 +126,7 @@ export const courseRouter = createTRPCRouter({
       select: {
         id: true,
         code: true,
+        joinCode: true,
         courseId: true,
         _count: { select: { enrollments: { where: { status: "ACTIVE" } } } },
         pacing: { select: { unitId: true, status: true } },
@@ -273,6 +283,7 @@ export const courseRouter = createTRPCRouter({
         sections: courseSections.map((s) => ({
           id: s.id,
           code: s.code,
+          joinCode: s.joinCode,
           studentCount: s._count.enrollments,
         })),
         completedUnits: units.filter((u) => u.status === "COMPLETED").length,

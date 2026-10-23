@@ -11,6 +11,7 @@ import { Card, EmptyState } from "~/app/_components/ui";
 import { courseTone, teacherFullName } from "~/app/student/_components/format";
 import { api } from "~/trpc/server";
 import type { RouterOutputs } from "~/trpc/react";
+import { JoinClass } from "./join-class";
 
 type Section = RouterOutputs["course"]["mySections"][number];
 type Units = RouterOutputs["course"]["syllabus"];
@@ -47,6 +48,8 @@ export async function CoursesOverview({ sections }: { sections: Section[] }) {
         </p>
       </div>
 
+      <JoinClass />
+
       {resume && (
         <Link
           href={`/student/courses?lesson=${resume.lesson.id}`}
@@ -72,7 +75,8 @@ export async function CoursesOverview({ sections }: { sections: Section[] }) {
       {sections.length === 0 ? (
         <Card>
           <EmptyState>
-            You are not enrolled in any courses this term.
+            You are not in any class yet. Enter the class code your teacher gave
+            you above.
           </EmptyState>
         </Card>
       ) : (

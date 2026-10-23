@@ -33,7 +33,7 @@ export default async function ClassPage({
       </nav>
       <PageHeader
         title={`${detail.course.name} — ${detail.code}`}
-        subtitle={`${teacher} · Period ${detail.period}${detail.room ? ` · ${detail.room}` : ""} · ${detail.enrollments.length} of ${detail.capacity} seats filled`}
+        subtitle={`${teacher} · Period ${detail.period}${detail.room ? ` · ${detail.room}` : ""} · ${detail.enrollments.length} of ${detail.capacity} seats filled · Students can join with class code ${detail.joinCode}`}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
