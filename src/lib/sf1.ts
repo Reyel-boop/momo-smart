@@ -3,8 +3,8 @@
  *
  * The sheet starts with school details ("School Year", "Grade Level",
  * "Section" with their values beside them), then a table whose header row
- * has "LRN", the learner's name (one cell "LAST, FIRST, EXT, MIDDLE" or
- * split across several columns) and "Sex". Learners are listed males first,
+ * has "LRN", the learner's name (one cell "LAST,FIRST, MIDDLE" or
+ * "LAST, FIRST, EXT, MIDDLE", or split across several columns) and "Sex". Learners are listed males first,
  * with "TOTAL MALE / FEMALE" rows in between; those have no LRN and are
  * skipped.
  */
@@ -42,14 +42,31 @@ function suffixOf(ext: string) {
   return `${titleCase(bare)}.`;
 }
 
+const EXTENSION = /^(jr|sr|ii|iii|iv)\.?$/i;
+/** "-" or "N/A" written where there is no middle name. */
+const blank = (value: string) =>
+  /^[-–.\s]*$|^n\/?a$/i.test(value) ? "" : value;
+
 /**
- * Turns SF1's "LAST, FIRST, EXTENSION, MIDDLE" into "First M. Last Ext".
- * Without commas the name is kept as written.
+ * Turns SF1's "LAST,FIRST, MIDDLE" or "LAST, FIRST, EXTENSION, MIDDLE" into
+ * "First M. Last Ext". An extension written with a name ("JR VILLACORTA",
+ * "CHRISTOPHER JR") is moved to the end. Without commas the name is kept as
+ * written.
  */
 export function sf1Name(raw: string) {
-  const parts = raw.split(",").map((p) => p.trim());
+  const parts = raw.split(",").map((p) => blank(p.replace(/\s+/g, " ").trim()));
   if (parts.length < 2) return titleCase(raw.replace(/\s+/g, " ").trim());
-  const [last = "", first = "", ext = "", middle = ""] = parts;
+  // Three parts: LAST, FIRST, MIDDLE. Four or more: LAST, FIRST, EXT, MIDDLE.
+  const [last = "", rawFirst = "", rawExt = "", rawMiddle = ""] =
+    parts.length === 3 ? [parts[0], parts[1], "", parts[2]] : parts;
+  let ext = rawExt;
+  const pull = (value: string) => {
+    const words = value.split(" ").filter(Boolean);
+    if (!ext) ext = words.find((w) => EXTENSION.test(w)) ?? "";
+    return words.filter((w) => !EXTENSION.test(w)).join(" ");
+  };
+  const first = pull(rawFirst);
+  const middle = pull(rawMiddle);
   const initial = middle ? ` ${middle[0]!.toUpperCase()}.` : "";
   return `${titleCase(first)}${initial} ${titleCase(last)} ${suffixOf(ext)}`
     .replace(/\s+/g, " ")
@@ -89,9 +106,17 @@ export function parseSchoolForm1(rows: Cell[][]): Sf1 | null {
   let skipped = 0;
   for (const row of rows.slice(headerIndex + 1)) {
     const lrn = text(row[lrnCol]).replace(/\s+/g, "");
-    // Keep empty cells in a split name so "Middle Name" stays in its place.
+    // The whole name in one cell ("LAST,FIRST, MIDDLE", beside empty merged
+    // cells), or split across columns: then keep empty cells so "Middle
+    // Name" stays in its place.
     const nameCells = row.slice(lrnCol + 1, sexCol).map(text);
-    const rawName = nameCells.some(Boolean) ? nameCells.join(", ") : "";
+    const filled = nameCells.filter(Boolean);
+    const rawName =
+      filled.length === 1
+        ? filled[0]!
+        : filled.length > 1
+          ? nameCells.join(", ")
+          : "";
     if (!/^\d{12}$/.test(lrn)) {
       // A row with a name but no valid LRN is a learner we can't add.
       if (rawName && /\d{6,}/.test(lrn)) skipped++;
