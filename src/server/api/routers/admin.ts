@@ -146,13 +146,31 @@ export const adminRouter = createTRPCRouter({
       z.object({
         role: z.enum(["TEACHER", "STUDENT"]),
         query: z.string().trim().max(80).optional(),
+        /** A section name such as "Rizal", or "none" for students in no class. */
+        section: z.string().trim().max(80).optional(),
       }),
     )
     .query(({ ctx, input }) => {
       const q = input.query;
+      const inSection = (code?: string) => ({
+        enrollments: {
+          some: {
+            status: "ACTIVE" as const,
+            section: { term: { isCurrent: true }, ...(code ? { code } : {}) },
+          },
+        },
+      });
       return ctx.db.user.findMany({
         where: {
           role: input.role,
+          ...(input.role === "STUDENT" && input.section
+            ? {
+                studentProfile:
+                  input.section === "none"
+                    ? { NOT: inSection() }
+                    : inSection(input.section),
+              }
+            : {}),
           ...(q
             ? {
                 OR: [
@@ -189,6 +207,13 @@ export const adminRouter = createTRPCRouter({
               gradeLevel: true,
               _count: {
                 select: { enrollments: { where: { status: "ACTIVE" } } },
+              },
+              enrollments: {
+                where: {
+                  status: "ACTIVE",
+                  section: { term: { isCurrent: true } },
+                },
+                select: { section: { select: { code: true } } },
               },
             },
           },
