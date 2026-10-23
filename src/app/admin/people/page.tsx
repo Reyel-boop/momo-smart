@@ -13,6 +13,7 @@ import {
   ImportStudentsButton,
   PersonActions,
 } from "./people-actions";
+import { SectionSelect } from "./section-select";
 
 export const metadata: Metadata = { title: "People · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -64,27 +65,6 @@ export default async function PeoplePage({
         )
       : found;
   const grouped = role === "STUDENT" && !section;
-  const sectionHref = (value: string) => {
-    const search = new URLSearchParams({ role });
-    if (query) search.set("q", query);
-    if (value) search.set("section", value);
-    return `/admin/people?${search.toString()}`;
-  };
-  const chip = (value: string, label: string) => (
-    <Link
-      key={value || "all"}
-      href={sectionHref(value)}
-      aria-current={section === value ? "page" : undefined}
-      className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-        section === value
-          ? "bg-brand text-white"
-          : "border-line bg-surface text-ink hover:bg-canvas border"
-      }`}
-    >
-      {label}
-    </Link>
-  );
-
   const tab = (value: "STUDENT" | "TEACHER", label: string) => (
     <Link
       href={`/admin/people?role=${value}`}
@@ -133,6 +113,11 @@ export default async function PeoplePage({
       <div className="flex flex-wrap items-center gap-3">
         {tab("STUDENT", "Students")}
         {tab("TEACHER", "Teachers")}
+        {role === "STUDENT" && (
+          <div className="sm:ml-4">
+            <SectionSelect sections={sections} value={section} />
+          </div>
+        )}
         <form
           action="/admin/people"
           className="relative ml-auto w-full max-w-xs"
@@ -153,18 +138,6 @@ export default async function PeoplePage({
           />
         </form>
       </div>
-
-      {role === "STUDENT" && sections.length > 0 && (
-        <nav
-          aria-label="Filter by section"
-          className="flex flex-wrap items-center gap-2"
-        >
-          <span className="text-muted mr-1 text-xs font-bold">Section</span>
-          {chip("", "All")}
-          {sections.map((code) => chip(code, code))}
-          {chip("none", "No section")}
-        </nav>
-      )}
 
       <Card className="overflow-hidden">
         <CardHeader
