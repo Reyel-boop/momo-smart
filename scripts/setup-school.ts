@@ -1,15 +1,17 @@
 /**
- * Sets up a real (non-demo) school on an EMPTY database:
+ * Sets up a real (non-demo) school:
  *
  *   DATABASE_URL="postgresql://…" npx tsx scripts/setup-school.ts \
- *     registrar@yourschool.edu.ph "Registrar Name"
+ *     registrar@yourschool.edu.ph "Registrar Name" [--replace-demo]
  *
  * Run `npx prisma migrate deploy` against the database first. This creates
  * the curriculum (Grade 10 core subjects and TLE 7–10 with their lessons,
  * lectures and Unit Questions bank), the current school year, and one admin
  * account with a temporary password that must be changed at first sign-in.
  *
- * It refuses to run on a database that already has users.
+ * Normally it refuses to run on a database that already has users. With
+ * --replace-demo it first clears a DEMO database — only if every account in
+ * it is a demo (@momosmart.edu) account — keeping the waitlist sign-ups.
  */
 import { randomInt } from "node:crypto";
 
@@ -24,18 +26,48 @@ const group = () =>
     "",
   );
 
+/** Tables kept when clearing the demo: migration history and waitlist leads. */
+const KEEP = new Set(["_prisma_migrations", "WaitlistEntry"]);
+
+async function clearDemo(db: PrismaClient) {
+  const real = await db.user.count({
+    where: {
+      NOT: [
+        { email: { endsWith: "@momosmart.edu" } },
+        { email: { endsWith: "@student.momosmart.edu" } },
+      ],
+    },
+  });
+  if (real > 0) {
+    throw new Error(
+      `Refusing to clear: ${real} account(s) are not demo accounts. This is not a demo database.`,
+    );
+  }
+  const tables = await db.$queryRawUnsafe<Array<{ tablename: string }>>(
+    `SELECT tablename FROM pg_tables WHERE schemaname = 'public'`,
+  );
+  const wipe = tables.map((t) => t.tablename).filter((t) => !KEEP.has(t));
+  await db.$executeRawUnsafe(
+    `TRUNCATE ${wipe.map((t) => `"${t}"`).join(", ")} RESTART IDENTITY CASCADE`,
+  );
+  console.log(`Cleared ${wipe.length} demo tables (kept the waitlist).`);
+}
+
 async function main() {
-  const [email, ...nameParts] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const replaceDemo = args.includes("--replace-demo");
+  const [email, ...nameParts] = args.filter((a) => !a.startsWith("--"));
   const name = nameParts.join(" ").trim() || "School Registrar";
   if (!email?.includes("@")) {
     console.error(
-      'Usage: npx tsx scripts/setup-school.ts <admin email> "<admin name>"',
+      'Usage: npx tsx scripts/setup-school.ts <admin email> "<admin name>" [--replace-demo]',
     );
     process.exit(1);
   }
 
   const db = new PrismaClient();
   try {
+    if (replaceDemo) await clearDemo(db);
     const users = await db.user.count();
     if (users > 0) {
       console.error(
