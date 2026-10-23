@@ -5,12 +5,13 @@ import { z } from "zod";
 
 import { signIn, signOut } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
+import { accountWhere } from "~/server/auth/identifier";
 import { db } from "~/server/db";
 
 export type LoginState = { error: string | null };
 
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid school email address."),
+  email: z.string().trim().min(1, "Enter your email or LRN."),
   password: z.string().min(1, "Enter your password."),
 });
 
@@ -34,8 +35,8 @@ export async function login(
   // `signIn` redirects by throwing, so the destination has to be chosen before
   // the call. Looking up the role here is safe: on bad credentials `signIn`
   // throws first and no redirect happens, so nothing is revealed.
-  const account = await db.user.findUnique({
-    where: { email: parsed.data.email.toLowerCase() },
+  const account = await db.user.findFirst({
+    where: accountWhere(parsed.data.email),
     select: { role: true },
   });
 

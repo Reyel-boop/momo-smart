@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 
 import { db } from "~/server/db";
+import { accountWhere } from "./identifier";
 import type { UserRole } from "../../../generated/prisma";
 
 /**
@@ -67,8 +68,9 @@ function readClaims(token: Record<string, unknown>): SessionClaims {
   };
 }
 
+/** `email` holds an email address or, for some students, their LRN. */
 const credentialsSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().min(1).max(200),
   password: z.string().min(1),
 });
 
@@ -103,8 +105,8 @@ export const authConfig = {
         const parsed = credentialsSchema.safeParse(raw);
         if (!parsed.success) return null;
 
-        const user = await db.user.findUnique({
-          where: { email: parsed.data.email.toLowerCase() },
+        const user = await db.user.findFirst({
+          where: accountWhere(parsed.data.email),
           select: {
             id: true,
             name: true,

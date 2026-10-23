@@ -9,6 +9,7 @@ import {
   teacherProcedure,
 } from "~/server/api/trpc";
 import { LECTURE_SECTION_TITLE } from "~/lib/video";
+import { importRoster, rosterRow } from "~/server/lib/import-roster";
 import { joinClassByCode } from "~/server/lib/join-class";
 import {
   assertSectionAccess,
@@ -16,6 +17,22 @@ import {
 } from "~/server/lib/permissions";
 
 export const courseRouter = createTRPCRouter({
+  /**
+   * A teacher adds the students of a School Form 1 to one of their classes;
+   * new students get an account signing in with their LRN.
+   */
+  importRoster: teacherProcedure
+    .input(
+      z.object({
+        rows: z.array(rosterRow).min(1).max(200),
+        sectionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
+      return importRoster(ctx.db, input.rows, input.sectionId);
+    }),
+
   /** A student joins a class with the code their teacher shared. */
   joinByCode: studentProcedure
     .input(z.object({ code: z.string().trim().min(1).max(20) }))
@@ -57,6 +74,7 @@ export const courseRouter = createTRPCRouter({
         select: {
           id: true,
           code: true,
+          joinCode: true,
           period: true,
           room: true,
           capacity: true,

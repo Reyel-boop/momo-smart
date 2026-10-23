@@ -10,10 +10,13 @@ import {
   EmptyState,
   Pill,
 } from "~/app/_components/ui";
+import { Sf1Upload } from "~/app/_components/sf1-upload";
 import { api } from "~/trpc/server";
 
 export const metadata: Metadata = { title: "Roster · Momo Smart" };
 export const dynamic = "force-dynamic";
+// Uploading School Form 1 hashes a password per new student.
+export const maxDuration = 60;
 
 const gradeTone = (percent: number | null) =>
   percent == null
@@ -56,6 +59,22 @@ export default async function RosterPage({
       <PageHeader
         title="Roster"
         subtitle={`${studentCount} student${studentCount === 1 ? "" : "s"} across ${visible.length} class section${visible.length === 1 ? "" : "s"}. Open a student to see their grades, attendance and family contacts.`}
+        action={
+          sections.length > 0 && (
+            <Sf1Upload
+              classes={(activeId
+                ? sections.filter((s) => s.id === activeId)
+                : sections
+              ).map((s) => ({
+                id: s.id,
+                label: `${s.course.name} — ${s.code}`,
+              }))}
+              allowNoClass={false}
+              mode="teacher"
+              buttonClassName="bg-navy hover:bg-navy-deep rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            />
+          )
+        }
       />
       <SectionTabs
         sections={sections.map((s) => ({
@@ -80,7 +99,10 @@ export default async function RosterPage({
               subtitle={`Period ${section.period}${section.room ? ` · ${section.room}` : ""} · ${roster.length} student${roster.length === 1 ? "" : "s"}`}
             />
             {roster.length === 0 ? (
-              <EmptyState>No students enrolled.</EmptyState>
+              <EmptyState>
+                No students yet. Use Upload School Form 1, or share the class
+                code {section.joinCode} with your students.
+              </EmptyState>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">

@@ -10,6 +10,7 @@ import {
   HelpIcon,
   SettingsIcon,
   StarIcon,
+  UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
 import { Avatar } from "~/app/_components/ui";
@@ -35,6 +36,7 @@ export function Sidebar({
       href: "/teacher/assignments",
       badge: ungradedCount,
     },
+    { label: "Roster", href: "/teacher/roster" },
     { label: "Grades", href: "/teacher/grades" },
     { label: "Calendar", href: "/teacher/calendar" },
     { label: "Messages", href: "/teacher/messages", dot: unreadMessages > 0 },
@@ -44,6 +46,7 @@ export function Sidebar({
     Dashboard: <GridIcon className="size-[18px]" />,
     Courses: <CapIcon className="size-[18px]" />,
     Assignments: <ClipboardIcon className="size-[18px]" />,
+    Roster: <UsersIcon className="size-[18px]" />,
     Grades: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,

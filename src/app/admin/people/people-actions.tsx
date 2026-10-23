@@ -84,7 +84,7 @@ function PasswordNotice({
           </dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt className="text-muted">Email</dt>
+          <dt className="text-muted">Sign in with</dt>
           <dd className="text-ink font-semibold">{email}</dd>
         </div>
         <div className="flex justify-between gap-3">
@@ -98,7 +98,9 @@ function PasswordNotice({
           className={secondary}
           onClick={() => {
             void navigator.clipboard
-              .writeText(`Email: ${email}\nTemporary password: ${password}`)
+              .writeText(
+                `Sign in with: ${email}\nTemporary password: ${password}`,
+              )
               .then(() => setCopied(true));
           }}
         >

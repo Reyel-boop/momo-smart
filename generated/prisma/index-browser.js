@@ -131,6 +131,7 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   title: 'title',
   isActive: 'isActive',
+  mustChangePassword: 'mustChangePassword',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -246,7 +247,8 @@ exports.Prisma.SectionScalarFieldEnum = {
   code: 'code',
   period: 'period',
   room: 'room',
-  capacity: 'capacity'
+  capacity: 'capacity',
+  joinCode: 'joinCode'
 };
 
 exports.Prisma.SectionMeetingScalarFieldEnum = {

@@ -5,6 +5,7 @@ import { timeAgo } from "~/app/_components/format";
 import { SearchIcon, UsersIcon } from "~/app/_components/icons";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
+import { Sf1Upload } from "~/app/_components/sf1-upload";
 import { api } from "~/trpc/server";
 import {
   AddPersonButton,
@@ -52,6 +53,17 @@ export default async function PeoplePage({
         subtitle="Add teachers and students. Each new account gets a temporary password they change the first time they sign in."
         action={
           <>
+            {role === "STUDENT" && (
+              <Sf1Upload
+                classes={classes.map((c) => ({
+                  id: c.id,
+                  label: `${c.course.name} — ${c.code}`,
+                }))}
+                allowNoClass
+                mode="admin"
+                buttonClassName="bg-brand hover:bg-brand/90 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+              />
+            )}
             {role === "STUDENT" && (
               <ImportStudentsButton
                 classes={classes.map((c) => ({
@@ -131,7 +143,9 @@ export default async function PeoplePage({
                     >
                       <td className="px-5 py-3">
                         <p className="text-ink font-semibold">{name}</p>
-                        <p className="text-muted text-xs">{person.email}</p>
+                        <p className="text-muted text-xs">
+                          {person.email ?? "Signs in with LRN"}
+                        </p>
                       </td>
                       <td className="text-muted px-4 py-3">
                         {person.studentProfile?.studentNumber ??
@@ -165,7 +179,11 @@ export default async function PeoplePage({
                         <PersonActions
                           userId={person.id}
                           name={name}
-                          email={person.email ?? ""}
+                          email={
+                            person.email ??
+                            person.studentProfile?.studentNumber ??
+                            ""
+                          }
                           active={person.isActive}
                         />
                       </td>

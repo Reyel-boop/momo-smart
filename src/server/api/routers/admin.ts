@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { createUnitQuizzesForSection } from "~/server/curriculum";
+import { importRoster, rosterRow } from "~/server/lib/import-roster";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 /**
@@ -283,6 +284,21 @@ export const adminRouter = createTRPCRouter({
       }
       return results;
     }),
+
+  /**
+   * Adds the students of a School Form 1 (or class list): new students get an
+   * account signing in with their LRN; everyone is enrolled in the class.
+   */
+  importRoster: adminProcedure
+    .input(
+      z.object({
+        rows: z.array(rosterRow).min(1).max(200),
+        sectionId: z.string().nullable(),
+      }),
+    )
+    .mutation(({ ctx, input }) =>
+      importRoster(ctx.db, input.rows, input.sectionId),
+    ),
 
   /** Issues a new temporary password, to be changed at next sign-in. */
   resetPassword: adminProcedure

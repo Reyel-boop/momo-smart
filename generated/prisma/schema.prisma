@@ -34,20 +34,23 @@ enum UserRole {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole  @default(STUDENT)
+  id                 String    @id @default(cuid())
+  name               String?
+  email              String?   @unique
+  emailVerified      DateTime?
+  image              String?
+  role               UserRole  @default(STUDENT)
   /// bcrypt hash for email + password sign-in; null for SSO-only accounts.
-  passwordHash  String?
+  passwordHash       String?
   /// Honorific shown in the UI ("Dr.", "Ms.", "Mr.").
-  title         String?
-  isActive      Boolean   @default(true)
-  lastLoginAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  title              String?
+  isActive           Boolean   @default(true)
+  /// Set for accounts created or reset by the registrar with a temporary
+  /// password; the user must choose their own before using the app.
+  mustChangePassword Boolean   @default(false)
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]
@@ -276,6 +279,8 @@ model Section {
   period   Int
   room     String?
   capacity Int     @default(30)
+  /// Code students enter to join the class ("Join a class" / sign-up).
+  joinCode String  @unique @default(dbgenerated("upper(substr(md5((random())::text || (clock_timestamp())::text), 1, 6))"))
 
   course  Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   term    Term           @relation(fields: [termId], references: [id], onDelete: Cascade)

@@ -49,17 +49,19 @@ export function LoginForm({
             htmlFor={emailId}
             className="text-ink mb-1.5 block text-sm font-semibold"
           >
-            School email
+            Email or LRN
           </label>
           <input
             id={emailId}
             name="email"
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@yourschool.edu.ph"
+            placeholder="you@yourschool.edu.ph or your 12-digit LRN"
             className="border-line bg-surface text-ink placeholder:text-muted/70 focus:border-brand focus:ring-brand/12 w-full rounded-xl border px-4 py-3 text-[15px] transition outline-none focus:ring-4"
           />
         </div>

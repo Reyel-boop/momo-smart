@@ -7685,6 +7685,7 @@ export namespace Prisma {
     passwordHash: string | null
     title: string | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7700,6 +7701,7 @@ export namespace Prisma {
     passwordHash: string | null
     title: string | null
     isActive: boolean | null
+    mustChangePassword: boolean | null
     lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7715,6 +7717,7 @@ export namespace Prisma {
     passwordHash: number
     title: number
     isActive: number
+    mustChangePassword: number
     lastLoginAt: number
     createdAt: number
     updatedAt: number
@@ -7732,6 +7735,7 @@ export namespace Prisma {
     passwordHash?: true
     title?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -7747,6 +7751,7 @@ export namespace Prisma {
     passwordHash?: true
     title?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -7762,6 +7767,7 @@ export namespace Prisma {
     passwordHash?: true
     title?: true
     isActive?: true
+    mustChangePassword?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -7850,6 +7856,7 @@ export namespace Prisma {
     passwordHash: string | null
     title: string | null
     isActive: boolean
+    mustChangePassword: boolean
     lastLoginAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -7882,6 +7889,7 @@ export namespace Prisma {
     passwordHash?: boolean
     title?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7913,6 +7921,7 @@ export namespace Prisma {
     passwordHash?: boolean
     title?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7928,6 +7937,7 @@ export namespace Prisma {
     passwordHash?: boolean
     title?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7943,12 +7953,13 @@ export namespace Prisma {
     passwordHash?: boolean
     title?: boolean
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "passwordHash" | "title" | "isActive" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "passwordHash" | "title" | "isActive" | "mustChangePassword" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -8005,6 +8016,11 @@ export namespace Prisma {
        */
       title: string | null
       isActive: boolean
+      /**
+       * Set for accounts created or reset by the registrar with a temporary
+       * password; the user must choose their own before using the app.
+       */
+      mustChangePassword: boolean
       lastLoginAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -8455,6 +8471,7 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly title: FieldRef<"User", 'String'>
     readonly isActive: FieldRef<"User", 'Boolean'>
+    readonly mustChangePassword: FieldRef<"User", 'Boolean'>
     readonly lastLoginAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -21722,6 +21739,7 @@ export namespace Prisma {
     period: number | null
     room: string | null
     capacity: number | null
+    joinCode: string | null
   }
 
   export type SectionMaxAggregateOutputType = {
@@ -21733,6 +21751,7 @@ export namespace Prisma {
     period: number | null
     room: string | null
     capacity: number | null
+    joinCode: string | null
   }
 
   export type SectionCountAggregateOutputType = {
@@ -21744,6 +21763,7 @@ export namespace Prisma {
     period: number
     room: number
     capacity: number
+    joinCode: number
     _all: number
   }
 
@@ -21767,6 +21787,7 @@ export namespace Prisma {
     period?: true
     room?: true
     capacity?: true
+    joinCode?: true
   }
 
   export type SectionMaxAggregateInputType = {
@@ -21778,6 +21799,7 @@ export namespace Prisma {
     period?: true
     room?: true
     capacity?: true
+    joinCode?: true
   }
 
   export type SectionCountAggregateInputType = {
@@ -21789,6 +21811,7 @@ export namespace Prisma {
     period?: true
     room?: true
     capacity?: true
+    joinCode?: true
     _all?: true
   }
 
@@ -21887,6 +21910,7 @@ export namespace Prisma {
     period: number
     room: string | null
     capacity: number
+    joinCode: string
     _count: SectionCountAggregateOutputType | null
     _avg: SectionAvgAggregateOutputType | null
     _sum: SectionSumAggregateOutputType | null
@@ -21917,6 +21941,7 @@ export namespace Prisma {
     period?: boolean
     room?: boolean
     capacity?: boolean
+    joinCode?: boolean
     course?: boolean | CourseDefaultArgs<ExtArgs>
     term?: boolean | TermDefaultArgs<ExtArgs>
     teacher?: boolean | TeacherProfileDefaultArgs<ExtArgs>
@@ -21943,6 +21968,7 @@ export namespace Prisma {
     period?: boolean
     room?: boolean
     capacity?: boolean
+    joinCode?: boolean
     course?: boolean | CourseDefaultArgs<ExtArgs>
     term?: boolean | TermDefaultArgs<ExtArgs>
     teacher?: boolean | TeacherProfileDefaultArgs<ExtArgs>
@@ -21957,6 +21983,7 @@ export namespace Prisma {
     period?: boolean
     room?: boolean
     capacity?: boolean
+    joinCode?: boolean
     course?: boolean | CourseDefaultArgs<ExtArgs>
     term?: boolean | TermDefaultArgs<ExtArgs>
     teacher?: boolean | TeacherProfileDefaultArgs<ExtArgs>
@@ -21971,9 +21998,10 @@ export namespace Prisma {
     period?: boolean
     room?: boolean
     capacity?: boolean
+    joinCode?: boolean
   }
 
-  export type SectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courseId" | "termId" | "teacherId" | "code" | "period" | "room" | "capacity", ExtArgs["result"]["section"]>
+  export type SectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "courseId" | "termId" | "teacherId" | "code" | "period" | "room" | "capacity" | "joinCode", ExtArgs["result"]["section"]>
   export type SectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     course?: boolean | CourseDefaultArgs<ExtArgs>
     term?: boolean | TermDefaultArgs<ExtArgs>
@@ -22035,6 +22063,10 @@ export namespace Prisma {
       period: number
       room: string | null
       capacity: number
+      /**
+       * Code students enter to join the class ("Join a class" / sign-up).
+       */
+      joinCode: string
     }, ExtArgs["result"]["section"]>
     composites: {}
   }
@@ -22480,6 +22512,7 @@ export namespace Prisma {
     readonly period: FieldRef<"Section", 'Int'>
     readonly room: FieldRef<"Section", 'String'>
     readonly capacity: FieldRef<"Section", 'Int'>
+    readonly joinCode: FieldRef<"Section", 'String'>
   }
     
 
@@ -72963,6 +72996,7 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     title: 'title',
     isActive: 'isActive',
+    mustChangePassword: 'mustChangePassword',
     lastLoginAt: 'lastLoginAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -73114,7 +73148,8 @@ export namespace Prisma {
     code: 'code',
     period: 'period',
     room: 'room',
-    capacity: 'capacity'
+    capacity: 'capacity',
+    joinCode: 'joinCode'
   };
 
   export type SectionScalarFieldEnum = (typeof SectionScalarFieldEnum)[keyof typeof SectionScalarFieldEnum]
@@ -74292,6 +74327,7 @@ export namespace Prisma {
     passwordHash?: StringNullableFilter<"User"> | string | null
     title?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
+    mustChangePassword?: BoolFilter<"User"> | boolean
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -74322,6 +74358,7 @@ export namespace Prisma {
     passwordHash?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -74355,6 +74392,7 @@ export namespace Prisma {
     passwordHash?: StringNullableFilter<"User"> | string | null
     title?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
+    mustChangePassword?: BoolFilter<"User"> | boolean
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -74385,6 +74423,7 @@ export namespace Prisma {
     passwordHash?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -74406,6 +74445,7 @@ export namespace Prisma {
     passwordHash?: StringNullableWithAggregatesFilter<"User"> | string | null
     title?: StringNullableWithAggregatesFilter<"User"> | string | null
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
+    mustChangePassword?: BoolWithAggregatesFilter<"User"> | boolean
     lastLoginAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -75164,6 +75204,7 @@ export namespace Prisma {
     period?: IntFilter<"Section"> | number
     room?: StringNullableFilter<"Section"> | string | null
     capacity?: IntFilter<"Section"> | number
+    joinCode?: StringFilter<"Section"> | string
     course?: XOR<CourseScalarRelationFilter, CourseWhereInput>
     term?: XOR<TermScalarRelationFilter, TermWhereInput>
     teacher?: XOR<TeacherProfileScalarRelationFilter, TeacherProfileWhereInput>
@@ -75189,6 +75230,7 @@ export namespace Prisma {
     period?: SortOrder
     room?: SortOrderInput | SortOrder
     capacity?: SortOrder
+    joinCode?: SortOrder
     course?: CourseOrderByWithRelationInput
     term?: TermOrderByWithRelationInput
     teacher?: TeacherProfileOrderByWithRelationInput
@@ -75207,6 +75249,7 @@ export namespace Prisma {
 
   export type SectionWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    joinCode?: string
     termId_courseId_code?: SectionTermIdCourseIdCodeCompoundUniqueInput
     AND?: SectionWhereInput | SectionWhereInput[]
     OR?: SectionWhereInput[]
@@ -75232,7 +75275,7 @@ export namespace Prisma {
     pacing?: SectionPacingListRelationFilter
     alerts?: AlertListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
-  }, "id" | "termId_courseId_code">
+  }, "id" | "joinCode" | "termId_courseId_code">
 
   export type SectionOrderByWithAggregationInput = {
     id?: SortOrder
@@ -75243,6 +75286,7 @@ export namespace Prisma {
     period?: SortOrder
     room?: SortOrderInput | SortOrder
     capacity?: SortOrder
+    joinCode?: SortOrder
     _count?: SectionCountOrderByAggregateInput
     _avg?: SectionAvgOrderByAggregateInput
     _max?: SectionMaxOrderByAggregateInput
@@ -75262,6 +75306,7 @@ export namespace Prisma {
     period?: IntWithAggregatesFilter<"Section"> | number
     room?: StringNullableWithAggregatesFilter<"Section"> | string | null
     capacity?: IntWithAggregatesFilter<"Section"> | number
+    joinCode?: StringWithAggregatesFilter<"Section"> | string
   }
 
   export type SectionMeetingWhereInput = {
@@ -78547,6 +78592,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -78577,6 +78623,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -78607,6 +78654,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78637,6 +78685,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78667,6 +78716,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -78682,6 +78732,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -78697,6 +78748,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -79493,6 +79545,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -79518,6 +79571,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -79537,6 +79591,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -79562,6 +79617,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -79584,6 +79640,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
   }
 
   export type SectionUpdateManyMutationInput = {
@@ -79592,6 +79649,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
   }
 
   export type SectionUncheckedUpdateManyInput = {
@@ -79603,6 +79661,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
   }
 
   export type SectionMeetingCreateInput = {
@@ -83197,6 +83256,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     title?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -83212,6 +83272,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     title?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -83227,6 +83288,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     title?: SortOrder
     isActive?: SortOrder
+    mustChangePassword?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -84094,6 +84156,7 @@ export namespace Prisma {
     period?: SortOrder
     room?: SortOrder
     capacity?: SortOrder
+    joinCode?: SortOrder
   }
 
   export type SectionAvgOrderByAggregateInput = {
@@ -84110,6 +84173,7 @@ export namespace Prisma {
     period?: SortOrder
     room?: SortOrder
     capacity?: SortOrder
+    joinCode?: SortOrder
   }
 
   export type SectionMinOrderByAggregateInput = {
@@ -84121,6 +84185,7 @@ export namespace Prisma {
     period?: SortOrder
     room?: SortOrder
     capacity?: SortOrder
+    joinCode?: SortOrder
   }
 
   export type SectionSumOrderByAggregateInput = {
@@ -93392,6 +93457,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -93421,6 +93487,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -93466,6 +93533,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -93495,6 +93563,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -93524,6 +93593,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -93553,6 +93623,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -93598,6 +93669,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -93627,6 +93699,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -93656,6 +93729,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -93685,6 +93759,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -94114,6 +94189,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -94143,6 +94219,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -94506,6 +94583,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -94535,6 +94613,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -94584,6 +94663,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     meetings?: SectionMeetingCreateNestedManyWithoutSectionInput
@@ -94607,6 +94687,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -94687,6 +94768,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -94716,6 +94798,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -94788,6 +94871,7 @@ export namespace Prisma {
     period?: IntFilter<"Section"> | number
     room?: StringNullableFilter<"Section"> | string | null
     capacity?: IntFilter<"Section"> | number
+    joinCode?: StringFilter<"Section"> | string
   }
 
   export type OfficeHourUpsertWithWhereUniqueWithoutTeacherInput = {
@@ -95256,6 +95340,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
     meetings?: SectionMeetingCreateNestedManyWithoutSectionInput
@@ -95279,6 +95364,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -95343,6 +95429,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
     meetings?: SectionMeetingCreateNestedManyWithoutSectionInput
@@ -95366,6 +95453,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -96327,6 +96415,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -96351,6 +96440,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutSectionInput
@@ -96385,6 +96475,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -96409,6 +96500,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutSectionNestedInput
@@ -96427,6 +96519,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -96451,6 +96544,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutSectionInput
@@ -96562,6 +96656,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -96586,6 +96681,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutSectionNestedInput
@@ -97996,6 +98092,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -98020,6 +98117,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -98083,6 +98181,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -98107,6 +98206,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -98572,6 +98672,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -98601,6 +98702,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -98716,6 +98818,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -98745,6 +98848,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -98836,6 +98940,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -98860,6 +98965,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutSectionInput
@@ -98950,6 +99056,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -98974,6 +99081,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutSectionNestedInput
@@ -99008,6 +99116,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -99032,6 +99141,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -99275,6 +99385,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -99299,6 +99410,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -100465,6 +100577,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -100494,6 +100607,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -100608,6 +100722,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100637,6 +100752,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -100854,6 +100970,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -100878,6 +100995,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -101074,6 +101192,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -101098,6 +101217,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -102328,6 +102448,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -102352,6 +102473,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -102379,6 +102501,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -102408,6 +102531,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -102477,6 +102601,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -102501,6 +102626,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -102534,6 +102660,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -102563,6 +102690,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -102823,6 +102951,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -102847,6 +102976,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -102874,6 +103004,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -102903,6 +103034,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -103029,6 +103161,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -103053,6 +103186,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -103086,6 +103220,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103115,6 +103250,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103197,6 +103333,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -103226,6 +103363,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -103314,6 +103452,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103343,6 +103482,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103470,6 +103610,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -103494,6 +103635,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -103642,6 +103784,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -103666,6 +103809,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -103688,6 +103832,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -103717,6 +103862,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -103747,6 +103893,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -103771,6 +103918,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -103831,6 +103979,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103860,6 +104009,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -103896,6 +104046,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -103920,6 +104071,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -103987,6 +104139,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104016,6 +104169,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104096,6 +104250,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104125,6 +104280,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104253,6 +104409,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104282,6 +104439,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104354,6 +104512,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104383,6 +104542,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104433,6 +104593,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104462,6 +104623,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104534,6 +104696,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104563,6 +104726,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104592,6 +104756,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104621,6 +104786,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104666,6 +104832,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104695,6 +104862,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104720,6 +104888,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     course: CourseCreateNestedOneWithoutSectionsInput
     term: TermCreateNestedOneWithoutSectionsInput
     teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
@@ -104744,6 +104913,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
     meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
     enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
     gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
@@ -104771,6 +104941,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104800,6 +104971,7 @@ export namespace Prisma {
     passwordHash?: string | null
     title?: string | null
     isActive?: boolean
+    mustChangePassword?: boolean
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -104841,6 +105013,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
@@ -104865,6 +105038,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -104898,6 +105072,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104927,6 +105102,7 @@ export namespace Prisma {
     passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    mustChangePassword?: BoolFieldUpdateOperationsInput | boolean
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -106276,6 +106452,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
   }
 
   export type OfficeHourCreateManyTeacherInput = {
@@ -106296,6 +106473,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     meetings?: SectionMeetingUpdateManyWithoutSectionNestedInput
@@ -106319,6 +106497,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -106340,6 +106519,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
   }
 
   export type OfficeHourUpdateWithoutTeacherInput = {
@@ -106492,6 +106672,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
   }
 
   export type SectionUpdateWithoutTermInput = {
@@ -106500,6 +106681,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
     meetings?: SectionMeetingUpdateManyWithoutSectionNestedInput
@@ -106523,6 +106705,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -106544,6 +106727,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
   }
 
   export type SectionCreateManyCourseInput = {
@@ -106554,6 +106738,7 @@ export namespace Prisma {
     period: number
     room?: string | null
     capacity?: number
+    joinCode?: string
   }
 
   export type UnitCreateManyCourseInput = {
@@ -106570,6 +106755,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     term?: TermUpdateOneRequiredWithoutSectionsNestedInput
     teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
     meetings?: SectionMeetingUpdateManyWithoutSectionNestedInput
@@ -106593,6 +106779,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
     meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
     enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
     gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
@@ -106614,6 +106801,7 @@ export namespace Prisma {
     period?: IntFieldUpdateOperationsInput | number
     room?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
   }
 
   export type UnitUpdateWithoutCourseInput = {
