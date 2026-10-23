@@ -16,6 +16,7 @@ import { humanise, longDate } from "~/app/_components/format";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { LectureEditor } from "./_components/lecture-editor";
+import { TeachCourse } from "./_components/teach-course";
 import { UnitStatusSelect } from "./unit-status";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
@@ -54,8 +55,15 @@ export default async function CoursesPage({
   const params = await searchParams;
   const requested =
     typeof params.subject === "string" ? params.subject : undefined;
-  const subjects = (await api.course.teachingUnits()).sort(
-    (a, b) => subjectRank(a.code) - subjectRank(b.code),
+  const [allSubjects, homerooms] = await Promise.all([
+    api.course.teachingUnits(),
+    api.course.homerooms(),
+  ]);
+  // Every course is listed; the ones this teacher has classes in come first.
+  const subjects = allSubjects.sort(
+    (a, b) =>
+      Number(b.sections.length > 0) - Number(a.sections.length > 0) ||
+      subjectRank(a.code) - subjectRank(b.code),
   );
 
   const active =
@@ -69,7 +77,7 @@ export default async function CoursesPage({
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageHeader
         title="Courses"
-        subtitle={`${subjects.length} subject${subjects.length === 1 ? "" : "s"} • ${totalUnits} units • ${sectionCount} class section${sectionCount === 1 ? "" : "s"} this quarter. Open a unit to see its lessons and the activities students answer.`}
+        subtitle={`${subjects.length} subject${subjects.length === 1 ? "" : "s"} • ${totalUnits} units • You teach ${sectionCount} class${sectionCount === 1 ? "" : "es"} this quarter. Open any course to see its lessons, or start teaching it to a section.`}
       />
 
       {!active ? (
@@ -101,8 +109,9 @@ export default async function CoursesPage({
                   <span
                     className={`block text-[11px] font-semibold ${isActive ? "text-white/70" : "text-muted"}`}
                   >
-                    {subject.units.length} units · {subject.completedUnits}{" "}
-                    completed
+                    {subject.sections.length > 0
+                      ? `${subject.units.length} units · ${subject.completedUnits} completed`
+                      : `${subject.units.length} units · not teaching yet`}
                   </span>
                 </Link>
               );
@@ -143,6 +152,30 @@ export default async function CoursesPage({
                       </span>
                     ))}
                   </div>
+                  <TeachCourse
+                    key={active.id}
+                    courseId={active.id}
+                    courseName={active.name}
+                    sections={homerooms
+                      .filter(
+                        (room) =>
+                          !active.sections.some(
+                            (section) =>
+                              section.code.toLowerCase() ===
+                              room.name.slice(0, 20).toLowerCase(),
+                          ),
+                      )
+                      .map((room) => ({
+                        id: room.id,
+                        label: `Grade ${room.gradeLevel} — ${room.name}`,
+                      }))}
+                  />
+                  {homerooms.length === 0 && (
+                    <p className="mt-3 text-xs text-white/60">
+                      No sections yet — the registrar adds them (Sections, or by
+                      uploading a School Form 1).
+                    </p>
+                  )}
                 </div>
                 <div className="w-full max-w-60">
                   <p className="text-xs font-semibold text-white/70">

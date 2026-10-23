@@ -10,6 +10,7 @@ import {
 } from "~/server/api/trpc";
 import { LECTURE_SECTION_TITLE } from "~/lib/video";
 import { homeroom, importRoster, rosterRow } from "~/server/lib/import-roster";
+import { createUnitQuizzesForSection } from "~/server/curriculum";
 import { joinClassByCode } from "~/server/lib/join-class";
 import {
   assertSectionAccess,
@@ -27,6 +28,84 @@ export const courseRouter = createTRPCRouter({
     .mutation(({ ctx, input }) =>
       importRoster(ctx.db, input.rows, [], input.homeroom),
     ),
+
+  /** The sections (homerooms) a teacher can start a class for. */
+  homerooms: teacherProcedure.query(({ ctx }) =>
+    ctx.db.homeroom.findMany({
+      orderBy: [{ gradeLevel: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, gradeLevel: true },
+    }),
+  ),
+
+  /**
+   * A teacher starts teaching a course to a section: the class is created
+   * with its Unit Questions and a class code students join with.
+   */
+  startClass: teacherProcedure
+    .input(z.object({ courseId: z.string(), homeroomId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const teacherId = ctx.session.user.teacherId;
+      const [term, room, course] = await Promise.all([
+        ctx.db.term.findFirst({
+          where: { isCurrent: true },
+          select: { id: true },
+        }),
+        ctx.db.homeroom.findUnique({
+          where: { id: input.homeroomId },
+          select: { name: true },
+        }),
+        ctx.db.course.findUnique({
+          where: { id: input.courseId },
+          select: { name: true },
+        }),
+      ]);
+      if (!teacherId || !term || !room || !course) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: !term
+            ? "There is no current school term set up."
+            : "That course or section no longer exists.",
+        });
+      }
+      const code = room.name.slice(0, 20);
+      const existing = await ctx.db.section.findUnique({
+        where: {
+          termId_courseId_code: {
+            termId: term.id,
+            courseId: input.courseId,
+            code,
+          },
+        },
+        select: {
+          id: true,
+          joinCode: true,
+          teacherId: true,
+          teacher: { select: { user: { select: { name: true } } } },
+        },
+      });
+      if (existing) {
+        if (existing.teacherId === teacherId) {
+          return { sectionId: existing.id, joinCode: existing.joinCode };
+        }
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `${existing.teacher.user.name ?? "Another teacher"} already teaches ${course.name} to ${code}.`,
+        });
+      }
+      const section = await ctx.db.section.create({
+        data: {
+          termId: term.id,
+          courseId: input.courseId,
+          teacherId,
+          code,
+          period: 1,
+          capacity: 60,
+        },
+        select: { id: true, joinCode: true },
+      });
+      await createUnitQuizzesForSection(ctx.db, section.id);
+      return { sectionId: section.id, joinCode: section.joinCode };
+    }),
 
   /** A student joins a class with the code their teacher shared. */
   joinByCode: studentProcedure
@@ -145,11 +224,10 @@ export const courseRouter = createTRPCRouter({
         pacing: { select: { unitId: true, status: true } },
       },
     });
-    if (sections.length === 0) return [];
-
     const sectionIds = sections.map((s) => s.id);
+    // Every course in the curriculum: the teacher’s own classes are listed
+    // with each, and any other course can be started for a section.
     const courses = await ctx.db.course.findMany({
-      where: { id: { in: [...new Set(sections.map((s) => s.courseId))] } },
       orderBy: { name: "asc" },
       select: {
         id: true,
