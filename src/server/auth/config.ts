@@ -23,6 +23,8 @@ declare module "next-auth" {
       studentId: string | null;
       /** Set when the user is a teacher. */
       teacherId: string | null;
+      /** Signed in with a temporary password that must be changed first. */
+      mustChangePassword: boolean;
     } & DefaultSession["user"];
   }
 
@@ -46,6 +48,7 @@ type SessionClaims = {
   role: UserRole;
   studentId: string | null;
   teacherId: string | null;
+  mustChangePassword: boolean;
 };
 
 const ROLES: UserRole[] = ["STUDENT", "TEACHER", "ADMIN"];
@@ -60,6 +63,7 @@ function readClaims(token: Record<string, unknown>): SessionClaims {
     role: ROLES.includes(role as UserRole) ? (role as UserRole) : "STUDENT",
     studentId: asString(token.studentId),
     teacherId: asString(token.teacherId),
+    mustChangePassword: token.mustChangePassword === true,
   };
 }
 
@@ -147,6 +151,8 @@ export const authConfig = {
           role: user.role ?? "STUDENT",
           studentId: user.studentId ?? null,
           teacherId: user.teacherId ?? null,
+          // Read on the next request, from the account row below.
+          mustChangePassword: false,
         };
         return { ...token, ...claims };
       }
@@ -164,6 +170,7 @@ export const authConfig = {
         select: {
           isActive: true,
           role: true,
+          mustChangePassword: true,
           studentProfile: { select: { id: true } },
           teacherProfile: { select: { id: true } },
         },
@@ -178,6 +185,7 @@ export const authConfig = {
         role: account.role,
         studentId: account.studentProfile?.id ?? null,
         teacherId: account.teacherProfile?.id ?? null,
+        mustChangePassword: account.mustChangePassword,
       };
     },
     session: ({ session, token }) => {

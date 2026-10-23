@@ -134,7 +134,10 @@ export const userRouter = createTRPCRouter({
       }
       await ctx.db.user.update({
         where: { id: ctx.session.user.id },
-        data: { passwordHash: await hash(input.newPassword, 10) },
+        data: {
+          passwordHash: await hash(input.newPassword, 10),
+          mustChangePassword: false,
+        },
       });
       return { ok: true };
     }),

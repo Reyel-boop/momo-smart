@@ -23,3 +23,25 @@ export async function saveLecture(
   revalidatePath("/student/courses");
   return { ok: true };
 }
+
+export type UnitStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+
+/** Marks a unit's status for every class of the course the teacher teaches. */
+export async function setUnitStatus(
+  sectionIds: string[],
+  unitId: string,
+  status: UnitStatus,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    for (const sectionId of sectionIds) {
+      await api.course.setPacing({ sectionId, unitId, status });
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Not saved.",
+    };
+  }
+  revalidatePath("/teacher", "layout");
+  return { ok: true };
+}

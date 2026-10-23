@@ -23,7 +23,10 @@ export default async function TeacherLayout({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  if (session.user.role === "STUDENT") redirect(homeForRole("STUDENT"));
+  // Teacher pages are keyed by the teacher profile; the registrar has its own
+  // portal.
+  if (session.user.role !== "TEACHER") redirect(homeForRole(session.user.role));
+  if (session.user.mustChangePassword) redirect("/account/password");
 
   const [me, overview, unread] = await Promise.all([
     api.user.me(),

@@ -25,6 +25,7 @@ export default async function StudentLayout({
   // Every student procedure is keyed by the student profile, so staff are sent
   // to their own home rather than a page that cannot load.
   if (session.user.role !== "STUDENT") redirect(homeForRole(session.user.role));
+  if (session.user.mustChangePassword) redirect("/account/password");
 
   const [overview, dueSoon, unread] = await Promise.all([
     api.dashboard.studentOverview(),

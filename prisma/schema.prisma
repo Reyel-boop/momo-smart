@@ -45,6 +45,9 @@ model User {
   /// Honorific shown in the UI ("Dr.", "Ms.", "Mr.").
   title         String?
   isActive      Boolean   @default(true)
+  /// Set for accounts created or reset by the registrar with a temporary
+  /// password; the user must choose their own before using the app.
+  mustChangePassword Boolean @default(false)
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

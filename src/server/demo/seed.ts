@@ -2052,6 +2052,21 @@ let running: Promise<DemoSeedSummary> | null = null;
  */
 export function seedDemoSchool(client: PrismaClient): Promise<DemoSeedSummary> {
   running ??= (async () => {
+    // The reset deletes every user. Refuse outright on a database that holds
+    // anyone besides the demo's own accounts — that is a real school.
+    const realAccounts = await client.user.count({
+      where: {
+        NOT: [
+          { email: { endsWith: "@momosmart.edu" } },
+          { email: { endsWith: "@student.momosmart.edu" } },
+        ],
+      },
+    });
+    if (realAccounts > 0) {
+      throw new Error(
+        `Refusing to reset: this database has ${realAccounts} non-demo account(s). The demo seed only runs on the demo database.`,
+      );
+    }
     db = client;
     NOW = new Date();
     TODAY_DOW = DAYS[NOW.getDay()]!;

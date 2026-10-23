@@ -1,3 +1,4 @@
+import { adminRouter } from "~/server/api/routers/admin";
 import { alertRouter } from "~/server/api/routers/alert";
 import { announcementRouter } from "~/server/api/routers/announcement";
 import { assessmentRouter } from "~/server/api/routers/assessment";
@@ -31,8 +32,10 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  *   message       direct messaging
  *   notification  in-app notification feed
  *   calendar      agenda, timetable and office hours
+ *   admin         registrar: accounts, classes and enrollment
  */
 export const appRouter = createTRPCRouter({
+  admin: adminRouter,
   user: userRouter,
   course: courseRouter,
   lesson: lessonRouter,

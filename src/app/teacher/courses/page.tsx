@@ -16,6 +16,7 @@ import { humanise, longDate } from "~/app/_components/format";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { LectureEditor } from "./_components/lecture-editor";
+import { UnitStatusSelect } from "./unit-status";
 
 export const metadata: Metadata = { title: "Courses · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -213,6 +214,13 @@ export default async function CoursesPage({
                         </summary>
 
                         <div className="bg-canvas/60 grid gap-5 px-6 pt-1 pb-5 lg:grid-cols-[3fr_2fr]">
+                          <div className="lg:col-span-2">
+                            <UnitStatusSelect
+                              unitId={unit.id}
+                              sectionIds={active.sections.map((s) => s.id)}
+                              status={unit.status}
+                            />
+                          </div>
                           <div>
                             <p className="text-muted text-[10px] font-bold tracking-wider uppercase">
                               Lessons

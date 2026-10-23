@@ -148,7 +148,16 @@ export default async function Home() {
                     ))}
                   </dl>
                 )}
-                {(user.role === "TEACHER" || user.role === "ADMIN") && (
+                {user.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="group bg-navy hover:bg-navy-deep mt-8 inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white transition"
+                  >
+                    Open Admin Portal
+                    <ArrowRightIcon className="size-4 transition group-hover:translate-x-0.5" />
+                  </Link>
+                )}
+                {user.role === "TEACHER" && (
                   <Link
                     href="/teacher"
                     className="group bg-navy hover:bg-navy-deep mt-8 inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-[15px] font-semibold text-white transition"
