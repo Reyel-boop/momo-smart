@@ -1,9 +1,7 @@
-import {
-  ChevronRightIcon,
-  MegaphoneIcon,
-  TrendUpIcon,
-} from "~/app/_components/icons";
+import Link from "next/link";
+import { ChevronRightIcon, TrendUpIcon } from "~/app/_components/icons";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
+import { AnnouncementButton } from "./announcement-button";
 
 type SectionPerformance = {
   sectionId: string;
@@ -35,19 +33,21 @@ function letterFor(percent: number): string {
 }
 
 export function Performance({ sections }: { sections: SectionPerformance[] }) {
+  const classes = sections.map((section) => ({
+    id: section.sectionId,
+    label: `${section.course.name} — ${section.sectionCode}`,
+  }));
   return (
     <Card>
       <CardHeader
         icon={<TrendUpIcon className="size-[18px]" />}
         title="Course Performance & Grade Distribution"
         action={
-          <button
-            type="button"
+          <AnnouncementButton
+            label="Post Announcement"
+            sections={classes}
             className="border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition"
-          >
-            <MegaphoneIcon className="size-3.5" />
-            Post Announcement
-          </button>
+          />
         }
       />
 
@@ -150,13 +150,13 @@ function SectionCard({
             ? `Syllabus: ${section.currentUnit.title}`
             : "Syllabus: not started"}
         </p>
-        <button
-          type="button"
+        <Link
+          href={`/teacher/roster?section=${section.sectionId}`}
           className="text-brand inline-flex shrink-0 items-center gap-0.5 text-xs font-bold hover:underline"
         >
           Open Roster
           <ChevronRightIcon className="size-3.5" />
-        </button>
+        </Link>
       </div>
     </article>
   );

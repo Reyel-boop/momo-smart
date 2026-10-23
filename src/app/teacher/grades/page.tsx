@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { type Metadata } from "next";
 
 import { DownloadIcon, StarIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
-import { PageHeader, SectionTabs } from "../_components/page-header";
+import { PageHeader, SectionTabs } from "~/app/_components/page-header";
 import {
   Avatar,
   Card,
@@ -106,13 +107,14 @@ export default async function GradesPage({
         title="Grades"
         subtitle={`${active.course.name} — ${active.code} • ${gradebook.rows.length} students • ${gradebook.assignments.length} published assignments${average !== null ? ` • class average ${average}%` : ""}.`}
         action={
-          <button
-            type="button"
+          <Link
+            href={`/teacher/grades/export?section=${active.id}`}
+            prefetch={false}
             className="border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition"
           >
             <DownloadIcon className="size-4" />
             Export CSV
-          </button>
+          </Link>
         }
       />
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ClockIcon } from "~/app/_components/icons";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
 import type { RouterOutputs } from "~/trpc/react";
@@ -82,8 +83,8 @@ export function DueSoon({ items }: { items: DueItem[] }) {
                     {points(item.pointsPossible)} Pts •{" "}
                     {item.rubric ? "Rubric Ready" : FORMAT_LABELS[item.format]}
                   </p>
-                  <button
-                    type="button"
+                  <Link
+                    href={`/student/assignments?assignment=${item.id}#submit`}
                     className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
                       opensElsewhere
                         ? "bg-brand-soft text-brand hover:bg-brand/10"
@@ -97,7 +98,7 @@ export function DueSoon({ items }: { items: DueItem[] }) {
                       : item.draft
                         ? "Continue"
                         : "Submit"}
-                  </button>
+                  </Link>
                 </div>
               </li>
             );

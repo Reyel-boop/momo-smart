@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-/** Consistent title block across the teacher sub-pages. */
+/** Consistent title block across the student and teacher sub-pages. */
 export function PageHeader({
   title,
   subtitle,

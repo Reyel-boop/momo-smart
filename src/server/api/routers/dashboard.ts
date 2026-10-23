@@ -425,6 +425,23 @@ export const dashboardRouter = createTRPCRouter({
     }
     const ahead = [...totals.values()].filter((stars) => stars > total).length;
 
+    // Every star-earning grade, newest first ("Full Ledger" on Scores).
+    const ledger = mine.map((grade) => {
+      const { assignment } = grade.submission;
+      const score = grade.score ?? 0;
+      return {
+        id: grade.id,
+        title: assignment.title,
+        courseName: assignment.section.course.name,
+        type: assignment.type,
+        releasedAt: grade.releasedAt,
+        score,
+        pointsPossible: assignment.pointsPossible,
+        stars: starsFor(score),
+        isPerfect: score >= assignment.pointsPossible,
+      };
+    });
+
     return {
       total,
       tests,
@@ -434,19 +451,8 @@ export const dashboardRouter = createTRPCRouter({
       rank: ahead + 1,
       cohortSize,
       ...rewardProgress(total),
-      recent: mine.slice(0, 3).map((grade) => {
-        const { assignment } = grade.submission;
-        const score = grade.score ?? 0;
-        return {
-          id: grade.id,
-          title: assignment.title,
-          courseName: assignment.section.course.name,
-          score,
-          pointsPossible: assignment.pointsPossible,
-          stars: starsFor(score),
-          isPerfect: score >= assignment.pointsPossible,
-        };
-      }),
+      recent: ledger.slice(0, 3),
+      ledger,
     };
   }),
 

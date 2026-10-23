@@ -64,7 +64,9 @@ export const courseRouter = createTRPCRouter({
           teacher: {
             select: {
               id: true,
-              user: { select: { name: true, title: true, image: true } },
+              user: {
+                select: { id: true, name: true, title: true, image: true },
+              },
             },
           },
           meetings: {

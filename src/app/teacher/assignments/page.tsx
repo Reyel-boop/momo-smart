@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { type Metadata } from "next";
 
 import { ClipboardIcon, PlusCircleIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
 import { humanise } from "~/app/_components/format";
-import { PageHeader, SectionTabs } from "../_components/page-header";
+import { PageHeader, SectionTabs } from "~/app/_components/page-header";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
 
 export const metadata: Metadata = { title: "Assignments · Momo Smart" };
@@ -63,13 +64,17 @@ export default async function AssignmentsPage({
         title="Assignments"
         subtitle={`${rows.length} assignment${rows.length === 1 ? "" : "s"} • ${upcoming.length} still open${drafts > 0 ? ` • ${drafts} unpublished` : ""}.`}
         action={
-          <button
-            type="button"
+          <Link
+            href={
+              activeId
+                ? `/teacher/assignments/new?section=${activeId}`
+                : "/teacher/assignments/new"
+            }
             className="bg-navy hover:bg-navy-deep inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
           >
             <PlusCircleIcon className="size-4" />
             New Assignment
-          </button>
+          </Link>
         }
       />
 

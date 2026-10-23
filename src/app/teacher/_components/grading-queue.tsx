@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowRightIcon,
   ChevronDownIcon,
@@ -10,7 +11,6 @@ import {
   Card,
   CardHeader,
   EmptyState,
-  GhostButton,
   Pill,
 } from "~/app/_components/ui";
 
@@ -46,14 +46,27 @@ const TIMELINESS: Record<
   LATE: { label: "Late", className: "text-rose-600" },
 };
 
+const pageLink =
+  "border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition";
+
+/**
+ * Submissions waiting for a grade. On the dashboard (`compact`) it links to
+ * the full queue; on the Grading page it pages with `nextHref`/`firstHref`.
+ */
 export function GradingQueue({
   items,
   total,
   sectionCount,
+  compact = false,
+  nextHref = null,
+  firstHref = null,
 }: {
   items: QueueItem[];
   total: number;
   sectionCount: number;
+  compact?: boolean;
+  nextHref?: string | null;
+  firstHref?: string | null;
 }) {
   return (
     <Card>
@@ -62,16 +75,18 @@ export function GradingQueue({
         title="Priority Grading Queue"
         subtitle={`${total} student ${total === 1 ? "file" : "files"} ready for rubric grading`}
         action={
-          <>
-            <GhostButton>
-              All Sections ({sectionCount})
-              <ChevronDownIcon className="size-3.5" />
-            </GhostButton>
-            <GhostButton>
-              <SlidersIcon className="size-3.5" />
-              Sort
-            </GhostButton>
-          </>
+          compact && (
+            <>
+              <Link href="/teacher/grading" className={pageLink}>
+                All Sections ({sectionCount})
+                <ChevronDownIcon className="size-3.5 -rotate-90" />
+              </Link>
+              <Link href="/teacher/grading?sort=NEWEST" className={pageLink}>
+                <SlidersIcon className="size-3.5" />
+                Sort
+              </Link>
+            </>
+          )
         }
       />
 
@@ -165,13 +180,13 @@ export function GradingQueue({
                       </td>
 
                       <td className="px-5 py-4 text-right">
-                        <button
-                          type="button"
+                        <Link
+                          href={`/teacher/grading/${item.id}`}
                           className="bg-navy hover:bg-navy-deep inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white transition"
                         >
                           Grade Now
                           <ArrowRightIcon className="size-3.5" />
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   );
@@ -185,13 +200,30 @@ export function GradingQueue({
               Showing {items.length} of {total} submissions needing grading
             </p>
             <div className="flex items-center gap-2">
-              <GhostButton>Previous</GhostButton>
-              <button
-                type="button"
-                className="bg-navy hover:bg-navy-deep rounded-lg px-3 py-2 text-xs font-semibold text-white transition"
-              >
-                Next Page
-              </button>
+              {compact ? (
+                <Link
+                  href="/teacher/grading"
+                  className="bg-navy hover:bg-navy-deep rounded-lg px-3 py-2 text-xs font-semibold text-white transition"
+                >
+                  Open full queue
+                </Link>
+              ) : (
+                <>
+                  {firstHref && (
+                    <Link href={firstHref} className={pageLink}>
+                      First page
+                    </Link>
+                  )}
+                  {nextHref && (
+                    <Link
+                      href={nextHref}
+                      className="bg-navy hover:bg-navy-deep rounded-lg px-3 py-2 text-xs font-semibold text-white transition"
+                    >
+                      Next Page
+                    </Link>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </>

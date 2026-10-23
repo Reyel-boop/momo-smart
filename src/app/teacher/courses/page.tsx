@@ -13,7 +13,7 @@ import {
 } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
 import { humanise, longDate } from "~/app/_components/format";
-import { PageHeader } from "../_components/page-header";
+import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { LectureEditor } from "./_components/lecture-editor";
 

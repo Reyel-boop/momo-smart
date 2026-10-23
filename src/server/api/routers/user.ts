@@ -1,6 +1,8 @@
 import { TRPCError } from "@trpc/server";
+import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 
+import { env } from "~/env";
 import {
   adminProcedure,
   createTRPCRouter,
@@ -78,14 +80,63 @@ export const userRouter = createTRPCRouter({
         name: z.string().min(1).max(120).optional(),
         image: z.string().url().optional(),
         title: z.string().max(20).optional(),
+        /** Teachers only: where students can find them, and a short bio. */
+        officeLocation: z.string().max(120).optional(),
+        bio: z.string().max(2000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { officeLocation, bio, ...user } = input;
+      if (
+        (officeLocation !== undefined || bio !== undefined) &&
+        ctx.session.user.teacherId
+      ) {
+        await ctx.db.teacherProfile.update({
+          where: { id: ctx.session.user.teacherId },
+          data: { officeLocation, bio },
+        });
+      }
       return ctx.db.user.update({
         where: { id: ctx.session.user.id },
-        data: input,
+        data: user,
         select: { id: true, name: true, image: true, title: true },
       });
+    }),
+
+  /** Changes the caller's password after checking the current one. */
+  changePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1),
+        newPassword: z.string().min(8).max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Demo accounts are shared; one visitor must not lock out the rest.
+      if (env.DEMO_MODE) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Passwords can't be changed on the demo accounts.",
+        });
+      }
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+        select: { passwordHash: true },
+      });
+      if (
+        !user?.passwordHash ||
+        !(await compare(input.currentPassword, user.passwordHash))
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Your current password is incorrect.",
+        });
+      }
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { passwordHash: await hash(input.newPassword, 10) },
+      });
+      return { ok: true };
     }),
 
   /** Full academic snapshot of one student, for the teacher's profile drawer. */

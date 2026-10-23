@@ -20,7 +20,14 @@ function SubmitButton() {
   );
 }
 
-export function ReplyForm({ conversationId }: { conversationId: string }) {
+export function ReplyForm({
+  conversationId,
+  basePath,
+}: {
+  conversationId: string;
+  /** The inbox page to refresh after sending. */
+  basePath: string;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -33,6 +40,7 @@ export function ReplyForm({ conversationId }: { conversationId: string }) {
       className="border-line flex items-end gap-2 border-t px-5 py-4"
     >
       <input type="hidden" name="conversationId" value={conversationId} />
+      <input type="hidden" name="basePath" value={basePath} />
       <label htmlFor="reply-body" className="sr-only">
         Write a reply
       </label>

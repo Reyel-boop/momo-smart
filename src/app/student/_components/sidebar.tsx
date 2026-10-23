@@ -57,13 +57,13 @@ export function Sidebar({
           </div>
         </div>
 
-        <button
-          type="button"
+        <Link
+          href="/student/assignments"
           className="bg-navy hover:bg-navy-deep mt-6 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition"
         >
           <PlusCircleIcon className="size-4" />
           Submit Assignment
-        </button>
+        </Link>
 
         <Nav items={items} icons={icons} />
       </div>

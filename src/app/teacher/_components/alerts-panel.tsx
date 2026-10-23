@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   AlertIcon,
   ArrowRightIcon,
@@ -6,6 +8,8 @@ import {
   UsersIcon,
 } from "~/app/_components/icons";
 import { Avatar, Pill } from "~/app/_components/ui";
+import { AlertAction, type Tutor } from "./alert-action";
+import type { InterventionType } from "./alert-actions";
 
 type Alert = {
   id: string;
@@ -17,21 +21,45 @@ type Alert = {
   metadata: unknown;
   currentPercent: number | null;
   currentLetter: string | null;
-  section: { code: string; course: { name: string } } | null;
+  section: { id: string; code: string; course: { name: string } } | null;
   student: { id: string; studentNumber: string; user: { name: string | null } };
 };
 
 /** The primary action offered for each kind of alert. */
 const ACTION: Record<
   string,
-  { label: string; icon: React.ComponentType<{ className?: string }> }
+  {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    type: InterventionType;
+  }
 > = {
-  MISSING_WORK: { label: "Contact Parent & Counselor", icon: MailIcon },
-  MISSED_ASSESSMENT: { label: "Schedule Exam Slot", icon: CalendarIcon },
-  GRADE_DROP: { label: "Assign Peer Tutor", icon: UsersIcon },
-  ATTENDANCE: { label: "Contact Parent & Counselor", icon: MailIcon },
-  INACTIVITY: { label: "Message Student", icon: MailIcon },
-  BEHAVIOR: { label: "Log Conference", icon: UsersIcon },
+  MISSING_WORK: {
+    label: "Contact Parent & Counselor",
+    icon: MailIcon,
+    type: "CONTACT_GUARDIAN",
+  },
+  MISSED_ASSESSMENT: {
+    label: "Schedule Exam Slot",
+    icon: CalendarIcon,
+    type: "SCHEDULE_MAKEUP",
+  },
+  GRADE_DROP: {
+    label: "Assign Peer Tutor",
+    icon: UsersIcon,
+    type: "ASSIGN_PEER_TUTOR",
+  },
+  ATTENDANCE: {
+    label: "Contact Parent & Counselor",
+    icon: MailIcon,
+    type: "CONTACT_GUARDIAN",
+  },
+  INACTIVITY: { label: "Log Follow-up", icon: MailIcon, type: "NOTE" },
+  BEHAVIOR: {
+    label: "Log Conference",
+    icon: UsersIcon,
+    type: "STUDENT_CONFERENCE",
+  },
 };
 
 function badgeFor(alert: Alert) {
@@ -59,9 +87,14 @@ function badgeFor(alert: Alert) {
 export function AlertsPanel({
   alerts,
   total,
+  tutors = {},
+  showPortalLink = true,
 }: {
   alerts: Alert[];
   total: number;
+  /** Possible peer tutors for each section, by section id. */
+  tutors?: Record<string, Tutor[]>;
+  showPortalLink?: boolean;
 }) {
   return (
     <section className="shadow-card overflow-hidden rounded-2xl border border-rose-200 bg-rose-50/40">
@@ -137,19 +170,24 @@ export function AlertsPanel({
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        className="bg-navy hover:bg-navy-deep inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-white transition"
+                      <AlertAction
+                        alertId={alert.id}
+                        studentName={alert.student.user.name ?? "the student"}
+                        defaultType={action.type}
+                        tutors={(alert.section
+                          ? (tutors[alert.section.id] ?? [])
+                          : []
+                        ).filter((tutor) => tutor.id !== alert.student.id)}
                       >
                         <action.icon className="size-3.5" />
                         {action.label}
-                      </button>
-                      <button
-                        type="button"
+                      </AlertAction>
+                      <Link
+                        href={`/teacher/students/${alert.student.id}`}
                         className="border-line bg-surface text-ink hover:bg-canvas rounded-lg border px-3 py-2 text-xs font-semibold transition"
                       >
                         Profile
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -159,15 +197,17 @@ export function AlertsPanel({
         </div>
       )}
 
-      <div className="border-t border-rose-200/70 px-5 py-3">
-        <button
-          type="button"
-          className="text-brand inline-flex items-center gap-1 text-xs font-bold hover:underline"
-        >
-          Launch Early Intervention Portal (MomoCare)
-          <ArrowRightIcon className="size-3.5" />
-        </button>
-      </div>
+      {showPortalLink && (
+        <div className="border-t border-rose-200/70 px-5 py-3">
+          <Link
+            href="/teacher/alerts"
+            className="text-brand inline-flex items-center gap-1 text-xs font-bold hover:underline"
+          >
+            Launch Early Intervention Portal (MomoCare)
+            <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,11 +1,14 @@
-import { DownloadIcon, MegaphoneIcon } from "~/app/_components/icons";
+import Link from "next/link";
+import { DownloadIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
 import { AlertsPanel } from "./_components/alerts-panel";
+import { AnnouncementButton } from "./_components/announcement-button";
 import { DailyRoster } from "./_components/daily-roster";
 import { GradingQueue } from "./_components/grading-queue";
 import { OfficeHours } from "./_components/office-hours";
 import { Performance } from "./_components/performance";
 import { StatCards } from "./_components/stat-cards";
+import { tutorsFor } from "./_components/tutors";
 
 /** Live figures, so the dashboard always reflects the database. */
 export const dynamic = "force-dynamic";
@@ -40,6 +43,7 @@ export default async function TeacherDashboard() {
     api.calendar.agenda({ from: now, to: in14Days }),
   ]);
 
+  const tutors = await tutorsFor(alerts.items);
   const pendingPeriod = daySchedule.periods.find(
     (period) => period.state !== "SUBMITTED",
   );
@@ -75,20 +79,18 @@ export default async function TeacherDashboard() {
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <button
-            type="button"
+          <Link
+            href="/teacher/grades/export"
+            prefetch={false}
             className="border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition"
           >
             <DownloadIcon className="size-4" />
             Export Reports
-          </button>
-          <button
-            type="button"
+          </Link>
+          <AnnouncementButton
+            label="Broadcast Announcement"
             className="bg-navy hover:bg-navy-deep inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-          >
-            <MegaphoneIcon className="size-4" />
-            Broadcast Announcement
-          </button>
+          />
         </div>
       </div>
 
@@ -115,8 +117,13 @@ export default async function TeacherDashboard() {
           items={queue.items}
           total={queueSummary.total}
           sectionCount={queueSummary.sections}
+          compact
         />
-        <AlertsPanel alerts={alerts.items} total={alerts.total} />
+        <AlertsPanel
+          alerts={alerts.items}
+          total={alerts.total}
+          tutors={tutors}
+        />
       </div>
 
       {/* Performance + office hours */}

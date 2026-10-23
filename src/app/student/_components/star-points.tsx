@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   CheckCircleIcon,
   ClipboardIcon,
@@ -113,12 +114,12 @@ export function StarPoints({ stars }: { stars: Stars }) {
           <p className="text-muted text-[11px] font-bold tracking-wide uppercase">
             Recent Star Earnings
           </p>
-          <button
-            type="button"
+          <Link
+            href="/student/scores#stars"
             className="text-brand text-xs font-bold hover:underline"
           >
             Full Ledger
-          </button>
+          </Link>
         </div>
 
         {stars.recent.length === 0 ? (

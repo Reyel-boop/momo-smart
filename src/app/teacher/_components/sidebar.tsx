@@ -77,13 +77,13 @@ export function Sidebar({
           </div>
         </div>
 
-        <button
-          type="button"
+        <Link
+          href="/teacher/assignments/new"
           className="bg-navy hover:bg-navy-deep mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition"
         >
           <ClipboardIcon className="size-4" />
-          Submit Assignment
-        </button>
+          New Assignment
+        </Link>
 
         <Nav items={items} icons={icons} />
       </div>

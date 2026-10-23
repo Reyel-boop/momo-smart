@@ -102,27 +102,6 @@ export function CardHeader({
   );
 }
 
-/** A non-functional control that mirrors the design; see README for scope. */
-export function GhostButton({
-  children,
-  className = "",
-  title,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  title?: string;
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      className={`border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
 export function EmptyState({ children }: { children: React.ReactNode }) {
   return <p className="text-muted px-5 py-8 text-center text-sm">{children}</p>;
 }
