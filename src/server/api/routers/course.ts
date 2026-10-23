@@ -36,7 +36,12 @@ export const courseRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
-      return importRoster(ctx.db, input.rows, input.sectionId, input.homeroom);
+      return importRoster(
+        ctx.db,
+        input.rows,
+        [input.sectionId],
+        input.homeroom,
+      );
     }),
 
   /** A student joins a class with the code their teacher shared. */

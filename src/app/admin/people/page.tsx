@@ -95,6 +95,17 @@ export default async function PeoplePage({
                 }))}
                 allowNoClass
                 mode="admin"
+                courses={options.courses.map((course) => ({
+                  id: course.id,
+                  label: course.name,
+                  sections: classes
+                    .filter((c) => c.course.id === course.id)
+                    .map((c) => c.code),
+                }))}
+                teachers={options.teachers.map((t) => ({
+                  id: t.id,
+                  label: [t.user.title, t.user.name].filter(Boolean).join(" "),
+                }))}
                 buttonClassName="bg-brand hover:bg-brand/90 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
               />
             )}
