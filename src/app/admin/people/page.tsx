@@ -13,7 +13,7 @@ import {
   ImportStudentsButton,
   PersonActions,
 } from "./people-actions";
-import { SectionSelect } from "./section-select";
+import { SectionSelect, StudentSectionSelect } from "./section-select";
 
 export const metadata: Metadata = { title: "People · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -29,7 +29,7 @@ export default async function PeoplePage({
   const role = params.role === "TEACHER" ? "TEACHER" : "STUDENT";
   const query = params.q?.trim() ?? "";
   const section = role === "STUDENT" ? (params.section?.trim() ?? "") : "";
-  const [found, options, classes] = await Promise.all([
+  const [found, options, classes, sectionList] = await Promise.all([
     api.admin.people({
       role,
       query: query || undefined,
@@ -37,32 +37,33 @@ export default async function PeoplePage({
     }),
     api.admin.options(),
     api.admin.classes(),
+    api.admin.sections(),
   ]);
 
-  // Students are listed by section (e.g. "Rizal"), then by name. A student
-  // in classes of several sections is listed under the first of them.
-  const sections = [...new Set(classes.map((c) => c.code))].sort((a, b) =>
-    a.localeCompare(b, undefined, { numeric: true }),
-  );
-  const sectionsOf = (person: (typeof found)[number]) =>
-    [
-      ...new Set(
-        person.studentProfile?.enrollments.map((e) => e.section.code) ?? [],
-      ),
-    ].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  const groupOf = (person: (typeof found)[number]) =>
-    sectionsOf(person)[0] ?? "";
+  // Students are listed by section (Grade 10 — Rizal), then by name.
+  const sectionLabel = (room: { name: string; gradeLevel: number }) =>
+    `Grade ${room.gradeLevel} — ${room.name}`;
+  const sections = sectionList.map((room) => ({
+    value: room.id,
+    label: sectionLabel(room),
+  }));
+  const roomOf = (person: (typeof found)[number]) =>
+    person.studentProfile?.section ?? null;
   const people =
     role === "STUDENT"
-      ? [...found].sort(
-          (a, b) =>
-            Number(!groupOf(a)) - Number(!groupOf(b)) ||
-            groupOf(a).localeCompare(groupOf(b), undefined, {
+      ? [...found].sort((a, b) => {
+          const ra = roomOf(a);
+          const rb = roomOf(b);
+          return (
+            Number(!ra) - Number(!rb) ||
+            (ra?.gradeLevel ?? 0) - (rb?.gradeLevel ?? 0) ||
+            (ra?.name ?? "").localeCompare(rb?.name ?? "", undefined, {
               numeric: true,
             }) ||
             Number(b.isActive) - Number(a.isActive) ||
-            (a.name ?? "").localeCompare(b.name ?? ""),
-        )
+            (a.name ?? "").localeCompare(b.name ?? "")
+          );
+        })
       : found;
   const grouped = role === "STUDENT" && !section;
   const tab = (value: "STUDENT" | "TEACHER", label: string) => (
@@ -147,7 +148,7 @@ export default async function PeoplePage({
             section === "none"
               ? " in no section"
               : section
-                ? ` in section ${section}`
+                ? ` in ${sections.find((s) => s.value === section)?.label ?? "this section"}`
                 : ""
           }${query ? ` matching “${query}”` : ""}`}
         />
@@ -186,13 +187,16 @@ export default async function PeoplePage({
                   const name =
                     [person.title, person.name].filter(Boolean).join(" ") ||
                     "—";
-                  const group = groupOf(person);
-                  const groupSize = people.filter(
-                    (p) => groupOf(p) === group,
-                  ).length;
+                  const room = roomOf(person);
+                  const group = room?.id ?? "";
                   const startsGroup =
                     grouped &&
-                    (index === 0 || groupOf(people[index - 1]!) !== group);
+                    (index === 0 ||
+                      (roomOf(people[index - 1]!)?.id ?? "") !== group);
+                  const groupSize = startsGroup
+                    ? people.filter((p) => (roomOf(p)?.id ?? "") === group)
+                        .length
+                    : 0;
                   return (
                     <Fragment key={person.id}>
                       {startsGroup && (
@@ -202,7 +206,7 @@ export default async function PeoplePage({
                             scope="rowgroup"
                             className="text-ink px-5 py-2 text-xs font-extrabold"
                           >
-                            {group ? `Section ${group}` : "No section yet"}
+                            {room ? sectionLabel(room) : "No section yet"}
                             <span className="text-muted ml-2 font-semibold">
                               {groupSize} student{groupSize === 1 ? "" : "s"}
                             </span>
@@ -221,14 +225,18 @@ export default async function PeoplePage({
                             person.teacherProfile?.employeeNumber ??
                             "—"}
                         </td>
-                        <td className="text-muted px-4 py-3">
+                        <td className="text-muted px-4 py-3 whitespace-nowrap">
                           {person.studentProfile
                             ? `Grade ${person.studentProfile.gradeLevel}`
                             : (person.teacherProfile?.department?.name ?? "—")}
                         </td>
                         {role === "STUDENT" && (
                           <td className="text-muted px-4 py-3">
-                            {sectionsOf(person).join(", ") || "—"}
+                            <StudentSectionSelect
+                              userId={person.id}
+                              value={room?.id ?? ""}
+                              sections={sections}
+                            />
                           </td>
                         )}
                         <td className="text-muted px-4 py-3">

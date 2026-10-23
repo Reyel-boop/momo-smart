@@ -26,11 +26,17 @@ export const courseRouter = createTRPCRouter({
       z.object({
         rows: z.array(rosterRow).min(1).max(200),
         sectionId: z.string(),
+        homeroom: z
+          .object({
+            name: z.string().trim().min(1).max(60),
+            gradeLevel: z.number().int().min(1).max(12),
+          })
+          .nullish(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
-      return importRoster(ctx.db, input.rows, input.sectionId);
+      return importRoster(ctx.db, input.rows, input.sectionId, input.homeroom);
     }),
 
   /** A student joins a class with the code their teacher shared. */

@@ -6,6 +6,7 @@ import { LogoMark } from "~/app/_components/brand";
 import {
   CapIcon,
   GridIcon,
+  ListIcon,
   SettingsIcon,
   UsersIcon,
 } from "~/app/_components/icons";
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 const ITEMS: NavItem[] = [
   { label: "Overview", href: "/admin", exact: true },
   { label: "People", href: "/admin/people" },
+  { label: "Sections", href: "/admin/sections" },
   { label: "Classes", href: "/admin/classes" },
   { label: "Settings", href: "/admin/settings" },
 ];
@@ -30,6 +32,7 @@ const ITEMS: NavItem[] = [
 const ICONS: Record<string, React.ReactNode> = {
   Overview: <GridIcon className="size-[18px]" />,
   People: <UsersIcon className="size-[18px]" />,
+  Sections: <ListIcon className="size-[18px]" />,
   Classes: <CapIcon className="size-[18px]" />,
   Settings: <SettingsIcon className="size-[18px]" />,
 };

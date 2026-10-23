@@ -9,6 +9,16 @@ import { createUnitQuizzesForSection } from "~/server/curriculum";
 import { importRoster, rosterRow } from "~/server/lib/import-roster";
 import type { PrismaClient } from "../../../../generated/prisma";
 
+const sectionInput = z.object({
+  name: z.string().trim().min(1, "Enter the section name.").max(60),
+  gradeLevel: z.number().int().min(1).max(12),
+});
+const sectionTaken = (section: { name: string; gradeLevel: number }) =>
+  new TRPCError({
+    code: "CONFLICT",
+    message: `Grade ${section.gradeLevel} already has a section named ${section.name}.`,
+  });
+
 /**
  * A unique-constraint violation. Checked by its code rather than its class:
  * the client can come from a different copy of the Prisma runtime.
@@ -146,29 +156,20 @@ export const adminRouter = createTRPCRouter({
       z.object({
         role: z.enum(["TEACHER", "STUDENT"]),
         query: z.string().trim().max(80).optional(),
-        /** A section name such as "Rizal", or "none" for students in no class. */
+        /** A section (homeroom) id, or "none" for students in no section. */
         section: z.string().trim().max(80).optional(),
       }),
     )
     .query(({ ctx, input }) => {
       const q = input.query;
-      const inSection = (code?: string) => ({
-        enrollments: {
-          some: {
-            status: "ACTIVE" as const,
-            section: { term: { isCurrent: true }, ...(code ? { code } : {}) },
-          },
-        },
-      });
       return ctx.db.user.findMany({
         where: {
           role: input.role,
           ...(input.role === "STUDENT" && input.section
             ? {
-                studentProfile:
-                  input.section === "none"
-                    ? { NOT: inSection() }
-                    : inSection(input.section),
+                studentProfile: {
+                  sectionId: input.section === "none" ? null : input.section,
+                },
               }
             : {}),
           ...(q
@@ -208,13 +209,7 @@ export const adminRouter = createTRPCRouter({
               _count: {
                 select: { enrollments: { where: { status: "ACTIVE" } } },
               },
-              enrollments: {
-                where: {
-                  status: "ACTIVE",
-                  section: { term: { isCurrent: true } },
-                },
-                select: { section: { select: { code: true } } },
-              },
+              section: { select: { id: true, name: true, gradeLevel: true } },
             },
           },
           teacherProfile: {
@@ -319,11 +314,129 @@ export const adminRouter = createTRPCRouter({
       z.object({
         rows: z.array(rosterRow).min(1).max(200),
         sectionId: z.string().nullable(),
+        homeroom: z
+          .object({
+            name: z.string().trim().min(1).max(60),
+            gradeLevel: z.number().int().min(1).max(12),
+          })
+          .nullish(),
       }),
     )
     .mutation(({ ctx, input }) =>
-      importRoster(ctx.db, input.rows, input.sectionId),
+      importRoster(ctx.db, input.rows, input.sectionId, input.homeroom),
     ),
+
+  /** Every course in the curriculum, with its units and this term's classes. */
+  courses: adminProcedure.query(({ ctx }) =>
+    ctx.db.course.findMany({
+      orderBy: { code: "asc" },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        department: { select: { name: true } },
+        units: {
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            order: true,
+            title: true,
+            _count: { select: { lessons: true } },
+          },
+        },
+        sections: {
+          where: { term: { isCurrent: true } },
+          orderBy: { code: "asc" },
+          select: { id: true, code: true },
+        },
+      },
+    }),
+  ),
+
+  /** Sections (homerooms) with how many students are in each. */
+  sections: adminProcedure.query(({ ctx }) =>
+    ctx.db.homeroom.findMany({
+      orderBy: [{ gradeLevel: "asc" }, { name: "asc" }],
+      select: {
+        id: true,
+        name: true,
+        gradeLevel: true,
+        _count: { select: { students: true } },
+      },
+    }),
+  ),
+
+  createSection: adminProcedure
+    .input(sectionInput)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.db.homeroom.create({
+          data: input,
+          select: { id: true },
+        });
+      } catch (error) {
+        if (isUniqueViolation(error)) throw sectionTaken(input);
+        throw error;
+      }
+    }),
+
+  /** Renames a section or moves it to another grade; its students follow. */
+  updateSection: adminProcedure
+    .input(sectionInput.extend({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...data } = input;
+      try {
+        await ctx.db.$transaction([
+          ctx.db.homeroom.update({ where: { id }, data }),
+          ctx.db.studentProfile.updateMany({
+            where: { sectionId: id },
+            data: { homeroom: data.name },
+          }),
+        ]);
+      } catch (error) {
+        if (isUniqueViolation(error)) throw sectionTaken(data);
+        throw error;
+      }
+      return { ok: true };
+    }),
+
+  /** Deletes a section. Its students stay, with no section. */
+  deleteSection: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.$transaction([
+        ctx.db.studentProfile.updateMany({
+          where: { sectionId: input.id },
+          data: { sectionId: null, homeroom: null },
+        }),
+        ctx.db.homeroom.delete({ where: { id: input.id } }),
+      ]);
+      return { ok: true };
+    }),
+
+  /** Puts a student in a section, or in none. */
+  setStudentSection: adminProcedure
+    .input(z.object({ userId: z.string(), sectionId: z.string().nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      const room = input.sectionId
+        ? await ctx.db.homeroom.findUnique({
+            where: { id: input.sectionId },
+            select: { id: true, name: true },
+          })
+        : null;
+      if (input.sectionId && !room) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "That section no longer exists.",
+        });
+      }
+      await ctx.db.studentProfile.update({
+        where: { userId: input.userId },
+        data: { sectionId: room?.id ?? null, homeroom: room?.name ?? null },
+      });
+      return { ok: true };
+    }),
 
   /** Issues a new temporary password, to be changed at next sign-in. */
   resetPassword: adminProcedure

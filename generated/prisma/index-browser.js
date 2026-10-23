@@ -173,9 +173,17 @@ exports.Prisma.StudentProfileScalarFieldEnum = {
   gradeLevel: 'gradeLevel',
   graduationYear: 'graduationYear',
   homeroom: 'homeroom',
+  sectionId: 'sectionId',
   cumulativeGpa: 'cumulativeGpa',
   gpaPercentile: 'gpaPercentile',
   photoUrl: 'photoUrl'
+};
+
+exports.Prisma.HomeroomScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  gradeLevel: 'gradeLevel',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.TeacherProfileScalarFieldEnum = {
@@ -993,6 +1001,7 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   StudentProfile: 'StudentProfile',
+  Homeroom: 'Homeroom',
   TeacherProfile: 'TeacherProfile',
   Guardian: 'Guardian',
   GuardianLink: 'GuardianLink',

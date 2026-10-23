@@ -117,10 +117,14 @@ model StudentProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   /// Human-facing identifier printed on the dashboard, e.g. "OHS-28491".
-  studentNumber  String  @unique
+  studentNumber  String    @unique
   gradeLevel     Int
   graduationYear Int?
+  /// Section name kept in step with `section`, for older screens.
   homeroom       String?
+  /// The student's section (homeroom), e.g. Grade 10 — Rizal.
+  sectionId      String?
+  section        Homeroom? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
   /// Cached cumulative GPA; recomputed when grades are released.
   cumulativeGpa  Float?
   gpaPercentile  Float?
@@ -140,6 +144,20 @@ model StudentProfile {
   tutoringGiven    PeerTutorAssignment[] @relation("TutorAssignmentTutor")
 
   @@index([gradeLevel])
+  @@index([sectionId])
+}
+
+/// A section (homeroom) students belong to, as on School Form 1 — e.g.
+/// Grade 10 "Rizal". Not to be confused with `Section`, which is a class.
+model Homeroom {
+  id         String   @id @default(cuid())
+  name       String
+  gradeLevel Int
+  createdAt  DateTime @default(now())
+
+  students StudentProfile[]
+
+  @@unique([gradeLevel, name])
 }
 
 model TeacherProfile {

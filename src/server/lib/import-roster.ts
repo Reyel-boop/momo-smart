@@ -42,13 +42,24 @@ const graduationYear = (gradeLevel: number, now = new Date()) =>
  * Creates accounts for students not seen before (they sign in with their
  * LRN, or email if one was given, and a temporary password) and enrolls
  * everyone in the class. A student whose LRN already has an account is only
- * enrolled, so uploading the same form twice is safe.
+ * enrolled, so uploading the same form twice is safe. Given the form's
+ * section (homeroom), everyone is placed in it; it is created if new.
  */
 export async function importRoster(
   db: PrismaClient,
   rows: RosterRow[],
   sectionId: string | null,
+  homeroom?: { name: string; gradeLevel: number } | null,
 ): Promise<RosterResult[]> {
+  const room = homeroom
+    ? await db.homeroom.upsert({
+        where: { gradeLevel_name: homeroom },
+        create: homeroom,
+        update: {},
+        select: { id: true, name: true },
+      })
+    : null;
+  const placement = room ? { sectionId: room.id, homeroom: room.name } : {};
   const results: RosterResult[] = [];
   for (const row of rows) {
     try {
@@ -84,12 +95,18 @@ export async function importRoster(
                 studentNumber: row.studentNumber,
                 gradeLevel: row.gradeLevel,
                 graduationYear: graduationYear(row.gradeLevel),
+                ...placement,
               },
             },
           },
           select: { studentProfile: { select: { id: true } } },
         });
         studentId = user.studentProfile!.id;
+      } else if (room) {
+        await db.studentProfile.update({
+          where: { id: studentId },
+          data: placement,
+        });
       }
 
       if (sectionId) {

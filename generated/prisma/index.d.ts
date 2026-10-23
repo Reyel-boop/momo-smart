@@ -39,6 +39,12 @@ export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTok
  */
 export type StudentProfile = $Result.DefaultSelection<Prisma.$StudentProfilePayload>
 /**
+ * Model Homeroom
+ * A section (homeroom) students belong to, as on School Form 1 — e.g.
+ * Grade 10 "Rizal". Not to be confused with `Section`, which is a class.
+ */
+export type Homeroom = $Result.DefaultSelection<Prisma.$HomeroomPayload>
+/**
  * Model TeacherProfile
  * 
  */
@@ -925,6 +931,16 @@ export class PrismaClient<
     * ```
     */
   get studentProfile(): Prisma.StudentProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.homeroom`: Exposes CRUD operations for the **Homeroom** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Homerooms
+    * const homerooms = await prisma.homeroom.findMany()
+    * ```
+    */
+  get homeroom(): Prisma.HomeroomDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.teacherProfile`: Exposes CRUD operations for the **TeacherProfile** model.
@@ -1881,6 +1897,7 @@ export namespace Prisma {
     Session: 'Session',
     VerificationToken: 'VerificationToken',
     StudentProfile: 'StudentProfile',
+    Homeroom: 'Homeroom',
     TeacherProfile: 'TeacherProfile',
     Guardian: 'Guardian',
     GuardianLink: 'GuardianLink',
@@ -1950,7 +1967,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2321,6 +2338,80 @@ export namespace Prisma {
           count: {
             args: Prisma.StudentProfileCountArgs<ExtArgs>
             result: $Utils.Optional<StudentProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      Homeroom: {
+        payload: Prisma.$HomeroomPayload<ExtArgs>
+        fields: Prisma.HomeroomFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HomeroomFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HomeroomFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          findFirst: {
+            args: Prisma.HomeroomFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HomeroomFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          findMany: {
+            args: Prisma.HomeroomFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>[]
+          }
+          create: {
+            args: Prisma.HomeroomCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          createMany: {
+            args: Prisma.HomeroomCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HomeroomCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>[]
+          }
+          delete: {
+            args: Prisma.HomeroomDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          update: {
+            args: Prisma.HomeroomUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          deleteMany: {
+            args: Prisma.HomeroomDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HomeroomUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HomeroomUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>[]
+          }
+          upsert: {
+            args: Prisma.HomeroomUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HomeroomPayload>
+          }
+          aggregate: {
+            args: Prisma.HomeroomAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHomeroom>
+          }
+          groupBy: {
+            args: Prisma.HomeroomGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HomeroomGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HomeroomCountArgs<ExtArgs>
+            result: $Utils.Optional<HomeroomCountAggregateOutputType> | number
           }
         }
       }
@@ -6199,6 +6290,7 @@ export namespace Prisma {
     session?: SessionOmit
     verificationToken?: VerificationTokenOmit
     studentProfile?: StudentProfileOmit
+    homeroom?: HomeroomOmit
     teacherProfile?: TeacherProfileOmit
     guardian?: GuardianOmit
     guardianLink?: GuardianLinkOmit
@@ -6591,6 +6683,37 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountTutoringGivenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PeerTutorAssignmentWhereInput
+  }
+
+
+  /**
+   * Count Type HomeroomCountOutputType
+   */
+
+  export type HomeroomCountOutputType = {
+    students: number
+  }
+
+  export type HomeroomCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    students?: boolean | HomeroomCountOutputTypeCountStudentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * HomeroomCountOutputType without action
+   */
+  export type HomeroomCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HomeroomCountOutputType
+     */
+    select?: HomeroomCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * HomeroomCountOutputType without action
+   */
+  export type HomeroomCountOutputTypeCountStudentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentProfileWhereInput
   }
 
 
@@ -12478,6 +12601,7 @@ export namespace Prisma {
     gradeLevel: number | null
     graduationYear: number | null
     homeroom: string | null
+    sectionId: string | null
     cumulativeGpa: number | null
     gpaPercentile: number | null
     photoUrl: string | null
@@ -12490,6 +12614,7 @@ export namespace Prisma {
     gradeLevel: number | null
     graduationYear: number | null
     homeroom: string | null
+    sectionId: string | null
     cumulativeGpa: number | null
     gpaPercentile: number | null
     photoUrl: string | null
@@ -12502,6 +12627,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear: number
     homeroom: number
+    sectionId: number
     cumulativeGpa: number
     gpaPercentile: number
     photoUrl: number
@@ -12530,6 +12656,7 @@ export namespace Prisma {
     gradeLevel?: true
     graduationYear?: true
     homeroom?: true
+    sectionId?: true
     cumulativeGpa?: true
     gpaPercentile?: true
     photoUrl?: true
@@ -12542,6 +12669,7 @@ export namespace Prisma {
     gradeLevel?: true
     graduationYear?: true
     homeroom?: true
+    sectionId?: true
     cumulativeGpa?: true
     gpaPercentile?: true
     photoUrl?: true
@@ -12554,6 +12682,7 @@ export namespace Prisma {
     gradeLevel?: true
     graduationYear?: true
     homeroom?: true
+    sectionId?: true
     cumulativeGpa?: true
     gpaPercentile?: true
     photoUrl?: true
@@ -12653,6 +12782,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear: number | null
     homeroom: string | null
+    sectionId: string | null
     cumulativeGpa: number | null
     gpaPercentile: number | null
     photoUrl: string | null
@@ -12684,10 +12814,12 @@ export namespace Prisma {
     gradeLevel?: boolean
     graduationYear?: boolean
     homeroom?: boolean
+    sectionId?: boolean
     cumulativeGpa?: boolean
     gpaPercentile?: boolean
     photoUrl?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
     enrollments?: boolean | StudentProfile$enrollmentsArgs<ExtArgs>
     submissions?: boolean | StudentProfile$submissionsArgs<ExtArgs>
     lessonProgress?: boolean | StudentProfile$lessonProgressArgs<ExtArgs>
@@ -12710,10 +12842,12 @@ export namespace Prisma {
     gradeLevel?: boolean
     graduationYear?: boolean
     homeroom?: boolean
+    sectionId?: boolean
     cumulativeGpa?: boolean
     gpaPercentile?: boolean
     photoUrl?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
   export type StudentProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -12723,10 +12857,12 @@ export namespace Prisma {
     gradeLevel?: boolean
     graduationYear?: boolean
     homeroom?: boolean
+    sectionId?: boolean
     cumulativeGpa?: boolean
     gpaPercentile?: boolean
     photoUrl?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
   export type StudentProfileSelectScalar = {
@@ -12736,14 +12872,16 @@ export namespace Prisma {
     gradeLevel?: boolean
     graduationYear?: boolean
     homeroom?: boolean
+    sectionId?: boolean
     cumulativeGpa?: boolean
     gpaPercentile?: boolean
     photoUrl?: boolean
   }
 
-  export type StudentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "studentNumber" | "gradeLevel" | "graduationYear" | "homeroom" | "cumulativeGpa" | "gpaPercentile" | "photoUrl", ExtArgs["result"]["studentProfile"]>
+  export type StudentProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "studentNumber" | "gradeLevel" | "graduationYear" | "homeroom" | "sectionId" | "cumulativeGpa" | "gpaPercentile" | "photoUrl", ExtArgs["result"]["studentProfile"]>
   export type StudentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
     enrollments?: boolean | StudentProfile$enrollmentsArgs<ExtArgs>
     submissions?: boolean | StudentProfile$submissionsArgs<ExtArgs>
     lessonProgress?: boolean | StudentProfile$lessonProgressArgs<ExtArgs>
@@ -12760,15 +12898,18 @@ export namespace Prisma {
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
   }
   export type StudentProfileIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    section?: boolean | StudentProfile$sectionArgs<ExtArgs>
   }
 
   export type $StudentProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentProfile"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      section: Prisma.$HomeroomPayload<ExtArgs> | null
       enrollments: Prisma.$EnrollmentPayload<ExtArgs>[]
       submissions: Prisma.$SubmissionPayload<ExtArgs>[]
       lessonProgress: Prisma.$LessonProgressPayload<ExtArgs>[]
@@ -12791,7 +12932,14 @@ export namespace Prisma {
       studentNumber: string
       gradeLevel: number
       graduationYear: number | null
+      /**
+       * Section name kept in step with `section`, for older screens.
+       */
       homeroom: string | null
+      /**
+       * The student's section (homeroom), e.g. Grade 10 — Rizal.
+       */
+      sectionId: string | null
       /**
        * Cached cumulative GPA; recomputed when grades are released.
        */
@@ -13193,6 +13341,7 @@ export namespace Prisma {
   export interface Prisma__StudentProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    section<T extends StudentProfile$sectionArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$sectionArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     enrollments<T extends StudentProfile$enrollmentsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$enrollmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EnrollmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     submissions<T extends StudentProfile$submissionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     lessonProgress<T extends StudentProfile$lessonProgressArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$lessonProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LessonProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13240,6 +13389,7 @@ export namespace Prisma {
     readonly gradeLevel: FieldRef<"StudentProfile", 'Int'>
     readonly graduationYear: FieldRef<"StudentProfile", 'Int'>
     readonly homeroom: FieldRef<"StudentProfile", 'String'>
+    readonly sectionId: FieldRef<"StudentProfile", 'String'>
     readonly cumulativeGpa: FieldRef<"StudentProfile", 'Float'>
     readonly gpaPercentile: FieldRef<"StudentProfile", 'Float'>
     readonly photoUrl: FieldRef<"StudentProfile", 'String'>
@@ -13639,6 +13789,25 @@ export namespace Prisma {
   }
 
   /**
+   * StudentProfile.section
+   */
+  export type StudentProfile$sectionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    where?: HomeroomWhereInput
+  }
+
+  /**
    * StudentProfile.enrollments
    */
   export type StudentProfile$enrollmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13942,6 +14111,1097 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StudentProfileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Homeroom
+   */
+
+  export type AggregateHomeroom = {
+    _count: HomeroomCountAggregateOutputType | null
+    _avg: HomeroomAvgAggregateOutputType | null
+    _sum: HomeroomSumAggregateOutputType | null
+    _min: HomeroomMinAggregateOutputType | null
+    _max: HomeroomMaxAggregateOutputType | null
+  }
+
+  export type HomeroomAvgAggregateOutputType = {
+    gradeLevel: number | null
+  }
+
+  export type HomeroomSumAggregateOutputType = {
+    gradeLevel: number | null
+  }
+
+  export type HomeroomMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    gradeLevel: number | null
+    createdAt: Date | null
+  }
+
+  export type HomeroomMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    gradeLevel: number | null
+    createdAt: Date | null
+  }
+
+  export type HomeroomCountAggregateOutputType = {
+    id: number
+    name: number
+    gradeLevel: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type HomeroomAvgAggregateInputType = {
+    gradeLevel?: true
+  }
+
+  export type HomeroomSumAggregateInputType = {
+    gradeLevel?: true
+  }
+
+  export type HomeroomMinAggregateInputType = {
+    id?: true
+    name?: true
+    gradeLevel?: true
+    createdAt?: true
+  }
+
+  export type HomeroomMaxAggregateInputType = {
+    id?: true
+    name?: true
+    gradeLevel?: true
+    createdAt?: true
+  }
+
+  export type HomeroomCountAggregateInputType = {
+    id?: true
+    name?: true
+    gradeLevel?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type HomeroomAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Homeroom to aggregate.
+     */
+    where?: HomeroomWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Homerooms to fetch.
+     */
+    orderBy?: HomeroomOrderByWithRelationInput | HomeroomOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HomeroomWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Homerooms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Homerooms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Homerooms
+    **/
+    _count?: true | HomeroomCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: HomeroomAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: HomeroomSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HomeroomMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HomeroomMaxAggregateInputType
+  }
+
+  export type GetHomeroomAggregateType<T extends HomeroomAggregateArgs> = {
+        [P in keyof T & keyof AggregateHomeroom]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHomeroom[P]>
+      : GetScalarType<T[P], AggregateHomeroom[P]>
+  }
+
+
+
+
+  export type HomeroomGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HomeroomWhereInput
+    orderBy?: HomeroomOrderByWithAggregationInput | HomeroomOrderByWithAggregationInput[]
+    by: HomeroomScalarFieldEnum[] | HomeroomScalarFieldEnum
+    having?: HomeroomScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HomeroomCountAggregateInputType | true
+    _avg?: HomeroomAvgAggregateInputType
+    _sum?: HomeroomSumAggregateInputType
+    _min?: HomeroomMinAggregateInputType
+    _max?: HomeroomMaxAggregateInputType
+  }
+
+  export type HomeroomGroupByOutputType = {
+    id: string
+    name: string
+    gradeLevel: number
+    createdAt: Date
+    _count: HomeroomCountAggregateOutputType | null
+    _avg: HomeroomAvgAggregateOutputType | null
+    _sum: HomeroomSumAggregateOutputType | null
+    _min: HomeroomMinAggregateOutputType | null
+    _max: HomeroomMaxAggregateOutputType | null
+  }
+
+  type GetHomeroomGroupByPayload<T extends HomeroomGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HomeroomGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HomeroomGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HomeroomGroupByOutputType[P]>
+            : GetScalarType<T[P], HomeroomGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HomeroomSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    gradeLevel?: boolean
+    createdAt?: boolean
+    students?: boolean | Homeroom$studentsArgs<ExtArgs>
+    _count?: boolean | HomeroomCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["homeroom"]>
+
+  export type HomeroomSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    gradeLevel?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["homeroom"]>
+
+  export type HomeroomSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    gradeLevel?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["homeroom"]>
+
+  export type HomeroomSelectScalar = {
+    id?: boolean
+    name?: boolean
+    gradeLevel?: boolean
+    createdAt?: boolean
+  }
+
+  export type HomeroomOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "gradeLevel" | "createdAt", ExtArgs["result"]["homeroom"]>
+  export type HomeroomInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    students?: boolean | Homeroom$studentsArgs<ExtArgs>
+    _count?: boolean | HomeroomCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type HomeroomIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type HomeroomIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $HomeroomPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Homeroom"
+    objects: {
+      students: Prisma.$StudentProfilePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      gradeLevel: number
+      createdAt: Date
+    }, ExtArgs["result"]["homeroom"]>
+    composites: {}
+  }
+
+  type HomeroomGetPayload<S extends boolean | null | undefined | HomeroomDefaultArgs> = $Result.GetResult<Prisma.$HomeroomPayload, S>
+
+  type HomeroomCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HomeroomFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HomeroomCountAggregateInputType | true
+    }
+
+  export interface HomeroomDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Homeroom'], meta: { name: 'Homeroom' } }
+    /**
+     * Find zero or one Homeroom that matches the filter.
+     * @param {HomeroomFindUniqueArgs} args - Arguments to find a Homeroom
+     * @example
+     * // Get one Homeroom
+     * const homeroom = await prisma.homeroom.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HomeroomFindUniqueArgs>(args: SelectSubset<T, HomeroomFindUniqueArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Homeroom that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HomeroomFindUniqueOrThrowArgs} args - Arguments to find a Homeroom
+     * @example
+     * // Get one Homeroom
+     * const homeroom = await prisma.homeroom.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HomeroomFindUniqueOrThrowArgs>(args: SelectSubset<T, HomeroomFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Homeroom that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomFindFirstArgs} args - Arguments to find a Homeroom
+     * @example
+     * // Get one Homeroom
+     * const homeroom = await prisma.homeroom.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HomeroomFindFirstArgs>(args?: SelectSubset<T, HomeroomFindFirstArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Homeroom that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomFindFirstOrThrowArgs} args - Arguments to find a Homeroom
+     * @example
+     * // Get one Homeroom
+     * const homeroom = await prisma.homeroom.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HomeroomFindFirstOrThrowArgs>(args?: SelectSubset<T, HomeroomFindFirstOrThrowArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Homerooms that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Homerooms
+     * const homerooms = await prisma.homeroom.findMany()
+     * 
+     * // Get first 10 Homerooms
+     * const homerooms = await prisma.homeroom.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const homeroomWithIdOnly = await prisma.homeroom.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HomeroomFindManyArgs>(args?: SelectSubset<T, HomeroomFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Homeroom.
+     * @param {HomeroomCreateArgs} args - Arguments to create a Homeroom.
+     * @example
+     * // Create one Homeroom
+     * const Homeroom = await prisma.homeroom.create({
+     *   data: {
+     *     // ... data to create a Homeroom
+     *   }
+     * })
+     * 
+     */
+    create<T extends HomeroomCreateArgs>(args: SelectSubset<T, HomeroomCreateArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Homerooms.
+     * @param {HomeroomCreateManyArgs} args - Arguments to create many Homerooms.
+     * @example
+     * // Create many Homerooms
+     * const homeroom = await prisma.homeroom.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HomeroomCreateManyArgs>(args?: SelectSubset<T, HomeroomCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Homerooms and returns the data saved in the database.
+     * @param {HomeroomCreateManyAndReturnArgs} args - Arguments to create many Homerooms.
+     * @example
+     * // Create many Homerooms
+     * const homeroom = await prisma.homeroom.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Homerooms and only return the `id`
+     * const homeroomWithIdOnly = await prisma.homeroom.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HomeroomCreateManyAndReturnArgs>(args?: SelectSubset<T, HomeroomCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Homeroom.
+     * @param {HomeroomDeleteArgs} args - Arguments to delete one Homeroom.
+     * @example
+     * // Delete one Homeroom
+     * const Homeroom = await prisma.homeroom.delete({
+     *   where: {
+     *     // ... filter to delete one Homeroom
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HomeroomDeleteArgs>(args: SelectSubset<T, HomeroomDeleteArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Homeroom.
+     * @param {HomeroomUpdateArgs} args - Arguments to update one Homeroom.
+     * @example
+     * // Update one Homeroom
+     * const homeroom = await prisma.homeroom.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HomeroomUpdateArgs>(args: SelectSubset<T, HomeroomUpdateArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Homerooms.
+     * @param {HomeroomDeleteManyArgs} args - Arguments to filter Homerooms to delete.
+     * @example
+     * // Delete a few Homerooms
+     * const { count } = await prisma.homeroom.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HomeroomDeleteManyArgs>(args?: SelectSubset<T, HomeroomDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Homerooms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Homerooms
+     * const homeroom = await prisma.homeroom.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HomeroomUpdateManyArgs>(args: SelectSubset<T, HomeroomUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Homerooms and returns the data updated in the database.
+     * @param {HomeroomUpdateManyAndReturnArgs} args - Arguments to update many Homerooms.
+     * @example
+     * // Update many Homerooms
+     * const homeroom = await prisma.homeroom.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Homerooms and only return the `id`
+     * const homeroomWithIdOnly = await prisma.homeroom.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HomeroomUpdateManyAndReturnArgs>(args: SelectSubset<T, HomeroomUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Homeroom.
+     * @param {HomeroomUpsertArgs} args - Arguments to update or create a Homeroom.
+     * @example
+     * // Update or create a Homeroom
+     * const homeroom = await prisma.homeroom.upsert({
+     *   create: {
+     *     // ... data to create a Homeroom
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Homeroom we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HomeroomUpsertArgs>(args: SelectSubset<T, HomeroomUpsertArgs<ExtArgs>>): Prisma__HomeroomClient<$Result.GetResult<Prisma.$HomeroomPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Homerooms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomCountArgs} args - Arguments to filter Homerooms to count.
+     * @example
+     * // Count the number of Homerooms
+     * const count = await prisma.homeroom.count({
+     *   where: {
+     *     // ... the filter for the Homerooms we want to count
+     *   }
+     * })
+    **/
+    count<T extends HomeroomCountArgs>(
+      args?: Subset<T, HomeroomCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HomeroomCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Homeroom.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HomeroomAggregateArgs>(args: Subset<T, HomeroomAggregateArgs>): Prisma.PrismaPromise<GetHomeroomAggregateType<T>>
+
+    /**
+     * Group by Homeroom.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HomeroomGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HomeroomGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HomeroomGroupByArgs['orderBy'] }
+        : { orderBy?: HomeroomGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HomeroomGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHomeroomGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Homeroom model
+   */
+  readonly fields: HomeroomFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Homeroom.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HomeroomClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    students<T extends Homeroom$studentsArgs<ExtArgs> = {}>(args?: Subset<T, Homeroom$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Homeroom model
+   */
+  interface HomeroomFieldRefs {
+    readonly id: FieldRef<"Homeroom", 'String'>
+    readonly name: FieldRef<"Homeroom", 'String'>
+    readonly gradeLevel: FieldRef<"Homeroom", 'Int'>
+    readonly createdAt: FieldRef<"Homeroom", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Homeroom findUnique
+   */
+  export type HomeroomFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter, which Homeroom to fetch.
+     */
+    where: HomeroomWhereUniqueInput
+  }
+
+  /**
+   * Homeroom findUniqueOrThrow
+   */
+  export type HomeroomFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter, which Homeroom to fetch.
+     */
+    where: HomeroomWhereUniqueInput
+  }
+
+  /**
+   * Homeroom findFirst
+   */
+  export type HomeroomFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter, which Homeroom to fetch.
+     */
+    where?: HomeroomWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Homerooms to fetch.
+     */
+    orderBy?: HomeroomOrderByWithRelationInput | HomeroomOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Homerooms.
+     */
+    cursor?: HomeroomWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Homerooms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Homerooms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Homerooms.
+     */
+    distinct?: HomeroomScalarFieldEnum | HomeroomScalarFieldEnum[]
+  }
+
+  /**
+   * Homeroom findFirstOrThrow
+   */
+  export type HomeroomFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter, which Homeroom to fetch.
+     */
+    where?: HomeroomWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Homerooms to fetch.
+     */
+    orderBy?: HomeroomOrderByWithRelationInput | HomeroomOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Homerooms.
+     */
+    cursor?: HomeroomWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Homerooms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Homerooms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Homerooms.
+     */
+    distinct?: HomeroomScalarFieldEnum | HomeroomScalarFieldEnum[]
+  }
+
+  /**
+   * Homeroom findMany
+   */
+  export type HomeroomFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter, which Homerooms to fetch.
+     */
+    where?: HomeroomWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Homerooms to fetch.
+     */
+    orderBy?: HomeroomOrderByWithRelationInput | HomeroomOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Homerooms.
+     */
+    cursor?: HomeroomWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Homerooms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Homerooms.
+     */
+    skip?: number
+    distinct?: HomeroomScalarFieldEnum | HomeroomScalarFieldEnum[]
+  }
+
+  /**
+   * Homeroom create
+   */
+  export type HomeroomCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Homeroom.
+     */
+    data: XOR<HomeroomCreateInput, HomeroomUncheckedCreateInput>
+  }
+
+  /**
+   * Homeroom createMany
+   */
+  export type HomeroomCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Homerooms.
+     */
+    data: HomeroomCreateManyInput | HomeroomCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Homeroom createManyAndReturn
+   */
+  export type HomeroomCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * The data used to create many Homerooms.
+     */
+    data: HomeroomCreateManyInput | HomeroomCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Homeroom update
+   */
+  export type HomeroomUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Homeroom.
+     */
+    data: XOR<HomeroomUpdateInput, HomeroomUncheckedUpdateInput>
+    /**
+     * Choose, which Homeroom to update.
+     */
+    where: HomeroomWhereUniqueInput
+  }
+
+  /**
+   * Homeroom updateMany
+   */
+  export type HomeroomUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Homerooms.
+     */
+    data: XOR<HomeroomUpdateManyMutationInput, HomeroomUncheckedUpdateManyInput>
+    /**
+     * Filter which Homerooms to update
+     */
+    where?: HomeroomWhereInput
+    /**
+     * Limit how many Homerooms to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Homeroom updateManyAndReturn
+   */
+  export type HomeroomUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * The data used to update Homerooms.
+     */
+    data: XOR<HomeroomUpdateManyMutationInput, HomeroomUncheckedUpdateManyInput>
+    /**
+     * Filter which Homerooms to update
+     */
+    where?: HomeroomWhereInput
+    /**
+     * Limit how many Homerooms to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Homeroom upsert
+   */
+  export type HomeroomUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Homeroom to update in case it exists.
+     */
+    where: HomeroomWhereUniqueInput
+    /**
+     * In case the Homeroom found by the `where` argument doesn't exist, create a new Homeroom with this data.
+     */
+    create: XOR<HomeroomCreateInput, HomeroomUncheckedCreateInput>
+    /**
+     * In case the Homeroom was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HomeroomUpdateInput, HomeroomUncheckedUpdateInput>
+  }
+
+  /**
+   * Homeroom delete
+   */
+  export type HomeroomDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
+    /**
+     * Filter which Homeroom to delete.
+     */
+    where: HomeroomWhereUniqueInput
+  }
+
+  /**
+   * Homeroom deleteMany
+   */
+  export type HomeroomDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Homerooms to delete
+     */
+    where?: HomeroomWhereInput
+    /**
+     * Limit how many Homerooms to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Homeroom.students
+   */
+  export type Homeroom$studentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentProfile
+     */
+    select?: StudentProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StudentProfile
+     */
+    omit?: StudentProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentProfileInclude<ExtArgs> | null
+    where?: StudentProfileWhereInput
+    orderBy?: StudentProfileOrderByWithRelationInput | StudentProfileOrderByWithRelationInput[]
+    cursor?: StudentProfileWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentProfileScalarFieldEnum | StudentProfileScalarFieldEnum[]
+  }
+
+  /**
+   * Homeroom without action
+   */
+  export type HomeroomDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Homeroom
+     */
+    select?: HomeroomSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Homeroom
+     */
+    omit?: HomeroomOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: HomeroomInclude<ExtArgs> | null
   }
 
 
@@ -73050,12 +74310,23 @@ export namespace Prisma {
     gradeLevel: 'gradeLevel',
     graduationYear: 'graduationYear',
     homeroom: 'homeroom',
+    sectionId: 'sectionId',
     cumulativeGpa: 'cumulativeGpa',
     gpaPercentile: 'gpaPercentile',
     photoUrl: 'photoUrl'
   };
 
   export type StudentProfileScalarFieldEnum = (typeof StudentProfileScalarFieldEnum)[keyof typeof StudentProfileScalarFieldEnum]
+
+
+  export const HomeroomScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    gradeLevel: 'gradeLevel',
+    createdAt: 'createdAt'
+  };
+
+  export type HomeroomScalarFieldEnum = (typeof HomeroomScalarFieldEnum)[keyof typeof HomeroomScalarFieldEnum]
 
 
   export const TeacherProfileScalarFieldEnum: {
@@ -74652,10 +75923,12 @@ export namespace Prisma {
     gradeLevel?: IntFilter<"StudentProfile"> | number
     graduationYear?: IntNullableFilter<"StudentProfile"> | number | null
     homeroom?: StringNullableFilter<"StudentProfile"> | string | null
+    sectionId?: StringNullableFilter<"StudentProfile"> | string | null
     cumulativeGpa?: FloatNullableFilter<"StudentProfile"> | number | null
     gpaPercentile?: FloatNullableFilter<"StudentProfile"> | number | null
     photoUrl?: StringNullableFilter<"StudentProfile"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    section?: XOR<HomeroomNullableScalarRelationFilter, HomeroomWhereInput> | null
     enrollments?: EnrollmentListRelationFilter
     submissions?: SubmissionListRelationFilter
     lessonProgress?: LessonProgressListRelationFilter
@@ -74677,10 +75950,12 @@ export namespace Prisma {
     gradeLevel?: SortOrder
     graduationYear?: SortOrderInput | SortOrder
     homeroom?: SortOrderInput | SortOrder
+    sectionId?: SortOrderInput | SortOrder
     cumulativeGpa?: SortOrderInput | SortOrder
     gpaPercentile?: SortOrderInput | SortOrder
     photoUrl?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
+    section?: HomeroomOrderByWithRelationInput
     enrollments?: EnrollmentOrderByRelationAggregateInput
     submissions?: SubmissionOrderByRelationAggregateInput
     lessonProgress?: LessonProgressOrderByRelationAggregateInput
@@ -74705,10 +75980,12 @@ export namespace Prisma {
     gradeLevel?: IntFilter<"StudentProfile"> | number
     graduationYear?: IntNullableFilter<"StudentProfile"> | number | null
     homeroom?: StringNullableFilter<"StudentProfile"> | string | null
+    sectionId?: StringNullableFilter<"StudentProfile"> | string | null
     cumulativeGpa?: FloatNullableFilter<"StudentProfile"> | number | null
     gpaPercentile?: FloatNullableFilter<"StudentProfile"> | number | null
     photoUrl?: StringNullableFilter<"StudentProfile"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    section?: XOR<HomeroomNullableScalarRelationFilter, HomeroomWhereInput> | null
     enrollments?: EnrollmentListRelationFilter
     submissions?: SubmissionListRelationFilter
     lessonProgress?: LessonProgressListRelationFilter
@@ -74730,6 +76007,7 @@ export namespace Prisma {
     gradeLevel?: SortOrder
     graduationYear?: SortOrderInput | SortOrder
     homeroom?: SortOrderInput | SortOrder
+    sectionId?: SortOrderInput | SortOrder
     cumulativeGpa?: SortOrderInput | SortOrder
     gpaPercentile?: SortOrderInput | SortOrder
     photoUrl?: SortOrderInput | SortOrder
@@ -74750,9 +76028,63 @@ export namespace Prisma {
     gradeLevel?: IntWithAggregatesFilter<"StudentProfile"> | number
     graduationYear?: IntNullableWithAggregatesFilter<"StudentProfile"> | number | null
     homeroom?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    sectionId?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
     cumulativeGpa?: FloatNullableWithAggregatesFilter<"StudentProfile"> | number | null
     gpaPercentile?: FloatNullableWithAggregatesFilter<"StudentProfile"> | number | null
     photoUrl?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+  }
+
+  export type HomeroomWhereInput = {
+    AND?: HomeroomWhereInput | HomeroomWhereInput[]
+    OR?: HomeroomWhereInput[]
+    NOT?: HomeroomWhereInput | HomeroomWhereInput[]
+    id?: StringFilter<"Homeroom"> | string
+    name?: StringFilter<"Homeroom"> | string
+    gradeLevel?: IntFilter<"Homeroom"> | number
+    createdAt?: DateTimeFilter<"Homeroom"> | Date | string
+    students?: StudentProfileListRelationFilter
+  }
+
+  export type HomeroomOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    gradeLevel?: SortOrder
+    createdAt?: SortOrder
+    students?: StudentProfileOrderByRelationAggregateInput
+  }
+
+  export type HomeroomWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    gradeLevel_name?: HomeroomGradeLevelNameCompoundUniqueInput
+    AND?: HomeroomWhereInput | HomeroomWhereInput[]
+    OR?: HomeroomWhereInput[]
+    NOT?: HomeroomWhereInput | HomeroomWhereInput[]
+    name?: StringFilter<"Homeroom"> | string
+    gradeLevel?: IntFilter<"Homeroom"> | number
+    createdAt?: DateTimeFilter<"Homeroom"> | Date | string
+    students?: StudentProfileListRelationFilter
+  }, "id" | "gradeLevel_name">
+
+  export type HomeroomOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    gradeLevel?: SortOrder
+    createdAt?: SortOrder
+    _count?: HomeroomCountOrderByAggregateInput
+    _avg?: HomeroomAvgOrderByAggregateInput
+    _max?: HomeroomMaxOrderByAggregateInput
+    _min?: HomeroomMinOrderByAggregateInput
+    _sum?: HomeroomSumOrderByAggregateInput
+  }
+
+  export type HomeroomScalarWhereWithAggregatesInput = {
+    AND?: HomeroomScalarWhereWithAggregatesInput | HomeroomScalarWhereWithAggregatesInput[]
+    OR?: HomeroomScalarWhereWithAggregatesInput[]
+    NOT?: HomeroomScalarWhereWithAggregatesInput | HomeroomScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Homeroom"> | string
+    name?: StringWithAggregatesFilter<"Homeroom"> | string
+    gradeLevel?: IntWithAggregatesFilter<"Homeroom"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"Homeroom"> | Date | string
   }
 
   export type TeacherProfileWhereInput = {
@@ -78965,6 +80297,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -78986,6 +80319,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -79013,6 +80347,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -79034,6 +80369,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79058,6 +80394,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -79081,9 +80418,63 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type HomeroomCreateInput = {
+    id?: string
+    name: string
+    gradeLevel: number
+    createdAt?: Date | string
+    students?: StudentProfileCreateNestedManyWithoutSectionInput
+  }
+
+  export type HomeroomUncheckedCreateInput = {
+    id?: string
+    name: string
+    gradeLevel: number
+    createdAt?: Date | string
+    students?: StudentProfileUncheckedCreateNestedManyWithoutSectionInput
+  }
+
+  export type HomeroomUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    students?: StudentProfileUpdateManyWithoutSectionNestedInput
+  }
+
+  export type HomeroomUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    students?: StudentProfileUncheckedUpdateManyWithoutSectionNestedInput
+  }
+
+  export type HomeroomCreateManyInput = {
+    id?: string
+    name: string
+    gradeLevel: number
+    createdAt?: Date | string
+  }
+
+  export type HomeroomUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HomeroomUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TeacherProfileCreateInput = {
@@ -83537,6 +84928,11 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type HomeroomNullableScalarRelationFilter = {
+    is?: HomeroomWhereInput | null
+    isNot?: HomeroomWhereInput | null
+  }
+
   export type EnrollmentListRelationFilter = {
     every?: EnrollmentWhereInput
     some?: EnrollmentWhereInput
@@ -83644,6 +85040,7 @@ export namespace Prisma {
     gradeLevel?: SortOrder
     graduationYear?: SortOrder
     homeroom?: SortOrder
+    sectionId?: SortOrder
     cumulativeGpa?: SortOrder
     gpaPercentile?: SortOrder
     photoUrl?: SortOrder
@@ -83663,6 +85060,7 @@ export namespace Prisma {
     gradeLevel?: SortOrder
     graduationYear?: SortOrder
     homeroom?: SortOrder
+    sectionId?: SortOrder
     cumulativeGpa?: SortOrder
     gpaPercentile?: SortOrder
     photoUrl?: SortOrder
@@ -83675,6 +85073,7 @@ export namespace Prisma {
     gradeLevel?: SortOrder
     graduationYear?: SortOrder
     homeroom?: SortOrder
+    sectionId?: SortOrder
     cumulativeGpa?: SortOrder
     gpaPercentile?: SortOrder
     photoUrl?: SortOrder
@@ -83717,6 +85116,50 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type StudentProfileListRelationFilter = {
+    every?: StudentProfileWhereInput
+    some?: StudentProfileWhereInput
+    none?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type HomeroomGradeLevelNameCompoundUniqueInput = {
+    gradeLevel: number
+    name: string
+  }
+
+  export type HomeroomCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    gradeLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type HomeroomAvgOrderByAggregateInput = {
+    gradeLevel?: SortOrder
+  }
+
+  export type HomeroomMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    gradeLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type HomeroomMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    gradeLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type HomeroomSumOrderByAggregateInput = {
+    gradeLevel?: SortOrder
   }
 
   export type DepartmentNullableScalarRelationFilter = {
@@ -87437,6 +88880,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type HomeroomCreateNestedOneWithoutStudentsInput = {
+    create?: XOR<HomeroomCreateWithoutStudentsInput, HomeroomUncheckedCreateWithoutStudentsInput>
+    connectOrCreate?: HomeroomCreateOrConnectWithoutStudentsInput
+    connect?: HomeroomWhereUniqueInput
+  }
+
   export type EnrollmentCreateNestedManyWithoutStudentInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -87627,6 +89076,16 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutStudentProfileInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStudentProfileInput, UserUpdateWithoutStudentProfileInput>, UserUncheckedUpdateWithoutStudentProfileInput>
+  }
+
+  export type HomeroomUpdateOneWithoutStudentsNestedInput = {
+    create?: XOR<HomeroomCreateWithoutStudentsInput, HomeroomUncheckedCreateWithoutStudentsInput>
+    connectOrCreate?: HomeroomCreateOrConnectWithoutStudentsInput
+    upsert?: HomeroomUpsertWithoutStudentsInput
+    disconnect?: HomeroomWhereInput | boolean
+    delete?: HomeroomWhereInput | boolean
+    connect?: HomeroomWhereUniqueInput
+    update?: XOR<XOR<HomeroomUpdateToOneWithWhereWithoutStudentsInput, HomeroomUpdateWithoutStudentsInput>, HomeroomUncheckedUpdateWithoutStudentsInput>
   }
 
   export type EnrollmentUpdateManyWithoutStudentNestedInput = {
@@ -87963,6 +89422,48 @@ export namespace Prisma {
     update?: PeerTutorAssignmentUpdateWithWhereUniqueWithoutTutorInput | PeerTutorAssignmentUpdateWithWhereUniqueWithoutTutorInput[]
     updateMany?: PeerTutorAssignmentUpdateManyWithWhereWithoutTutorInput | PeerTutorAssignmentUpdateManyWithWhereWithoutTutorInput[]
     deleteMany?: PeerTutorAssignmentScalarWhereInput | PeerTutorAssignmentScalarWhereInput[]
+  }
+
+  export type StudentProfileCreateNestedManyWithoutSectionInput = {
+    create?: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput> | StudentProfileCreateWithoutSectionInput[] | StudentProfileUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutSectionInput | StudentProfileCreateOrConnectWithoutSectionInput[]
+    createMany?: StudentProfileCreateManySectionInputEnvelope
+    connect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+  }
+
+  export type StudentProfileUncheckedCreateNestedManyWithoutSectionInput = {
+    create?: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput> | StudentProfileCreateWithoutSectionInput[] | StudentProfileUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutSectionInput | StudentProfileCreateOrConnectWithoutSectionInput[]
+    createMany?: StudentProfileCreateManySectionInputEnvelope
+    connect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+  }
+
+  export type StudentProfileUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput> | StudentProfileCreateWithoutSectionInput[] | StudentProfileUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutSectionInput | StudentProfileCreateOrConnectWithoutSectionInput[]
+    upsert?: StudentProfileUpsertWithWhereUniqueWithoutSectionInput | StudentProfileUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: StudentProfileCreateManySectionInputEnvelope
+    set?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    disconnect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    delete?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    connect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    update?: StudentProfileUpdateWithWhereUniqueWithoutSectionInput | StudentProfileUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: StudentProfileUpdateManyWithWhereWithoutSectionInput | StudentProfileUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: StudentProfileScalarWhereInput | StudentProfileScalarWhereInput[]
+  }
+
+  export type StudentProfileUncheckedUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput> | StudentProfileCreateWithoutSectionInput[] | StudentProfileUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutSectionInput | StudentProfileCreateOrConnectWithoutSectionInput[]
+    upsert?: StudentProfileUpsertWithWhereUniqueWithoutSectionInput | StudentProfileUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: StudentProfileCreateManySectionInputEnvelope
+    set?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    disconnect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    delete?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    connect?: StudentProfileWhereUniqueInput | StudentProfileWhereUniqueInput[]
+    update?: StudentProfileUpdateWithWhereUniqueWithoutSectionInput | StudentProfileUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: StudentProfileUpdateManyWithWhereWithoutSectionInput | StudentProfileUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: StudentProfileScalarWhereInput | StudentProfileScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutTeacherProfileInput = {
@@ -92563,6 +94064,7 @@ export namespace Prisma {
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -92583,6 +94085,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -93051,6 +94554,7 @@ export namespace Prisma {
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -93071,6 +94575,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -93784,6 +95289,25 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
   }
 
+  export type HomeroomCreateWithoutStudentsInput = {
+    id?: string
+    name: string
+    gradeLevel: number
+    createdAt?: Date | string
+  }
+
+  export type HomeroomUncheckedCreateWithoutStudentsInput = {
+    id?: string
+    name: string
+    gradeLevel: number
+    createdAt?: Date | string
+  }
+
+  export type HomeroomCreateOrConnectWithoutStudentsInput = {
+    where: HomeroomWhereUniqueInput
+    create: XOR<HomeroomCreateWithoutStudentsInput, HomeroomUncheckedCreateWithoutStudentsInput>
+  }
+
   export type EnrollmentCreateWithoutStudentInput = {
     id?: string
     status?: $Enums.EnrollmentStatus
@@ -94239,6 +95763,31 @@ export namespace Prisma {
     interventionActions?: InterventionActionUncheckedUpdateManyWithoutPerformedByNestedInput
   }
 
+  export type HomeroomUpsertWithoutStudentsInput = {
+    update: XOR<HomeroomUpdateWithoutStudentsInput, HomeroomUncheckedUpdateWithoutStudentsInput>
+    create: XOR<HomeroomCreateWithoutStudentsInput, HomeroomUncheckedCreateWithoutStudentsInput>
+    where?: HomeroomWhereInput
+  }
+
+  export type HomeroomUpdateToOneWithWhereWithoutStudentsInput = {
+    where?: HomeroomWhereInput
+    data: XOR<HomeroomUpdateWithoutStudentsInput, HomeroomUncheckedUpdateWithoutStudentsInput>
+  }
+
+  export type HomeroomUpdateWithoutStudentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HomeroomUncheckedUpdateWithoutStudentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EnrollmentUpsertWithWhereUniqueWithoutStudentInput = {
     where: EnrollmentWhereUniqueInput
     update: XOR<EnrollmentUpdateWithoutStudentInput, EnrollmentUncheckedUpdateWithoutStudentInput>
@@ -94571,6 +96120,96 @@ export namespace Prisma {
   export type PeerTutorAssignmentUpdateManyWithWhereWithoutTutorInput = {
     where: PeerTutorAssignmentScalarWhereInput
     data: XOR<PeerTutorAssignmentUpdateManyMutationInput, PeerTutorAssignmentUncheckedUpdateManyWithoutTutorInput>
+  }
+
+  export type StudentProfileCreateWithoutSectionInput = {
+    id?: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordCreateNestedManyWithoutStudentInput
+    alerts?: AlertCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutSectionInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteUncheckedCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationUncheckedCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutSectionInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput>
+  }
+
+  export type StudentProfileCreateManySectionInputEnvelope = {
+    data: StudentProfileCreateManySectionInput | StudentProfileCreateManySectionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentProfileUpsertWithWhereUniqueWithoutSectionInput = {
+    where: StudentProfileWhereUniqueInput
+    update: XOR<StudentProfileUpdateWithoutSectionInput, StudentProfileUncheckedUpdateWithoutSectionInput>
+    create: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput>
+  }
+
+  export type StudentProfileUpdateWithWhereUniqueWithoutSectionInput = {
+    where: StudentProfileWhereUniqueInput
+    data: XOR<StudentProfileUpdateWithoutSectionInput, StudentProfileUncheckedUpdateWithoutSectionInput>
+  }
+
+  export type StudentProfileUpdateManyWithWhereWithoutSectionInput = {
+    where: StudentProfileScalarWhereInput
+    data: XOR<StudentProfileUpdateManyMutationInput, StudentProfileUncheckedUpdateManyWithoutSectionInput>
+  }
+
+  export type StudentProfileScalarWhereInput = {
+    AND?: StudentProfileScalarWhereInput | StudentProfileScalarWhereInput[]
+    OR?: StudentProfileScalarWhereInput[]
+    NOT?: StudentProfileScalarWhereInput | StudentProfileScalarWhereInput[]
+    id?: StringFilter<"StudentProfile"> | string
+    userId?: StringFilter<"StudentProfile"> | string
+    studentNumber?: StringFilter<"StudentProfile"> | string
+    gradeLevel?: IntFilter<"StudentProfile"> | number
+    graduationYear?: IntNullableFilter<"StudentProfile"> | number | null
+    homeroom?: StringNullableFilter<"StudentProfile"> | string | null
+    sectionId?: StringNullableFilter<"StudentProfile"> | string | null
+    cumulativeGpa?: FloatNullableFilter<"StudentProfile"> | number | null
+    gpaPercentile?: FloatNullableFilter<"StudentProfile"> | number | null
+    photoUrl?: StringNullableFilter<"StudentProfile"> | string | null
   }
 
   export type UserCreateWithoutTeacherProfileInput = {
@@ -94977,6 +96616,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -94997,6 +96637,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -95068,6 +96709,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -95088,6 +96730,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -95114,6 +96757,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -95134,6 +96778,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -95176,6 +96821,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -95196,6 +96842,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96572,6 +98219,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
     lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
@@ -96592,6 +98240,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -96715,6 +98364,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
     lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
@@ -96735,6 +98385,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -98309,6 +99960,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
@@ -98329,6 +99981,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -98422,6 +100075,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
@@ -98442,6 +100096,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -98513,6 +100168,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -98533,6 +100189,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -98626,6 +100283,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -98646,6 +100304,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -100123,6 +101782,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
     lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
@@ -100143,6 +101803,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -100293,6 +101954,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
     lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
@@ -100313,6 +101975,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -101748,6 +103411,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -101768,6 +103432,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -101935,6 +103600,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -101955,6 +103621,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -102763,6 +104430,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -102783,6 +104451,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -102858,6 +104527,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -102878,6 +104548,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -102904,6 +104575,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -102924,6 +104596,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -103108,6 +104781,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -103128,6 +104802,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -103512,6 +105187,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -103532,6 +105208,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -103563,6 +105240,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -103583,6 +105261,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -103674,6 +105353,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -103694,6 +105374,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -103731,6 +105412,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -103751,6 +105433,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -105263,6 +106946,7 @@ export namespace Prisma {
     gpaPercentile?: number | null
     photoUrl?: string | null
     user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
     enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
     submissions?: SubmissionCreateNestedManyWithoutStudentInput
     lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
@@ -105283,6 +106967,7 @@ export namespace Prisma {
     gradeLevel: number
     graduationYear?: number | null
     homeroom?: string | null
+    sectionId?: string | null
     cumulativeGpa?: number | null
     gpaPercentile?: number | null
     photoUrl?: string | null
@@ -105362,6 +107047,7 @@ export namespace Prisma {
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
     enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
     submissions?: SubmissionUpdateManyWithoutStudentNestedInput
     lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
@@ -105382,6 +107068,7 @@ export namespace Prisma {
     gradeLevel?: IntFieldUpdateOperationsInput | number
     graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
     homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
     cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
     gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
     photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -106442,6 +108129,78 @@ export namespace Prisma {
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StudentProfileCreateManySectionInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+  }
+
+  export type StudentProfileUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUncheckedUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUncheckedUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateManyWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SectionCreateManyTeacherInput = {

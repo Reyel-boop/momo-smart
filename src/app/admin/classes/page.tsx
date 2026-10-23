@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import Link from "next/link";
 
-import { CapIcon } from "~/app/_components/icons";
+import { BookIcon, CapIcon } from "~/app/_components/icons";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, CardHeader, EmptyState } from "~/app/_components/ui";
 import { api } from "~/trpc/server";
@@ -11,9 +11,10 @@ export const metadata: Metadata = { title: "Classes · Momo Smart" };
 export const dynamic = "force-dynamic";
 
 export default async function ClassesPage() {
-  const [classes, options] = await Promise.all([
+  const [classes, options, courses] = await Promise.all([
     api.admin.classes(),
     api.admin.options(),
+    api.admin.courses(),
   ]);
 
   return (
@@ -98,6 +99,91 @@ export default async function ClassesPage() {
             </table>
           </div>
         )}
+      </Card>
+
+      <Card className="overflow-hidden">
+        <CardHeader
+          icon={<BookIcon className="size-[18px]" />}
+          title="Courses"
+          subtitle={`${courses.length} course${courses.length === 1 ? "" : "s"} in the curriculum — open one to see its units and lessons`}
+        />
+        <ul className="divide-line divide-y">
+          {courses.map((course) => {
+            const lessons = course.units.reduce(
+              (sum, unit) => sum + unit._count.lessons,
+              0,
+            );
+            return (
+              <li key={course.id}>
+                <details className="group">
+                  <summary className="hover:bg-canvas flex cursor-pointer list-none flex-wrap items-center gap-x-4 gap-y-1 px-5 py-3">
+                    <span className="min-w-0 flex-1">
+                      <span className="text-ink block font-semibold">
+                        {course.name}
+                      </span>
+                      <span className="text-muted text-xs">
+                        {course.code} · {course.department.name}
+                      </span>
+                    </span>
+                    <span className="text-muted text-xs">
+                      {course.units.length} unit
+                      {course.units.length === 1 ? "" : "s"} · {lessons} lesson
+                      {lessons === 1 ? "" : "s"}
+                    </span>
+                    <span className="text-xs font-semibold">
+                      {course.sections.length > 0 ? (
+                        <span className="text-brand">
+                          {course.sections.length} class
+                          {course.sections.length === 1 ? "" : "es"}
+                        </span>
+                      ) : (
+                        <span className="text-muted">No class yet</span>
+                      )}
+                    </span>
+                    <span className="text-muted text-xs transition group-open:rotate-90">
+                      ›
+                    </span>
+                  </summary>
+                  <div className="bg-canvas/60 space-y-3 px-5 py-4 text-sm">
+                    {course.description && (
+                      <p className="text-muted">{course.description}</p>
+                    )}
+                    <ol className="space-y-1">
+                      {course.units.map((unit) => (
+                        <li key={unit.id} className="text-ink">
+                          <span className="text-muted mr-2 font-mono text-xs">
+                            Unit {unit.order}
+                          </span>
+                          {unit.title}
+                          <span className="text-muted ml-2 text-xs">
+                            {unit._count.lessons} lesson
+                            {unit._count.lessons === 1 ? "" : "s"}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                    {course.sections.length > 0 && (
+                      <p className="text-muted text-xs">
+                        Classes:{" "}
+                        {course.sections.map((section, i) => (
+                          <span key={section.id}>
+                            {i > 0 && ", "}
+                            <Link
+                              href={`/admin/classes/${section.id}`}
+                              className="text-brand font-semibold hover:underline"
+                            >
+                              {section.code}
+                            </Link>
+                          </span>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                </details>
+              </li>
+            );
+          })}
+        </ul>
       </Card>
     </div>
   );

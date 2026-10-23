@@ -143,13 +143,22 @@ export function Sf1Upload({
             `Adding ${Math.min(i + BATCH, rows.length)} of ${rows.length}…`,
           );
           const batch = rows.slice(i, i + BATCH);
+          // Everyone goes into the form's section (homeroom).
+          const homeroom = form.section?.trim()
+            ? { name: form.section.trim(), gradeLevel: Number(grade) }
+            : null;
           const result: ImportResult[] =
             mode === "admin"
               ? await adminImport.mutateAsync({
                   rows: batch,
                   sectionId: sectionId || null,
+                  homeroom,
                 })
-              : await teacherImport.mutateAsync({ rows: batch, sectionId });
+              : await teacherImport.mutateAsync({
+                  rows: batch,
+                  sectionId,
+                  homeroom,
+                });
           all.push(...result);
         }
         setResults(all);
@@ -231,7 +240,8 @@ export function Sf1Upload({
               <p className="text-muted text-sm">
                 Choose the SF1 Excel file from LIS. Every learner gets an
                 account that signs in with their <b>LRN</b> and a temporary
-                password, and is enrolled in the class.
+                password, is placed in the form&rsquo;s section, and is enrolled
+                in the class.
               </p>
             </div>
 
