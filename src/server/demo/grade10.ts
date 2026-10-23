@@ -7,22 +7,29 @@
  * is the exception: its lessons are written out in full in seed.ts (video,
  * lab protocol, timed assessment), so it is listed here without lessons.
  */
+import type { QuizItem } from "./grade10-quiz";
+import type { DemoLecture } from "./lectures/types";
 
 export type DemoLesson = {
   title: string;
   summary: string;
   reading: string;
   questions: string[];
+  /** Lecture video and write-up; core subjects keep theirs in lectures/. */
+  lecture?: DemoLecture;
 };
 
 export type DemoUnit = {
   title: string;
   description: string;
   lessons: DemoLesson[];
+  /** Unit Questions; core subjects keep theirs in grade10-quiz.ts. */
+  quiz?: QuizItem[];
 };
 
 export type DemoSubject = {
-  key: "MATH" | "SCI" | "FIL" | "ENG" | "AP";
+  /** Core subjects: MATH, SCI, FIL, ENG, AP. TLE courses: TLE7, TLE10-CSS… */
+  key: string;
   code: string;
   name: string;
   department: string;

@@ -28,11 +28,21 @@ const STATUS = {
   NOT_STARTED: { label: "Upcoming", tone: "slate" },
 } as const;
 
-/** Core subjects in the order the school lists them; anything else after. */
+/**
+ * Core subjects in the order the school lists them, then TLE by grade and
+ * major ("TLE 7", "TLE 9-CSS", "TLE 10-EIM"…), then anything else.
+ */
 const SUBJECT_ORDER = ["MATH", "SCI", "FIL", "ENG", "AP"];
+const TLE_MAJORS = ["CSS", "COOK", "ACP", "EIM"];
 const subjectRank = (code: string) => {
-  const index = SUBJECT_ORDER.indexOf(code.split(" ")[0]!.toUpperCase());
-  return index === -1 ? SUBJECT_ORDER.length : index;
+  const upper = code.toUpperCase();
+  const tle = /^TLE (\d+)(?:-(\w+))?$/.exec(upper);
+  if (tle) {
+    const major = tle[2] ? TLE_MAJORS.indexOf(tle[2]) + 1 : 0;
+    return 100 + Number(tle[1]) * 10 + major;
+  }
+  const index = SUBJECT_ORDER.indexOf(upper.split(" ")[0]!);
+  return index === -1 ? 1000 : index;
 };
 
 export default async function CoursesPage({

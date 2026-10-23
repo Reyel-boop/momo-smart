@@ -19,6 +19,7 @@ import { hashSync } from "bcryptjs";
 import type { Prisma, PrismaClient } from "../../../generated/prisma";
 import { DEMO_PASSWORD } from "./accounts";
 import { GRADE10_SUBJECTS, type DemoSubject } from "./grade10";
+import { TLE_SUBJECTS } from "./tle";
 import { UNIT_QUIZZES } from "./grade10-quiz";
 import { GRADE10_LECTURES, lectureVideoUrl } from "./lectures";
 import { LECTURE_SECTION_TITLE } from "../../lib/video";
@@ -32,6 +33,16 @@ import { LECTURE_SECTION_TITLE } from "../../lib/video";
 let db: PrismaClient;
 
 const DEMO_HASH = hashSync(DEMO_PASSWORD, 10);
+
+/** The five Grade 10 core subjects, then TLE 7–10. */
+const ALL_SUBJECTS: DemoSubject[] = [...GRADE10_SUBJECTS, ...TLE_SUBJECTS];
+
+/**
+ * The unit being taught now: unit 4 in the core subjects, the last unit in
+ * shorter courses. Earlier units are finished, later ones still to come.
+ */
+const currentUnitIndex = (subject: DemoSubject) =>
+  Math.min(3, subject.units.length - 1);
 
 /** "Today" anchor, fixed per run so relative dates stay coherent. */
 let NOW = new Date();
@@ -156,11 +167,20 @@ async function reset() {
 async function build() {
   // --- Departments and term -------------------------------------------------
   const departments = new Map<DemoSubject["key"], string>();
-  for (const subject of GRADE10_SUBJECTS) {
-    const department = await db.department.create({
-      data: { name: subject.department, code: subject.key },
-    });
-    departments.set(subject.key, department.id);
+  const departmentByName = new Map<string, string>();
+  for (const subject of ALL_SUBJECTS) {
+    let departmentId = departmentByName.get(subject.department);
+    if (!departmentId) {
+      const department = await db.department.create({
+        data: {
+          name: subject.department,
+          code: subject.key.startsWith("TLE") ? "TLE" : subject.key,
+        },
+      });
+      departmentId = department.id;
+      departmentByName.set(subject.department, departmentId);
+    }
+    departments.set(subject.key, departmentId);
   }
 
   const term = await db.term.create({
@@ -206,7 +226,7 @@ async function build() {
 
   // --- Courses: the five Grade 10 core subjects ------------------------------
   const courses = new Map<DemoSubject["key"], string>();
-  for (const subject of GRADE10_SUBJECTS) {
+  for (const subject of ALL_SUBJECTS) {
     const course = await db.course.create({
       data: {
         code: subject.code,
@@ -324,8 +344,41 @@ async function build() {
   const filSec = await josephSection("FIL", 4, "09:30", "10:30");
   const apushSec = await josephSection("AP", 7, "13:00", "14:00");
 
+  // TLE: Grades 7 and 8 take the exploratory course; Grades 9 and 10 take
+  // one major each. Grade 10 majors are grouped by advisory class.
+  const tleSection = (key: DemoSubject["key"], code: string, period: number) =>
+    db.section.create({
+      data: {
+        courseId: courses.get(key)!,
+        termId: term.id,
+        teacherId: chen.id,
+        code,
+        period,
+        room: "TLE Workshop",
+        capacity: 40,
+      },
+    });
+  const tleSections = {
+    TLE7: await tleSection("TLE7", "St. Francis", 8),
+    TLE8: await tleSection("TLE8", "St. Clare", 8),
+    "TLE9-CSS": await tleSection("TLE9-CSS", "St. Dominic", 9),
+    "TLE9-COOK": await tleSection("TLE9-COOK", "St. Dominic", 9),
+    "TLE9-ACP": await tleSection("TLE9-ACP", "St. Dominic", 9),
+    "TLE9-EIM": await tleSection("TLE9-EIM", "St. Dominic", 9),
+    "TLE10-CSS": await tleSection("TLE10-CSS", "St. Joseph", 8),
+    "TLE10-COOK": await tleSection("TLE10-COOK", "St. Anne", 8),
+    "TLE10-ACP": await tleSection("TLE10-ACP", "St. Anne", 8),
+    "TLE10-EIM": await tleSection("TLE10-EIM", "St. Luke", 8),
+  };
+
   // --- Students -------------------------------------------------------------
-  const studentSeeds = [
+  const studentSeeds: Array<{
+    name: string;
+    number: string;
+    gpa: number;
+    percentile?: number;
+    grade?: number;
+  }> = [
     {
       name: "Alex Rivera",
       number: "OHS-28491",
@@ -343,6 +396,21 @@ async function build() {
     { name: "Priya Anand", number: "OHS-94210", gpa: 3.7 },
     { name: "Noah Kim", number: "OHS-94222", gpa: 3.1 },
     { name: "Grace Okafor", number: "OHS-94240", gpa: 3.95 },
+    // Grades 7–9, enrolled only in TLE.
+    { name: "Bea Santos", number: "OHS-97011", gpa: 3.6, grade: 7 },
+    { name: "Paolo Cruz", number: "OHS-97012", gpa: 3.2, grade: 7 },
+    { name: "Lia Mendoza", number: "OHS-97013", gpa: 3.8, grade: 7 },
+    { name: "Miguel Reyes", number: "OHS-98021", gpa: 3.4, grade: 8 },
+    { name: "Ana Dela Cruz", number: "OHS-98022", gpa: 3.7, grade: 8 },
+    { name: "Kyle Tan", number: "OHS-98023", gpa: 3.0, grade: 8 },
+    { name: "Jasmine Villanueva", number: "OHS-99031", gpa: 3.5, grade: 9 },
+    { name: "Carlo Bautista", number: "OHS-99032", gpa: 3.1, grade: 9 },
+    { name: "Rhea Garcia", number: "OHS-99033", gpa: 3.9, grade: 9 },
+    { name: "Joshua Lim", number: "OHS-99034", gpa: 3.3, grade: 9 },
+    { name: "Nina Flores", number: "OHS-99035", gpa: 3.6, grade: 9 },
+    { name: "Diego Ramos", number: "OHS-99036", gpa: 2.9, grade: 9 },
+    { name: "Trisha Aquino", number: "OHS-99037", gpa: 3.7, grade: 9 },
+    { name: "Ivan Castillo", number: "OHS-99038", gpa: 3.2, grade: 9 },
   ];
 
   const students = new Map<string, { id: string; userId: string }>();
@@ -356,8 +424,8 @@ async function build() {
         studentProfile: {
           create: {
             studentNumber: seed.number,
-            gradeLevel: 10,
-            graduationYear: 2029,
+            gradeLevel: seed.grade ?? 10,
+            graduationYear: 2029 + (10 - (seed.grade ?? 10)),
             cumulativeGpa: seed.gpa,
             gpaPercentile: seed.percentile,
           },
@@ -491,6 +559,37 @@ async function build() {
     "Ethan Brooks": 72,
   });
 
+  // TLE. Alex's St. Joseph class takes Computer Systems Servicing.
+  const tleRosters: Record<keyof typeof tleSections, Record<string, number>> = {
+    TLE7: { "Bea Santos": 90, "Paolo Cruz": 84, "Lia Mendoza": 93 },
+    TLE8: { "Miguel Reyes": 86, "Ana Dela Cruz": 91, "Kyle Tan": 79 },
+    "TLE9-CSS": { "Jasmine Villanueva": 89, "Carlo Bautista": 82 },
+    "TLE9-COOK": { "Rhea Garcia": 94, "Joshua Lim": 85 },
+    "TLE9-ACP": { "Nina Flores": 88, "Diego Ramos": 77 },
+    "TLE9-EIM": { "Trisha Aquino": 90, "Ivan Castillo": 83 },
+    "TLE10-CSS": {
+      "Alex Rivera": 95,
+      "Marcus Rivera": 88,
+      "Maya Lin": 90,
+      "Sofia Ramirez": 87,
+      "Ethan Brooks": 78,
+    },
+    "TLE10-COOK": {
+      "Marcus Vance": 89,
+      "Priya Anand": 93,
+      "Grace Okafor": 95,
+    },
+    "TLE10-ACP": { "Jordan Rivera": 81, "Noah Kim": 86 },
+    "TLE10-EIM": { "Lucas Bennet": 88, "Chloe Nguyen": 80 },
+  };
+  for (const [key, grades] of Object.entries(tleRosters)) {
+    await enroll(
+      tleSections[key as keyof typeof tleSections].id,
+      Object.keys(grades),
+      grades,
+    );
+  }
+
   // Grade history for Jordan Rivera: 86% → 73.5% triggers the drop alert.
   const jordanEnrollment = await db.enrollment.findFirstOrThrow({
     where: { sectionId: bioSec1.id, studentId: studentId("Jordan Rivera") },
@@ -525,6 +624,9 @@ async function build() {
     ENG: [englitSec.id],
     FIL: [filSec.id],
     AP: [apushSec.id],
+    ...Object.fromEntries(
+      Object.entries(tleSections).map(([key, section]) => [key, [section.id]]),
+    ),
   };
   const unitsBy = new Map<DemoSubject["key"], Array<{ id: string }>>();
   const unitRows: Prisma.UnitCreateManyInput[] = [];
@@ -532,8 +634,9 @@ async function build() {
   const lessonSectionRows: Prisma.LessonSectionCreateManyInput[] = [];
   const pacingRows: Prisma.SectionPacingCreateManyInput[] = [];
 
-  for (const subject of GRADE10_SUBJECTS) {
+  for (const subject of ALL_SUBJECTS) {
     const created = [];
+    const current = currentUnitIndex(subject);
     for (const [index, plan] of subject.units.entries()) {
       const unitId = randomUUID();
       unitRows.push({
@@ -542,13 +645,13 @@ async function build() {
         order: index + 1,
         title: `Unit ${index + 1}: ${plan.title}`,
         description: plan.description,
-        examDate: index === 3 ? at(9, 8, 0) : undefined,
+        examDate: index === current ? at(9, 8, 0) : undefined,
       });
       created.push({ id: unitId });
 
       for (const [lessonIndex, item] of plan.lessons.entries()) {
         const lessonId = randomUUID();
-        const lecture = GRADE10_LECTURES[item.title];
+        const lecture = item.lecture ?? GRADE10_LECTURES[item.title];
         lessonRows.push({
           id: lessonId,
           unitId,
@@ -587,18 +690,18 @@ async function build() {
         );
       }
 
-      for (const sectionId of sectionsOf[subject.key]) {
+      for (const sectionId of sectionsOf[subject.key] ?? []) {
         pacingRows.push({
           sectionId,
           unitId,
           status:
-            index < 3
+            index < current
               ? "COMPLETED"
-              : index === 3
+              : index === current
                 ? "IN_PROGRESS"
                 : "NOT_STARTED",
-          startedAt: index <= 3 ? at(-30 + index * 6) : null,
-          completedAt: index < 3 ? at(-25 + index * 6) : null,
+          startedAt: index <= current ? at(-30 + index * 6) : null,
+          completedAt: index < current ? at(-25 + index * 6) : null,
         });
       }
     }
@@ -627,12 +730,15 @@ async function build() {
   const attemptRows: Prisma.AssessmentAttemptCreateManyInput[] = [];
   const responseRows: Prisma.QuestionResponseCreateManyInput[] = [];
 
-  for (const subject of GRADE10_SUBJECTS) {
+  for (const subject of ALL_SUBJECTS) {
+    const current = currentUnitIndex(subject);
     for (const [unitIndex, unit] of unitsBy.get(subject.key)!.entries()) {
-      const quiz = UNIT_QUIZZES[subject.key][unitIndex];
+      const quiz =
+        subject.units[unitIndex]?.quiz ??
+        UNIT_QUIZZES[subject.key]?.[unitIndex];
       if (!quiz) continue;
 
-      for (const sectionId of sectionsOf[subject.key]) {
+      for (const sectionId of sectionsOf[subject.key] ?? []) {
         const assessmentId = randomUUID();
         quizRows.push({
           id: assessmentId,
@@ -640,7 +746,7 @@ async function build() {
           unitId: unit.id,
           title: `Unit ${unitIndex + 1} Questions`,
           instructions:
-            "Read the unit discussion first, then answer all five questions. You have two tries; your best score counts.",
+            "Read the unit discussion first. The five questions come one at a time, 2 minutes each, and you see the rationale after every answer. You have two tries; your best score counts.",
           totalPoints: quiz.length,
           maxAttempts: 2,
           allowScratchpad: false,
@@ -684,9 +790,9 @@ async function build() {
           };
         });
 
-        if (unitIndex > 3) continue;
+        if (unitIndex > current) continue;
         const roster = rosterRows.filter((row) => row.sectionId === sectionId);
-        const answered = unitIndex < 3 ? roster : roster.slice(0, 2);
+        const answered = unitIndex < current ? roster : roster.slice(0, 2);
         for (const [seat, entry] of answered.entries()) {
           const percent = entry.currentPercent ?? 80;
           const correctCount = Math.max(
@@ -694,7 +800,7 @@ async function build() {
             Math.min(5, Math.round(percent / 20) - ((unitIndex + seat) % 2)),
           );
           const submittedAt = at(
-            -25 + unitIndex * 6 - (unitIndex === 3 ? 0 : 1),
+            -25 + unitIndex * 6 - (unitIndex === current ? 0 : 1),
             19,
             seat * 7,
           );
@@ -1909,6 +2015,7 @@ async function build() {
       englitSec,
       filSec,
       apushSec,
+      ...Object.values(tleSections),
     ].length,
   };
 }

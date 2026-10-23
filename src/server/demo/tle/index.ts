@@ -1,0 +1,16 @@
+/**
+ * TLE (Technology and Livelihood Education) for the demo school.
+ *
+ * TLE 7 and 8 are exploratory: one unit per strand (ICT, Home Economics,
+ * Agri-Fishery Arts, Industrial Arts). TLE 9 and 10 are specialized: one
+ * course per major — Computer Systems Servicing, Cookery, Agricultural Crop
+ * Production, and Electrical Installation and Maintenance. Every lesson
+ * carries its lecture and every unit its Unit Questions.
+ */
+import type { DemoSubject } from "../grade10";
+import { TLE7 } from "./grade7";
+import { TLE8 } from "./grade8";
+import { TLE9 } from "./grade9";
+import { TLE10 } from "./grade10";
+
+export const TLE_SUBJECTS: DemoSubject[] = [TLE7, TLE8, ...TLE9, ...TLE10];
