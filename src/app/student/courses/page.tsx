@@ -9,6 +9,7 @@ import { teacherFullName } from "~/app/student/_components/format";
 import { youTubeId } from "~/lib/video";
 import { api } from "~/trpc/server";
 import type { RouterOutputs } from "~/trpc/react";
+import { CoursesOverview } from "./_components/courses-overview";
 import { InstructorCard } from "./_components/instructor-card";
 import { LecturePlayer } from "./_components/lecture-player";
 import { LessonContent } from "./_components/lesson-content";
@@ -38,10 +39,17 @@ export default async function StudentCourses({
 }) {
   const params = await searchParams;
   const requestedCourse = param(params.course) ?? null;
+  const requestedLesson = param(params.lesson) ?? null;
   const sections = await api.course.mySections();
 
+  // Plain /student/courses (sidebar, breadcrumb, "View All") lists every
+  // course; a course or lesson in the URL opens a lesson.
+  if (!requestedCourse && !requestedLesson) {
+    return <CoursesOverview sections={sections} />;
+  }
+
   const lessonId =
-    param(params.lesson) ?? (await pickLesson(requestedCourse, sections));
+    requestedLesson ?? (await pickLesson(requestedCourse, sections));
   const lesson = lessonId ? await loadLesson(lessonId) : null;
   const activeCourseId =
     lesson?.unit.course.id ?? requestedCourse ?? sections[0]?.course.id;
@@ -200,10 +208,15 @@ function CourseSwitcher({
   sections: Sections;
   activeCourseId: string | undefined;
 }) {
-  if (sections.length < 2) return null;
-
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <Link
+        href="/student/courses"
+        className="border-line bg-surface text-brand hover:bg-canvas inline-flex items-center gap-1 rounded-xl border px-3.5 py-2 text-xs font-bold whitespace-nowrap transition"
+      >
+        <ChevronRightIcon className="size-3.5 rotate-180" />
+        All courses
+      </Link>
       {sections.map((section) => {
         const active = section.course.id === activeCourseId;
         return (
