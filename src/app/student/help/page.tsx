@@ -11,7 +11,7 @@ const TOPICS: HelpTopic[] = [
   {
     question: "How do I join a class?",
     answer:
-      "Ask your teacher for the class code. Open Courses and enter it under Join a class. You can also enter it when you create your account.",
+      "Open Courses and, under Join a class, enter the class code from your teacher or the course code (for example MATH 10) — the course code puts you in your own section's class. You can also enter a class code when you create your account.",
   },
   {
     question: "How do I study a lesson?",

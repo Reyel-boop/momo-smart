@@ -9,7 +9,7 @@ import {
   teacherProcedure,
 } from "~/server/api/trpc";
 import { LECTURE_SECTION_TITLE } from "~/lib/video";
-import { importRoster, rosterRow } from "~/server/lib/import-roster";
+import { homeroom, importRoster, rosterRow } from "~/server/lib/import-roster";
 import { joinClassByCode } from "~/server/lib/join-class";
 import {
   assertSectionAccess,
@@ -18,31 +18,15 @@ import {
 
 export const courseRouter = createTRPCRouter({
   /**
-   * A teacher adds the students of a School Form 1 to one of their classes;
-   * new students get an account signing in with their LRN.
+   * A teacher uploads a School Form 1: new students get an account signing
+   * in with their LRN, and everyone is placed in the section. They join
+   * courses themselves with a class or course code.
    */
   importRoster: teacherProcedure
-    .input(
-      z.object({
-        rows: z.array(rosterRow).min(1).max(200),
-        sectionId: z.string(),
-        homeroom: z
-          .object({
-            name: z.string().trim().min(1).max(60),
-            gradeLevel: z.number().int().min(1).max(12),
-          })
-          .nullish(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
-      return importRoster(
-        ctx.db,
-        input.rows,
-        [input.sectionId],
-        input.homeroom,
-      );
-    }),
+    .input(z.object({ rows: z.array(rosterRow).min(1).max(200), homeroom }))
+    .mutation(({ ctx, input }) =>
+      importRoster(ctx.db, input.rows, [], input.homeroom),
+    ),
 
   /** A student joins a class with the code their teacher shared. */
   joinByCode: studentProcedure

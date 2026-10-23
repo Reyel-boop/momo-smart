@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { PlusCircleIcon, UsersIcon } from "~/app/_components/icons";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, CardHeader, EmptyState } from "~/app/_components/ui";
-import { Sf1Upload } from "~/app/_components/sf1-upload";
 import { api } from "~/trpc/server";
 import { EnrollStudents, RemoveStudentButton } from "../class-forms";
 
@@ -37,19 +36,6 @@ export default async function ClassPage({
       <PageHeader
         title={`${detail.course.name} — ${detail.code}`}
         subtitle={`${teacher} · Period ${detail.period}${detail.room ? ` · ${detail.room}` : ""} · ${detail.enrollments.length} of ${detail.capacity} seats filled · Students can join with class code ${detail.joinCode}`}
-        action={
-          <Sf1Upload
-            classes={[
-              {
-                id: detail.id,
-                label: `${detail.course.name} — ${detail.code}`,
-              },
-            ]}
-            allowNoClass={false}
-            mode="admin"
-            buttonClassName="bg-navy hover:bg-navy-deep rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-          />
-        }
       />
 
       <div className="grid gap-6 lg:grid-cols-2">

@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
 import { createUnitQuizzesForSection } from "~/server/curriculum";
-import { importRoster, rosterRow } from "~/server/lib/import-roster";
+import { homeroom, importRoster, rosterRow } from "~/server/lib/import-roster";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 const sectionInput = z.object({
@@ -306,94 +306,15 @@ export const adminRouter = createTRPCRouter({
     }),
 
   /**
-   * Adds the students of a School Form 1 (or class list): new students get an
-   * account signing in with their LRN; everyone is enrolled in the class.
+   * Adds the students of a School Form 1: new students get an account
+   * signing in with their LRN, and everyone is placed in the section. They
+   * join courses themselves with a class or course code.
    */
   importRoster: adminProcedure
-    .input(
-      z.object({
-        rows: z.array(rosterRow).min(1).max(200),
-        /** The classes to enroll everyone in (none: accounts only). */
-        sectionIds: z.array(z.string()).max(30),
-        homeroom: z
-          .object({
-            name: z.string().trim().min(1).max(60),
-            gradeLevel: z.number().int().min(1).max(12),
-          })
-          .nullish(),
-      }),
-    )
+    .input(z.object({ rows: z.array(rosterRow).min(1).max(200), homeroom }))
     .mutation(({ ctx, input }) =>
-      importRoster(ctx.db, input.rows, input.sectionIds, input.homeroom),
+      importRoster(ctx.db, input.rows, [], input.homeroom),
     ),
-
-  /**
-   * The classes of these courses for one section (e.g. every subject of
-   * "ST ANNE"), creating those that don't exist yet with the given teacher.
-   */
-  classesForSection: adminProcedure
-    .input(
-      z.object({
-        courseIds: z.array(z.string()).min(1).max(30),
-        code: z
-          .string()
-          .trim()
-          .min(1, "Enter the section name.")
-          .max(20, "Keep the section name to 20 characters."),
-        teacherId: z.string().nullish(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const term = await ctx.db.term.findFirst({
-        where: { isCurrent: true },
-        select: { id: true },
-      });
-      if (!term) {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "There is no current school term set up.",
-        });
-      }
-      const sectionIds: string[] = [];
-      let created = 0;
-      for (const courseId of input.courseIds) {
-        const existing = await ctx.db.section.findUnique({
-          where: {
-            termId_courseId_code: {
-              termId: term.id,
-              courseId,
-              code: input.code,
-            },
-          },
-          select: { id: true },
-        });
-        if (existing) {
-          sectionIds.push(existing.id);
-          continue;
-        }
-        if (!input.teacherId) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Choose the teacher for the new classes.",
-          });
-        }
-        const section = await ctx.db.section.create({
-          data: {
-            termId: term.id,
-            courseId,
-            teacherId: input.teacherId,
-            code: input.code,
-            period: 1,
-            capacity: 60,
-          },
-          select: { id: true },
-        });
-        await createUnitQuizzesForSection(ctx.db, section.id);
-        sectionIds.push(section.id);
-        created++;
-      }
-      return { sectionIds, created };
-    }),
 
   /** Every course in the curriculum, with its units and this term's classes. */
   courses: adminProcedure.query(({ ctx }) =>

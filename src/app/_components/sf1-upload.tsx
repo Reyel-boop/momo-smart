@@ -1,12 +1,12 @@
 "use client";
 
+import { TRPCClientError } from "@trpc/client";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
 import { parseSchoolForm1, type Sf1 } from "~/lib/sf1";
-import { api } from "~/trpc/react";
-import { TRPCClientError } from "@trpc/client";
 import type { AppRouter } from "~/server/api/root";
+import { api } from "~/trpc/react";
 
 export type ImportRow = {
   studentNumber: string;
@@ -40,54 +40,29 @@ async function readWorkbook(file: File): Promise<Sf1 | null> {
 
 /**
  * "Upload School Form 1": reads the SF1 Excel file in the browser, shows
- * who was found, then creates accounts (sign-in with LRN) and enrolls them
- * in the chosen class. Ends with a downloadable sign-in list. Admins may
- * create accounts without a class; teachers add to one of their classes.
+ * who was found, then creates accounts (sign-in with LRN) and places
+ * everyone in the section. Students join their courses themselves with a
+ * class or course code. Ends with a downloadable sign-in list.
  */
 export function Sf1Upload({
-  classes,
-  allowNoClass,
   mode,
   buttonClassName,
   label = "Upload School Form 1",
-  courses,
-  teachers = [],
 }: {
-  classes: Array<{ id: string; label: string }>;
-  allowNoClass: boolean;
   mode: "admin" | "teacher";
   buttonClassName: string;
   label?: string;
-  /**
-   * Admin: pick any courses instead of one class. Each gets a class for the
-   * section (found, or created with the chosen teacher).
-   */
-  courses?: Array<{ id: string; label: string; sections: string[] }>;
-  teachers?: Array<{ id: string; label: string }>;
 }) {
   const router = useRouter();
   const id = useId();
   const adminImport = api.admin.importRoster.useMutation();
   const teacherImport = api.course.importRoster.useMutation();
-  const sectionClasses = api.admin.classesForSection.useMutation();
-  const [sectionName, setSectionName] = useState("");
-  const [courseIds, setCourseIds] = useState<string[]>([]);
-  const [teacherId, setTeacherId] = useState("");
-  const [enrolledIn, setEnrolledIn] = useState(0);
-  const hasClass = (course: { sections: string[] }) =>
-    course.sections.some(
-      (code) => code.toLowerCase() === sectionName.trim().toLowerCase(),
-    );
-  const needsTeacher =
-    courses?.some((c) => courseIds.includes(c.id) && !hasClass(c)) ?? false;
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Sf1 | null>(null);
   const [fileName, setFileName] = useState("");
   const [readError, setReadError] = useState<string | null>(null);
+  const [sectionName, setSectionName] = useState("");
   const [grade, setGrade] = useState("10");
-  const [sectionId, setSectionId] = useState(
-    allowNoClass ? "" : (classes[0]?.id ?? ""),
-  );
   const [results, setResults] = useState<ImportResult[] | null>(null);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -130,12 +105,6 @@ export function Sf1Upload({
         setForm(parsed);
         setSectionName(parsed.section?.trim() ?? "");
         if (parsed.gradeLevel) setGrade(String(parsed.gradeLevel));
-        // Pre-select the class whose section matches the form's.
-        const section = parsed.section?.toLowerCase();
-        const match = section
-          ? classes.find((c) => c.label.toLowerCase().includes(section))
-          : undefined;
-        if (match) setSectionId(match.id);
       } catch {
         setReadError(
           "This file couldn't be read. Save it as .xlsx and try again.",
@@ -154,29 +123,11 @@ export function Sf1Upload({
       name: s.name,
       gradeLevel: Number(grade),
     }));
+    const homeroom = { name: sectionName.trim(), gradeLevel: Number(grade) };
     setImporting(true);
     void (async () => {
       const all: ImportResult[] = [];
       try {
-        // The classes to enroll in: the picked courses' classes for this
-        // section (created if needed), or the one class chosen.
-        let sectionIds = sectionId ? [sectionId] : [];
-        if (courses) {
-          sectionIds = [];
-          if (courseIds.length > 0) {
-            setProgress("Setting up the classes…");
-            ({ sectionIds } = await sectionClasses.mutateAsync({
-              courseIds,
-              code: sectionName.trim(),
-              teacherId: teacherId || null,
-            }));
-          }
-        }
-        setEnrolledIn(sectionIds.length);
-        // Everyone goes into the section (homeroom).
-        const homeroom = sectionName.trim()
-          ? { name: sectionName.trim(), gradeLevel: Number(grade) }
-          : null;
         for (let i = 0; i < rows.length; i += BATCH) {
           setProgress(
             `Adding ${Math.min(i + BATCH, rows.length)} of ${rows.length}…`,
@@ -184,16 +135,8 @@ export function Sf1Upload({
           const batch = rows.slice(i, i + BATCH);
           const result: ImportResult[] =
             mode === "admin"
-              ? await adminImport.mutateAsync({
-                  rows: batch,
-                  sectionIds,
-                  homeroom,
-                })
-              : await teacherImport.mutateAsync({
-                  rows: batch,
-                  sectionId,
-                  homeroom,
-                });
+              ? await adminImport.mutateAsync({ rows: batch, homeroom })
+              : await teacherImport.mutateAsync({ rows: batch, homeroom });
           all.push(...result);
         }
         setResults(all);
@@ -236,7 +179,7 @@ export function Sf1Upload({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `sign-in-list-${(form?.section ?? "class").replace(/\W+/g, "-")}.csv`;
+    a.download = `sign-in-list-${(sectionName || "section").replace(/\W+/g, "-")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -244,6 +187,7 @@ export function Sf1Upload({
   const created = results?.filter((r) => r.status === "created").length ?? 0;
   const existing = results?.filter((r) => r.status === "existing").length ?? 0;
   const failed = results?.filter((r) => r.status === "failed").length ?? 0;
+  const sectionLabel = `Grade ${grade} — ${sectionName.trim()}`;
 
   return (
     <>
@@ -275,8 +219,8 @@ export function Sf1Upload({
               <p className="text-muted text-sm">
                 Choose the SF1 Excel file from LIS. Every learner gets an
                 account that signs in with their <b>LRN</b> and a temporary
-                password, is placed in the section, and is enrolled in the{" "}
-                {courses ? "courses you pick" : "class"}.
+                password, and is placed in the section. Students then join each
+                course with its <b>class code</b> or <b>course code</b>.
               </p>
             </div>
 
@@ -285,15 +229,14 @@ export function Sf1Upload({
                 <p className="text-ink text-sm font-semibold">
                   {created} new account{created === 1 ? "" : "s"} · {existing}{" "}
                   already had one
-                  {failed > 0 && ` · ${failed} not added`}
-                  {enrolledIn > 0
-                    ? ` — all enrolled in ${enrolledIn === 1 ? "the class" : `${enrolledIn} classes`}.`
-                    : "."}
+                  {failed > 0 && ` · ${failed} not added`} — all in{" "}
+                  {sectionLabel}.
                 </p>
                 <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
                   Download the sign-in list now — temporary passwords are shown
-                  only once. Students sign in with their LRN and change the
-                  password the first time.
+                  only once. Students sign in with their LRN, change the
+                  password the first time, then join their courses under Courses
+                  → Join a class.
                 </p>
                 <div className="border-line max-h-72 overflow-y-auto rounded-xl border">
                   <table className="w-full text-left text-sm">
@@ -397,7 +340,7 @@ export function Sf1Upload({
                           id={`${id}-section`}
                           value={sectionName}
                           onChange={(e) => setSectionName(e.target.value)}
-                          maxLength={20}
+                          maxLength={60}
                           placeholder="e.g. ST ANNE"
                           className={field}
                         />
@@ -423,125 +366,6 @@ export function Sf1Upload({
                         </select>
                       </div>
                     </div>
-
-                    {courses ? (
-                      <fieldset>
-                        <div className="flex items-center justify-between gap-2">
-                          <legend className="text-ink text-xs font-bold">
-                            Enroll them in these courses
-                          </legend>
-                          <span className="text-xs font-semibold">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setCourseIds(courses.map((c) => c.id))
-                              }
-                              className="text-brand hover:underline"
-                            >
-                              All
-                            </button>
-                            <span className="text-muted mx-1">·</span>
-                            <button
-                              type="button"
-                              onClick={() => setCourseIds([])}
-                              className="text-brand hover:underline"
-                            >
-                              None
-                            </button>
-                          </span>
-                        </div>
-                        <div className="border-line mt-1 grid max-h-56 gap-1 overflow-y-auto rounded-lg border p-2 sm:grid-cols-2">
-                          {courses.map((course) => (
-                            <label
-                              key={course.id}
-                              className="hover:bg-canvas flex cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={courseIds.includes(course.id)}
-                                onChange={(e) =>
-                                  setCourseIds((ids) =>
-                                    e.target.checked
-                                      ? [...ids, course.id]
-                                      : ids.filter((x) => x !== course.id),
-                                  )
-                                }
-                                className="accent-brand mt-0.5"
-                              />
-                              <span className="text-ink">
-                                {course.label}
-                                {sectionName.trim() && (
-                                  <span className="text-muted block text-xs">
-                                    {hasClass(course)
-                                      ? `Class ${sectionName.trim()} exists`
-                                      : `New class: ${sectionName.trim()}`}
-                                  </span>
-                                )}
-                              </span>
-                            </label>
-                          ))}
-                        </div>
-                        <p className="text-muted mt-1 text-xs">
-                          {courseIds.length === 0
-                            ? "No course picked: accounts only. Students can also join later with a class code."
-                            : `${courseIds.length} course${courseIds.length === 1 ? "" : "s"} picked.`}
-                        </p>
-                        {needsTeacher && (
-                          <div className="mt-3">
-                            <label
-                              htmlFor={`${id}-teacher`}
-                              className="text-ink text-xs font-bold"
-                            >
-                              Teacher for the new classes
-                            </label>
-                            <select
-                              id={`${id}-teacher`}
-                              value={teacherId}
-                              onChange={(e) => setTeacherId(e.target.value)}
-                              className={field}
-                            >
-                              <option value="">Choose a teacher…</option>
-                              {teachers.map((t) => (
-                                <option key={t.id} value={t.id}>
-                                  {t.label}
-                                </option>
-                              ))}
-                            </select>
-                            {teachers.length === 0 && (
-                              <p className="mt-1 text-xs text-rose-600">
-                                Add a teacher in People first.
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </fieldset>
-                    ) : (
-                      <div>
-                        <label
-                          htmlFor={`${id}-class`}
-                          className="text-ink text-xs font-bold"
-                        >
-                          Enroll them in
-                        </label>
-                        <select
-                          id={`${id}-class`}
-                          value={sectionId}
-                          onChange={(e) => setSectionId(e.target.value)}
-                          className={field}
-                        >
-                          {allowNoClass && (
-                            <option value="">
-                              No class yet (accounts only)
-                            </option>
-                          )}
-                          {classes.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
                   </>
                 )}
 
@@ -567,14 +391,7 @@ export function Sf1Upload({
                   <button
                     type="button"
                     onClick={run}
-                    disabled={
-                      busy ||
-                      !form ||
-                      (courses
-                        ? courseIds.length > 0 &&
-                          (!sectionName.trim() || (needsTeacher && !teacherId))
-                        : !allowNoClass && !sectionId)
-                    }
+                    disabled={busy || !form || !sectionName.trim()}
                     className="bg-navy hover:bg-navy-deep rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                   >
                     {importing

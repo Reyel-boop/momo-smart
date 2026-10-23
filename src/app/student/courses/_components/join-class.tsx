@@ -39,7 +39,7 @@ export function JoinClass() {
         onChange={(e) => setCode(e.target.value)}
         required
         maxLength={20}
-        placeholder="Class code from your teacher"
+        placeholder="Class code or course code (e.g. MATH 10)"
         autoCapitalize="characters"
         className="border-line bg-canvas text-ink placeholder:text-muted focus:border-brand focus:ring-brand/10 min-w-0 flex-1 rounded-lg border px-3 py-2 font-mono text-sm uppercase transition outline-none placeholder:font-sans placeholder:normal-case focus:ring-4"
       />

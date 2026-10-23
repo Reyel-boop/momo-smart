@@ -12,6 +12,12 @@ export const rosterRow = z.object({
   gradeLevel: z.number().int().min(1).max(12),
   email: z.string().trim().toLowerCase().email().optional(),
 });
+/** The section (homeroom) a School Form 1 upload places students in. */
+export const homeroom = z.object({
+  name: z.string().trim().min(1, "Enter the section name.").max(60),
+  gradeLevel: z.number().int().min(1).max(12),
+});
+
 export type RosterRow = z.infer<typeof rosterRow>;
 
 export type RosterResult =

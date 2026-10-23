@@ -11,7 +11,7 @@ const TOPICS: HelpTopic[] = [
   {
     question: "How do students join my class?",
     answer:
-      "Each class has a class code, shown on your Courses page next to the section name. Share it with your students: they enter it when they create their account, or later with Join a class on their Courses page. The registrar can also add students for you.",
+      "Each class has a class code, shown on your Courses page next to the section name. Share it with your students: they enter it when they create their account, or later with Join a class on their Courses page. They can also type the course code (for example MATH 10) to join the class for their own section, if the class is named after the section.",
   },
   {
     question: "How do I add or change a lecture?",

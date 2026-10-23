@@ -62,14 +62,6 @@ export default async function RosterPage({
         action={
           sections.length > 0 && (
             <Sf1Upload
-              classes={(activeId
-                ? sections.filter((s) => s.id === activeId)
-                : sections
-              ).map((s) => ({
-                id: s.id,
-                label: `${s.course.name} — ${s.code}`,
-              }))}
-              allowNoClass={false}
               mode="teacher"
               buttonClassName="bg-navy hover:bg-navy-deep rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
             />
