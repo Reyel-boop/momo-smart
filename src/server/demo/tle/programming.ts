@@ -1,9 +1,9 @@
 /**
  * TLE – ICT: Computer Programming (Grade 9 or 10), following DepEd's
  * Three-Term Budget of Work (updated April 7, 2026): one unit per week,
- * one lesson per learning competency. Lessons carry a written lecture (no
- * video yet — teachers can attach one), a reading built from the suggested
- * activities, and a self-check; every unit has five Unit Questions.
+ * one lesson per learning competency. Lessons carry a lecture video, a
+ * written lecture, a reading built from the suggested activities, and a
+ * self-check; every unit has five Unit Questions.
  *
  * Code samples use ~~~ fences so they don't clash with template literals.
  */
@@ -12,6 +12,32 @@ import { q, TLE_DEPARTMENT } from "./common";
 
 /** `inline code` inside a lecture. */
 const c = (text: string) => `\`${text}\``;
+
+/**
+ * The lecture video for each lesson (YouTube id). Each was checked to exist
+ * and allow embedding, and chosen for covering the lesson’s topic.
+ */
+export const LESSON_VIDEOS: Record<string, string> = {
+  "Trends, Careers and Skills in Computer Programming": "r3En5esTJAE", // Careers in Coding — Bite-Size Science (BEMC)
+  "Computer Ergonomics": "87e1NlZF57E", // How to Set Up a Computer Workstation — TucsonOrtho
+  "HTML Structure, Elements and Attributes": "vNOyRZIkC7o", // HTML Tags, Attributes and Elements — John Morris
+  "Using an HTML Editor": "0Sj8ehugmhE", // HTML First Program in Notepad & VS Code — Akash Padhiyar
+  "Headings, Paragraphs, Styles and Text Formatting": "ORAxXmFpJqg", // Text Formatting with HTML in 5 Minutes — Learndev
+  "Embedding Multimedia Elements": "P_xH63rOqPE", // HTML Media Elements: Audio & Video — CodeLucky
+  "HTML Lists": "-kXZvKxs9oA", // Learn HTML lists in 4 minutes — Bro Code
+  "HTML Tables": "IHAYN1BBNEg", // Tables, rowspan and colspan — Quentin Watt Tutorials
+  "HTML Forms, Input Types and Elements": "frAGrGN00OA", // HTML Forms and Inputs — Dave Gray
+  "HTML Links": "81wMe4sWGVQ", // Anchor Tag, href, mail link and target — TegaFate HUB
+  "Planning and Building a Website": "mtXM87QMSi8", // A Navbar with Multiple Pages — How to Web Dev
+  "CSS Syntax, Selectors and Types": "uzF1Doc3cZQ", // Get started with CSS in 8 minutes — Bro Code
+  "CSS Colors, Backgrounds, Fonts and Text": "Ddc-IIrIot0", // CSS Colors Tutorial for Beginners — Dave Gray
+  "CSS Borders, Margins and Padding": "jLaoQzW8doI", // CSS Margin, Padding and Border Explained — SimpliCode
+  "Styling Icons, Links, Lists and Tables": "sORF-Awir70", // Styling links: visited, hover, active, focus — Dave Gray
+  "CSS Animation and Transition": "YszONjKpgg4", // Learn CSS Animation In 15 Minutes — Web Dev Simplified
+  "The CSS Box Model": "ZaiIDH0qp1c", // CSS box model explained — Coder Coder
+  "CSS Box Shadow and Transform": "qdeIy9_fbxE", // Learn CSS transformations in 9 minutes — Bro Code
+  "Creating an Interactive Website": "ldPLpY2evrM", // CSS Buttons & Hover Animation — FollowAndrew
+};
 
 const lesson = (
   title: string,
@@ -24,7 +50,7 @@ const lesson = (
   summary,
   reading,
   questions,
-  lecture: { videoId: "", lecture },
+  lecture: { videoId: LESSON_VIDEOS[title] ?? "", lecture },
 });
 
 const UNITS: DemoUnit[] = [
