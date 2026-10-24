@@ -29,6 +29,15 @@ export const courseRouter = createTRPCRouter({
       importRoster(ctx.db, input.rows, [], input.homeroom),
     ),
 
+  /** The teacher’s department (subject area), if the registrar set one. */
+  myDepartment: teacherProcedure.query(async ({ ctx }) => {
+    const teacher = await ctx.db.teacherProfile.findUnique({
+      where: { id: ctx.session.user.teacherId ?? "" },
+      select: { department: { select: { id: true, name: true } } },
+    });
+    return teacher?.department ?? null;
+  }),
+
   /** The sections (homerooms) a teacher can start a class for. */
   homerooms: teacherProcedure.query(({ ctx }) =>
     ctx.db.homeroom.findMany({
@@ -45,7 +54,7 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ courseId: z.string(), homeroomId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const teacherId = ctx.session.user.teacherId;
-      const [term, room, course] = await Promise.all([
+      const [term, room, course, teacher] = await Promise.all([
         ctx.db.term.findFirst({
           where: { isCurrent: true },
           select: { id: true },
@@ -56,7 +65,11 @@ export const courseRouter = createTRPCRouter({
         }),
         ctx.db.course.findUnique({
           where: { id: input.courseId },
-          select: { name: true },
+          select: { name: true, departmentId: true },
+        }),
+        ctx.db.teacherProfile.findUnique({
+          where: { id: teacherId ?? "" },
+          select: { department: { select: { id: true, name: true } } },
         }),
       ]);
       if (!teacherId || !term || !room || !course) {
@@ -65,6 +78,14 @@ export const courseRouter = createTRPCRouter({
           message: !term
             ? "There is no current school term set up."
             : "That course or section no longer exists.",
+        });
+      }
+      // A teacher with a department starts only that department’s courses.
+      const department = teacher?.department;
+      if (department && department.id !== course.departmentId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: `${course.name} is not a ${department.name} course. Ask the registrar to change your department.`,
         });
       }
       const code = room.name.slice(0, 20);
@@ -235,7 +256,7 @@ export const courseRouter = createTRPCRouter({
         name: true,
         description: true,
         colorToken: true,
-        department: { select: { name: true } },
+        department: { select: { id: true, name: true } },
         units: {
           orderBy: { order: "asc" },
           select: {

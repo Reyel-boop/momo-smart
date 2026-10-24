@@ -55,19 +55,26 @@ export default async function CoursesPage({
   const params = await searchParams;
   const requested =
     typeof params.subject === "string" ? params.subject : undefined;
-  const [allSubjects, homerooms] = await Promise.all([
+  const [allSubjects, homerooms, department] = await Promise.all([
     api.course.teachingUnits(),
     api.course.homerooms(),
+    api.course.myDepartment(),
   ]);
-  // Every course is listed; the ones this teacher has classes in come first.
+  // Every course is listed: the ones this teacher has classes in first, then
+  // their department’s, then the rest.
   const subjects = allSubjects.sort(
     (a, b) =>
       Number(b.sections.length > 0) - Number(a.sections.length > 0) ||
+      Number(b.department.id === department?.id) -
+        Number(a.department.id === department?.id) ||
       subjectRank(a.code) - subjectRank(b.code),
   );
 
   const active =
     subjects.find((subject) => subject.id === requested) ?? subjects[0];
+  // With a department set, only that department’s courses can be started.
+  const canStart = (subject: { department: { id: string } }) =>
+    !department || subject.department.id === department.id;
   const totalUnits = subjects.reduce((sum, s) => sum + s.units.length, 0);
   const sectionCount = new Set(
     subjects.flatMap((s) => s.sections.map((section) => section.id)),
@@ -152,24 +159,31 @@ export default async function CoursesPage({
                       </span>
                     ))}
                   </div>
-                  <TeachCourse
-                    key={active.id}
-                    courseId={active.id}
-                    courseName={active.name}
-                    sections={homerooms
-                      .filter(
-                        (room) =>
-                          !active.sections.some(
-                            (section) =>
-                              section.code.toLowerCase() ===
-                              room.name.slice(0, 20).toLowerCase(),
-                          ),
-                      )
-                      .map((room) => ({
-                        id: room.id,
-                        label: `Grade ${room.gradeLevel} — ${room.name}`,
-                      }))}
-                  />
+                  {canStart(active) ? (
+                    <TeachCourse
+                      key={active.id}
+                      courseId={active.id}
+                      courseName={active.name}
+                      sections={homerooms
+                        .filter(
+                          (room) =>
+                            !active.sections.some(
+                              (section) =>
+                                section.code.toLowerCase() ===
+                                room.name.slice(0, 20).toLowerCase(),
+                            ),
+                        )
+                        .map((room) => ({
+                          id: room.id,
+                          label: `Grade ${room.gradeLevel} — ${room.name}`,
+                        }))}
+                    />
+                  ) : (
+                    <p className="mt-3 text-xs text-white/60">
+                      This is a {active.department.name} course. You can start
+                      classes for {department?.name} courses.
+                    </p>
+                  )}
                   {homerooms.length === 0 && (
                     <p className="mt-3 text-xs text-white/60">
                       No sections yet — the registrar adds them (Sections, or by
