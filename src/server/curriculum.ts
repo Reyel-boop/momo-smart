@@ -79,9 +79,7 @@ export async function createCurriculum(db: PrismaClient) {
   }
 
   const courseRows: Prisma.CourseCreateManyInput[] = [];
-  const unitRows: Prisma.UnitCreateManyInput[] = [];
-  const lessonRows: Prisma.LessonCreateManyInput[] = [];
-  const sectionRows: Prisma.LessonSectionCreateManyInput[] = [];
+  const rows: ContentRows = { units: [], lessons: [], sections: [] };
 
   for (const subject of ALL_SUBJECTS) {
     const courseId = randomUUID();
@@ -95,79 +93,150 @@ export async function createCurriculum(db: PrismaClient) {
       departmentId: departments.get(subject.department)!,
       colorToken: subject.colorToken,
     });
-
-    for (const [index, plan] of subject.units.entries()) {
-      const unitId = randomUUID();
-      unitRows.push({
-        id: unitId,
-        courseId,
-        order: index + 1,
-        title: `Unit ${index + 1}: ${plan.title}`,
-        description: plan.description,
-      });
-
-      const lessons: DemoLesson[] =
-        plan.lessons.length > 0
-          ? plan.lessons
-          : subject.key === "SCI" && index === 3
-            ? SCIENCE_UNIT4_LESSONS.map((l) => ({
-                ...l,
-                reading: "",
-                questions: [],
-              }))
-            : [];
-
-      for (const [lessonIndex, item] of lessons.entries()) {
-        const lessonId = randomUUID();
-        const lecture = item.lecture ?? GRADE10_LECTURES[item.title];
-        lessonRows.push({
-          id: lessonId,
-          unitId,
-          order: lessonIndex + 1,
-          title: item.title,
-          summary: item.summary,
-          estimatedMinutes: 40,
-          videoUrl: lecture ? lectureVideoUrl(lecture) : null,
-        });
-        if (lecture) {
-          sectionRows.push({
-            lessonId,
-            kind: "READING",
-            order: 0,
-            title: LECTURE_SECTION_TITLE,
-            body: lecture.lecture,
-          });
-        }
-        if (item.reading) {
-          sectionRows.push({
-            lessonId,
-            kind: "READING",
-            order: 1,
-            title: "Reading",
-            body: item.reading,
-          });
-        }
-        if (item.questions.length > 0) {
-          sectionRows.push({
-            lessonId,
-            kind: "SELF_CHECK",
-            order: 2,
-            title: "Self-Check",
-            body: item.questions.map((q, n) => `${n + 1}. ${q}`).join("\n"),
-          });
-        }
-      }
-    }
+    addCourseContent(rows, subject, courseId);
   }
 
   await db.course.createMany({ data: courseRows });
-  await db.unit.createMany({ data: unitRows });
-  await db.lesson.createMany({ data: lessonRows });
-  await db.lessonSection.createMany({ data: sectionRows });
+  await db.unit.createMany({ data: rows.units });
+  await db.lesson.createMany({ data: rows.lessons });
+  await db.lessonSection.createMany({ data: rows.sections });
   return {
     courses: courseRows.length,
-    units: unitRows.length,
-    lessons: lessonRows.length,
+    units: rows.units.length,
+    lessons: rows.lessons.length,
+  };
+}
+
+type ContentRows = {
+  units: Prisma.UnitCreateManyInput[];
+  lessons: Prisma.LessonCreateManyInput[];
+  sections: Prisma.LessonSectionCreateManyInput[];
+};
+
+/** A subject's units, lessons and lesson tabs, as rows for one course. */
+function addCourseContent(
+  rows: ContentRows,
+  subject: DemoSubject,
+  courseId: string,
+) {
+  const unitRows = rows.units;
+  const lessonRows = rows.lessons;
+  const sectionRows = rows.sections;
+  for (const [index, plan] of subject.units.entries()) {
+    const unitId = randomUUID();
+    unitRows.push({
+      id: unitId,
+      courseId,
+      order: index + 1,
+      title: `Unit ${index + 1}: ${plan.title}`,
+      description: plan.description,
+    });
+
+    const lessons: DemoLesson[] =
+      plan.lessons.length > 0
+        ? plan.lessons
+        : subject.key === "SCI" && index === 3
+          ? SCIENCE_UNIT4_LESSONS.map((l) => ({
+              ...l,
+              reading: "",
+              questions: [],
+            }))
+          : [];
+
+    for (const [lessonIndex, item] of lessons.entries()) {
+      const lessonId = randomUUID();
+      const lecture = item.lecture ?? GRADE10_LECTURES[item.title];
+      lessonRows.push({
+        id: lessonId,
+        unitId,
+        order: lessonIndex + 1,
+        title: item.title,
+        summary: item.summary,
+        estimatedMinutes: 40,
+        // A lecture may be text only; teachers can attach a video later.
+        videoUrl: lecture?.videoId ? lectureVideoUrl(lecture) : null,
+      });
+      if (lecture) {
+        sectionRows.push({
+          lessonId,
+          kind: "READING",
+          order: 0,
+          title: LECTURE_SECTION_TITLE,
+          body: lecture.lecture,
+        });
+      }
+      if (item.reading) {
+        sectionRows.push({
+          lessonId,
+          kind: "READING",
+          order: 1,
+          title: "Reading",
+          body: item.reading,
+        });
+      }
+      if (item.questions.length > 0) {
+        sectionRows.push({
+          lessonId,
+          kind: "SELF_CHECK",
+          order: 2,
+          title: "Self-Check",
+          body: item.questions.map((q, n) => `${n + 1}. ${q}`).join("\n"),
+        });
+      }
+    }
+  }
+}
+
+/**
+ * Replaces an existing course's content with a subject from the curriculum
+ * (e.g. TLE 10-CSS becoming TLE 10 Computer Programming): the course keeps
+ * its id and classes, gets the subject's code, name and description, its
+ * units and lessons are rebuilt, and every class gets the new Unit
+ * Questions. The old units' quizzes, pacing and lessons go with them.
+ */
+export async function replaceCourseContent(
+  db: PrismaClient,
+  oldCode: string,
+  subject: DemoSubject,
+) {
+  const course = await db.course.findUniqueOrThrow({
+    where: { code: oldCode },
+    select: { id: true, units: { select: { id: true } } },
+  });
+  const unitIds = course.units.map((u) => u.id);
+  const rows: ContentRows = { units: [], lessons: [], sections: [] };
+  addCourseContent(rows, subject, course.id);
+
+  await db.$transaction([
+    // Unit Questions only point at their unit, so remove them explicitly.
+    db.assessment.deleteMany({
+      where: { unitId: { in: unitIds }, assignmentId: null },
+    }),
+    db.unit.deleteMany({ where: { id: { in: unitIds } } }),
+    db.course.update({
+      where: { id: course.id },
+      data: {
+        code: subject.code,
+        name: subject.name,
+        description: subject.description,
+      },
+    }),
+    db.unit.createMany({ data: rows.units }),
+    db.lesson.createMany({ data: rows.lessons }),
+    db.lessonSection.createMany({ data: rows.sections }),
+  ]);
+
+  const classes = await db.section.findMany({
+    where: { courseId: course.id },
+    select: { id: true },
+  });
+  for (const section of classes) {
+    await createUnitQuizzesForSection(db, section.id);
+  }
+  return {
+    units: rows.units.length,
+    lessons: rows.lessons.length,
+    classes: classes.length,
   };
 }
 

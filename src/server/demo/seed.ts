@@ -361,11 +361,11 @@ async function build() {
   const tleSections = {
     TLE7: await tleSection("TLE7", "St. Francis", 8),
     TLE8: await tleSection("TLE8", "St. Clare", 8),
-    "TLE9-CSS": await tleSection("TLE9-CSS", "St. Dominic", 9),
+    "TLE9-CP": await tleSection("TLE9-CP", "St. Dominic", 9),
     "TLE9-COOK": await tleSection("TLE9-COOK", "St. Dominic", 9),
     "TLE9-ACP": await tleSection("TLE9-ACP", "St. Dominic", 9),
     "TLE9-EIM": await tleSection("TLE9-EIM", "St. Dominic", 9),
-    "TLE10-CSS": await tleSection("TLE10-CSS", "St. Joseph", 8),
+    "TLE10-CP": await tleSection("TLE10-CP", "St. Joseph", 8),
     "TLE10-COOK": await tleSection("TLE10-COOK", "St. Anne", 8),
     "TLE10-ACP": await tleSection("TLE10-ACP", "St. Anne", 8),
     "TLE10-EIM": await tleSection("TLE10-EIM", "St. Luke", 8),
@@ -563,11 +563,11 @@ async function build() {
   const tleRosters: Record<keyof typeof tleSections, Record<string, number>> = {
     TLE7: { "Bea Santos": 90, "Paolo Cruz": 84, "Lia Mendoza": 93 },
     TLE8: { "Miguel Reyes": 86, "Ana Dela Cruz": 91, "Kyle Tan": 79 },
-    "TLE9-CSS": { "Jasmine Villanueva": 89, "Carlo Bautista": 82 },
+    "TLE9-CP": { "Jasmine Villanueva": 89, "Carlo Bautista": 82 },
     "TLE9-COOK": { "Rhea Garcia": 94, "Joshua Lim": 85 },
     "TLE9-ACP": { "Nina Flores": 88, "Diego Ramos": 77 },
     "TLE9-EIM": { "Trisha Aquino": 90, "Ivan Castillo": 83 },
-    "TLE10-CSS": {
+    "TLE10-CP": {
       "Alex Rivera": 95,
       "Marcus Rivera": 88,
       "Maya Lin": 90,

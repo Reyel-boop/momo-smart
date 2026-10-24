@@ -28,7 +28,7 @@ export type DemoUnit = {
 };
 
 export type DemoSubject = {
-  /** Core subjects: MATH, SCI, FIL, ENG, AP. TLE courses: TLE7, TLE10-CSS… */
+  /** Core subjects: MATH, SCI, FIL, ENG, AP. TLE courses: TLE7, TLE10-CP… */
   key: string;
   code: string;
   name: string;

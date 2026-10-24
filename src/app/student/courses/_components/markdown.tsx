@@ -3,17 +3,29 @@ import { CheckCircleIcon } from "~/app/_components/icons";
 type Block =
   | { kind: "heading"; text: string }
   | { kind: "paragraph"; text: string }
-  | { kind: "list"; items: string[] };
+  | { kind: "list"; items: string[] }
+  | { kind: "code"; text: string };
 
 /**
  * Renders the small Markdown subset lesson authors use — headings, bullet
- * lists, paragraphs and **bold** — without pulling in a Markdown library.
- * Text is rendered as React children, so nothing is injected as raw HTML.
+ * lists, paragraphs, **bold**, `inline code` and ``` code blocks — without
+ * pulling in a Markdown library. Text is rendered as React children, so
+ * nothing (not even HTML in a code sample) is injected as raw HTML.
  */
 export function LessonMarkdown({ source }: { source: string }) {
   return (
     <div className="space-y-4">
       {parse(source).map((block, index) => {
+        if (block.kind === "code") {
+          return (
+            <pre
+              key={index}
+              className="border-line bg-canvas text-ink overflow-x-auto rounded-lg border px-4 py-3 font-mono text-xs leading-relaxed"
+            >
+              <code>{block.text}</code>
+            </pre>
+          );
+        }
         if (block.kind === "heading") {
           return (
             <h3 key={index} className="text-ink text-lg font-bold">
@@ -64,7 +76,24 @@ function parse(source: string): Block[] {
     }
   };
 
+  let code: string[] | null = null;
   for (const raw of source.split("\n")) {
+    // Inside a ``` block lines are kept exactly, indentation included.
+    if (code) {
+      if (/^(```|~~~)/.test(raw.trim())) {
+        blocks.push({ kind: "code", text: code.join("\n") });
+        code = null;
+      } else {
+        code.push(raw);
+      }
+      continue;
+    }
+    if (/^(```|~~~)/.test(raw.trim())) {
+      flushParagraph();
+      flushList();
+      code = [];
+      continue;
+    }
     const line = raw.trim();
     const heading = /^#{1,6}\s+(.*)$/.exec(line);
     const bullet = /^[-*]\s+(.*)$/.exec(line);
@@ -84,14 +113,22 @@ function parse(source: string): Block[] {
       paragraph.push(line);
     }
   }
+  if (code) blocks.push({ kind: "code", text: code.join("\n") });
   flushParagraph();
   flushList();
   return blocks;
 }
 
 function inline(text: string): React.ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
-    part.length > 4 && part.startsWith("**") && part.endsWith("**") ? (
+  return text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).map((part, index) =>
+    part.length > 2 && part.startsWith("`") && part.endsWith("`") ? (
+      <code
+        key={index}
+        className="bg-canvas text-ink rounded px-1 py-0.5 font-mono text-[0.85em]"
+      >
+        {part.slice(1, -1)}
+      </code>
+    ) : part.length > 4 && part.startsWith("**") && part.endsWith("**") ? (
       <strong key={index} className="text-ink font-semibold">
         {part.slice(2, -2)}
       </strong>
