@@ -13,6 +13,7 @@ import {
   ImportStudentsButton,
   PersonActions,
 } from "./people-actions";
+import { TeacherDepartmentSelect } from "./department-select";
 import { SectionSelect, StudentSectionSelect } from "./section-select";
 
 export const metadata: Metadata = { title: "People · Momo Smart" };
@@ -221,9 +222,17 @@ export default async function PeoplePage({
                             "—"}
                         </td>
                         <td className="text-muted px-4 py-3 whitespace-nowrap">
-                          {person.studentProfile
-                            ? `Grade ${person.studentProfile.gradeLevel}`
-                            : (person.teacherProfile?.department?.name ?? "—")}
+                          {person.studentProfile ? (
+                            `Grade ${person.studentProfile.gradeLevel}`
+                          ) : person.teacherProfile ? (
+                            <TeacherDepartmentSelect
+                              userId={person.id}
+                              value={person.teacherProfile.department?.id ?? ""}
+                              departments={options.departments}
+                            />
+                          ) : (
+                            "—"
+                          )}
                         </td>
                         {role === "STUDENT" && (
                           <td className="text-muted px-4 py-3">

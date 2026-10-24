@@ -216,7 +216,7 @@ export const adminRouter = createTRPCRouter({
             select: {
               id: true,
               employeeNumber: true,
-              department: { select: { name: true } },
+              department: { select: { id: true, name: true } },
               _count: { select: { sections: true } },
             },
           },
@@ -402,6 +402,31 @@ export const adminRouter = createTRPCRouter({
         }),
         ctx.db.homeroom.delete({ where: { id: input.id } }),
       ]);
+      return { ok: true };
+    }),
+
+  /** Sets a teacher's department (subject area), or none. */
+  setTeacherDepartment: adminProcedure
+    .input(
+      z.object({ userId: z.string(), departmentId: z.string().nullable() }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (input.departmentId) {
+        const exists = await ctx.db.department.findUnique({
+          where: { id: input.departmentId },
+          select: { id: true },
+        });
+        if (!exists) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "That department no longer exists.",
+          });
+        }
+      }
+      await ctx.db.teacherProfile.update({
+        where: { userId: input.userId },
+        data: { departmentId: input.departmentId },
+      });
       return { ok: true };
     }),
 
