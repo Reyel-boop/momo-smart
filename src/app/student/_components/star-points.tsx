@@ -16,11 +16,23 @@ export function StarPoints({ stars }: { stars: Stars }) {
   const { nextReward } = stars;
 
   const tallies = [
-    { label: "Unit Tests", value: stars.tests, icon: ClipboardIcon },
+    {
+      label: "Unit Questions",
+      value: stars.questions,
+      icon: CheckCircleIcon,
+      note: "1 Star per correct answer",
+    },
+    {
+      label: "Unit Tests",
+      value: stars.tests,
+      icon: ClipboardIcon,
+      note: "1 Star per point",
+    },
     {
       label: "Quizzes & Coursework",
       value: stars.coursework,
       icon: TimerIcon,
+      note: "1 Star per point",
     },
   ];
 
@@ -38,7 +50,9 @@ export function StarPoints({ stars }: { stars: Stars }) {
               </h2>
               <Pill tone="amber">{stars.total.toLocaleString()} Stars</Pill>
             </div>
-            <p className="text-muted mt-0.5 text-xs">1 Star per graded point</p>
+            <p className="text-muted mt-0.5 text-xs">
+              1 Star per correct answer and per graded point
+            </p>
           </div>
         </div>
         {nextReward && (
@@ -84,7 +98,7 @@ export function StarPoints({ stars }: { stars: Stars }) {
         </div>
       </div>
 
-      <div className="grid gap-3 px-5 pt-5 sm:grid-cols-2">
+      <div className="grid gap-3 px-5 pt-5 sm:grid-cols-3">
         {tallies.map((tally) => (
           <div
             key={tally.label}
@@ -95,7 +109,7 @@ export function StarPoints({ stars }: { stars: Stars }) {
               <p className="text-ink text-[11px] font-bold tracking-wide uppercase">
                 {tally.label}
               </p>
-              <p className="text-muted text-xs">1 Star per point</p>
+              <p className="text-muted text-xs">{tally.note}</p>
             </div>
             <div className="text-right">
               <p className="text-navy text-lg font-extrabold">
@@ -124,7 +138,7 @@ export function StarPoints({ stars }: { stars: Stars }) {
 
         {stars.recent.length === 0 ? (
           <p className="text-muted mt-3 text-sm">
-            Stars appear here once a grade is released.
+            Answer Unit Questions to start earning stars.
           </p>
         ) : (
           <ul className="mt-3 space-y-2">

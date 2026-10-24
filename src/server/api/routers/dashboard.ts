@@ -8,9 +8,11 @@ import {
 import { dayOfWeekOf, toDateOnly, weekOfTerm } from "~/server/lib/dates";
 import { computeGpa, distributionOf, round } from "~/server/lib/grading";
 import {
+  questionStarLedger,
   rewardProgress,
   STAR_ASSIGNMENT_TYPES,
   starsFor,
+  starTotals,
 } from "~/server/lib/stars";
 
 export const dashboardRouter = createTRPCRouter({
@@ -360,48 +362,45 @@ export const dashboardRouter = createTRPCRouter({
       select: { gradeLevel: true },
     });
 
-    const [mine, cohort, cohortSize] = await Promise.all([
-      ctx.db.grade.findMany({
-        where: {
-          status: "RELEASED",
-          submission: {
-            studentId: ctx.studentId,
-            assignment: { type: { in: STAR_ASSIGNMENT_TYPES } },
+    const [mine, cohort, cohortSize, totals, questionLedger] =
+      await Promise.all([
+        ctx.db.grade.findMany({
+          where: {
+            status: "RELEASED",
+            submission: {
+              studentId: ctx.studentId,
+              assignment: { type: { in: STAR_ASSIGNMENT_TYPES } },
+            },
           },
-        },
-        orderBy: { releasedAt: "desc" },
-        select: {
-          id: true,
-          score: true,
-          releasedAt: true,
-          submission: {
-            select: {
-              assignment: {
-                select: {
-                  title: true,
-                  type: true,
-                  pointsPossible: true,
-                  section: { select: { course: { select: { name: true } } } },
+          orderBy: { releasedAt: "desc" },
+          select: {
+            id: true,
+            score: true,
+            releasedAt: true,
+            submission: {
+              select: {
+                assignment: {
+                  select: {
+                    title: true,
+                    type: true,
+                    pointsPossible: true,
+                    section: { select: { course: { select: { name: true } } } },
+                  },
                 },
               },
             },
           },
-        },
-      }),
-      ctx.db.grade.findMany({
-        where: {
-          status: "RELEASED",
-          submission: {
-            student: { gradeLevel: profile.gradeLevel },
-            assignment: { type: { in: STAR_ASSIGNMENT_TYPES } },
-          },
-        },
-        select: { score: true, submission: { select: { studentId: true } } },
-      }),
-      ctx.db.studentProfile.count({
-        where: { gradeLevel: profile.gradeLevel },
-      }),
-    ]);
+        }),
+        ctx.db.studentProfile.findMany({
+          where: { gradeLevel: profile.gradeLevel, user: { isActive: true } },
+          select: { id: true },
+        }),
+        ctx.db.studentProfile.count({
+          where: { gradeLevel: profile.gradeLevel, user: { isActive: true } },
+        }),
+        starTotals(ctx.db),
+        questionStarLedger(ctx.db, ctx.studentId),
+      ]);
 
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
     let tests = 0;
@@ -415,37 +414,59 @@ export const dashboardRouter = createTRPCRouter({
         thisWeek += stars;
       }
     }
-    const total = tests + coursework;
-
-    // Rank is one more than the number of peers who have out-earned us.
-    const totals = new Map<string, number>();
-    for (const grade of cohort) {
-      const id = grade.submission.studentId;
-      totals.set(id, (totals.get(id) ?? 0) + starsFor(grade.score));
+    // One star per Unit Question answered correctly (each question once).
+    let questions = 0;
+    for (const entry of questionLedger) {
+      questions += entry.stars;
+      if (entry.answeredAt && entry.answeredAt.getTime() >= weekAgo) {
+        thisWeek += entry.stars;
+      }
     }
-    const ahead = [...totals.values()].filter((stars) => stars > total).length;
+    const total = tests + coursework + questions;
 
-    // Every star-earning grade, newest first ("Full Ledger" on Scores).
-    const ledger = mine.map((grade) => {
-      const { assignment } = grade.submission;
-      const score = grade.score ?? 0;
-      return {
-        id: grade.id,
-        title: assignment.title,
-        courseName: assignment.section.course.name,
-        type: assignment.type,
-        releasedAt: grade.releasedAt,
-        score,
-        pointsPossible: assignment.pointsPossible,
-        stars: starsFor(score),
-        isPerfect: score >= assignment.pointsPossible,
-      };
-    });
+    // Rank is one more than the number of grade-mates who have out-earned us.
+    const ahead = cohort.filter(
+      (peer) => (totals.get(peer.id)?.total ?? 0) > total,
+    ).length;
+
+    // Every star-earning grade and set of Unit Questions, newest first
+    // ("Full Ledger" on Scores).
+    const ledger = [
+      ...mine.map((grade) => {
+        const { assignment } = grade.submission;
+        const score = grade.score ?? 0;
+        return {
+          id: grade.id,
+          title: assignment.title,
+          courseName: assignment.section.course.name,
+          type: assignment.type,
+          releasedAt: grade.releasedAt,
+          score,
+          pointsPossible: assignment.pointsPossible,
+          stars: starsFor(score),
+          isPerfect: score >= assignment.pointsPossible,
+        };
+      }),
+      ...questionLedger.map((entry) => ({
+        id: entry.id,
+        title: entry.title,
+        courseName: entry.courseName,
+        type: "UNIT_QUESTIONS",
+        releasedAt: entry.answeredAt,
+        score: entry.stars,
+        pointsPossible: entry.totalPoints,
+        stars: entry.stars,
+        isPerfect: entry.stars >= entry.totalPoints,
+      })),
+    ].sort(
+      (a, b) => (b.releasedAt?.getTime() ?? 0) - (a.releasedAt?.getTime() ?? 0),
+    );
 
     return {
       total,
       tests,
       coursework,
+      questions,
       thisWeek,
       gradeLevel: profile.gradeLevel,
       rank: ahead + 1,
@@ -455,6 +476,77 @@ export const dashboardRouter = createTRPCRouter({
       ledger,
     };
   }),
+
+  /**
+   * The star leaderboard: every active student ranked by stars — the whole
+   * school, the viewer's grade, or the viewer's section. Ties share a rank.
+   * Returns the top 50 and, if lower, the viewer's own row.
+   */
+  leaderboard: studentProcedure
+    .input(z.object({ scope: z.enum(["all", "grade", "section"]) }))
+    .query(async ({ ctx, input }) => {
+      const me = await ctx.db.studentProfile.findUniqueOrThrow({
+        where: { id: ctx.studentId },
+        select: {
+          gradeLevel: true,
+          section: { select: { id: true, name: true } },
+        },
+      });
+      const [students, totals] = await Promise.all([
+        ctx.db.studentProfile.findMany({
+          where: {
+            user: { isActive: true },
+            ...(input.scope === "grade" ? { gradeLevel: me.gradeLevel } : {}),
+            ...(input.scope === "section"
+              ? { sectionId: me.section?.id ?? "-" }
+              : {}),
+          },
+          select: {
+            id: true,
+            gradeLevel: true,
+            section: { select: { name: true } },
+            user: { select: { name: true } },
+          },
+        }),
+        starTotals(ctx.db),
+      ]);
+
+      const rows = students
+        .map((s) => {
+          const t = totals.get(s.id);
+          return {
+            studentId: s.id,
+            name: s.user.name ?? "Student",
+            gradeLevel: s.gradeLevel,
+            section: s.section?.name ?? null,
+            stars: t?.total ?? 0,
+            questionStars: t?.questions ?? 0,
+            gradedStars: t?.graded ?? 0,
+            isMe: s.id === ctx.studentId,
+          };
+        })
+        .sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
+      // Standard competition ranking: 1, 2, 2, 4…
+      const ranked = rows.map((row, index) => ({
+        ...row,
+        rank:
+          index > 0 && rows[index - 1]!.stars === row.stars
+            ? rows.findIndex((r) => r.stars === row.stars) + 1
+            : index + 1,
+      }));
+      const top = ranked.slice(0, 50);
+      const mine = ranked.find((r) => r.isMe);
+      return {
+        scope: input.scope,
+        gradeLevel: me.gradeLevel,
+        section: me.section?.name ?? null,
+        count: ranked.length,
+        top,
+        me: mine && !top.some((r) => r.isMe) ? mine : null,
+        myRank: mine?.rank ?? null,
+        myStars: mine?.stars ?? 0,
+      };
+    }),
 
   /** Recomputes and caches the student's GPA after grades change. */
   refreshGpa: studentProcedure.mutation(async ({ ctx }) => {
