@@ -188,6 +188,47 @@ function addCourseContent(
 }
 
 /**
+ * Adds one curriculum subject as a new course to a running school (e.g.
+ * TLE 9 Telecommunications). Does nothing if its code already exists.
+ */
+export async function addCourse(db: PrismaClient, subject: DemoSubject) {
+  const existing = await db.course.findUnique({
+    where: { code: subject.code },
+    select: { id: true },
+  });
+  if (existing) return { created: false, units: 0, lessons: 0 };
+  const department = await db.department.findUniqueOrThrow({
+    where: { name: subject.department },
+    select: { id: true },
+  });
+  const courseId = randomUUID();
+  const rows: ContentRows = { units: [], lessons: [], sections: [] };
+  addCourseContent(rows, subject, courseId);
+  await db.$transaction([
+    db.course.create({
+      data: {
+        id: courseId,
+        code: subject.code,
+        name: subject.name,
+        description: subject.description,
+        level: "REGULAR",
+        credits: 1,
+        departmentId: department.id,
+        colorToken: subject.colorToken,
+      },
+    }),
+    db.unit.createMany({ data: rows.units }),
+    db.lesson.createMany({ data: rows.lessons }),
+    db.lessonSection.createMany({ data: rows.sections }),
+  ]);
+  return {
+    created: true,
+    units: rows.units.length,
+    lessons: rows.lessons.length,
+  };
+}
+
+/**
  * Replaces an existing course's content with a subject from the curriculum
  * (e.g. TLE 10-CSS becoming TLE 10 Computer Programming): the course keeps
  * its id and classes, gets the subject's code, name and description, its

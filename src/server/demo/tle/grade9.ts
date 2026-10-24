@@ -1,10 +1,12 @@
 import type { DemoSubject } from "../grade10";
 import { q, TLE_DEPARTMENT, tleLesson } from "./common";
 import { computerProgramming } from "./programming";
+import { telecommunications } from "./telecom";
 
 /** TLE 9 specialized majors: one course per strand. */
 export const TLE9: DemoSubject[] = [
   computerProgramming(9),
+  telecommunications(9),
   {
     key: "TLE9-COOK",
     code: "TLE 9-COOK",

@@ -4,7 +4,8 @@
  * TLE 7 and 8 are exploratory: one unit per strand (ICT, Home Economics,
  * Agri-Fishery Arts, Industrial Arts). TLE 9 and 10 are specialized: one
  * course per major — Computer Programming, Cookery, Agricultural Crop
- * Production, and Electrical Installation and Maintenance. Every lesson
+ * Production, and Electrical Installation and Maintenance; TLE 9 also has
+ * Telecommunications (contact center services). Every lesson
  * carries its lecture and every unit its Unit Questions.
  */
 import type { DemoSubject } from "../grade10";
