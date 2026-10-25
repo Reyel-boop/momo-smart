@@ -48,6 +48,7 @@ async function questionsOf(db: Db, ids: string[]) {
     where: { id: { in: ids } },
     select: {
       id: true,
+      assessmentId: true,
       prompt: true,
       explanation: true,
       options: {
@@ -166,50 +167,73 @@ export const liveRouter = createTRPCRouter({
     }));
   }),
 
-  /** Teacher: opens a new game in the lobby (ending any open one for the class). */
+  /**
+   * Teacher: opens a new game in the lobby (ending any open one for the
+   * class) with 5, 10, 15 or 20 questions, drawn at random from one unit's
+   * questions or from all the class's units (a mixed review).
+   */
   create: teacherProcedure
     .input(
       z.object({
-        assessmentId: z.string(),
+        sectionId: z.string(),
+        /** One unit's Unit Questions, or null for all units. */
+        assessmentId: z.string().nullable(),
+        questionCount: z.union([
+          z.literal(5),
+          z.literal(10),
+          z.literal(15),
+          z.literal(20),
+        ]),
         secondsPerQuestion: z.number().int().min(5).max(120),
         teamMode: z.boolean(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const quiz = await ctx.db.assessment.findUnique({
-        where: { id: input.assessmentId },
-        select: {
-          sectionId: true,
-          section: { select: { teacherId: true } },
-          questions: {
-            orderBy: { order: "asc" },
-            where: { options: { some: { isCorrect: true } } },
-            select: { id: true },
-          },
-        },
+      const section = await ctx.db.section.findUnique({
+        where: { id: input.sectionId },
+        select: { teacherId: true },
       });
-      if (quiz?.section.teacherId !== ctx.teacherId || !quiz) {
+      if (section?.teacherId !== ctx.teacherId || !section) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You can only start a live quiz for your own class.",
         });
       }
-      if (quiz.questions.length === 0) {
+      const pool = await ctx.db.question.findMany({
+        where: {
+          options: { some: { isCorrect: true } },
+          assessment: {
+            sectionId: input.sectionId,
+            assignmentId: null,
+            unitId: { not: null },
+            ...(input.assessmentId ? { id: input.assessmentId } : {}),
+          },
+        },
+        select: { id: true, assessmentId: true },
+      });
+      if (pool.length < input.questionCount) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This unit has no questions to play.",
+          message: `There are only ${pool.length} questions here. Choose fewer questions${input.assessmentId ? ", or All units" : ""}.`,
         });
       }
+      // Fisher–Yates shuffle, then take the number asked for.
+      const shuffled = [...pool];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
+      }
+      const chosen = shuffled.slice(0, input.questionCount);
       await ctx.db.liveGame.updateMany({
-        where: { sectionId: quiz.sectionId, status: { not: "FINISHED" } },
+        where: { sectionId: input.sectionId, status: { not: "FINISHED" } },
         data: { status: "FINISHED", finishedAt: new Date() },
       });
       const game = await ctx.db.liveGame.create({
         data: {
-          sectionId: quiz.sectionId,
+          sectionId: input.sectionId,
           hostId: ctx.teacherId,
-          assessmentId: input.assessmentId,
-          questionIds: quiz.questions.map((q) => q.id),
+          assessmentId: input.assessmentId ?? chosen[0]!.assessmentId,
+          questionIds: chosen.map((q) => q.id),
           secondsPerQuestion: input.secondsPerQuestion,
           teamMode: input.teamMode,
         },
@@ -235,11 +259,16 @@ export const liveRouter = createTRPCRouter({
           })
         : [];
       const reveal = game.status === "REVEAL" || game.status === "FINISHED";
+      // Questions from several units make a mixed review.
+      const units = new Set(questions.map((q) => q.assessmentId)).size;
       return {
         id: game.id,
         status: game.status,
         title: `${game.section.course.name} — ${game.section.code}`,
-        unit: game.assessment.unit?.title ?? game.assessment.title,
+        unit:
+          units > 1
+            ? `Mixed review · ${units} units`
+            : (game.assessment.unit?.title ?? game.assessment.title),
         teamMode: game.teamMode,
         index: game.currentIndex,
         total: game.questionIds.length,

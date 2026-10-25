@@ -13,7 +13,14 @@ type Classes = RouterOutputs["live"]["setupOptions"];
 const field =
   "border-line bg-canvas text-ink focus:border-brand focus:bg-surface focus:ring-brand/10 mt-1 w-full rounded-lg border px-3 py-2.5 text-sm transition outline-none focus:ring-4";
 
-/** Choose the class, the unit's questions, the timer and the mode. */
+const COUNTS = [5, 10, 15, 20] as const;
+type QuestionCount = (typeof COUNTS)[number];
+const ALL_UNITS = "all";
+
+/**
+ * Choose the class, where the questions come from (one unit or all units),
+ * how many (5–20), the timer and the mode.
+ */
 export function LiveSetup({ classes }: { classes: Classes }) {
   const router = useRouter();
   const id = useId();
@@ -25,6 +32,16 @@ export function LiveSetup({ classes }: { classes: Classes }) {
   );
   const [seconds, setSeconds] = useState("20");
   const [teamMode, setTeamMode] = useState(false);
+  const [count, setCount] = useState<QuestionCount>(5);
+  // Questions available: one unit's, or every unit's for a mixed review.
+  const available =
+    assessmentId === ALL_UNITS
+      ? (current?.quizzes.reduce((sum, q) => sum + q.questions, 0) ?? 0)
+      : (current?.quizzes.find((q) => q.id === assessmentId)?.questions ?? 0);
+  const playableCount =
+    count <= available
+      ? count
+      : ([...COUNTS].reverse().find((n) => n <= available) ?? count);
   const [error, setError] = useState<string | null>(null);
   const create = api.live.create.useMutation({
     onSuccess: ({ gameId }) => router.push(`/teacher/live/${gameId}`),
@@ -98,8 +115,44 @@ export function LiveSetup({ classes }: { classes: Classes }) {
                 {q.label} — {q.questions} questions
               </option>
             ))}
+            {(current?.quizzes.length ?? 0) > 1 && (
+              <option value={ALL_UNITS}>
+                All units (mixed review) —{" "}
+                {current?.quizzes.reduce((sum, q) => sum + q.questions, 0)}{" "}
+                questions
+              </option>
+            )}
           </select>
         </div>
+        <fieldset className="sm:col-span-2">
+          <legend className="text-ink text-xs font-bold">
+            Number of questions
+          </legend>
+          <div className="mt-1 grid grid-cols-4 gap-2">
+            {COUNTS.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setCount(n)}
+                disabled={n > available}
+                aria-pressed={playableCount === n}
+                className={`rounded-lg border px-3 py-2.5 text-base font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                  playableCount === n
+                    ? "border-navy bg-navy text-white"
+                    : "border-line bg-canvas text-ink hover:bg-surface"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <p className="text-muted mt-1 text-xs">
+            {available < 20
+              ? `${available} questions available here${assessmentId !== ALL_UNITS && (current?.quizzes.length ?? 0) > 1 ? " — choose All units for more" : ""}. `
+              : ""}
+            Questions are picked at random.
+          </p>
+        </fieldset>
         <div>
           <label htmlFor={`${id}-time`} className="text-ink text-xs font-bold">
             Time per question
@@ -148,11 +201,13 @@ export function LiveSetup({ classes }: { classes: Classes }) {
       )}
       <button
         type="button"
-        disabled={!assessmentId || create.isPending}
+        disabled={!assessmentId || available < 5 || create.isPending}
         onClick={() => {
           setError(null);
           create.mutate({
-            assessmentId,
+            sectionId,
+            assessmentId: assessmentId === ALL_UNITS ? null : assessmentId,
+            questionCount: playableCount,
             secondsPerQuestion: Number(seconds),
             teamMode,
           });
