@@ -35,7 +35,7 @@ const STATUS = {
  * major ("TLE 7", "TLE 9-CP", "TLE 10-EIM"…), then anything else.
  */
 const SUBJECT_ORDER = ["MATH", "SCI", "FIL", "ENG", "AP"];
-const TLE_MAJORS = ["AFA", "CP", "TEL", "COOK", "ACP", "EIM"];
+const TLE_MAJORS = ["AFA", "FCS", "IA", "CP", "TEL", "COOK", "ACP", "EIM"];
 const subjectRank = (code: string) => {
   const upper = code.toUpperCase();
   const tle = /^TLE (\d+)(?:-(\w+))?$/.exec(upper);
