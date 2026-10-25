@@ -33,6 +33,8 @@ export const assessmentRouter = createTRPCRouter({
       return ctx.db.assessment.findMany({
         where: {
           sectionId: input.sectionId,
+          // Live Quiz question banks are not assessments students take.
+          bankForUnitId: null,
           ...(ctx.session.user.role === "STUDENT"
             ? { publishedAt: { not: null } }
             : {}),

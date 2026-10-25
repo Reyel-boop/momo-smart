@@ -419,8 +419,10 @@ model Unit {
   lessons Lesson[]
   pacing  SectionPacing[]
 
-  assignments Assignment[]
-  assessments Assessment[]
+  assignments   Assignment[]
+  assessments   Assessment[]
+  /// Extra questions for Live Quiz (one bank per class), beyond the Unit Questions.
+  questionBanks Assessment[] @relation("UnitQuestionBank")
 
   @@unique([courseId, order])
 }
@@ -828,11 +830,14 @@ model RubricScore {
 // ---------------------------------------------------------------------------
 
 model Assessment {
-  id           String  @id @default(cuid())
-  sectionId    String
-  unitId       String?
+  id            String  @id @default(cuid())
+  sectionId     String
+  unitId        String?
+  /// Set on a Live Quiz question bank: the unit its extra questions belong
+  /// to. A bank is never published and is not one of the Unit Questions.
+  bankForUnitId String?
   /// Assessments post to the gradebook through an assignment.
-  assignmentId String? @unique
+  assignmentId  String? @unique
 
   title        String
   instructions String?
@@ -852,9 +857,10 @@ model Assessment {
   lockdownEnabled  Boolean   @default(false)
   publishedAt      DateTime?
 
-  section    Section     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  unit       Unit?       @relation(fields: [unitId], references: [id], onDelete: SetNull)
-  assignment Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
+  section     Section     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  unit        Unit?       @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  bankForUnit Unit?       @relation("UnitQuestionBank", fields: [bankForUnitId], references: [id], onDelete: Cascade)
+  assignment  Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
 
   questions Question[]
   liveGames LiveGame[]
@@ -864,6 +870,7 @@ model Assessment {
   updatedAt DateTime @updatedAt
 
   @@index([sectionId, opensAt])
+  @@index([bankForUnitId])
 }
 
 enum QuestionType {

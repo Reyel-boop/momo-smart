@@ -25,6 +25,8 @@ export type DemoUnit = {
   lessons: DemoLesson[];
   /** Unit Questions; core subjects keep theirs in grade10-quiz.ts. */
   quiz?: QuizItem[];
+  /** Extra Live Quiz questions; core subjects keep theirs in banks/. */
+  bank?: QuizItem[];
 };
 
 export type DemoSubject = {

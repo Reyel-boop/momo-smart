@@ -7376,6 +7376,7 @@ export namespace Prisma {
     pacing: number
     assignments: number
     assessments: number
+    questionBanks: number
   }
 
   export type UnitCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7383,6 +7384,7 @@ export namespace Prisma {
     pacing?: boolean | UnitCountOutputTypeCountPacingArgs
     assignments?: boolean | UnitCountOutputTypeCountAssignmentsArgs
     assessments?: boolean | UnitCountOutputTypeCountAssessmentsArgs
+    questionBanks?: boolean | UnitCountOutputTypeCountQuestionBanksArgs
   }
 
   // Custom InputTypes
@@ -7421,6 +7423,13 @@ export namespace Prisma {
    * UnitCountOutputType without action
    */
   export type UnitCountOutputTypeCountAssessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AssessmentWhereInput
+  }
+
+  /**
+   * UnitCountOutputType without action
+   */
+  export type UnitCountOutputTypeCountQuestionBanksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AssessmentWhereInput
   }
 
@@ -28543,6 +28552,7 @@ export namespace Prisma {
     pacing?: boolean | Unit$pacingArgs<ExtArgs>
     assignments?: boolean | Unit$assignmentsArgs<ExtArgs>
     assessments?: boolean | Unit$assessmentsArgs<ExtArgs>
+    questionBanks?: boolean | Unit$questionBanksArgs<ExtArgs>
     _count?: boolean | UnitCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["unit"]>
 
@@ -28582,6 +28592,7 @@ export namespace Prisma {
     pacing?: boolean | Unit$pacingArgs<ExtArgs>
     assignments?: boolean | Unit$assignmentsArgs<ExtArgs>
     assessments?: boolean | Unit$assessmentsArgs<ExtArgs>
+    questionBanks?: boolean | Unit$questionBanksArgs<ExtArgs>
     _count?: boolean | UnitCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UnitIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -28599,6 +28610,10 @@ export namespace Prisma {
       pacing: Prisma.$SectionPacingPayload<ExtArgs>[]
       assignments: Prisma.$AssignmentPayload<ExtArgs>[]
       assessments: Prisma.$AssessmentPayload<ExtArgs>[]
+      /**
+       * Extra questions for Live Quiz (one bank per class), beyond the Unit Questions.
+       */
+      questionBanks: Prisma.$AssessmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -29009,6 +29024,7 @@ export namespace Prisma {
     pacing<T extends Unit$pacingArgs<ExtArgs> = {}>(args?: Subset<T, Unit$pacingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SectionPacingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     assignments<T extends Unit$assignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Unit$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     assessments<T extends Unit$assessmentsArgs<ExtArgs> = {}>(args?: Subset<T, Unit$assessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    questionBanks<T extends Unit$questionBanksArgs<ExtArgs> = {}>(args?: Subset<T, Unit$questionBanksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -29515,6 +29531,30 @@ export namespace Prisma {
    * Unit.assessments
    */
   export type Unit$assessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Assessment
+     */
+    select?: AssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Assessment
+     */
+    omit?: AssessmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AssessmentInclude<ExtArgs> | null
+    where?: AssessmentWhereInput
+    orderBy?: AssessmentOrderByWithRelationInput | AssessmentOrderByWithRelationInput[]
+    cursor?: AssessmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AssessmentScalarFieldEnum | AssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * Unit.questionBanks
+   */
+  export type Unit$questionBanksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Assessment
      */
@@ -49565,6 +49605,7 @@ export namespace Prisma {
     id: string | null
     sectionId: string | null
     unitId: string | null
+    bankForUnitId: string | null
     assignmentId: string | null
     title: string | null
     instructions: string | null
@@ -49587,6 +49628,7 @@ export namespace Prisma {
     id: string | null
     sectionId: string | null
     unitId: string | null
+    bankForUnitId: string | null
     assignmentId: string | null
     title: string | null
     instructions: string | null
@@ -49609,6 +49651,7 @@ export namespace Prisma {
     id: number
     sectionId: number
     unitId: number
+    bankForUnitId: number
     assignmentId: number
     title: number
     instructions: number
@@ -49645,6 +49688,7 @@ export namespace Prisma {
     id?: true
     sectionId?: true
     unitId?: true
+    bankForUnitId?: true
     assignmentId?: true
     title?: true
     instructions?: true
@@ -49667,6 +49711,7 @@ export namespace Prisma {
     id?: true
     sectionId?: true
     unitId?: true
+    bankForUnitId?: true
     assignmentId?: true
     title?: true
     instructions?: true
@@ -49689,6 +49734,7 @@ export namespace Prisma {
     id?: true
     sectionId?: true
     unitId?: true
+    bankForUnitId?: true
     assignmentId?: true
     title?: true
     instructions?: true
@@ -49798,6 +49844,7 @@ export namespace Prisma {
     id: string
     sectionId: string
     unitId: string | null
+    bankForUnitId: string | null
     assignmentId: string | null
     title: string
     instructions: string | null
@@ -49839,6 +49886,7 @@ export namespace Prisma {
     id?: boolean
     sectionId?: boolean
     unitId?: boolean
+    bankForUnitId?: boolean
     assignmentId?: boolean
     title?: boolean
     instructions?: boolean
@@ -49857,6 +49905,7 @@ export namespace Prisma {
     updatedAt?: boolean
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
     questions?: boolean | Assessment$questionsArgs<ExtArgs>
     liveGames?: boolean | Assessment$liveGamesArgs<ExtArgs>
@@ -49868,6 +49917,7 @@ export namespace Prisma {
     id?: boolean
     sectionId?: boolean
     unitId?: boolean
+    bankForUnitId?: boolean
     assignmentId?: boolean
     title?: boolean
     instructions?: boolean
@@ -49886,6 +49936,7 @@ export namespace Prisma {
     updatedAt?: boolean
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
   }, ExtArgs["result"]["assessment"]>
 
@@ -49893,6 +49944,7 @@ export namespace Prisma {
     id?: boolean
     sectionId?: boolean
     unitId?: boolean
+    bankForUnitId?: boolean
     assignmentId?: boolean
     title?: boolean
     instructions?: boolean
@@ -49911,6 +49963,7 @@ export namespace Prisma {
     updatedAt?: boolean
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
   }, ExtArgs["result"]["assessment"]>
 
@@ -49918,6 +49971,7 @@ export namespace Prisma {
     id?: boolean
     sectionId?: boolean
     unitId?: boolean
+    bankForUnitId?: boolean
     assignmentId?: boolean
     title?: boolean
     instructions?: boolean
@@ -49936,10 +49990,11 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type AssessmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sectionId" | "unitId" | "assignmentId" | "title" | "instructions" | "standards" | "totalPoints" | "timeLimitMinutes" | "maxAttempts" | "opensAt" | "closesAt" | "shuffleQuestions" | "allowScratchpad" | "allowAttachments" | "lockdownEnabled" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["assessment"]>
+  export type AssessmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sectionId" | "unitId" | "bankForUnitId" | "assignmentId" | "title" | "instructions" | "standards" | "totalPoints" | "timeLimitMinutes" | "maxAttempts" | "opensAt" | "closesAt" | "shuffleQuestions" | "allowScratchpad" | "allowAttachments" | "lockdownEnabled" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["assessment"]>
   export type AssessmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
     questions?: boolean | Assessment$questionsArgs<ExtArgs>
     liveGames?: boolean | Assessment$liveGamesArgs<ExtArgs>
@@ -49949,11 +50004,13 @@ export namespace Prisma {
   export type AssessmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
   }
   export type AssessmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     section?: boolean | SectionDefaultArgs<ExtArgs>
     unit?: boolean | Assessment$unitArgs<ExtArgs>
+    bankForUnit?: boolean | Assessment$bankForUnitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
   }
 
@@ -49962,6 +50019,7 @@ export namespace Prisma {
     objects: {
       section: Prisma.$SectionPayload<ExtArgs>
       unit: Prisma.$UnitPayload<ExtArgs> | null
+      bankForUnit: Prisma.$UnitPayload<ExtArgs> | null
       assignment: Prisma.$AssignmentPayload<ExtArgs> | null
       questions: Prisma.$QuestionPayload<ExtArgs>[]
       liveGames: Prisma.$LiveGamePayload<ExtArgs>[]
@@ -49971,6 +50029,11 @@ export namespace Prisma {
       id: string
       sectionId: string
       unitId: string | null
+      /**
+       * Set on a Live Quiz question bank: the unit its extra questions belong
+       * to. A bank is never published and is not one of the Unit Questions.
+       */
+      bankForUnitId: string | null
       /**
        * Assessments post to the gradebook through an assignment.
        */
@@ -50392,6 +50455,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     section<T extends SectionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SectionDefaultArgs<ExtArgs>>): Prisma__SectionClient<$Result.GetResult<Prisma.$SectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     unit<T extends Assessment$unitArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$unitArgs<ExtArgs>>): Prisma__UnitClient<$Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    bankForUnit<T extends Assessment$bankForUnitArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$bankForUnitArgs<ExtArgs>>): Prisma__UnitClient<$Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     assignment<T extends Assessment$assignmentArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$assignmentArgs<ExtArgs>>): Prisma__AssignmentClient<$Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     questions<T extends Assessment$questionsArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     liveGames<T extends Assessment$liveGamesArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$liveGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -50428,6 +50492,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Assessment", 'String'>
     readonly sectionId: FieldRef<"Assessment", 'String'>
     readonly unitId: FieldRef<"Assessment", 'String'>
+    readonly bankForUnitId: FieldRef<"Assessment", 'String'>
     readonly assignmentId: FieldRef<"Assessment", 'String'>
     readonly title: FieldRef<"Assessment", 'String'>
     readonly instructions: FieldRef<"Assessment", 'String'>
@@ -50843,6 +50908,25 @@ export namespace Prisma {
    * Assessment.unit
    */
   export type Assessment$unitArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Unit
+     */
+    select?: UnitSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Unit
+     */
+    omit?: UnitOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UnitInclude<ExtArgs> | null
+    where?: UnitWhereInput
+  }
+
+  /**
+   * Assessment.bankForUnit
+   */
+  export type Assessment$bankForUnitArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Unit
      */
@@ -78777,6 +78861,7 @@ export namespace Prisma {
     id: 'id',
     sectionId: 'sectionId',
     unitId: 'unitId',
+    bankForUnitId: 'bankForUnitId',
     assignmentId: 'assignmentId',
     title: 'title',
     instructions: 'instructions',
@@ -81003,6 +81088,7 @@ export namespace Prisma {
     pacing?: SectionPacingListRelationFilter
     assignments?: AssignmentListRelationFilter
     assessments?: AssessmentListRelationFilter
+    questionBanks?: AssessmentListRelationFilter
   }
 
   export type UnitOrderByWithRelationInput = {
@@ -81017,6 +81103,7 @@ export namespace Prisma {
     pacing?: SectionPacingOrderByRelationAggregateInput
     assignments?: AssignmentOrderByRelationAggregateInput
     assessments?: AssessmentOrderByRelationAggregateInput
+    questionBanks?: AssessmentOrderByRelationAggregateInput
   }
 
   export type UnitWhereUniqueInput = Prisma.AtLeast<{
@@ -81035,6 +81122,7 @@ export namespace Prisma {
     pacing?: SectionPacingListRelationFilter
     assignments?: AssignmentListRelationFilter
     assessments?: AssessmentListRelationFilter
+    questionBanks?: AssessmentListRelationFilter
   }, "id" | "courseId_order">
 
   export type UnitOrderByWithAggregationInput = {
@@ -82364,6 +82452,7 @@ export namespace Prisma {
     id?: StringFilter<"Assessment"> | string
     sectionId?: StringFilter<"Assessment"> | string
     unitId?: StringNullableFilter<"Assessment"> | string | null
+    bankForUnitId?: StringNullableFilter<"Assessment"> | string | null
     assignmentId?: StringNullableFilter<"Assessment"> | string | null
     title?: StringFilter<"Assessment"> | string
     instructions?: StringNullableFilter<"Assessment"> | string | null
@@ -82382,6 +82471,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Assessment"> | Date | string
     section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
     unit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
+    bankForUnit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
     assignment?: XOR<AssignmentNullableScalarRelationFilter, AssignmentWhereInput> | null
     questions?: QuestionListRelationFilter
     liveGames?: LiveGameListRelationFilter
@@ -82392,6 +82482,7 @@ export namespace Prisma {
     id?: SortOrder
     sectionId?: SortOrder
     unitId?: SortOrderInput | SortOrder
+    bankForUnitId?: SortOrderInput | SortOrder
     assignmentId?: SortOrderInput | SortOrder
     title?: SortOrder
     instructions?: SortOrderInput | SortOrder
@@ -82410,6 +82501,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     section?: SectionOrderByWithRelationInput
     unit?: UnitOrderByWithRelationInput
+    bankForUnit?: UnitOrderByWithRelationInput
     assignment?: AssignmentOrderByWithRelationInput
     questions?: QuestionOrderByRelationAggregateInput
     liveGames?: LiveGameOrderByRelationAggregateInput
@@ -82424,6 +82516,7 @@ export namespace Prisma {
     NOT?: AssessmentWhereInput | AssessmentWhereInput[]
     sectionId?: StringFilter<"Assessment"> | string
     unitId?: StringNullableFilter<"Assessment"> | string | null
+    bankForUnitId?: StringNullableFilter<"Assessment"> | string | null
     title?: StringFilter<"Assessment"> | string
     instructions?: StringNullableFilter<"Assessment"> | string | null
     standards?: StringNullableFilter<"Assessment"> | string | null
@@ -82441,6 +82534,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Assessment"> | Date | string
     section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
     unit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
+    bankForUnit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
     assignment?: XOR<AssignmentNullableScalarRelationFilter, AssignmentWhereInput> | null
     questions?: QuestionListRelationFilter
     liveGames?: LiveGameListRelationFilter
@@ -82451,6 +82545,7 @@ export namespace Prisma {
     id?: SortOrder
     sectionId?: SortOrder
     unitId?: SortOrderInput | SortOrder
+    bankForUnitId?: SortOrderInput | SortOrder
     assignmentId?: SortOrderInput | SortOrder
     title?: SortOrder
     instructions?: SortOrderInput | SortOrder
@@ -82481,6 +82576,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Assessment"> | string
     sectionId?: StringWithAggregatesFilter<"Assessment"> | string
     unitId?: StringNullableWithAggregatesFilter<"Assessment"> | string | null
+    bankForUnitId?: StringNullableWithAggregatesFilter<"Assessment"> | string | null
     assignmentId?: StringNullableWithAggregatesFilter<"Assessment"> | string | null
     title?: StringWithAggregatesFilter<"Assessment"> | string
     instructions?: StringNullableWithAggregatesFilter<"Assessment"> | string | null
@@ -85684,6 +85780,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutUnitInput
     assignments?: AssignmentCreateNestedManyWithoutUnitInput
     assessments?: AssessmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateInput = {
@@ -85697,6 +85794,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
     assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUpdateInput = {
@@ -85710,6 +85808,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateInput = {
@@ -85723,6 +85822,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitCreateManyInput = {
@@ -87084,6 +87184,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
@@ -87094,6 +87195,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -87134,6 +87236,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
@@ -87144,6 +87247,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -87169,6 +87273,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -87210,6 +87315,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -91618,6 +91724,7 @@ export namespace Prisma {
     id?: SortOrder
     sectionId?: SortOrder
     unitId?: SortOrder
+    bankForUnitId?: SortOrder
     assignmentId?: SortOrder
     title?: SortOrder
     instructions?: SortOrder
@@ -91646,6 +91753,7 @@ export namespace Prisma {
     id?: SortOrder
     sectionId?: SortOrder
     unitId?: SortOrder
+    bankForUnitId?: SortOrder
     assignmentId?: SortOrder
     title?: SortOrder
     instructions?: SortOrder
@@ -91668,6 +91776,7 @@ export namespace Prisma {
     id?: SortOrder
     sectionId?: SortOrder
     unitId?: SortOrder
+    bankForUnitId?: SortOrder
     assignmentId?: SortOrder
     title?: SortOrder
     instructions?: SortOrder
@@ -95528,6 +95637,13 @@ export namespace Prisma {
     connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
   }
 
+  export type AssessmentCreateNestedManyWithoutBankForUnitInput = {
+    create?: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput> | AssessmentCreateWithoutBankForUnitInput[] | AssessmentUncheckedCreateWithoutBankForUnitInput[]
+    connectOrCreate?: AssessmentCreateOrConnectWithoutBankForUnitInput | AssessmentCreateOrConnectWithoutBankForUnitInput[]
+    createMany?: AssessmentCreateManyBankForUnitInputEnvelope
+    connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+  }
+
   export type LessonUncheckedCreateNestedManyWithoutUnitInput = {
     create?: XOR<LessonCreateWithoutUnitInput, LessonUncheckedCreateWithoutUnitInput> | LessonCreateWithoutUnitInput[] | LessonUncheckedCreateWithoutUnitInput[]
     connectOrCreate?: LessonCreateOrConnectWithoutUnitInput | LessonCreateOrConnectWithoutUnitInput[]
@@ -95553,6 +95669,13 @@ export namespace Prisma {
     create?: XOR<AssessmentCreateWithoutUnitInput, AssessmentUncheckedCreateWithoutUnitInput> | AssessmentCreateWithoutUnitInput[] | AssessmentUncheckedCreateWithoutUnitInput[]
     connectOrCreate?: AssessmentCreateOrConnectWithoutUnitInput | AssessmentCreateOrConnectWithoutUnitInput[]
     createMany?: AssessmentCreateManyUnitInputEnvelope
+    connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+  }
+
+  export type AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput = {
+    create?: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput> | AssessmentCreateWithoutBankForUnitInput[] | AssessmentUncheckedCreateWithoutBankForUnitInput[]
+    connectOrCreate?: AssessmentCreateOrConnectWithoutBankForUnitInput | AssessmentCreateOrConnectWithoutBankForUnitInput[]
+    createMany?: AssessmentCreateManyBankForUnitInputEnvelope
     connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
   }
 
@@ -95620,6 +95743,20 @@ export namespace Prisma {
     deleteMany?: AssessmentScalarWhereInput | AssessmentScalarWhereInput[]
   }
 
+  export type AssessmentUpdateManyWithoutBankForUnitNestedInput = {
+    create?: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput> | AssessmentCreateWithoutBankForUnitInput[] | AssessmentUncheckedCreateWithoutBankForUnitInput[]
+    connectOrCreate?: AssessmentCreateOrConnectWithoutBankForUnitInput | AssessmentCreateOrConnectWithoutBankForUnitInput[]
+    upsert?: AssessmentUpsertWithWhereUniqueWithoutBankForUnitInput | AssessmentUpsertWithWhereUniqueWithoutBankForUnitInput[]
+    createMany?: AssessmentCreateManyBankForUnitInputEnvelope
+    set?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    disconnect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    delete?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    update?: AssessmentUpdateWithWhereUniqueWithoutBankForUnitInput | AssessmentUpdateWithWhereUniqueWithoutBankForUnitInput[]
+    updateMany?: AssessmentUpdateManyWithWhereWithoutBankForUnitInput | AssessmentUpdateManyWithWhereWithoutBankForUnitInput[]
+    deleteMany?: AssessmentScalarWhereInput | AssessmentScalarWhereInput[]
+  }
+
   export type LessonUncheckedUpdateManyWithoutUnitNestedInput = {
     create?: XOR<LessonCreateWithoutUnitInput, LessonUncheckedCreateWithoutUnitInput> | LessonCreateWithoutUnitInput[] | LessonUncheckedCreateWithoutUnitInput[]
     connectOrCreate?: LessonCreateOrConnectWithoutUnitInput | LessonCreateOrConnectWithoutUnitInput[]
@@ -95673,6 +95810,20 @@ export namespace Prisma {
     connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
     update?: AssessmentUpdateWithWhereUniqueWithoutUnitInput | AssessmentUpdateWithWhereUniqueWithoutUnitInput[]
     updateMany?: AssessmentUpdateManyWithWhereWithoutUnitInput | AssessmentUpdateManyWithWhereWithoutUnitInput[]
+    deleteMany?: AssessmentScalarWhereInput | AssessmentScalarWhereInput[]
+  }
+
+  export type AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput = {
+    create?: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput> | AssessmentCreateWithoutBankForUnitInput[] | AssessmentUncheckedCreateWithoutBankForUnitInput[]
+    connectOrCreate?: AssessmentCreateOrConnectWithoutBankForUnitInput | AssessmentCreateOrConnectWithoutBankForUnitInput[]
+    upsert?: AssessmentUpsertWithWhereUniqueWithoutBankForUnitInput | AssessmentUpsertWithWhereUniqueWithoutBankForUnitInput[]
+    createMany?: AssessmentCreateManyBankForUnitInputEnvelope
+    set?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    disconnect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    delete?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    connect?: AssessmentWhereUniqueInput | AssessmentWhereUniqueInput[]
+    update?: AssessmentUpdateWithWhereUniqueWithoutBankForUnitInput | AssessmentUpdateWithWhereUniqueWithoutBankForUnitInput[]
+    updateMany?: AssessmentUpdateManyWithWhereWithoutBankForUnitInput | AssessmentUpdateManyWithWhereWithoutBankForUnitInput[]
     deleteMany?: AssessmentScalarWhereInput | AssessmentScalarWhereInput[]
   }
 
@@ -97018,6 +97169,12 @@ export namespace Prisma {
     connect?: UnitWhereUniqueInput
   }
 
+  export type UnitCreateNestedOneWithoutQuestionBanksInput = {
+    create?: XOR<UnitCreateWithoutQuestionBanksInput, UnitUncheckedCreateWithoutQuestionBanksInput>
+    connectOrCreate?: UnitCreateOrConnectWithoutQuestionBanksInput
+    connect?: UnitWhereUniqueInput
+  }
+
   export type AssignmentCreateNestedOneWithoutAssessmentInput = {
     create?: XOR<AssignmentCreateWithoutAssessmentInput, AssignmentUncheckedCreateWithoutAssessmentInput>
     connectOrCreate?: AssignmentCreateOrConnectWithoutAssessmentInput
@@ -97082,6 +97239,16 @@ export namespace Prisma {
     delete?: UnitWhereInput | boolean
     connect?: UnitWhereUniqueInput
     update?: XOR<XOR<UnitUpdateToOneWithWhereWithoutAssessmentsInput, UnitUpdateWithoutAssessmentsInput>, UnitUncheckedUpdateWithoutAssessmentsInput>
+  }
+
+  export type UnitUpdateOneWithoutQuestionBanksNestedInput = {
+    create?: XOR<UnitCreateWithoutQuestionBanksInput, UnitUncheckedCreateWithoutQuestionBanksInput>
+    connectOrCreate?: UnitCreateOrConnectWithoutQuestionBanksInput
+    upsert?: UnitUpsertWithoutQuestionBanksInput
+    disconnect?: UnitWhereInput | boolean
+    delete?: UnitWhereInput | boolean
+    connect?: UnitWhereUniqueInput
+    update?: XOR<XOR<UnitUpdateToOneWithWhereWithoutQuestionBanksInput, UnitUpdateWithoutQuestionBanksInput>, UnitUncheckedUpdateWithoutQuestionBanksInput>
   }
 
   export type AssignmentUpdateOneWithoutAssessmentNestedInput = {
@@ -102560,6 +102727,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutUnitInput
     assignments?: AssignmentCreateNestedManyWithoutUnitInput
     assessments?: AssessmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateWithoutCourseInput = {
@@ -102572,6 +102740,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
     assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitCreateOrConnectWithoutCourseInput = {
@@ -102894,6 +103063,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
@@ -102903,6 +103073,7 @@ export namespace Prisma {
   export type AssessmentUncheckedCreateWithoutSectionInput = {
     id?: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -103404,6 +103575,7 @@ export namespace Prisma {
     id?: StringFilter<"Assessment"> | string
     sectionId?: StringFilter<"Assessment"> | string
     unitId?: StringNullableFilter<"Assessment"> | string | null
+    bankForUnitId?: StringNullableFilter<"Assessment"> | string | null
     assignmentId?: StringNullableFilter<"Assessment"> | string | null
     title?: StringFilter<"Assessment"> | string
     instructions?: StringNullableFilter<"Assessment"> | string | null
@@ -104179,6 +104351,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
@@ -104188,6 +104361,7 @@ export namespace Prisma {
   export type AssessmentUncheckedCreateWithoutUnitInput = {
     id?: string
     sectionId: string
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -104216,6 +104390,66 @@ export namespace Prisma {
 
   export type AssessmentCreateManyUnitInputEnvelope = {
     data: AssessmentCreateManyUnitInput | AssessmentCreateManyUnitInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AssessmentCreateWithoutBankForUnitInput = {
+    id?: string
+    title: string
+    instructions?: string | null
+    standards?: string | null
+    totalPoints: number
+    timeLimitMinutes?: number | null
+    maxAttempts?: number
+    opensAt?: Date | string | null
+    closesAt?: Date | string | null
+    shuffleQuestions?: boolean
+    allowScratchpad?: boolean
+    allowAttachments?: boolean
+    lockdownEnabled?: boolean
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    section: SectionCreateNestedOneWithoutAssessmentsInput
+    unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
+    questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type AssessmentUncheckedCreateWithoutBankForUnitInput = {
+    id?: string
+    sectionId: string
+    unitId?: string | null
+    assignmentId?: string | null
+    title: string
+    instructions?: string | null
+    standards?: string | null
+    totalPoints: number
+    timeLimitMinutes?: number | null
+    maxAttempts?: number
+    opensAt?: Date | string | null
+    closesAt?: Date | string | null
+    shuffleQuestions?: boolean
+    allowScratchpad?: boolean
+    allowAttachments?: boolean
+    lockdownEnabled?: boolean
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type AssessmentCreateOrConnectWithoutBankForUnitInput = {
+    where: AssessmentWhereUniqueInput
+    create: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput>
+  }
+
+  export type AssessmentCreateManyBankForUnitInputEnvelope = {
+    data: AssessmentCreateManyBankForUnitInput | AssessmentCreateManyBankForUnitInput[]
     skipDuplicates?: boolean
   }
 
@@ -104335,6 +104569,22 @@ export namespace Prisma {
     data: XOR<AssessmentUpdateManyMutationInput, AssessmentUncheckedUpdateManyWithoutUnitInput>
   }
 
+  export type AssessmentUpsertWithWhereUniqueWithoutBankForUnitInput = {
+    where: AssessmentWhereUniqueInput
+    update: XOR<AssessmentUpdateWithoutBankForUnitInput, AssessmentUncheckedUpdateWithoutBankForUnitInput>
+    create: XOR<AssessmentCreateWithoutBankForUnitInput, AssessmentUncheckedCreateWithoutBankForUnitInput>
+  }
+
+  export type AssessmentUpdateWithWhereUniqueWithoutBankForUnitInput = {
+    where: AssessmentWhereUniqueInput
+    data: XOR<AssessmentUpdateWithoutBankForUnitInput, AssessmentUncheckedUpdateWithoutBankForUnitInput>
+  }
+
+  export type AssessmentUpdateManyWithWhereWithoutBankForUnitInput = {
+    where: AssessmentScalarWhereInput
+    data: XOR<AssessmentUpdateManyMutationInput, AssessmentUncheckedUpdateManyWithoutBankForUnitInput>
+  }
+
   export type LessonCreateWithoutUnlocksInput = {
     id?: string
     order: number
@@ -104440,6 +104690,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutUnitInput
     assignments?: AssignmentCreateNestedManyWithoutUnitInput
     assessments?: AssessmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateWithoutLessonsInput = {
@@ -104452,6 +104703,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
     assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitCreateOrConnectWithoutLessonsInput = {
@@ -104739,6 +104991,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateWithoutLessonsInput = {
@@ -104751,6 +105004,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type LessonSectionUpsertWithWhereUniqueWithoutLessonInput = {
@@ -105302,6 +105556,7 @@ export namespace Prisma {
     lessons?: LessonCreateNestedManyWithoutUnitInput
     assignments?: AssignmentCreateNestedManyWithoutUnitInput
     assessments?: AssessmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateWithoutPacingInput = {
@@ -105314,6 +105569,7 @@ export namespace Prisma {
     lessons?: LessonUncheckedCreateNestedManyWithoutUnitInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
     assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitCreateOrConnectWithoutPacingInput = {
@@ -105399,6 +105655,7 @@ export namespace Prisma {
     lessons?: LessonUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateWithoutPacingInput = {
@@ -105411,6 +105668,7 @@ export namespace Prisma {
     lessons?: LessonUncheckedUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type LessonCreateWithoutProgressInput = {
@@ -106350,6 +106608,7 @@ export namespace Prisma {
     lessons?: LessonCreateNestedManyWithoutUnitInput
     pacing?: SectionPacingCreateNestedManyWithoutUnitInput
     assessments?: AssessmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateWithoutAssignmentsInput = {
@@ -106362,6 +106621,7 @@ export namespace Prisma {
     lessons?: LessonUncheckedCreateNestedManyWithoutUnitInput
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
     assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitCreateOrConnectWithoutAssignmentsInput = {
@@ -106517,6 +106777,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
@@ -106526,6 +106787,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     title: string
     instructions?: string | null
     standards?: string | null
@@ -106629,6 +106891,7 @@ export namespace Prisma {
     lessons?: LessonUpdateManyWithoutUnitNestedInput
     pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateWithoutAssignmentsInput = {
@@ -106641,6 +106904,7 @@ export namespace Prisma {
     lessons?: LessonUncheckedUpdateManyWithoutUnitNestedInput
     pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type LessonUpsertWithoutAssignmentsInput = {
@@ -106794,6 +107058,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
@@ -106803,6 +107068,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
     standards?: NullableStringFieldUpdateOperationsInput | string | null
@@ -108220,6 +108486,7 @@ export namespace Prisma {
     lessons?: LessonCreateNestedManyWithoutUnitInput
     pacing?: SectionPacingCreateNestedManyWithoutUnitInput
     assignments?: AssignmentCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitUncheckedCreateWithoutAssessmentsInput = {
@@ -108232,11 +108499,43 @@ export namespace Prisma {
     lessons?: LessonUncheckedCreateNestedManyWithoutUnitInput
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
     assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
+    questionBanks?: AssessmentUncheckedCreateNestedManyWithoutBankForUnitInput
   }
 
   export type UnitCreateOrConnectWithoutAssessmentsInput = {
     where: UnitWhereUniqueInput
     create: XOR<UnitCreateWithoutAssessmentsInput, UnitUncheckedCreateWithoutAssessmentsInput>
+  }
+
+  export type UnitCreateWithoutQuestionBanksInput = {
+    id?: string
+    order: number
+    title: string
+    description?: string | null
+    examDate?: Date | string | null
+    course: CourseCreateNestedOneWithoutUnitsInput
+    lessons?: LessonCreateNestedManyWithoutUnitInput
+    pacing?: SectionPacingCreateNestedManyWithoutUnitInput
+    assignments?: AssignmentCreateNestedManyWithoutUnitInput
+    assessments?: AssessmentCreateNestedManyWithoutUnitInput
+  }
+
+  export type UnitUncheckedCreateWithoutQuestionBanksInput = {
+    id?: string
+    courseId: string
+    order: number
+    title: string
+    description?: string | null
+    examDate?: Date | string | null
+    lessons?: LessonUncheckedCreateNestedManyWithoutUnitInput
+    pacing?: SectionPacingUncheckedCreateNestedManyWithoutUnitInput
+    assignments?: AssignmentUncheckedCreateNestedManyWithoutUnitInput
+    assessments?: AssessmentUncheckedCreateNestedManyWithoutUnitInput
+  }
+
+  export type UnitCreateOrConnectWithoutQuestionBanksInput = {
+    where: UnitWhereUniqueInput
+    create: XOR<UnitCreateWithoutQuestionBanksInput, UnitUncheckedCreateWithoutQuestionBanksInput>
   }
 
   export type AssignmentCreateWithoutAssessmentInput = {
@@ -108492,6 +108791,7 @@ export namespace Prisma {
     lessons?: LessonUpdateManyWithoutUnitNestedInput
     pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateWithoutAssessmentsInput = {
@@ -108504,6 +108804,44 @@ export namespace Prisma {
     lessons?: LessonUncheckedUpdateManyWithoutUnitNestedInput
     pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
+  }
+
+  export type UnitUpsertWithoutQuestionBanksInput = {
+    update: XOR<UnitUpdateWithoutQuestionBanksInput, UnitUncheckedUpdateWithoutQuestionBanksInput>
+    create: XOR<UnitCreateWithoutQuestionBanksInput, UnitUncheckedCreateWithoutQuestionBanksInput>
+    where?: UnitWhereInput
+  }
+
+  export type UnitUpdateToOneWithWhereWithoutQuestionBanksInput = {
+    where?: UnitWhereInput
+    data: XOR<UnitUpdateWithoutQuestionBanksInput, UnitUncheckedUpdateWithoutQuestionBanksInput>
+  }
+
+  export type UnitUpdateWithoutQuestionBanksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    examDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    course?: CourseUpdateOneRequiredWithoutUnitsNestedInput
+    lessons?: LessonUpdateManyWithoutUnitNestedInput
+    pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
+    assignments?: AssignmentUpdateManyWithoutUnitNestedInput
+    assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+  }
+
+  export type UnitUncheckedUpdateWithoutQuestionBanksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    courseId?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    examDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lessons?: LessonUncheckedUpdateManyWithoutUnitNestedInput
+    pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
+    assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
+    assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
   }
 
   export type AssignmentUpsertWithoutAssessmentInput = {
@@ -108646,6 +108984,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
@@ -108655,6 +108994,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -108782,6 +109122,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
@@ -108791,6 +109132,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -108967,6 +109309,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
@@ -108976,6 +109319,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -109154,6 +109498,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
@@ -109163,6 +109508,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -112832,6 +113178,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    bankForUnit?: UnitCreateNestedOneWithoutQuestionBanksInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
@@ -112841,6 +113188,7 @@ export namespace Prisma {
     id?: string
     sectionId: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -113044,6 +113392,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
@@ -113053,6 +113402,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115085,6 +115435,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateWithoutCourseInput = {
@@ -115097,6 +115448,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutUnitNestedInput
     assignments?: AssignmentUncheckedUpdateManyWithoutUnitNestedInput
     assessments?: AssessmentUncheckedUpdateManyWithoutUnitNestedInput
+    questionBanks?: AssessmentUncheckedUpdateManyWithoutBankForUnitNestedInput
   }
 
   export type UnitUncheckedUpdateManyWithoutCourseInput = {
@@ -115158,6 +115510,7 @@ export namespace Prisma {
   export type AssessmentCreateManySectionInput = {
     id?: string
     unitId?: string | null
+    bankForUnitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -115425,6 +115778,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
@@ -115434,6 +115788,7 @@ export namespace Prisma {
   export type AssessmentUncheckedUpdateWithoutSectionInput = {
     id?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115458,6 +115813,7 @@ export namespace Prisma {
   export type AssessmentUncheckedUpdateManyWithoutSectionInput = {
     id?: StringFieldUpdateOperationsInput | string
     unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115800,6 +116156,29 @@ export namespace Prisma {
   export type AssessmentCreateManyUnitInput = {
     id?: string
     sectionId: string
+    bankForUnitId?: string | null
+    assignmentId?: string | null
+    title: string
+    instructions?: string | null
+    standards?: string | null
+    totalPoints: number
+    timeLimitMinutes?: number | null
+    maxAttempts?: number
+    opensAt?: Date | string | null
+    closesAt?: Date | string | null
+    shuffleQuestions?: boolean
+    allowScratchpad?: boolean
+    allowAttachments?: boolean
+    lockdownEnabled?: boolean
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AssessmentCreateManyBankForUnitInput = {
+    id?: string
+    sectionId: string
+    unitId?: string | null
     assignmentId?: string | null
     title: string
     instructions?: string | null
@@ -115980,6 +116359,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
+    bankForUnit?: UnitUpdateOneWithoutQuestionBanksNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
     liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
@@ -115989,6 +116369,7 @@ export namespace Prisma {
   export type AssessmentUncheckedUpdateWithoutUnitInput = {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116013,6 +116394,79 @@ export namespace Prisma {
   export type AssessmentUncheckedUpdateManyWithoutUnitInput = {
     id?: StringFieldUpdateOperationsInput | string
     sectionId?: StringFieldUpdateOperationsInput | string
+    bankForUnitId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    standards?: NullableStringFieldUpdateOperationsInput | string | null
+    totalPoints?: FloatFieldUpdateOperationsInput | number
+    timeLimitMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    opensAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closesAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shuffleQuestions?: BoolFieldUpdateOperationsInput | boolean
+    allowScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    allowAttachments?: BoolFieldUpdateOperationsInput | boolean
+    lockdownEnabled?: BoolFieldUpdateOperationsInput | boolean
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AssessmentUpdateWithoutBankForUnitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    standards?: NullableStringFieldUpdateOperationsInput | string | null
+    totalPoints?: FloatFieldUpdateOperationsInput | number
+    timeLimitMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    opensAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closesAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shuffleQuestions?: BoolFieldUpdateOperationsInput | boolean
+    allowScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    allowAttachments?: BoolFieldUpdateOperationsInput | boolean
+    lockdownEnabled?: BoolFieldUpdateOperationsInput | boolean
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
+    unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
+    questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type AssessmentUncheckedUpdateWithoutBankForUnitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    standards?: NullableStringFieldUpdateOperationsInput | string | null
+    totalPoints?: FloatFieldUpdateOperationsInput | number
+    timeLimitMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    opensAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closesAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shuffleQuestions?: BoolFieldUpdateOperationsInput | boolean
+    allowScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    allowAttachments?: BoolFieldUpdateOperationsInput | boolean
+    lockdownEnabled?: BoolFieldUpdateOperationsInput | boolean
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type AssessmentUncheckedUpdateManyWithoutBankForUnitInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    unitId?: NullableStringFieldUpdateOperationsInput | string | null
     assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     instructions?: NullableStringFieldUpdateOperationsInput | string | null

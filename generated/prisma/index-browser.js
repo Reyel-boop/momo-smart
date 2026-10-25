@@ -484,6 +484,7 @@ exports.Prisma.AssessmentScalarFieldEnum = {
   id: 'id',
   sectionId: 'sectionId',
   unitId: 'unitId',
+  bankForUnitId: 'bankForUnitId',
   assignmentId: 'assignmentId',
   title: 'title',
   instructions: 'instructions',

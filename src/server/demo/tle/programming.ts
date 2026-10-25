@@ -9,6 +9,7 @@
  */
 import type { DemoLesson, DemoSubject, DemoUnit } from "../grade10";
 import { q, TLE_DEPARTMENT } from "./common";
+import { PROGRAMMING_BANK } from "./programming-bank";
 
 /** `inline code` inside a lecture. */
 const c = (text: string) => `\`${text}\``;
@@ -1404,5 +1405,5 @@ export const computerProgramming = (grade: 9 | 10): DemoSubject => ({
   description:
     "Developing websites with HTML and CSS in a safe and responsible manner (DepEd Budget of Work, Grade 9 or 10).",
   colorToken: "blue",
-  units: UNITS,
+  units: UNITS.map((unit, i) => ({ ...unit, bank: PROGRAMMING_BANK[i] })),
 });

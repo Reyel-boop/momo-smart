@@ -18,6 +18,7 @@ import {
 } from "./demo/grade10";
 import { UNIT_QUIZZES, type QuizItem } from "./demo/grade10-quiz";
 import { GRADE10_LECTURES, lectureVideoUrl } from "./demo/lectures";
+import { QUESTION_BANKS } from "./demo/banks";
 import { TLE_SUBJECTS } from "./demo/tle";
 
 export const ALL_SUBJECTS: DemoSubject[] = [
@@ -58,6 +59,22 @@ export function quizFor(
   const index = unitOrder - 1;
   return (
     subject.units[index]?.quiz ?? UNIT_QUIZZES[subject.key]?.[index] ?? null
+  );
+}
+
+/**
+ * Extra questions for a unit's Live Quiz (beyond its Unit Questions), so a
+ * single unit can fill a 10-, 15- or 20-question game.
+ */
+export function bankFor(
+  courseCode: string,
+  unitOrder: number,
+): QuizItem[] | null {
+  const subject = ALL_SUBJECTS.find((s) => s.code === courseCode);
+  if (!subject) return null;
+  const index = unitOrder - 1;
+  return (
+    subject.units[index]?.bank ?? QUESTION_BANKS[subject.key]?.[index] ?? null
   );
 }
 
@@ -303,65 +320,105 @@ export async function createUnitQuizzesForSection(
         },
       },
       assessments: {
-        where: { unitId: { not: null }, assignmentId: null },
-        select: { unitId: true },
+        where: {
+          assignmentId: null,
+          OR: [{ unitId: { not: null } }, { bankForUnitId: { not: null } }],
+        },
+        select: { unitId: true, bankForUnitId: true },
       },
     },
   });
   const done = new Set(section.assessments.map((a) => a.unitId));
+  const banked = new Set(section.assessments.map((a) => a.bankForUnitId));
 
-  const quizRows: Prisma.AssessmentCreateManyInput[] = [];
-  const questionRows: Prisma.QuestionCreateManyInput[] = [];
-  const optionRows: Prisma.QuestionOptionCreateManyInput[] = [];
+  const rows: QuizRows = { quizzes: [], questions: [], options: [] };
   const now = new Date();
+  let quizzes = 0;
 
   for (const unit of section.course.units) {
-    if (done.has(unit.id)) continue;
-    const quiz = quizFor(section.course.code, unit.order);
-    if (!quiz) continue;
-
-    const assessmentId = randomUUID();
-    quizRows.push({
-      id: assessmentId,
-      sectionId,
-      unitId: unit.id,
-      title: `Unit ${unit.order} Questions`,
-      instructions: QUIZ_INSTRUCTIONS,
-      totalPoints: quiz.length,
-      maxAttempts: 2,
-      allowScratchpad: false,
-      publishedAt: now,
-    });
-    for (const [n, item] of quiz.entries()) {
-      const questionId = randomUUID();
-      questionRows.push({
-        id: questionId,
-        assessmentId,
-        order: n + 1,
-        type: "MULTIPLE_CHOICE",
-        prompt: item.q,
-        points: 1,
-        explanation: item.why,
+    const quiz = done.has(unit.id)
+      ? null
+      : quizFor(section.course.code, unit.order);
+    if (quiz) {
+      const assessmentId = randomUUID();
+      rows.quizzes.push({
+        id: assessmentId,
+        sectionId,
+        unitId: unit.id,
+        title: `Unit ${unit.order} Questions`,
+        instructions: QUIZ_INSTRUCTIONS,
+        totalPoints: quiz.length,
+        maxAttempts: 2,
+        allowScratchpad: false,
+        publishedAt: now,
       });
-      // Spread the right answer across A–D instead of always the same letter.
-      const correctAt = (unit.order - 1 + n * 3) % 4;
-      const choices = item.choices.filter((_, k) => k !== item.answer);
-      choices.splice(correctAt, 0, item.choices[item.answer]);
-      choices.forEach((text, k) =>
-        optionRows.push({
-          questionId,
-          label: LABELS[k]!,
-          text,
-          isCorrect: k === correctAt,
-          order: k,
-        }),
-      );
+      addQuestions(rows, assessmentId, unit.order, quiz, 1);
+      quizzes++;
+    }
+
+    // The Live Quiz question bank: never published, not a Unit Question.
+    const bank = banked.has(unit.id)
+      ? null
+      : bankFor(section.course.code, unit.order);
+    if (bank?.length) {
+      const assessmentId = randomUUID();
+      rows.quizzes.push({
+        id: assessmentId,
+        sectionId,
+        bankForUnitId: unit.id,
+        title: `Unit ${unit.order} Live Quiz Questions`,
+        totalPoints: bank.length,
+        maxAttempts: 1,
+        allowScratchpad: false,
+      });
+      addQuestions(rows, assessmentId, unit.order, bank, 1);
     }
   }
 
-  if (quizRows.length === 0) return 0;
-  await db.assessment.createMany({ data: quizRows });
-  await db.question.createMany({ data: questionRows });
-  await db.questionOption.createMany({ data: optionRows });
-  return quizRows.length;
+  if (rows.quizzes.length === 0) return 0;
+  await db.assessment.createMany({ data: rows.quizzes });
+  await db.question.createMany({ data: rows.questions });
+  await db.questionOption.createMany({ data: rows.options });
+  return quizzes;
+}
+
+type QuizRows = {
+  quizzes: Prisma.AssessmentCreateManyInput[];
+  questions: Prisma.QuestionCreateManyInput[];
+  options: Prisma.QuestionOptionCreateManyInput[];
+};
+
+/** Multiple-choice questions with options A–D, numbered from `firstOrder`. */
+function addQuestions(
+  rows: QuizRows,
+  assessmentId: string,
+  unitOrder: number,
+  items: QuizItem[],
+  firstOrder: number,
+) {
+  for (const [n, item] of items.entries()) {
+    const questionId = randomUUID();
+    rows.questions.push({
+      id: questionId,
+      assessmentId,
+      order: firstOrder + n,
+      type: "MULTIPLE_CHOICE",
+      prompt: item.q,
+      points: 1,
+      explanation: item.why,
+    });
+    // Spread the right answer across A–D instead of always the same letter.
+    const correctAt = (unitOrder - 1 + n * 3) % 4;
+    const choices = item.choices.filter((_, k) => k !== item.answer);
+    choices.splice(correctAt, 0, item.choices[item.answer]);
+    choices.forEach((text, k) =>
+      rows.options.push({
+        questionId,
+        label: LABELS[k]!,
+        text,
+        isCorrect: k === correctAt,
+        order: k,
+      }),
+    );
+  }
 }
