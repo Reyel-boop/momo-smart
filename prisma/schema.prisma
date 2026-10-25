@@ -142,6 +142,7 @@ model StudentProfile {
   officeHourSlots  OfficeHourBooking[]
   tutorAssignments PeerTutorAssignment[] @relation("TutorAssignmentStudent")
   tutoringGiven    PeerTutorAssignment[] @relation("TutorAssignmentTutor")
+  livePlayers      LivePlayer[]
 
   @@index([gradeLevel])
   @@index([sectionId])
@@ -173,6 +174,7 @@ model TeacherProfile {
 
   sections    Section[]
   officeHours OfficeHour[]
+  liveGames   LiveGame[]
 
   @@index([departmentId])
 }
@@ -315,6 +317,7 @@ model Section {
   pacing             SectionPacing[]
   alerts             Alert[]
   tutorAssignments   PeerTutorAssignment[]
+  liveGames          LiveGame[]
 
   @@unique([termId, courseId, code])
   @@index([teacherId, termId])
@@ -854,6 +857,7 @@ model Assessment {
   assignment Assignment? @relation(fields: [assignmentId], references: [id], onDelete: SetNull)
 
   questions Question[]
+  liveGames LiveGame[]
   attempts  AssessmentAttempt[]
 
   createdAt DateTime @default(now())
@@ -1359,4 +1363,75 @@ model WaitlistEntry {
   updatedAt DateTime @updatedAt
 
   @@index([createdAt])
+}
+
+enum LiveGameStatus {
+  LOBBY
+  QUESTION
+  REVEAL
+  FINISHED
+}
+
+/// A live, Kahoot-style quiz game the teacher hosts for a class from one
+/// set of Unit Questions; students join from their devices and race to
+/// answer each question.
+model LiveGame {
+  id                 String         @id @default(cuid())
+  sectionId          String
+  hostId             String
+  assessmentId       String
+  status             LiveGameStatus @default(LOBBY)
+  /// The questions in play, in order.
+  questionIds        String[]
+  /// Index into questionIds of the current question (-1 in the lobby).
+  currentIndex       Int            @default(-1)
+  questionStartedAt  DateTime?
+  secondsPerQuestion Int            @default(20)
+  /// Team A vs Team B instead of everyone for themselves.
+  teamMode           Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  finishedAt         DateTime?
+
+  section    Section        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  host       TeacherProfile @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  assessment Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  players    LivePlayer[]
+  answers    LiveAnswer[]
+
+  @@index([sectionId, status])
+}
+
+/// A student taking part in a live game.
+model LivePlayer {
+  id        String   @id @default(cuid())
+  gameId    String
+  studentId String
+  /// 0 = Team A, 1 = Team B (team mode only).
+  team      Int?
+  score     Int      @default(0)
+  joinedAt  DateTime @default(now())
+
+  game    LiveGame       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  student StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers LiveAnswer[]
+
+  @@unique([gameId, studentId])
+}
+
+/// One player's answer to one question of a live game.
+model LiveAnswer {
+  id         String   @id @default(cuid())
+  gameId     String
+  playerId   String
+  questionId String
+  optionId   String
+  isCorrect  Boolean
+  points     Int
+  answeredAt DateTime @default(now())
+
+  game   LiveGame   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player LivePlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, questionId])
+  @@index([gameId, questionId])
 }

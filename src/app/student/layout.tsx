@@ -7,6 +7,7 @@ import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
 import { isDemoEmail } from "~/server/demo/accounts";
 import { api } from "~/trpc/server";
+import { LiveBanner } from "./_components/live-banner";
 import { Sidebar } from "./_components/sidebar";
 import { Topbar } from "./_components/topbar";
 
@@ -47,6 +48,7 @@ export default async function StudentLayout({
         {env.DEMO_MODE && isDemoEmail(session.user.email) && (
           <DemoBanner persona={studentName} />
         )}
+        <LiveBanner />
         <Topbar
           termName={overview.term?.name ?? "Current term"}
           studentName={studentName}

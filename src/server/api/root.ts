@@ -9,6 +9,7 @@ import { courseRouter } from "~/server/api/routers/course";
 import { dashboardRouter } from "~/server/api/routers/dashboard";
 import { gradingRouter } from "~/server/api/routers/grading";
 import { lessonRouter } from "~/server/api/routers/lesson";
+import { liveRouter } from "~/server/api/routers/live";
 import { messageRouter } from "~/server/api/routers/message";
 import { notificationRouter } from "~/server/api/routers/notification";
 import { submissionRouter } from "~/server/api/routers/submission";
@@ -39,6 +40,7 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   course: courseRouter,
   lesson: lessonRouter,
+  live: liveRouter,
   assignment: assignmentRouter,
   submission: submissionRouter,
   grading: gradingRouter,

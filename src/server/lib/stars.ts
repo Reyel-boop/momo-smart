@@ -66,18 +66,27 @@ type Db = PrismaClient | Prisma.TransactionClient;
 export type StarTotal = { questions: number; graded: number; total: number };
 
 /**
- * Every student's stars: one per Unit Question answered correctly (each
- * question once) plus one per point of released graded work.
+ * Every student's stars: one per Unit Question answered correctly — on
+ * their own or in a Live Quiz, each question once — plus one per point of
+ * released graded work.
  */
 export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
   const [answers, grades] = await Promise.all([
     db.$queryRaw<Array<{ studentId: string; stars: bigint }>>`
-      SELECT a."studentId", COUNT(DISTINCT r."questionId") AS stars
-      FROM "QuestionResponse" r
-      JOIN "AssessmentAttempt" a ON a."id" = r."attemptId"
-      JOIN "Assessment" q ON q."id" = a."assessmentId"
-      WHERE r."isCorrect" = true AND q."assignmentId" IS NULL
-      GROUP BY a."studentId"`,
+      SELECT correct."studentId", COUNT(DISTINCT correct."questionId") AS stars
+      FROM (
+        SELECT a."studentId", r."questionId"
+        FROM "QuestionResponse" r
+        JOIN "AssessmentAttempt" a ON a."id" = r."attemptId"
+        JOIN "Assessment" q ON q."id" = a."assessmentId"
+        WHERE r."isCorrect" = true AND q."assignmentId" IS NULL
+        UNION
+        SELECT p."studentId", l."questionId"
+        FROM "LiveAnswer" l
+        JOIN "LivePlayer" p ON p."id" = l."playerId"
+        WHERE l."isCorrect" = true
+      ) correct
+      GROUP BY correct."studentId"`,
     db.grade.findMany({
       where: {
         status: "RELEASED",
@@ -111,7 +120,10 @@ export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
   return totals;
 }
 
-/** One student's Unit Question stars, per set of questions, newest first. */
+/**
+ * One student's Unit Question stars (own tries and Live Quizzes), per set of
+ * questions, newest first.
+ */
 export async function questionStarLedger(db: Db, studentId: string) {
   const rows = await db.$queryRaw<
     Array<{
@@ -124,18 +136,26 @@ export async function questionStarLedger(db: Db, studentId: string) {
     }>
   >`
     SELECT q."id", q."title", c."name" AS "courseName", q."totalPoints",
-           COUNT(DISTINCT r."questionId") AS stars,
-           MAX(r."answeredAt") AS "lastAnsweredAt"
-    FROM "QuestionResponse" r
-    JOIN "AssessmentAttempt" a ON a."id" = r."attemptId"
-    JOIN "Assessment" q ON q."id" = a."assessmentId"
+           COUNT(DISTINCT correct."questionId") AS stars,
+           MAX(correct."answeredAt") AS "lastAnsweredAt"
+    FROM (
+      SELECT r."questionId", r."answeredAt"
+      FROM "QuestionResponse" r
+      JOIN "AssessmentAttempt" a ON a."id" = r."attemptId"
+      WHERE a."studentId" = ${studentId} AND r."isCorrect" = true
+      UNION ALL
+      SELECT l."questionId", l."answeredAt"
+      FROM "LiveAnswer" l
+      JOIN "LivePlayer" p ON p."id" = l."playerId"
+      WHERE p."studentId" = ${studentId} AND l."isCorrect" = true
+    ) correct
+    JOIN "Question" qu ON qu."id" = correct."questionId"
+    JOIN "Assessment" q ON q."id" = qu."assessmentId"
     JOIN "Section" s ON s."id" = q."sectionId"
     JOIN "Course" c ON c."id" = s."courseId"
-    WHERE a."studentId" = ${studentId}
-      AND r."isCorrect" = true
-      AND q."assignmentId" IS NULL
+    WHERE q."assignmentId" IS NULL
     GROUP BY q."id", q."title", c."name", q."totalPoints"
-    ORDER BY MAX(r."answeredAt") DESC NULLS LAST`;
+    ORDER BY MAX(correct."answeredAt") DESC NULLS LAST`;
   return rows.map((row) => ({
     id: row.id,
     title: row.title,

@@ -300,6 +300,23 @@ export type OfficeHourBooking = $Result.DefaultSelection<Prisma.$OfficeHourBooki
  * `User` and untouched by the demo reset, so leads survive every re-seed.
  */
 export type WaitlistEntry = $Result.DefaultSelection<Prisma.$WaitlistEntryPayload>
+/**
+ * Model LiveGame
+ * A live, Kahoot-style quiz game the teacher hosts for a class from one
+ * set of Unit Questions; students join from their devices and race to
+ * answer each question.
+ */
+export type LiveGame = $Result.DefaultSelection<Prisma.$LiveGamePayload>
+/**
+ * Model LivePlayer
+ * A student taking part in a live game.
+ */
+export type LivePlayer = $Result.DefaultSelection<Prisma.$LivePlayerPayload>
+/**
+ * Model LiveAnswer
+ * One player's answer to one question of a live game.
+ */
+export type LiveAnswer = $Result.DefaultSelection<Prisma.$LiveAnswerPayload>
 
 /**
  * Enums
@@ -638,6 +655,16 @@ export const BookingStatus: {
 
 export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
 
+
+export const LiveGameStatus: {
+  LOBBY: 'LOBBY',
+  QUESTION: 'QUESTION',
+  REVEAL: 'REVEAL',
+  FINISHED: 'FINISHED'
+};
+
+export type LiveGameStatus = (typeof LiveGameStatus)[keyof typeof LiveGameStatus]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -763,6 +790,10 @@ export const OfficeHourMode: typeof $Enums.OfficeHourMode
 export type BookingStatus = $Enums.BookingStatus
 
 export const BookingStatus: typeof $Enums.BookingStatus
+
+export type LiveGameStatus = $Enums.LiveGameStatus
+
+export const LiveGameStatus: typeof $Enums.LiveGameStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -1451,6 +1482,36 @@ export class PrismaClient<
     * ```
     */
   get waitlistEntry(): Prisma.WaitlistEntryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.liveGame`: Exposes CRUD operations for the **LiveGame** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more LiveGames
+    * const liveGames = await prisma.liveGame.findMany()
+    * ```
+    */
+  get liveGame(): Prisma.LiveGameDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.livePlayer`: Exposes CRUD operations for the **LivePlayer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more LivePlayers
+    * const livePlayers = await prisma.livePlayer.findMany()
+    * ```
+    */
+  get livePlayer(): Prisma.LivePlayerDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.liveAnswer`: Exposes CRUD operations for the **LiveAnswer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more LiveAnswers
+    * const liveAnswers = await prisma.liveAnswer.findMany()
+    * ```
+    */
+  get liveAnswer(): Prisma.LiveAnswerDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1948,7 +2009,10 @@ export namespace Prisma {
     CalendarEvent: 'CalendarEvent',
     OfficeHour: 'OfficeHour',
     OfficeHourBooking: 'OfficeHourBooking',
-    WaitlistEntry: 'WaitlistEntry'
+    WaitlistEntry: 'WaitlistEntry',
+    LiveGame: 'LiveGame',
+    LivePlayer: 'LivePlayer',
+    LiveAnswer: 'LiveAnswer'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1967,7 +2031,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6189,6 +6253,228 @@ export namespace Prisma {
           }
         }
       }
+      LiveGame: {
+        payload: Prisma.$LiveGamePayload<ExtArgs>
+        fields: Prisma.LiveGameFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.LiveGameFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.LiveGameFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          findFirst: {
+            args: Prisma.LiveGameFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.LiveGameFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          findMany: {
+            args: Prisma.LiveGameFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>[]
+          }
+          create: {
+            args: Prisma.LiveGameCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          createMany: {
+            args: Prisma.LiveGameCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.LiveGameCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>[]
+          }
+          delete: {
+            args: Prisma.LiveGameDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          update: {
+            args: Prisma.LiveGameUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          deleteMany: {
+            args: Prisma.LiveGameDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.LiveGameUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.LiveGameUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>[]
+          }
+          upsert: {
+            args: Prisma.LiveGameUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveGamePayload>
+          }
+          aggregate: {
+            args: Prisma.LiveGameAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLiveGame>
+          }
+          groupBy: {
+            args: Prisma.LiveGameGroupByArgs<ExtArgs>
+            result: $Utils.Optional<LiveGameGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.LiveGameCountArgs<ExtArgs>
+            result: $Utils.Optional<LiveGameCountAggregateOutputType> | number
+          }
+        }
+      }
+      LivePlayer: {
+        payload: Prisma.$LivePlayerPayload<ExtArgs>
+        fields: Prisma.LivePlayerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.LivePlayerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.LivePlayerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          findFirst: {
+            args: Prisma.LivePlayerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.LivePlayerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          findMany: {
+            args: Prisma.LivePlayerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>[]
+          }
+          create: {
+            args: Prisma.LivePlayerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          createMany: {
+            args: Prisma.LivePlayerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.LivePlayerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>[]
+          }
+          delete: {
+            args: Prisma.LivePlayerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          update: {
+            args: Prisma.LivePlayerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          deleteMany: {
+            args: Prisma.LivePlayerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.LivePlayerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.LivePlayerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>[]
+          }
+          upsert: {
+            args: Prisma.LivePlayerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LivePlayerPayload>
+          }
+          aggregate: {
+            args: Prisma.LivePlayerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLivePlayer>
+          }
+          groupBy: {
+            args: Prisma.LivePlayerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<LivePlayerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.LivePlayerCountArgs<ExtArgs>
+            result: $Utils.Optional<LivePlayerCountAggregateOutputType> | number
+          }
+        }
+      }
+      LiveAnswer: {
+        payload: Prisma.$LiveAnswerPayload<ExtArgs>
+        fields: Prisma.LiveAnswerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.LiveAnswerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.LiveAnswerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          findFirst: {
+            args: Prisma.LiveAnswerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.LiveAnswerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          findMany: {
+            args: Prisma.LiveAnswerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>[]
+          }
+          create: {
+            args: Prisma.LiveAnswerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          createMany: {
+            args: Prisma.LiveAnswerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.LiveAnswerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>[]
+          }
+          delete: {
+            args: Prisma.LiveAnswerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          update: {
+            args: Prisma.LiveAnswerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          deleteMany: {
+            args: Prisma.LiveAnswerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.LiveAnswerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.LiveAnswerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>[]
+          }
+          upsert: {
+            args: Prisma.LiveAnswerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LiveAnswerPayload>
+          }
+          aggregate: {
+            args: Prisma.LiveAnswerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLiveAnswer>
+          }
+          groupBy: {
+            args: Prisma.LiveAnswerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<LiveAnswerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.LiveAnswerCountArgs<ExtArgs>
+            result: $Utils.Optional<LiveAnswerCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6342,6 +6628,9 @@ export namespace Prisma {
     officeHour?: OfficeHourOmit
     officeHourBooking?: OfficeHourBookingOmit
     waitlistEntry?: WaitlistEntryOmit
+    liveGame?: LiveGameOmit
+    livePlayer?: LivePlayerOmit
+    liveAnswer?: LiveAnswerOmit
   }
 
   /* Types for Logging */
@@ -6573,6 +6862,7 @@ export namespace Prisma {
     officeHourSlots: number
     tutorAssignments: number
     tutoringGiven: number
+    livePlayers: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6588,6 +6878,7 @@ export namespace Prisma {
     officeHourSlots?: boolean | StudentProfileCountOutputTypeCountOfficeHourSlotsArgs
     tutorAssignments?: boolean | StudentProfileCountOutputTypeCountTutorAssignmentsArgs
     tutoringGiven?: boolean | StudentProfileCountOutputTypeCountTutoringGivenArgs
+    livePlayers?: boolean | StudentProfileCountOutputTypeCountLivePlayersArgs
   }
 
   // Custom InputTypes
@@ -6685,6 +6976,13 @@ export namespace Prisma {
     where?: PeerTutorAssignmentWhereInput
   }
 
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountLivePlayersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LivePlayerWhereInput
+  }
+
 
   /**
    * Count Type HomeroomCountOutputType
@@ -6724,11 +7022,13 @@ export namespace Prisma {
   export type TeacherProfileCountOutputType = {
     sections: number
     officeHours: number
+    liveGames: number
   }
 
   export type TeacherProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sections?: boolean | TeacherProfileCountOutputTypeCountSectionsArgs
     officeHours?: boolean | TeacherProfileCountOutputTypeCountOfficeHoursArgs
+    liveGames?: boolean | TeacherProfileCountOutputTypeCountLiveGamesArgs
   }
 
   // Custom InputTypes
@@ -6754,6 +7054,13 @@ export namespace Prisma {
    */
   export type TeacherProfileCountOutputTypeCountOfficeHoursArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OfficeHourWhereInput
+  }
+
+  /**
+   * TeacherProfileCountOutputType without action
+   */
+  export type TeacherProfileCountOutputTypeCountLiveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveGameWhereInput
   }
 
 
@@ -6915,6 +7222,7 @@ export namespace Prisma {
     pacing: number
     alerts: number
     tutorAssignments: number
+    liveGames: number
   }
 
   export type SectionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6929,6 +7237,7 @@ export namespace Prisma {
     pacing?: boolean | SectionCountOutputTypeCountPacingArgs
     alerts?: boolean | SectionCountOutputTypeCountAlertsArgs
     tutorAssignments?: boolean | SectionCountOutputTypeCountTutorAssignmentsArgs
+    liveGames?: boolean | SectionCountOutputTypeCountLiveGamesArgs
   }
 
   // Custom InputTypes
@@ -7017,6 +7326,13 @@ export namespace Prisma {
    */
   export type SectionCountOutputTypeCountTutorAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PeerTutorAssignmentWhereInput
+  }
+
+  /**
+   * SectionCountOutputType without action
+   */
+  export type SectionCountOutputTypeCountLiveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveGameWhereInput
   }
 
 
@@ -7475,11 +7791,13 @@ export namespace Prisma {
 
   export type AssessmentCountOutputType = {
     questions: number
+    liveGames: number
     attempts: number
   }
 
   export type AssessmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     questions?: boolean | AssessmentCountOutputTypeCountQuestionsArgs
+    liveGames?: boolean | AssessmentCountOutputTypeCountLiveGamesArgs
     attempts?: boolean | AssessmentCountOutputTypeCountAttemptsArgs
   }
 
@@ -7499,6 +7817,13 @@ export namespace Prisma {
    */
   export type AssessmentCountOutputTypeCountQuestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: QuestionWhereInput
+  }
+
+  /**
+   * AssessmentCountOutputType without action
+   */
+  export type AssessmentCountOutputTypeCountLiveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveGameWhereInput
   }
 
   /**
@@ -7781,6 +8106,77 @@ export namespace Prisma {
    */
   export type OfficeHourCountOutputTypeCountBookingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OfficeHourBookingWhereInput
+  }
+
+
+  /**
+   * Count Type LiveGameCountOutputType
+   */
+
+  export type LiveGameCountOutputType = {
+    players: number
+    answers: number
+  }
+
+  export type LiveGameCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    players?: boolean | LiveGameCountOutputTypeCountPlayersArgs
+    answers?: boolean | LiveGameCountOutputTypeCountAnswersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * LiveGameCountOutputType without action
+   */
+  export type LiveGameCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGameCountOutputType
+     */
+    select?: LiveGameCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * LiveGameCountOutputType without action
+   */
+  export type LiveGameCountOutputTypeCountPlayersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LivePlayerWhereInput
+  }
+
+  /**
+   * LiveGameCountOutputType without action
+   */
+  export type LiveGameCountOutputTypeCountAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveAnswerWhereInput
+  }
+
+
+  /**
+   * Count Type LivePlayerCountOutputType
+   */
+
+  export type LivePlayerCountOutputType = {
+    answers: number
+  }
+
+  export type LivePlayerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    answers?: boolean | LivePlayerCountOutputTypeCountAnswersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * LivePlayerCountOutputType without action
+   */
+  export type LivePlayerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayerCountOutputType
+     */
+    select?: LivePlayerCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * LivePlayerCountOutputType without action
+   */
+  export type LivePlayerCountOutputTypeCountAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveAnswerWhereInput
   }
 
 
@@ -12832,6 +13228,7 @@ export namespace Prisma {
     officeHourSlots?: boolean | StudentProfile$officeHourSlotsArgs<ExtArgs>
     tutorAssignments?: boolean | StudentProfile$tutorAssignmentsArgs<ExtArgs>
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
+    livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
@@ -12894,6 +13291,7 @@ export namespace Prisma {
     officeHourSlots?: boolean | StudentProfile$officeHourSlotsArgs<ExtArgs>
     tutorAssignments?: boolean | StudentProfile$tutorAssignmentsArgs<ExtArgs>
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
+    livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12922,6 +13320,7 @@ export namespace Prisma {
       officeHourSlots: Prisma.$OfficeHourBookingPayload<ExtArgs>[]
       tutorAssignments: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
       tutoringGiven: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
+      livePlayers: Prisma.$LivePlayerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13354,6 +13753,7 @@ export namespace Prisma {
     officeHourSlots<T extends StudentProfile$officeHourSlotsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$officeHourSlotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfficeHourBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tutorAssignments<T extends StudentProfile$tutorAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$tutorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tutoringGiven<T extends StudentProfile$tutoringGivenArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$tutoringGivenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    livePlayers<T extends StudentProfile$livePlayersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$livePlayersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14093,6 +14493,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PeerTutorAssignmentScalarFieldEnum | PeerTutorAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.livePlayers
+   */
+  export type StudentProfile$livePlayersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    where?: LivePlayerWhereInput
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    cursor?: LivePlayerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
   }
 
   /**
@@ -15381,6 +15805,7 @@ export namespace Prisma {
     department?: boolean | TeacherProfile$departmentArgs<ExtArgs>
     sections?: boolean | TeacherProfile$sectionsArgs<ExtArgs>
     officeHours?: boolean | TeacherProfile$officeHoursArgs<ExtArgs>
+    liveGames?: boolean | TeacherProfile$liveGamesArgs<ExtArgs>
     _count?: boolean | TeacherProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["teacherProfile"]>
 
@@ -15421,6 +15846,7 @@ export namespace Prisma {
     department?: boolean | TeacherProfile$departmentArgs<ExtArgs>
     sections?: boolean | TeacherProfile$sectionsArgs<ExtArgs>
     officeHours?: boolean | TeacherProfile$officeHoursArgs<ExtArgs>
+    liveGames?: boolean | TeacherProfile$liveGamesArgs<ExtArgs>
     _count?: boolean | TeacherProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TeacherProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15439,6 +15865,7 @@ export namespace Prisma {
       department: Prisma.$DepartmentPayload<ExtArgs> | null
       sections: Prisma.$SectionPayload<ExtArgs>[]
       officeHours: Prisma.$OfficeHourPayload<ExtArgs>[]
+      liveGames: Prisma.$LiveGamePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -15845,6 +16272,7 @@ export namespace Prisma {
     department<T extends TeacherProfile$departmentArgs<ExtArgs> = {}>(args?: Subset<T, TeacherProfile$departmentArgs<ExtArgs>>): Prisma__DepartmentClient<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     sections<T extends TeacherProfile$sectionsArgs<ExtArgs> = {}>(args?: Subset<T, TeacherProfile$sectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     officeHours<T extends TeacherProfile$officeHoursArgs<ExtArgs> = {}>(args?: Subset<T, TeacherProfile$officeHoursArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfficeHourPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    liveGames<T extends TeacherProfile$liveGamesArgs<ExtArgs> = {}>(args?: Subset<T, TeacherProfile$liveGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16340,6 +16768,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OfficeHourScalarFieldEnum | OfficeHourScalarFieldEnum[]
+  }
+
+  /**
+   * TeacherProfile.liveGames
+   */
+  export type TeacherProfile$liveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    where?: LiveGameWhereInput
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    cursor?: LiveGameWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
   }
 
   /**
@@ -23216,6 +23668,7 @@ export namespace Prisma {
     pacing?: boolean | Section$pacingArgs<ExtArgs>
     alerts?: boolean | Section$alertsArgs<ExtArgs>
     tutorAssignments?: boolean | Section$tutorAssignmentsArgs<ExtArgs>
+    liveGames?: boolean | Section$liveGamesArgs<ExtArgs>
     _count?: boolean | SectionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["section"]>
 
@@ -23277,6 +23730,7 @@ export namespace Prisma {
     pacing?: boolean | Section$pacingArgs<ExtArgs>
     alerts?: boolean | Section$alertsArgs<ExtArgs>
     tutorAssignments?: boolean | Section$tutorAssignmentsArgs<ExtArgs>
+    liveGames?: boolean | Section$liveGamesArgs<ExtArgs>
     _count?: boolean | SectionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SectionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -23307,6 +23761,7 @@ export namespace Prisma {
       pacing: Prisma.$SectionPacingPayload<ExtArgs>[]
       alerts: Prisma.$AlertPayload<ExtArgs>[]
       tutorAssignments: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
+      liveGames: Prisma.$LiveGamePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -23735,6 +24190,7 @@ export namespace Prisma {
     pacing<T extends Section$pacingArgs<ExtArgs> = {}>(args?: Subset<T, Section$pacingArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SectionPacingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     alerts<T extends Section$alertsArgs<ExtArgs> = {}>(args?: Subset<T, Section$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tutorAssignments<T extends Section$tutorAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Section$tutorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    liveGames<T extends Section$liveGamesArgs<ExtArgs> = {}>(args?: Subset<T, Section$liveGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -24430,6 +24886,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PeerTutorAssignmentScalarFieldEnum | PeerTutorAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * Section.liveGames
+   */
+  export type Section$liveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    where?: LiveGameWhereInput
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    cursor?: LiveGameWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
   }
 
   /**
@@ -49379,6 +49859,7 @@ export namespace Prisma {
     unit?: boolean | Assessment$unitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
     questions?: boolean | Assessment$questionsArgs<ExtArgs>
+    liveGames?: boolean | Assessment$liveGamesArgs<ExtArgs>
     attempts?: boolean | Assessment$attemptsArgs<ExtArgs>
     _count?: boolean | AssessmentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["assessment"]>
@@ -49461,6 +49942,7 @@ export namespace Prisma {
     unit?: boolean | Assessment$unitArgs<ExtArgs>
     assignment?: boolean | Assessment$assignmentArgs<ExtArgs>
     questions?: boolean | Assessment$questionsArgs<ExtArgs>
+    liveGames?: boolean | Assessment$liveGamesArgs<ExtArgs>
     attempts?: boolean | Assessment$attemptsArgs<ExtArgs>
     _count?: boolean | AssessmentCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -49482,6 +49964,7 @@ export namespace Prisma {
       unit: Prisma.$UnitPayload<ExtArgs> | null
       assignment: Prisma.$AssignmentPayload<ExtArgs> | null
       questions: Prisma.$QuestionPayload<ExtArgs>[]
+      liveGames: Prisma.$LiveGamePayload<ExtArgs>[]
       attempts: Prisma.$AssessmentAttemptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -49911,6 +50394,7 @@ export namespace Prisma {
     unit<T extends Assessment$unitArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$unitArgs<ExtArgs>>): Prisma__UnitClient<$Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     assignment<T extends Assessment$assignmentArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$assignmentArgs<ExtArgs>>): Prisma__AssignmentClient<$Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     questions<T extends Assessment$questionsArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    liveGames<T extends Assessment$liveGamesArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$liveGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attempts<T extends Assessment$attemptsArgs<ExtArgs> = {}>(args?: Subset<T, Assessment$attemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AssessmentAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -50415,6 +50899,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: QuestionScalarFieldEnum | QuestionScalarFieldEnum[]
+  }
+
+  /**
+   * Assessment.liveGames
+   */
+  export type Assessment$liveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    where?: LiveGameWhereInput
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    cursor?: LiveGameWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
   }
 
   /**
@@ -74233,6 +74741,3561 @@ export namespace Prisma {
 
 
   /**
+   * Model LiveGame
+   */
+
+  export type AggregateLiveGame = {
+    _count: LiveGameCountAggregateOutputType | null
+    _avg: LiveGameAvgAggregateOutputType | null
+    _sum: LiveGameSumAggregateOutputType | null
+    _min: LiveGameMinAggregateOutputType | null
+    _max: LiveGameMaxAggregateOutputType | null
+  }
+
+  export type LiveGameAvgAggregateOutputType = {
+    currentIndex: number | null
+    secondsPerQuestion: number | null
+  }
+
+  export type LiveGameSumAggregateOutputType = {
+    currentIndex: number | null
+    secondsPerQuestion: number | null
+  }
+
+  export type LiveGameMinAggregateOutputType = {
+    id: string | null
+    sectionId: string | null
+    hostId: string | null
+    assessmentId: string | null
+    status: $Enums.LiveGameStatus | null
+    currentIndex: number | null
+    questionStartedAt: Date | null
+    secondsPerQuestion: number | null
+    teamMode: boolean | null
+    createdAt: Date | null
+    finishedAt: Date | null
+  }
+
+  export type LiveGameMaxAggregateOutputType = {
+    id: string | null
+    sectionId: string | null
+    hostId: string | null
+    assessmentId: string | null
+    status: $Enums.LiveGameStatus | null
+    currentIndex: number | null
+    questionStartedAt: Date | null
+    secondsPerQuestion: number | null
+    teamMode: boolean | null
+    createdAt: Date | null
+    finishedAt: Date | null
+  }
+
+  export type LiveGameCountAggregateOutputType = {
+    id: number
+    sectionId: number
+    hostId: number
+    assessmentId: number
+    status: number
+    questionIds: number
+    currentIndex: number
+    questionStartedAt: number
+    secondsPerQuestion: number
+    teamMode: number
+    createdAt: number
+    finishedAt: number
+    _all: number
+  }
+
+
+  export type LiveGameAvgAggregateInputType = {
+    currentIndex?: true
+    secondsPerQuestion?: true
+  }
+
+  export type LiveGameSumAggregateInputType = {
+    currentIndex?: true
+    secondsPerQuestion?: true
+  }
+
+  export type LiveGameMinAggregateInputType = {
+    id?: true
+    sectionId?: true
+    hostId?: true
+    assessmentId?: true
+    status?: true
+    currentIndex?: true
+    questionStartedAt?: true
+    secondsPerQuestion?: true
+    teamMode?: true
+    createdAt?: true
+    finishedAt?: true
+  }
+
+  export type LiveGameMaxAggregateInputType = {
+    id?: true
+    sectionId?: true
+    hostId?: true
+    assessmentId?: true
+    status?: true
+    currentIndex?: true
+    questionStartedAt?: true
+    secondsPerQuestion?: true
+    teamMode?: true
+    createdAt?: true
+    finishedAt?: true
+  }
+
+  export type LiveGameCountAggregateInputType = {
+    id?: true
+    sectionId?: true
+    hostId?: true
+    assessmentId?: true
+    status?: true
+    questionIds?: true
+    currentIndex?: true
+    questionStartedAt?: true
+    secondsPerQuestion?: true
+    teamMode?: true
+    createdAt?: true
+    finishedAt?: true
+    _all?: true
+  }
+
+  export type LiveGameAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LiveGame to aggregate.
+     */
+    where?: LiveGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveGames to fetch.
+     */
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: LiveGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned LiveGames
+    **/
+    _count?: true | LiveGameCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: LiveGameAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: LiveGameSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: LiveGameMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: LiveGameMaxAggregateInputType
+  }
+
+  export type GetLiveGameAggregateType<T extends LiveGameAggregateArgs> = {
+        [P in keyof T & keyof AggregateLiveGame]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLiveGame[P]>
+      : GetScalarType<T[P], AggregateLiveGame[P]>
+  }
+
+
+
+
+  export type LiveGameGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveGameWhereInput
+    orderBy?: LiveGameOrderByWithAggregationInput | LiveGameOrderByWithAggregationInput[]
+    by: LiveGameScalarFieldEnum[] | LiveGameScalarFieldEnum
+    having?: LiveGameScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: LiveGameCountAggregateInputType | true
+    _avg?: LiveGameAvgAggregateInputType
+    _sum?: LiveGameSumAggregateInputType
+    _min?: LiveGameMinAggregateInputType
+    _max?: LiveGameMaxAggregateInputType
+  }
+
+  export type LiveGameGroupByOutputType = {
+    id: string
+    sectionId: string
+    hostId: string
+    assessmentId: string
+    status: $Enums.LiveGameStatus
+    questionIds: string[]
+    currentIndex: number
+    questionStartedAt: Date | null
+    secondsPerQuestion: number
+    teamMode: boolean
+    createdAt: Date
+    finishedAt: Date | null
+    _count: LiveGameCountAggregateOutputType | null
+    _avg: LiveGameAvgAggregateOutputType | null
+    _sum: LiveGameSumAggregateOutputType | null
+    _min: LiveGameMinAggregateOutputType | null
+    _max: LiveGameMaxAggregateOutputType | null
+  }
+
+  type GetLiveGameGroupByPayload<T extends LiveGameGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<LiveGameGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof LiveGameGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], LiveGameGroupByOutputType[P]>
+            : GetScalarType<T[P], LiveGameGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type LiveGameSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    hostId?: boolean
+    assessmentId?: boolean
+    status?: boolean
+    questionIds?: boolean
+    currentIndex?: boolean
+    questionStartedAt?: boolean
+    secondsPerQuestion?: boolean
+    teamMode?: boolean
+    createdAt?: boolean
+    finishedAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+    players?: boolean | LiveGame$playersArgs<ExtArgs>
+    answers?: boolean | LiveGame$answersArgs<ExtArgs>
+    _count?: boolean | LiveGameCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveGame"]>
+
+  export type LiveGameSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    hostId?: boolean
+    assessmentId?: boolean
+    status?: boolean
+    questionIds?: boolean
+    currentIndex?: boolean
+    questionStartedAt?: boolean
+    secondsPerQuestion?: boolean
+    teamMode?: boolean
+    createdAt?: boolean
+    finishedAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveGame"]>
+
+  export type LiveGameSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    hostId?: boolean
+    assessmentId?: boolean
+    status?: boolean
+    questionIds?: boolean
+    currentIndex?: boolean
+    questionStartedAt?: boolean
+    secondsPerQuestion?: boolean
+    teamMode?: boolean
+    createdAt?: boolean
+    finishedAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveGame"]>
+
+  export type LiveGameSelectScalar = {
+    id?: boolean
+    sectionId?: boolean
+    hostId?: boolean
+    assessmentId?: boolean
+    status?: boolean
+    questionIds?: boolean
+    currentIndex?: boolean
+    questionStartedAt?: boolean
+    secondsPerQuestion?: boolean
+    teamMode?: boolean
+    createdAt?: boolean
+    finishedAt?: boolean
+  }
+
+  export type LiveGameOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sectionId" | "hostId" | "assessmentId" | "status" | "questionIds" | "currentIndex" | "questionStartedAt" | "secondsPerQuestion" | "teamMode" | "createdAt" | "finishedAt", ExtArgs["result"]["liveGame"]>
+  export type LiveGameInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+    players?: boolean | LiveGame$playersArgs<ExtArgs>
+    answers?: boolean | LiveGame$answersArgs<ExtArgs>
+    _count?: boolean | LiveGameCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type LiveGameIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+  }
+  export type LiveGameIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    host?: boolean | TeacherProfileDefaultArgs<ExtArgs>
+    assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
+  }
+
+  export type $LiveGamePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "LiveGame"
+    objects: {
+      section: Prisma.$SectionPayload<ExtArgs>
+      host: Prisma.$TeacherProfilePayload<ExtArgs>
+      assessment: Prisma.$AssessmentPayload<ExtArgs>
+      players: Prisma.$LivePlayerPayload<ExtArgs>[]
+      answers: Prisma.$LiveAnswerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sectionId: string
+      hostId: string
+      assessmentId: string
+      status: $Enums.LiveGameStatus
+      /**
+       * The questions in play, in order.
+       */
+      questionIds: string[]
+      /**
+       * Index into questionIds of the current question (-1 in the lobby).
+       */
+      currentIndex: number
+      questionStartedAt: Date | null
+      secondsPerQuestion: number
+      /**
+       * Team A vs Team B instead of everyone for themselves.
+       */
+      teamMode: boolean
+      createdAt: Date
+      finishedAt: Date | null
+    }, ExtArgs["result"]["liveGame"]>
+    composites: {}
+  }
+
+  type LiveGameGetPayload<S extends boolean | null | undefined | LiveGameDefaultArgs> = $Result.GetResult<Prisma.$LiveGamePayload, S>
+
+  type LiveGameCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<LiveGameFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: LiveGameCountAggregateInputType | true
+    }
+
+  export interface LiveGameDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['LiveGame'], meta: { name: 'LiveGame' } }
+    /**
+     * Find zero or one LiveGame that matches the filter.
+     * @param {LiveGameFindUniqueArgs} args - Arguments to find a LiveGame
+     * @example
+     * // Get one LiveGame
+     * const liveGame = await prisma.liveGame.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LiveGameFindUniqueArgs>(args: SelectSubset<T, LiveGameFindUniqueArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one LiveGame that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LiveGameFindUniqueOrThrowArgs} args - Arguments to find a LiveGame
+     * @example
+     * // Get one LiveGame
+     * const liveGame = await prisma.liveGame.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LiveGameFindUniqueOrThrowArgs>(args: SelectSubset<T, LiveGameFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LiveGame that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameFindFirstArgs} args - Arguments to find a LiveGame
+     * @example
+     * // Get one LiveGame
+     * const liveGame = await prisma.liveGame.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LiveGameFindFirstArgs>(args?: SelectSubset<T, LiveGameFindFirstArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LiveGame that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameFindFirstOrThrowArgs} args - Arguments to find a LiveGame
+     * @example
+     * // Get one LiveGame
+     * const liveGame = await prisma.liveGame.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LiveGameFindFirstOrThrowArgs>(args?: SelectSubset<T, LiveGameFindFirstOrThrowArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more LiveGames that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all LiveGames
+     * const liveGames = await prisma.liveGame.findMany()
+     * 
+     * // Get first 10 LiveGames
+     * const liveGames = await prisma.liveGame.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const liveGameWithIdOnly = await prisma.liveGame.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends LiveGameFindManyArgs>(args?: SelectSubset<T, LiveGameFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a LiveGame.
+     * @param {LiveGameCreateArgs} args - Arguments to create a LiveGame.
+     * @example
+     * // Create one LiveGame
+     * const LiveGame = await prisma.liveGame.create({
+     *   data: {
+     *     // ... data to create a LiveGame
+     *   }
+     * })
+     * 
+     */
+    create<T extends LiveGameCreateArgs>(args: SelectSubset<T, LiveGameCreateArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many LiveGames.
+     * @param {LiveGameCreateManyArgs} args - Arguments to create many LiveGames.
+     * @example
+     * // Create many LiveGames
+     * const liveGame = await prisma.liveGame.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends LiveGameCreateManyArgs>(args?: SelectSubset<T, LiveGameCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many LiveGames and returns the data saved in the database.
+     * @param {LiveGameCreateManyAndReturnArgs} args - Arguments to create many LiveGames.
+     * @example
+     * // Create many LiveGames
+     * const liveGame = await prisma.liveGame.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many LiveGames and only return the `id`
+     * const liveGameWithIdOnly = await prisma.liveGame.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends LiveGameCreateManyAndReturnArgs>(args?: SelectSubset<T, LiveGameCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a LiveGame.
+     * @param {LiveGameDeleteArgs} args - Arguments to delete one LiveGame.
+     * @example
+     * // Delete one LiveGame
+     * const LiveGame = await prisma.liveGame.delete({
+     *   where: {
+     *     // ... filter to delete one LiveGame
+     *   }
+     * })
+     * 
+     */
+    delete<T extends LiveGameDeleteArgs>(args: SelectSubset<T, LiveGameDeleteArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one LiveGame.
+     * @param {LiveGameUpdateArgs} args - Arguments to update one LiveGame.
+     * @example
+     * // Update one LiveGame
+     * const liveGame = await prisma.liveGame.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends LiveGameUpdateArgs>(args: SelectSubset<T, LiveGameUpdateArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more LiveGames.
+     * @param {LiveGameDeleteManyArgs} args - Arguments to filter LiveGames to delete.
+     * @example
+     * // Delete a few LiveGames
+     * const { count } = await prisma.liveGame.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends LiveGameDeleteManyArgs>(args?: SelectSubset<T, LiveGameDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LiveGames.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many LiveGames
+     * const liveGame = await prisma.liveGame.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends LiveGameUpdateManyArgs>(args: SelectSubset<T, LiveGameUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LiveGames and returns the data updated in the database.
+     * @param {LiveGameUpdateManyAndReturnArgs} args - Arguments to update many LiveGames.
+     * @example
+     * // Update many LiveGames
+     * const liveGame = await prisma.liveGame.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more LiveGames and only return the `id`
+     * const liveGameWithIdOnly = await prisma.liveGame.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends LiveGameUpdateManyAndReturnArgs>(args: SelectSubset<T, LiveGameUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one LiveGame.
+     * @param {LiveGameUpsertArgs} args - Arguments to update or create a LiveGame.
+     * @example
+     * // Update or create a LiveGame
+     * const liveGame = await prisma.liveGame.upsert({
+     *   create: {
+     *     // ... data to create a LiveGame
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the LiveGame we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LiveGameUpsertArgs>(args: SelectSubset<T, LiveGameUpsertArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of LiveGames.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameCountArgs} args - Arguments to filter LiveGames to count.
+     * @example
+     * // Count the number of LiveGames
+     * const count = await prisma.liveGame.count({
+     *   where: {
+     *     // ... the filter for the LiveGames we want to count
+     *   }
+     * })
+    **/
+    count<T extends LiveGameCountArgs>(
+      args?: Subset<T, LiveGameCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], LiveGameCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a LiveGame.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LiveGameAggregateArgs>(args: Subset<T, LiveGameAggregateArgs>): Prisma.PrismaPromise<GetLiveGameAggregateType<T>>
+
+    /**
+     * Group by LiveGame.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveGameGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LiveGameGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LiveGameGroupByArgs['orderBy'] }
+        : { orderBy?: LiveGameGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LiveGameGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLiveGameGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the LiveGame model
+   */
+  readonly fields: LiveGameFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for LiveGame.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__LiveGameClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    section<T extends SectionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SectionDefaultArgs<ExtArgs>>): Prisma__SectionClient<$Result.GetResult<Prisma.$SectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    host<T extends TeacherProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TeacherProfileDefaultArgs<ExtArgs>>): Prisma__TeacherProfileClient<$Result.GetResult<Prisma.$TeacherProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    assessment<T extends AssessmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AssessmentDefaultArgs<ExtArgs>>): Prisma__AssessmentClient<$Result.GetResult<Prisma.$AssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    players<T extends LiveGame$playersArgs<ExtArgs> = {}>(args?: Subset<T, LiveGame$playersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    answers<T extends LiveGame$answersArgs<ExtArgs> = {}>(args?: Subset<T, LiveGame$answersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the LiveGame model
+   */
+  interface LiveGameFieldRefs {
+    readonly id: FieldRef<"LiveGame", 'String'>
+    readonly sectionId: FieldRef<"LiveGame", 'String'>
+    readonly hostId: FieldRef<"LiveGame", 'String'>
+    readonly assessmentId: FieldRef<"LiveGame", 'String'>
+    readonly status: FieldRef<"LiveGame", 'LiveGameStatus'>
+    readonly questionIds: FieldRef<"LiveGame", 'String[]'>
+    readonly currentIndex: FieldRef<"LiveGame", 'Int'>
+    readonly questionStartedAt: FieldRef<"LiveGame", 'DateTime'>
+    readonly secondsPerQuestion: FieldRef<"LiveGame", 'Int'>
+    readonly teamMode: FieldRef<"LiveGame", 'Boolean'>
+    readonly createdAt: FieldRef<"LiveGame", 'DateTime'>
+    readonly finishedAt: FieldRef<"LiveGame", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * LiveGame findUnique
+   */
+  export type LiveGameFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveGame to fetch.
+     */
+    where: LiveGameWhereUniqueInput
+  }
+
+  /**
+   * LiveGame findUniqueOrThrow
+   */
+  export type LiveGameFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveGame to fetch.
+     */
+    where: LiveGameWhereUniqueInput
+  }
+
+  /**
+   * LiveGame findFirst
+   */
+  export type LiveGameFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveGame to fetch.
+     */
+    where?: LiveGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveGames to fetch.
+     */
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LiveGames.
+     */
+    cursor?: LiveGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LiveGames.
+     */
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
+  }
+
+  /**
+   * LiveGame findFirstOrThrow
+   */
+  export type LiveGameFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveGame to fetch.
+     */
+    where?: LiveGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveGames to fetch.
+     */
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LiveGames.
+     */
+    cursor?: LiveGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveGames.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LiveGames.
+     */
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
+  }
+
+  /**
+   * LiveGame findMany
+   */
+  export type LiveGameFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveGames to fetch.
+     */
+    where?: LiveGameWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveGames to fetch.
+     */
+    orderBy?: LiveGameOrderByWithRelationInput | LiveGameOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing LiveGames.
+     */
+    cursor?: LiveGameWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveGames from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveGames.
+     */
+    skip?: number
+    distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
+  }
+
+  /**
+   * LiveGame create
+   */
+  export type LiveGameCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * The data needed to create a LiveGame.
+     */
+    data: XOR<LiveGameCreateInput, LiveGameUncheckedCreateInput>
+  }
+
+  /**
+   * LiveGame createMany
+   */
+  export type LiveGameCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many LiveGames.
+     */
+    data: LiveGameCreateManyInput | LiveGameCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * LiveGame createManyAndReturn
+   */
+  export type LiveGameCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * The data used to create many LiveGames.
+     */
+    data: LiveGameCreateManyInput | LiveGameCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LiveGame update
+   */
+  export type LiveGameUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * The data needed to update a LiveGame.
+     */
+    data: XOR<LiveGameUpdateInput, LiveGameUncheckedUpdateInput>
+    /**
+     * Choose, which LiveGame to update.
+     */
+    where: LiveGameWhereUniqueInput
+  }
+
+  /**
+   * LiveGame updateMany
+   */
+  export type LiveGameUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update LiveGames.
+     */
+    data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyInput>
+    /**
+     * Filter which LiveGames to update
+     */
+    where?: LiveGameWhereInput
+    /**
+     * Limit how many LiveGames to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * LiveGame updateManyAndReturn
+   */
+  export type LiveGameUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * The data used to update LiveGames.
+     */
+    data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyInput>
+    /**
+     * Filter which LiveGames to update
+     */
+    where?: LiveGameWhereInput
+    /**
+     * Limit how many LiveGames to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LiveGame upsert
+   */
+  export type LiveGameUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * The filter to search for the LiveGame to update in case it exists.
+     */
+    where: LiveGameWhereUniqueInput
+    /**
+     * In case the LiveGame found by the `where` argument doesn't exist, create a new LiveGame with this data.
+     */
+    create: XOR<LiveGameCreateInput, LiveGameUncheckedCreateInput>
+    /**
+     * In case the LiveGame was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<LiveGameUpdateInput, LiveGameUncheckedUpdateInput>
+  }
+
+  /**
+   * LiveGame delete
+   */
+  export type LiveGameDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+    /**
+     * Filter which LiveGame to delete.
+     */
+    where: LiveGameWhereUniqueInput
+  }
+
+  /**
+   * LiveGame deleteMany
+   */
+  export type LiveGameDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LiveGames to delete
+     */
+    where?: LiveGameWhereInput
+    /**
+     * Limit how many LiveGames to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * LiveGame.players
+   */
+  export type LiveGame$playersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    where?: LivePlayerWhereInput
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    cursor?: LivePlayerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
+  }
+
+  /**
+   * LiveGame.answers
+   */
+  export type LiveGame$answersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    where?: LiveAnswerWhereInput
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    cursor?: LiveAnswerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LiveAnswerScalarFieldEnum | LiveAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * LiveGame without action
+   */
+  export type LiveGameDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveGame
+     */
+    select?: LiveGameSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveGame
+     */
+    omit?: LiveGameOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveGameInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model LivePlayer
+   */
+
+  export type AggregateLivePlayer = {
+    _count: LivePlayerCountAggregateOutputType | null
+    _avg: LivePlayerAvgAggregateOutputType | null
+    _sum: LivePlayerSumAggregateOutputType | null
+    _min: LivePlayerMinAggregateOutputType | null
+    _max: LivePlayerMaxAggregateOutputType | null
+  }
+
+  export type LivePlayerAvgAggregateOutputType = {
+    team: number | null
+    score: number | null
+  }
+
+  export type LivePlayerSumAggregateOutputType = {
+    team: number | null
+    score: number | null
+  }
+
+  export type LivePlayerMinAggregateOutputType = {
+    id: string | null
+    gameId: string | null
+    studentId: string | null
+    team: number | null
+    score: number | null
+    joinedAt: Date | null
+  }
+
+  export type LivePlayerMaxAggregateOutputType = {
+    id: string | null
+    gameId: string | null
+    studentId: string | null
+    team: number | null
+    score: number | null
+    joinedAt: Date | null
+  }
+
+  export type LivePlayerCountAggregateOutputType = {
+    id: number
+    gameId: number
+    studentId: number
+    team: number
+    score: number
+    joinedAt: number
+    _all: number
+  }
+
+
+  export type LivePlayerAvgAggregateInputType = {
+    team?: true
+    score?: true
+  }
+
+  export type LivePlayerSumAggregateInputType = {
+    team?: true
+    score?: true
+  }
+
+  export type LivePlayerMinAggregateInputType = {
+    id?: true
+    gameId?: true
+    studentId?: true
+    team?: true
+    score?: true
+    joinedAt?: true
+  }
+
+  export type LivePlayerMaxAggregateInputType = {
+    id?: true
+    gameId?: true
+    studentId?: true
+    team?: true
+    score?: true
+    joinedAt?: true
+  }
+
+  export type LivePlayerCountAggregateInputType = {
+    id?: true
+    gameId?: true
+    studentId?: true
+    team?: true
+    score?: true
+    joinedAt?: true
+    _all?: true
+  }
+
+  export type LivePlayerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LivePlayer to aggregate.
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LivePlayers to fetch.
+     */
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: LivePlayerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LivePlayers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LivePlayers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned LivePlayers
+    **/
+    _count?: true | LivePlayerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: LivePlayerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: LivePlayerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: LivePlayerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: LivePlayerMaxAggregateInputType
+  }
+
+  export type GetLivePlayerAggregateType<T extends LivePlayerAggregateArgs> = {
+        [P in keyof T & keyof AggregateLivePlayer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLivePlayer[P]>
+      : GetScalarType<T[P], AggregateLivePlayer[P]>
+  }
+
+
+
+
+  export type LivePlayerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LivePlayerWhereInput
+    orderBy?: LivePlayerOrderByWithAggregationInput | LivePlayerOrderByWithAggregationInput[]
+    by: LivePlayerScalarFieldEnum[] | LivePlayerScalarFieldEnum
+    having?: LivePlayerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: LivePlayerCountAggregateInputType | true
+    _avg?: LivePlayerAvgAggregateInputType
+    _sum?: LivePlayerSumAggregateInputType
+    _min?: LivePlayerMinAggregateInputType
+    _max?: LivePlayerMaxAggregateInputType
+  }
+
+  export type LivePlayerGroupByOutputType = {
+    id: string
+    gameId: string
+    studentId: string
+    team: number | null
+    score: number
+    joinedAt: Date
+    _count: LivePlayerCountAggregateOutputType | null
+    _avg: LivePlayerAvgAggregateOutputType | null
+    _sum: LivePlayerSumAggregateOutputType | null
+    _min: LivePlayerMinAggregateOutputType | null
+    _max: LivePlayerMaxAggregateOutputType | null
+  }
+
+  type GetLivePlayerGroupByPayload<T extends LivePlayerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<LivePlayerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof LivePlayerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], LivePlayerGroupByOutputType[P]>
+            : GetScalarType<T[P], LivePlayerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type LivePlayerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    studentId?: boolean
+    team?: boolean
+    score?: boolean
+    joinedAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    answers?: boolean | LivePlayer$answersArgs<ExtArgs>
+    _count?: boolean | LivePlayerCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["livePlayer"]>
+
+  export type LivePlayerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    studentId?: boolean
+    team?: boolean
+    score?: boolean
+    joinedAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["livePlayer"]>
+
+  export type LivePlayerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    studentId?: boolean
+    team?: boolean
+    score?: boolean
+    joinedAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["livePlayer"]>
+
+  export type LivePlayerSelectScalar = {
+    id?: boolean
+    gameId?: boolean
+    studentId?: boolean
+    team?: boolean
+    score?: boolean
+    joinedAt?: boolean
+  }
+
+  export type LivePlayerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gameId" | "studentId" | "team" | "score" | "joinedAt", ExtArgs["result"]["livePlayer"]>
+  export type LivePlayerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    answers?: boolean | LivePlayer$answersArgs<ExtArgs>
+    _count?: boolean | LivePlayerCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type LivePlayerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+  export type LivePlayerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+
+  export type $LivePlayerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "LivePlayer"
+    objects: {
+      game: Prisma.$LiveGamePayload<ExtArgs>
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+      answers: Prisma.$LiveAnswerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      gameId: string
+      studentId: string
+      /**
+       * 0 = Team A, 1 = Team B (team mode only).
+       */
+      team: number | null
+      score: number
+      joinedAt: Date
+    }, ExtArgs["result"]["livePlayer"]>
+    composites: {}
+  }
+
+  type LivePlayerGetPayload<S extends boolean | null | undefined | LivePlayerDefaultArgs> = $Result.GetResult<Prisma.$LivePlayerPayload, S>
+
+  type LivePlayerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<LivePlayerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: LivePlayerCountAggregateInputType | true
+    }
+
+  export interface LivePlayerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['LivePlayer'], meta: { name: 'LivePlayer' } }
+    /**
+     * Find zero or one LivePlayer that matches the filter.
+     * @param {LivePlayerFindUniqueArgs} args - Arguments to find a LivePlayer
+     * @example
+     * // Get one LivePlayer
+     * const livePlayer = await prisma.livePlayer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LivePlayerFindUniqueArgs>(args: SelectSubset<T, LivePlayerFindUniqueArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one LivePlayer that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LivePlayerFindUniqueOrThrowArgs} args - Arguments to find a LivePlayer
+     * @example
+     * // Get one LivePlayer
+     * const livePlayer = await prisma.livePlayer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LivePlayerFindUniqueOrThrowArgs>(args: SelectSubset<T, LivePlayerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LivePlayer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerFindFirstArgs} args - Arguments to find a LivePlayer
+     * @example
+     * // Get one LivePlayer
+     * const livePlayer = await prisma.livePlayer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LivePlayerFindFirstArgs>(args?: SelectSubset<T, LivePlayerFindFirstArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LivePlayer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerFindFirstOrThrowArgs} args - Arguments to find a LivePlayer
+     * @example
+     * // Get one LivePlayer
+     * const livePlayer = await prisma.livePlayer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LivePlayerFindFirstOrThrowArgs>(args?: SelectSubset<T, LivePlayerFindFirstOrThrowArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more LivePlayers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all LivePlayers
+     * const livePlayers = await prisma.livePlayer.findMany()
+     * 
+     * // Get first 10 LivePlayers
+     * const livePlayers = await prisma.livePlayer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const livePlayerWithIdOnly = await prisma.livePlayer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends LivePlayerFindManyArgs>(args?: SelectSubset<T, LivePlayerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a LivePlayer.
+     * @param {LivePlayerCreateArgs} args - Arguments to create a LivePlayer.
+     * @example
+     * // Create one LivePlayer
+     * const LivePlayer = await prisma.livePlayer.create({
+     *   data: {
+     *     // ... data to create a LivePlayer
+     *   }
+     * })
+     * 
+     */
+    create<T extends LivePlayerCreateArgs>(args: SelectSubset<T, LivePlayerCreateArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many LivePlayers.
+     * @param {LivePlayerCreateManyArgs} args - Arguments to create many LivePlayers.
+     * @example
+     * // Create many LivePlayers
+     * const livePlayer = await prisma.livePlayer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends LivePlayerCreateManyArgs>(args?: SelectSubset<T, LivePlayerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many LivePlayers and returns the data saved in the database.
+     * @param {LivePlayerCreateManyAndReturnArgs} args - Arguments to create many LivePlayers.
+     * @example
+     * // Create many LivePlayers
+     * const livePlayer = await prisma.livePlayer.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many LivePlayers and only return the `id`
+     * const livePlayerWithIdOnly = await prisma.livePlayer.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends LivePlayerCreateManyAndReturnArgs>(args?: SelectSubset<T, LivePlayerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a LivePlayer.
+     * @param {LivePlayerDeleteArgs} args - Arguments to delete one LivePlayer.
+     * @example
+     * // Delete one LivePlayer
+     * const LivePlayer = await prisma.livePlayer.delete({
+     *   where: {
+     *     // ... filter to delete one LivePlayer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends LivePlayerDeleteArgs>(args: SelectSubset<T, LivePlayerDeleteArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one LivePlayer.
+     * @param {LivePlayerUpdateArgs} args - Arguments to update one LivePlayer.
+     * @example
+     * // Update one LivePlayer
+     * const livePlayer = await prisma.livePlayer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends LivePlayerUpdateArgs>(args: SelectSubset<T, LivePlayerUpdateArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more LivePlayers.
+     * @param {LivePlayerDeleteManyArgs} args - Arguments to filter LivePlayers to delete.
+     * @example
+     * // Delete a few LivePlayers
+     * const { count } = await prisma.livePlayer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends LivePlayerDeleteManyArgs>(args?: SelectSubset<T, LivePlayerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LivePlayers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many LivePlayers
+     * const livePlayer = await prisma.livePlayer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends LivePlayerUpdateManyArgs>(args: SelectSubset<T, LivePlayerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LivePlayers and returns the data updated in the database.
+     * @param {LivePlayerUpdateManyAndReturnArgs} args - Arguments to update many LivePlayers.
+     * @example
+     * // Update many LivePlayers
+     * const livePlayer = await prisma.livePlayer.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more LivePlayers and only return the `id`
+     * const livePlayerWithIdOnly = await prisma.livePlayer.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends LivePlayerUpdateManyAndReturnArgs>(args: SelectSubset<T, LivePlayerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one LivePlayer.
+     * @param {LivePlayerUpsertArgs} args - Arguments to update or create a LivePlayer.
+     * @example
+     * // Update or create a LivePlayer
+     * const livePlayer = await prisma.livePlayer.upsert({
+     *   create: {
+     *     // ... data to create a LivePlayer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the LivePlayer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LivePlayerUpsertArgs>(args: SelectSubset<T, LivePlayerUpsertArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of LivePlayers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerCountArgs} args - Arguments to filter LivePlayers to count.
+     * @example
+     * // Count the number of LivePlayers
+     * const count = await prisma.livePlayer.count({
+     *   where: {
+     *     // ... the filter for the LivePlayers we want to count
+     *   }
+     * })
+    **/
+    count<T extends LivePlayerCountArgs>(
+      args?: Subset<T, LivePlayerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], LivePlayerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a LivePlayer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LivePlayerAggregateArgs>(args: Subset<T, LivePlayerAggregateArgs>): Prisma.PrismaPromise<GetLivePlayerAggregateType<T>>
+
+    /**
+     * Group by LivePlayer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LivePlayerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LivePlayerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LivePlayerGroupByArgs['orderBy'] }
+        : { orderBy?: LivePlayerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LivePlayerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLivePlayerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the LivePlayer model
+   */
+  readonly fields: LivePlayerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for LivePlayer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__LivePlayerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    game<T extends LiveGameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, LiveGameDefaultArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    answers<T extends LivePlayer$answersArgs<ExtArgs> = {}>(args?: Subset<T, LivePlayer$answersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the LivePlayer model
+   */
+  interface LivePlayerFieldRefs {
+    readonly id: FieldRef<"LivePlayer", 'String'>
+    readonly gameId: FieldRef<"LivePlayer", 'String'>
+    readonly studentId: FieldRef<"LivePlayer", 'String'>
+    readonly team: FieldRef<"LivePlayer", 'Int'>
+    readonly score: FieldRef<"LivePlayer", 'Int'>
+    readonly joinedAt: FieldRef<"LivePlayer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * LivePlayer findUnique
+   */
+  export type LivePlayerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter, which LivePlayer to fetch.
+     */
+    where: LivePlayerWhereUniqueInput
+  }
+
+  /**
+   * LivePlayer findUniqueOrThrow
+   */
+  export type LivePlayerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter, which LivePlayer to fetch.
+     */
+    where: LivePlayerWhereUniqueInput
+  }
+
+  /**
+   * LivePlayer findFirst
+   */
+  export type LivePlayerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter, which LivePlayer to fetch.
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LivePlayers to fetch.
+     */
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LivePlayers.
+     */
+    cursor?: LivePlayerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LivePlayers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LivePlayers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LivePlayers.
+     */
+    distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
+  }
+
+  /**
+   * LivePlayer findFirstOrThrow
+   */
+  export type LivePlayerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter, which LivePlayer to fetch.
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LivePlayers to fetch.
+     */
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LivePlayers.
+     */
+    cursor?: LivePlayerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LivePlayers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LivePlayers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LivePlayers.
+     */
+    distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
+  }
+
+  /**
+   * LivePlayer findMany
+   */
+  export type LivePlayerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter, which LivePlayers to fetch.
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LivePlayers to fetch.
+     */
+    orderBy?: LivePlayerOrderByWithRelationInput | LivePlayerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing LivePlayers.
+     */
+    cursor?: LivePlayerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LivePlayers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LivePlayers.
+     */
+    skip?: number
+    distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
+  }
+
+  /**
+   * LivePlayer create
+   */
+  export type LivePlayerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a LivePlayer.
+     */
+    data: XOR<LivePlayerCreateInput, LivePlayerUncheckedCreateInput>
+  }
+
+  /**
+   * LivePlayer createMany
+   */
+  export type LivePlayerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many LivePlayers.
+     */
+    data: LivePlayerCreateManyInput | LivePlayerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * LivePlayer createManyAndReturn
+   */
+  export type LivePlayerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * The data used to create many LivePlayers.
+     */
+    data: LivePlayerCreateManyInput | LivePlayerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LivePlayer update
+   */
+  export type LivePlayerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a LivePlayer.
+     */
+    data: XOR<LivePlayerUpdateInput, LivePlayerUncheckedUpdateInput>
+    /**
+     * Choose, which LivePlayer to update.
+     */
+    where: LivePlayerWhereUniqueInput
+  }
+
+  /**
+   * LivePlayer updateMany
+   */
+  export type LivePlayerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update LivePlayers.
+     */
+    data: XOR<LivePlayerUpdateManyMutationInput, LivePlayerUncheckedUpdateManyInput>
+    /**
+     * Filter which LivePlayers to update
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * Limit how many LivePlayers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * LivePlayer updateManyAndReturn
+   */
+  export type LivePlayerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * The data used to update LivePlayers.
+     */
+    data: XOR<LivePlayerUpdateManyMutationInput, LivePlayerUncheckedUpdateManyInput>
+    /**
+     * Filter which LivePlayers to update
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * Limit how many LivePlayers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LivePlayer upsert
+   */
+  export type LivePlayerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the LivePlayer to update in case it exists.
+     */
+    where: LivePlayerWhereUniqueInput
+    /**
+     * In case the LivePlayer found by the `where` argument doesn't exist, create a new LivePlayer with this data.
+     */
+    create: XOR<LivePlayerCreateInput, LivePlayerUncheckedCreateInput>
+    /**
+     * In case the LivePlayer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<LivePlayerUpdateInput, LivePlayerUncheckedUpdateInput>
+  }
+
+  /**
+   * LivePlayer delete
+   */
+  export type LivePlayerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+    /**
+     * Filter which LivePlayer to delete.
+     */
+    where: LivePlayerWhereUniqueInput
+  }
+
+  /**
+   * LivePlayer deleteMany
+   */
+  export type LivePlayerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LivePlayers to delete
+     */
+    where?: LivePlayerWhereInput
+    /**
+     * Limit how many LivePlayers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * LivePlayer.answers
+   */
+  export type LivePlayer$answersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    where?: LiveAnswerWhereInput
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    cursor?: LiveAnswerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LiveAnswerScalarFieldEnum | LiveAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * LivePlayer without action
+   */
+  export type LivePlayerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LivePlayer
+     */
+    select?: LivePlayerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LivePlayer
+     */
+    omit?: LivePlayerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LivePlayerInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model LiveAnswer
+   */
+
+  export type AggregateLiveAnswer = {
+    _count: LiveAnswerCountAggregateOutputType | null
+    _avg: LiveAnswerAvgAggregateOutputType | null
+    _sum: LiveAnswerSumAggregateOutputType | null
+    _min: LiveAnswerMinAggregateOutputType | null
+    _max: LiveAnswerMaxAggregateOutputType | null
+  }
+
+  export type LiveAnswerAvgAggregateOutputType = {
+    points: number | null
+  }
+
+  export type LiveAnswerSumAggregateOutputType = {
+    points: number | null
+  }
+
+  export type LiveAnswerMinAggregateOutputType = {
+    id: string | null
+    gameId: string | null
+    playerId: string | null
+    questionId: string | null
+    optionId: string | null
+    isCorrect: boolean | null
+    points: number | null
+    answeredAt: Date | null
+  }
+
+  export type LiveAnswerMaxAggregateOutputType = {
+    id: string | null
+    gameId: string | null
+    playerId: string | null
+    questionId: string | null
+    optionId: string | null
+    isCorrect: boolean | null
+    points: number | null
+    answeredAt: Date | null
+  }
+
+  export type LiveAnswerCountAggregateOutputType = {
+    id: number
+    gameId: number
+    playerId: number
+    questionId: number
+    optionId: number
+    isCorrect: number
+    points: number
+    answeredAt: number
+    _all: number
+  }
+
+
+  export type LiveAnswerAvgAggregateInputType = {
+    points?: true
+  }
+
+  export type LiveAnswerSumAggregateInputType = {
+    points?: true
+  }
+
+  export type LiveAnswerMinAggregateInputType = {
+    id?: true
+    gameId?: true
+    playerId?: true
+    questionId?: true
+    optionId?: true
+    isCorrect?: true
+    points?: true
+    answeredAt?: true
+  }
+
+  export type LiveAnswerMaxAggregateInputType = {
+    id?: true
+    gameId?: true
+    playerId?: true
+    questionId?: true
+    optionId?: true
+    isCorrect?: true
+    points?: true
+    answeredAt?: true
+  }
+
+  export type LiveAnswerCountAggregateInputType = {
+    id?: true
+    gameId?: true
+    playerId?: true
+    questionId?: true
+    optionId?: true
+    isCorrect?: true
+    points?: true
+    answeredAt?: true
+    _all?: true
+  }
+
+  export type LiveAnswerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LiveAnswer to aggregate.
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveAnswers to fetch.
+     */
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: LiveAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned LiveAnswers
+    **/
+    _count?: true | LiveAnswerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: LiveAnswerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: LiveAnswerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: LiveAnswerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: LiveAnswerMaxAggregateInputType
+  }
+
+  export type GetLiveAnswerAggregateType<T extends LiveAnswerAggregateArgs> = {
+        [P in keyof T & keyof AggregateLiveAnswer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLiveAnswer[P]>
+      : GetScalarType<T[P], AggregateLiveAnswer[P]>
+  }
+
+
+
+
+  export type LiveAnswerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LiveAnswerWhereInput
+    orderBy?: LiveAnswerOrderByWithAggregationInput | LiveAnswerOrderByWithAggregationInput[]
+    by: LiveAnswerScalarFieldEnum[] | LiveAnswerScalarFieldEnum
+    having?: LiveAnswerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: LiveAnswerCountAggregateInputType | true
+    _avg?: LiveAnswerAvgAggregateInputType
+    _sum?: LiveAnswerSumAggregateInputType
+    _min?: LiveAnswerMinAggregateInputType
+    _max?: LiveAnswerMaxAggregateInputType
+  }
+
+  export type LiveAnswerGroupByOutputType = {
+    id: string
+    gameId: string
+    playerId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt: Date
+    _count: LiveAnswerCountAggregateOutputType | null
+    _avg: LiveAnswerAvgAggregateOutputType | null
+    _sum: LiveAnswerSumAggregateOutputType | null
+    _min: LiveAnswerMinAggregateOutputType | null
+    _max: LiveAnswerMaxAggregateOutputType | null
+  }
+
+  type GetLiveAnswerGroupByPayload<T extends LiveAnswerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<LiveAnswerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof LiveAnswerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], LiveAnswerGroupByOutputType[P]>
+            : GetScalarType<T[P], LiveAnswerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type LiveAnswerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    playerId?: boolean
+    questionId?: boolean
+    optionId?: boolean
+    isCorrect?: boolean
+    points?: boolean
+    answeredAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveAnswer"]>
+
+  export type LiveAnswerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    playerId?: boolean
+    questionId?: boolean
+    optionId?: boolean
+    isCorrect?: boolean
+    points?: boolean
+    answeredAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveAnswer"]>
+
+  export type LiveAnswerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    gameId?: boolean
+    playerId?: boolean
+    questionId?: boolean
+    optionId?: boolean
+    isCorrect?: boolean
+    points?: boolean
+    answeredAt?: boolean
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["liveAnswer"]>
+
+  export type LiveAnswerSelectScalar = {
+    id?: boolean
+    gameId?: boolean
+    playerId?: boolean
+    questionId?: boolean
+    optionId?: boolean
+    isCorrect?: boolean
+    points?: boolean
+    answeredAt?: boolean
+  }
+
+  export type LiveAnswerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gameId" | "playerId" | "questionId" | "optionId" | "isCorrect" | "points" | "answeredAt", ExtArgs["result"]["liveAnswer"]>
+  export type LiveAnswerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }
+  export type LiveAnswerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }
+  export type LiveAnswerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    game?: boolean | LiveGameDefaultArgs<ExtArgs>
+    player?: boolean | LivePlayerDefaultArgs<ExtArgs>
+  }
+
+  export type $LiveAnswerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "LiveAnswer"
+    objects: {
+      game: Prisma.$LiveGamePayload<ExtArgs>
+      player: Prisma.$LivePlayerPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      gameId: string
+      playerId: string
+      questionId: string
+      optionId: string
+      isCorrect: boolean
+      points: number
+      answeredAt: Date
+    }, ExtArgs["result"]["liveAnswer"]>
+    composites: {}
+  }
+
+  type LiveAnswerGetPayload<S extends boolean | null | undefined | LiveAnswerDefaultArgs> = $Result.GetResult<Prisma.$LiveAnswerPayload, S>
+
+  type LiveAnswerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<LiveAnswerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: LiveAnswerCountAggregateInputType | true
+    }
+
+  export interface LiveAnswerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['LiveAnswer'], meta: { name: 'LiveAnswer' } }
+    /**
+     * Find zero or one LiveAnswer that matches the filter.
+     * @param {LiveAnswerFindUniqueArgs} args - Arguments to find a LiveAnswer
+     * @example
+     * // Get one LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LiveAnswerFindUniqueArgs>(args: SelectSubset<T, LiveAnswerFindUniqueArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one LiveAnswer that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LiveAnswerFindUniqueOrThrowArgs} args - Arguments to find a LiveAnswer
+     * @example
+     * // Get one LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LiveAnswerFindUniqueOrThrowArgs>(args: SelectSubset<T, LiveAnswerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LiveAnswer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerFindFirstArgs} args - Arguments to find a LiveAnswer
+     * @example
+     * // Get one LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LiveAnswerFindFirstArgs>(args?: SelectSubset<T, LiveAnswerFindFirstArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first LiveAnswer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerFindFirstOrThrowArgs} args - Arguments to find a LiveAnswer
+     * @example
+     * // Get one LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LiveAnswerFindFirstOrThrowArgs>(args?: SelectSubset<T, LiveAnswerFindFirstOrThrowArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more LiveAnswers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all LiveAnswers
+     * const liveAnswers = await prisma.liveAnswer.findMany()
+     * 
+     * // Get first 10 LiveAnswers
+     * const liveAnswers = await prisma.liveAnswer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const liveAnswerWithIdOnly = await prisma.liveAnswer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends LiveAnswerFindManyArgs>(args?: SelectSubset<T, LiveAnswerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a LiveAnswer.
+     * @param {LiveAnswerCreateArgs} args - Arguments to create a LiveAnswer.
+     * @example
+     * // Create one LiveAnswer
+     * const LiveAnswer = await prisma.liveAnswer.create({
+     *   data: {
+     *     // ... data to create a LiveAnswer
+     *   }
+     * })
+     * 
+     */
+    create<T extends LiveAnswerCreateArgs>(args: SelectSubset<T, LiveAnswerCreateArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many LiveAnswers.
+     * @param {LiveAnswerCreateManyArgs} args - Arguments to create many LiveAnswers.
+     * @example
+     * // Create many LiveAnswers
+     * const liveAnswer = await prisma.liveAnswer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends LiveAnswerCreateManyArgs>(args?: SelectSubset<T, LiveAnswerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many LiveAnswers and returns the data saved in the database.
+     * @param {LiveAnswerCreateManyAndReturnArgs} args - Arguments to create many LiveAnswers.
+     * @example
+     * // Create many LiveAnswers
+     * const liveAnswer = await prisma.liveAnswer.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many LiveAnswers and only return the `id`
+     * const liveAnswerWithIdOnly = await prisma.liveAnswer.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends LiveAnswerCreateManyAndReturnArgs>(args?: SelectSubset<T, LiveAnswerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a LiveAnswer.
+     * @param {LiveAnswerDeleteArgs} args - Arguments to delete one LiveAnswer.
+     * @example
+     * // Delete one LiveAnswer
+     * const LiveAnswer = await prisma.liveAnswer.delete({
+     *   where: {
+     *     // ... filter to delete one LiveAnswer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends LiveAnswerDeleteArgs>(args: SelectSubset<T, LiveAnswerDeleteArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one LiveAnswer.
+     * @param {LiveAnswerUpdateArgs} args - Arguments to update one LiveAnswer.
+     * @example
+     * // Update one LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends LiveAnswerUpdateArgs>(args: SelectSubset<T, LiveAnswerUpdateArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more LiveAnswers.
+     * @param {LiveAnswerDeleteManyArgs} args - Arguments to filter LiveAnswers to delete.
+     * @example
+     * // Delete a few LiveAnswers
+     * const { count } = await prisma.liveAnswer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends LiveAnswerDeleteManyArgs>(args?: SelectSubset<T, LiveAnswerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LiveAnswers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many LiveAnswers
+     * const liveAnswer = await prisma.liveAnswer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends LiveAnswerUpdateManyArgs>(args: SelectSubset<T, LiveAnswerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more LiveAnswers and returns the data updated in the database.
+     * @param {LiveAnswerUpdateManyAndReturnArgs} args - Arguments to update many LiveAnswers.
+     * @example
+     * // Update many LiveAnswers
+     * const liveAnswer = await prisma.liveAnswer.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more LiveAnswers and only return the `id`
+     * const liveAnswerWithIdOnly = await prisma.liveAnswer.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends LiveAnswerUpdateManyAndReturnArgs>(args: SelectSubset<T, LiveAnswerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one LiveAnswer.
+     * @param {LiveAnswerUpsertArgs} args - Arguments to update or create a LiveAnswer.
+     * @example
+     * // Update or create a LiveAnswer
+     * const liveAnswer = await prisma.liveAnswer.upsert({
+     *   create: {
+     *     // ... data to create a LiveAnswer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the LiveAnswer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LiveAnswerUpsertArgs>(args: SelectSubset<T, LiveAnswerUpsertArgs<ExtArgs>>): Prisma__LiveAnswerClient<$Result.GetResult<Prisma.$LiveAnswerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of LiveAnswers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerCountArgs} args - Arguments to filter LiveAnswers to count.
+     * @example
+     * // Count the number of LiveAnswers
+     * const count = await prisma.liveAnswer.count({
+     *   where: {
+     *     // ... the filter for the LiveAnswers we want to count
+     *   }
+     * })
+    **/
+    count<T extends LiveAnswerCountArgs>(
+      args?: Subset<T, LiveAnswerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], LiveAnswerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a LiveAnswer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LiveAnswerAggregateArgs>(args: Subset<T, LiveAnswerAggregateArgs>): Prisma.PrismaPromise<GetLiveAnswerAggregateType<T>>
+
+    /**
+     * Group by LiveAnswer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LiveAnswerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LiveAnswerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LiveAnswerGroupByArgs['orderBy'] }
+        : { orderBy?: LiveAnswerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LiveAnswerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLiveAnswerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the LiveAnswer model
+   */
+  readonly fields: LiveAnswerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for LiveAnswer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__LiveAnswerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    game<T extends LiveGameDefaultArgs<ExtArgs> = {}>(args?: Subset<T, LiveGameDefaultArgs<ExtArgs>>): Prisma__LiveGameClient<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    player<T extends LivePlayerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, LivePlayerDefaultArgs<ExtArgs>>): Prisma__LivePlayerClient<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the LiveAnswer model
+   */
+  interface LiveAnswerFieldRefs {
+    readonly id: FieldRef<"LiveAnswer", 'String'>
+    readonly gameId: FieldRef<"LiveAnswer", 'String'>
+    readonly playerId: FieldRef<"LiveAnswer", 'String'>
+    readonly questionId: FieldRef<"LiveAnswer", 'String'>
+    readonly optionId: FieldRef<"LiveAnswer", 'String'>
+    readonly isCorrect: FieldRef<"LiveAnswer", 'Boolean'>
+    readonly points: FieldRef<"LiveAnswer", 'Int'>
+    readonly answeredAt: FieldRef<"LiveAnswer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * LiveAnswer findUnique
+   */
+  export type LiveAnswerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveAnswer to fetch.
+     */
+    where: LiveAnswerWhereUniqueInput
+  }
+
+  /**
+   * LiveAnswer findUniqueOrThrow
+   */
+  export type LiveAnswerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveAnswer to fetch.
+     */
+    where: LiveAnswerWhereUniqueInput
+  }
+
+  /**
+   * LiveAnswer findFirst
+   */
+  export type LiveAnswerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveAnswer to fetch.
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveAnswers to fetch.
+     */
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LiveAnswers.
+     */
+    cursor?: LiveAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LiveAnswers.
+     */
+    distinct?: LiveAnswerScalarFieldEnum | LiveAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * LiveAnswer findFirstOrThrow
+   */
+  export type LiveAnswerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveAnswer to fetch.
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveAnswers to fetch.
+     */
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for LiveAnswers.
+     */
+    cursor?: LiveAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of LiveAnswers.
+     */
+    distinct?: LiveAnswerScalarFieldEnum | LiveAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * LiveAnswer findMany
+   */
+  export type LiveAnswerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which LiveAnswers to fetch.
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of LiveAnswers to fetch.
+     */
+    orderBy?: LiveAnswerOrderByWithRelationInput | LiveAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing LiveAnswers.
+     */
+    cursor?: LiveAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` LiveAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` LiveAnswers.
+     */
+    skip?: number
+    distinct?: LiveAnswerScalarFieldEnum | LiveAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * LiveAnswer create
+   */
+  export type LiveAnswerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a LiveAnswer.
+     */
+    data: XOR<LiveAnswerCreateInput, LiveAnswerUncheckedCreateInput>
+  }
+
+  /**
+   * LiveAnswer createMany
+   */
+  export type LiveAnswerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many LiveAnswers.
+     */
+    data: LiveAnswerCreateManyInput | LiveAnswerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * LiveAnswer createManyAndReturn
+   */
+  export type LiveAnswerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * The data used to create many LiveAnswers.
+     */
+    data: LiveAnswerCreateManyInput | LiveAnswerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LiveAnswer update
+   */
+  export type LiveAnswerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a LiveAnswer.
+     */
+    data: XOR<LiveAnswerUpdateInput, LiveAnswerUncheckedUpdateInput>
+    /**
+     * Choose, which LiveAnswer to update.
+     */
+    where: LiveAnswerWhereUniqueInput
+  }
+
+  /**
+   * LiveAnswer updateMany
+   */
+  export type LiveAnswerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update LiveAnswers.
+     */
+    data: XOR<LiveAnswerUpdateManyMutationInput, LiveAnswerUncheckedUpdateManyInput>
+    /**
+     * Filter which LiveAnswers to update
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * Limit how many LiveAnswers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * LiveAnswer updateManyAndReturn
+   */
+  export type LiveAnswerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * The data used to update LiveAnswers.
+     */
+    data: XOR<LiveAnswerUpdateManyMutationInput, LiveAnswerUncheckedUpdateManyInput>
+    /**
+     * Filter which LiveAnswers to update
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * Limit how many LiveAnswers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * LiveAnswer upsert
+   */
+  export type LiveAnswerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the LiveAnswer to update in case it exists.
+     */
+    where: LiveAnswerWhereUniqueInput
+    /**
+     * In case the LiveAnswer found by the `where` argument doesn't exist, create a new LiveAnswer with this data.
+     */
+    create: XOR<LiveAnswerCreateInput, LiveAnswerUncheckedCreateInput>
+    /**
+     * In case the LiveAnswer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<LiveAnswerUpdateInput, LiveAnswerUncheckedUpdateInput>
+  }
+
+  /**
+   * LiveAnswer delete
+   */
+  export type LiveAnswerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+    /**
+     * Filter which LiveAnswer to delete.
+     */
+    where: LiveAnswerWhereUniqueInput
+  }
+
+  /**
+   * LiveAnswer deleteMany
+   */
+  export type LiveAnswerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which LiveAnswers to delete
+     */
+    where?: LiveAnswerWhereInput
+    /**
+     * Limit how many LiveAnswers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * LiveAnswer without action
+   */
+  export type LiveAnswerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LiveAnswer
+     */
+    select?: LiveAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the LiveAnswer
+     */
+    omit?: LiveAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LiveAnswerInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -75025,6 +79088,50 @@ export namespace Prisma {
   export type WaitlistEntryScalarFieldEnum = (typeof WaitlistEntryScalarFieldEnum)[keyof typeof WaitlistEntryScalarFieldEnum]
 
 
+  export const LiveGameScalarFieldEnum: {
+    id: 'id',
+    sectionId: 'sectionId',
+    hostId: 'hostId',
+    assessmentId: 'assessmentId',
+    status: 'status',
+    questionIds: 'questionIds',
+    currentIndex: 'currentIndex',
+    questionStartedAt: 'questionStartedAt',
+    secondsPerQuestion: 'secondsPerQuestion',
+    teamMode: 'teamMode',
+    createdAt: 'createdAt',
+    finishedAt: 'finishedAt'
+  };
+
+  export type LiveGameScalarFieldEnum = (typeof LiveGameScalarFieldEnum)[keyof typeof LiveGameScalarFieldEnum]
+
+
+  export const LivePlayerScalarFieldEnum: {
+    id: 'id',
+    gameId: 'gameId',
+    studentId: 'studentId',
+    team: 'team',
+    score: 'score',
+    joinedAt: 'joinedAt'
+  };
+
+  export type LivePlayerScalarFieldEnum = (typeof LivePlayerScalarFieldEnum)[keyof typeof LivePlayerScalarFieldEnum]
+
+
+  export const LiveAnswerScalarFieldEnum: {
+    id: 'id',
+    gameId: 'gameId',
+    playerId: 'playerId',
+    questionId: 'questionId',
+    optionId: 'optionId',
+    isCorrect: 'isCorrect',
+    points: 'points',
+    answeredAt: 'answeredAt'
+  };
+
+  export type LiveAnswerScalarFieldEnum = (typeof LiveAnswerScalarFieldEnum)[keyof typeof LiveAnswerScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -75580,6 +79687,20 @@ export namespace Prisma {
    */
   export type ListEnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus[]'>
     
+
+
+  /**
+   * Reference to a field of type 'LiveGameStatus'
+   */
+  export type EnumLiveGameStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LiveGameStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'LiveGameStatus[]'
+   */
+  export type ListEnumLiveGameStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LiveGameStatus[]'>
+    
   /**
    * Deep Input Types
    */
@@ -75941,6 +80062,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
+    livePlayers?: LivePlayerListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
@@ -75968,6 +80090,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingOrderByRelationAggregateInput
     tutorAssignments?: PeerTutorAssignmentOrderByRelationAggregateInput
     tutoringGiven?: PeerTutorAssignmentOrderByRelationAggregateInput
+    livePlayers?: LivePlayerOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -75998,6 +80121,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
+    livePlayers?: LivePlayerListRelationFilter
   }, "id" | "userId" | "studentNumber">
 
   export type StudentProfileOrderByWithAggregationInput = {
@@ -76101,6 +80225,7 @@ export namespace Prisma {
     department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
     sections?: SectionListRelationFilter
     officeHours?: OfficeHourListRelationFilter
+    liveGames?: LiveGameListRelationFilter
   }
 
   export type TeacherProfileOrderByWithRelationInput = {
@@ -76114,6 +80239,7 @@ export namespace Prisma {
     department?: DepartmentOrderByWithRelationInput
     sections?: SectionOrderByRelationAggregateInput
     officeHours?: OfficeHourOrderByRelationAggregateInput
+    liveGames?: LiveGameOrderByRelationAggregateInput
   }
 
   export type TeacherProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -76130,6 +80256,7 @@ export namespace Prisma {
     department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
     sections?: SectionListRelationFilter
     officeHours?: OfficeHourListRelationFilter
+    liveGames?: LiveGameListRelationFilter
   }, "id" | "userId" | "employeeNumber">
 
   export type TeacherProfileOrderByWithAggregationInput = {
@@ -76551,6 +80678,7 @@ export namespace Prisma {
     pacing?: SectionPacingListRelationFilter
     alerts?: AlertListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
+    liveGames?: LiveGameListRelationFilter
   }
 
   export type SectionOrderByWithRelationInput = {
@@ -76577,6 +80705,7 @@ export namespace Prisma {
     pacing?: SectionPacingOrderByRelationAggregateInput
     alerts?: AlertOrderByRelationAggregateInput
     tutorAssignments?: PeerTutorAssignmentOrderByRelationAggregateInput
+    liveGames?: LiveGameOrderByRelationAggregateInput
   }
 
   export type SectionWhereUniqueInput = Prisma.AtLeast<{
@@ -76607,6 +80736,7 @@ export namespace Prisma {
     pacing?: SectionPacingListRelationFilter
     alerts?: AlertListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
+    liveGames?: LiveGameListRelationFilter
   }, "id" | "joinCode" | "termId_courseId_code">
 
   export type SectionOrderByWithAggregationInput = {
@@ -78254,6 +82384,7 @@ export namespace Prisma {
     unit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
     assignment?: XOR<AssignmentNullableScalarRelationFilter, AssignmentWhereInput> | null
     questions?: QuestionListRelationFilter
+    liveGames?: LiveGameListRelationFilter
     attempts?: AssessmentAttemptListRelationFilter
   }
 
@@ -78281,6 +82412,7 @@ export namespace Prisma {
     unit?: UnitOrderByWithRelationInput
     assignment?: AssignmentOrderByWithRelationInput
     questions?: QuestionOrderByRelationAggregateInput
+    liveGames?: LiveGameOrderByRelationAggregateInput
     attempts?: AssessmentAttemptOrderByRelationAggregateInput
   }
 
@@ -78311,6 +82443,7 @@ export namespace Prisma {
     unit?: XOR<UnitNullableScalarRelationFilter, UnitWhereInput> | null
     assignment?: XOR<AssignmentNullableScalarRelationFilter, AssignmentWhereInput> | null
     questions?: QuestionListRelationFilter
+    liveGames?: LiveGameListRelationFilter
     attempts?: AssessmentAttemptListRelationFilter
   }, "id" | "assignmentId">
 
@@ -79914,6 +84047,255 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"WaitlistEntry"> | Date | string
   }
 
+  export type LiveGameWhereInput = {
+    AND?: LiveGameWhereInput | LiveGameWhereInput[]
+    OR?: LiveGameWhereInput[]
+    NOT?: LiveGameWhereInput | LiveGameWhereInput[]
+    id?: StringFilter<"LiveGame"> | string
+    sectionId?: StringFilter<"LiveGame"> | string
+    hostId?: StringFilter<"LiveGame"> | string
+    assessmentId?: StringFilter<"LiveGame"> | string
+    status?: EnumLiveGameStatusFilter<"LiveGame"> | $Enums.LiveGameStatus
+    questionIds?: StringNullableListFilter<"LiveGame">
+    currentIndex?: IntFilter<"LiveGame"> | number
+    questionStartedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+    secondsPerQuestion?: IntFilter<"LiveGame"> | number
+    teamMode?: BoolFilter<"LiveGame"> | boolean
+    createdAt?: DateTimeFilter<"LiveGame"> | Date | string
+    finishedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+    section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
+    host?: XOR<TeacherProfileScalarRelationFilter, TeacherProfileWhereInput>
+    assessment?: XOR<AssessmentScalarRelationFilter, AssessmentWhereInput>
+    players?: LivePlayerListRelationFilter
+    answers?: LiveAnswerListRelationFilter
+  }
+
+  export type LiveGameOrderByWithRelationInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    hostId?: SortOrder
+    assessmentId?: SortOrder
+    status?: SortOrder
+    questionIds?: SortOrder
+    currentIndex?: SortOrder
+    questionStartedAt?: SortOrderInput | SortOrder
+    secondsPerQuestion?: SortOrder
+    teamMode?: SortOrder
+    createdAt?: SortOrder
+    finishedAt?: SortOrderInput | SortOrder
+    section?: SectionOrderByWithRelationInput
+    host?: TeacherProfileOrderByWithRelationInput
+    assessment?: AssessmentOrderByWithRelationInput
+    players?: LivePlayerOrderByRelationAggregateInput
+    answers?: LiveAnswerOrderByRelationAggregateInput
+  }
+
+  export type LiveGameWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: LiveGameWhereInput | LiveGameWhereInput[]
+    OR?: LiveGameWhereInput[]
+    NOT?: LiveGameWhereInput | LiveGameWhereInput[]
+    sectionId?: StringFilter<"LiveGame"> | string
+    hostId?: StringFilter<"LiveGame"> | string
+    assessmentId?: StringFilter<"LiveGame"> | string
+    status?: EnumLiveGameStatusFilter<"LiveGame"> | $Enums.LiveGameStatus
+    questionIds?: StringNullableListFilter<"LiveGame">
+    currentIndex?: IntFilter<"LiveGame"> | number
+    questionStartedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+    secondsPerQuestion?: IntFilter<"LiveGame"> | number
+    teamMode?: BoolFilter<"LiveGame"> | boolean
+    createdAt?: DateTimeFilter<"LiveGame"> | Date | string
+    finishedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+    section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
+    host?: XOR<TeacherProfileScalarRelationFilter, TeacherProfileWhereInput>
+    assessment?: XOR<AssessmentScalarRelationFilter, AssessmentWhereInput>
+    players?: LivePlayerListRelationFilter
+    answers?: LiveAnswerListRelationFilter
+  }, "id">
+
+  export type LiveGameOrderByWithAggregationInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    hostId?: SortOrder
+    assessmentId?: SortOrder
+    status?: SortOrder
+    questionIds?: SortOrder
+    currentIndex?: SortOrder
+    questionStartedAt?: SortOrderInput | SortOrder
+    secondsPerQuestion?: SortOrder
+    teamMode?: SortOrder
+    createdAt?: SortOrder
+    finishedAt?: SortOrderInput | SortOrder
+    _count?: LiveGameCountOrderByAggregateInput
+    _avg?: LiveGameAvgOrderByAggregateInput
+    _max?: LiveGameMaxOrderByAggregateInput
+    _min?: LiveGameMinOrderByAggregateInput
+    _sum?: LiveGameSumOrderByAggregateInput
+  }
+
+  export type LiveGameScalarWhereWithAggregatesInput = {
+    AND?: LiveGameScalarWhereWithAggregatesInput | LiveGameScalarWhereWithAggregatesInput[]
+    OR?: LiveGameScalarWhereWithAggregatesInput[]
+    NOT?: LiveGameScalarWhereWithAggregatesInput | LiveGameScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"LiveGame"> | string
+    sectionId?: StringWithAggregatesFilter<"LiveGame"> | string
+    hostId?: StringWithAggregatesFilter<"LiveGame"> | string
+    assessmentId?: StringWithAggregatesFilter<"LiveGame"> | string
+    status?: EnumLiveGameStatusWithAggregatesFilter<"LiveGame"> | $Enums.LiveGameStatus
+    questionIds?: StringNullableListFilter<"LiveGame">
+    currentIndex?: IntWithAggregatesFilter<"LiveGame"> | number
+    questionStartedAt?: DateTimeNullableWithAggregatesFilter<"LiveGame"> | Date | string | null
+    secondsPerQuestion?: IntWithAggregatesFilter<"LiveGame"> | number
+    teamMode?: BoolWithAggregatesFilter<"LiveGame"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"LiveGame"> | Date | string
+    finishedAt?: DateTimeNullableWithAggregatesFilter<"LiveGame"> | Date | string | null
+  }
+
+  export type LivePlayerWhereInput = {
+    AND?: LivePlayerWhereInput | LivePlayerWhereInput[]
+    OR?: LivePlayerWhereInput[]
+    NOT?: LivePlayerWhereInput | LivePlayerWhereInput[]
+    id?: StringFilter<"LivePlayer"> | string
+    gameId?: StringFilter<"LivePlayer"> | string
+    studentId?: StringFilter<"LivePlayer"> | string
+    team?: IntNullableFilter<"LivePlayer"> | number | null
+    score?: IntFilter<"LivePlayer"> | number
+    joinedAt?: DateTimeFilter<"LivePlayer"> | Date | string
+    game?: XOR<LiveGameScalarRelationFilter, LiveGameWhereInput>
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+    answers?: LiveAnswerListRelationFilter
+  }
+
+  export type LivePlayerOrderByWithRelationInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    studentId?: SortOrder
+    team?: SortOrderInput | SortOrder
+    score?: SortOrder
+    joinedAt?: SortOrder
+    game?: LiveGameOrderByWithRelationInput
+    student?: StudentProfileOrderByWithRelationInput
+    answers?: LiveAnswerOrderByRelationAggregateInput
+  }
+
+  export type LivePlayerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    gameId_studentId?: LivePlayerGameIdStudentIdCompoundUniqueInput
+    AND?: LivePlayerWhereInput | LivePlayerWhereInput[]
+    OR?: LivePlayerWhereInput[]
+    NOT?: LivePlayerWhereInput | LivePlayerWhereInput[]
+    gameId?: StringFilter<"LivePlayer"> | string
+    studentId?: StringFilter<"LivePlayer"> | string
+    team?: IntNullableFilter<"LivePlayer"> | number | null
+    score?: IntFilter<"LivePlayer"> | number
+    joinedAt?: DateTimeFilter<"LivePlayer"> | Date | string
+    game?: XOR<LiveGameScalarRelationFilter, LiveGameWhereInput>
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+    answers?: LiveAnswerListRelationFilter
+  }, "id" | "gameId_studentId">
+
+  export type LivePlayerOrderByWithAggregationInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    studentId?: SortOrder
+    team?: SortOrderInput | SortOrder
+    score?: SortOrder
+    joinedAt?: SortOrder
+    _count?: LivePlayerCountOrderByAggregateInput
+    _avg?: LivePlayerAvgOrderByAggregateInput
+    _max?: LivePlayerMaxOrderByAggregateInput
+    _min?: LivePlayerMinOrderByAggregateInput
+    _sum?: LivePlayerSumOrderByAggregateInput
+  }
+
+  export type LivePlayerScalarWhereWithAggregatesInput = {
+    AND?: LivePlayerScalarWhereWithAggregatesInput | LivePlayerScalarWhereWithAggregatesInput[]
+    OR?: LivePlayerScalarWhereWithAggregatesInput[]
+    NOT?: LivePlayerScalarWhereWithAggregatesInput | LivePlayerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"LivePlayer"> | string
+    gameId?: StringWithAggregatesFilter<"LivePlayer"> | string
+    studentId?: StringWithAggregatesFilter<"LivePlayer"> | string
+    team?: IntNullableWithAggregatesFilter<"LivePlayer"> | number | null
+    score?: IntWithAggregatesFilter<"LivePlayer"> | number
+    joinedAt?: DateTimeWithAggregatesFilter<"LivePlayer"> | Date | string
+  }
+
+  export type LiveAnswerWhereInput = {
+    AND?: LiveAnswerWhereInput | LiveAnswerWhereInput[]
+    OR?: LiveAnswerWhereInput[]
+    NOT?: LiveAnswerWhereInput | LiveAnswerWhereInput[]
+    id?: StringFilter<"LiveAnswer"> | string
+    gameId?: StringFilter<"LiveAnswer"> | string
+    playerId?: StringFilter<"LiveAnswer"> | string
+    questionId?: StringFilter<"LiveAnswer"> | string
+    optionId?: StringFilter<"LiveAnswer"> | string
+    isCorrect?: BoolFilter<"LiveAnswer"> | boolean
+    points?: IntFilter<"LiveAnswer"> | number
+    answeredAt?: DateTimeFilter<"LiveAnswer"> | Date | string
+    game?: XOR<LiveGameScalarRelationFilter, LiveGameWhereInput>
+    player?: XOR<LivePlayerScalarRelationFilter, LivePlayerWhereInput>
+  }
+
+  export type LiveAnswerOrderByWithRelationInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    playerId?: SortOrder
+    questionId?: SortOrder
+    optionId?: SortOrder
+    isCorrect?: SortOrder
+    points?: SortOrder
+    answeredAt?: SortOrder
+    game?: LiveGameOrderByWithRelationInput
+    player?: LivePlayerOrderByWithRelationInput
+  }
+
+  export type LiveAnswerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    playerId_questionId?: LiveAnswerPlayerIdQuestionIdCompoundUniqueInput
+    AND?: LiveAnswerWhereInput | LiveAnswerWhereInput[]
+    OR?: LiveAnswerWhereInput[]
+    NOT?: LiveAnswerWhereInput | LiveAnswerWhereInput[]
+    gameId?: StringFilter<"LiveAnswer"> | string
+    playerId?: StringFilter<"LiveAnswer"> | string
+    questionId?: StringFilter<"LiveAnswer"> | string
+    optionId?: StringFilter<"LiveAnswer"> | string
+    isCorrect?: BoolFilter<"LiveAnswer"> | boolean
+    points?: IntFilter<"LiveAnswer"> | number
+    answeredAt?: DateTimeFilter<"LiveAnswer"> | Date | string
+    game?: XOR<LiveGameScalarRelationFilter, LiveGameWhereInput>
+    player?: XOR<LivePlayerScalarRelationFilter, LivePlayerWhereInput>
+  }, "id" | "playerId_questionId">
+
+  export type LiveAnswerOrderByWithAggregationInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    playerId?: SortOrder
+    questionId?: SortOrder
+    optionId?: SortOrder
+    isCorrect?: SortOrder
+    points?: SortOrder
+    answeredAt?: SortOrder
+    _count?: LiveAnswerCountOrderByAggregateInput
+    _avg?: LiveAnswerAvgOrderByAggregateInput
+    _max?: LiveAnswerMaxOrderByAggregateInput
+    _min?: LiveAnswerMinOrderByAggregateInput
+    _sum?: LiveAnswerSumOrderByAggregateInput
+  }
+
+  export type LiveAnswerScalarWhereWithAggregatesInput = {
+    AND?: LiveAnswerScalarWhereWithAggregatesInput | LiveAnswerScalarWhereWithAggregatesInput[]
+    OR?: LiveAnswerScalarWhereWithAggregatesInput[]
+    NOT?: LiveAnswerScalarWhereWithAggregatesInput | LiveAnswerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"LiveAnswer"> | string
+    gameId?: StringWithAggregatesFilter<"LiveAnswer"> | string
+    playerId?: StringWithAggregatesFilter<"LiveAnswer"> | string
+    questionId?: StringWithAggregatesFilter<"LiveAnswer"> | string
+    optionId?: StringWithAggregatesFilter<"LiveAnswer"> | string
+    isCorrect?: BoolWithAggregatesFilter<"LiveAnswer"> | boolean
+    points?: IntWithAggregatesFilter<"LiveAnswer"> | number
+    answeredAt?: DateTimeWithAggregatesFilter<"LiveAnswer"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -80310,6 +84692,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
@@ -80335,6 +84718,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
@@ -80360,6 +84744,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
@@ -80385,6 +84770,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
@@ -80486,6 +84872,7 @@ export namespace Prisma {
     department?: DepartmentCreateNestedOneWithoutTeachersInput
     sections?: SectionCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUncheckedCreateInput = {
@@ -80497,6 +84884,7 @@ export namespace Prisma {
     bio?: string | null
     sections?: SectionUncheckedCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourUncheckedCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUpdateInput = {
@@ -80508,6 +84896,7 @@ export namespace Prisma {
     department?: DepartmentUpdateOneWithoutTeachersNestedInput
     sections?: SectionUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateInput = {
@@ -80519,6 +84908,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     sections?: SectionUncheckedUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUncheckedUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileCreateManyInput = {
@@ -80951,6 +85341,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateInput = {
@@ -80974,6 +85365,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUpdateInput = {
@@ -80997,6 +85389,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateInput = {
@@ -81020,6 +85413,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionCreateManyInput = {
@@ -82692,6 +87086,7 @@ export namespace Prisma {
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
   }
 
@@ -82716,6 +87111,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
@@ -82740,6 +87136,7 @@ export namespace Prisma {
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -82764,6 +87161,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -84428,6 +88826,256 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type LiveGameCreateInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    section: SectionCreateNestedOneWithoutLiveGamesInput
+    host: TeacherProfileCreateNestedOneWithoutLiveGamesInput
+    assessment: AssessmentCreateNestedOneWithoutLiveGamesInput
+    players?: LivePlayerCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    players?: LivePlayerUncheckedCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    section?: SectionUpdateOneRequiredWithoutLiveGamesNestedInput
+    host?: TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput
+    assessment?: AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput
+    players?: LivePlayerUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    players?: LivePlayerUncheckedUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameCreateManyInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+  }
+
+  export type LiveGameUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type LiveGameUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type LivePlayerCreateInput = {
+    id?: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    game: LiveGameCreateNestedOneWithoutPlayersInput
+    student: StudentProfileCreateNestedOneWithoutLivePlayersInput
+    answers?: LiveAnswerCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerUncheckedCreateInput = {
+    id?: string
+    gameId: string
+    studentId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: LiveGameUpdateOneRequiredWithoutPlayersNestedInput
+    student?: StudentProfileUpdateOneRequiredWithoutLivePlayersNestedInput
+    answers?: LiveAnswerUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    answers?: LiveAnswerUncheckedUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerCreateManyInput = {
+    id?: string
+    gameId: string
+    studentId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+  }
+
+  export type LivePlayerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LivePlayerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerCreateInput = {
+    id?: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+    game: LiveGameCreateNestedOneWithoutAnswersInput
+    player: LivePlayerCreateNestedOneWithoutAnswersInput
+  }
+
+  export type LiveAnswerUncheckedCreateInput = {
+    id?: string
+    gameId: string
+    playerId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LiveAnswerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: LiveGameUpdateOneRequiredWithoutAnswersNestedInput
+    player?: LivePlayerUpdateOneRequiredWithoutAnswersNestedInput
+  }
+
+  export type LiveAnswerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    playerId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerCreateManyInput = {
+    id?: string
+    gameId: string
+    playerId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LiveAnswerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    playerId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -84993,6 +89641,12 @@ export namespace Prisma {
     none?: PeerTutorAssignmentWhereInput
   }
 
+  export type LivePlayerListRelationFilter = {
+    every?: LivePlayerWhereInput
+    some?: LivePlayerWhereInput
+    none?: LivePlayerWhereInput
+  }
+
   export type EnrollmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -85030,6 +89684,10 @@ export namespace Prisma {
   }
 
   export type PeerTutorAssignmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type LivePlayerOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -85179,11 +89837,21 @@ export namespace Prisma {
     none?: OfficeHourWhereInput
   }
 
+  export type LiveGameListRelationFilter = {
+    every?: LiveGameWhereInput
+    some?: LiveGameWhereInput
+    none?: LiveGameWhereInput
+  }
+
   export type SectionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type OfficeHourOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type LiveGameOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -88204,6 +92872,184 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type EnumLiveGameStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.LiveGameStatus | EnumLiveGameStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumLiveGameStatusFilter<$PrismaModel> | $Enums.LiveGameStatus
+  }
+
+  export type LiveAnswerListRelationFilter = {
+    every?: LiveAnswerWhereInput
+    some?: LiveAnswerWhereInput
+    none?: LiveAnswerWhereInput
+  }
+
+  export type LiveAnswerOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type LiveGameCountOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    hostId?: SortOrder
+    assessmentId?: SortOrder
+    status?: SortOrder
+    questionIds?: SortOrder
+    currentIndex?: SortOrder
+    questionStartedAt?: SortOrder
+    secondsPerQuestion?: SortOrder
+    teamMode?: SortOrder
+    createdAt?: SortOrder
+    finishedAt?: SortOrder
+  }
+
+  export type LiveGameAvgOrderByAggregateInput = {
+    currentIndex?: SortOrder
+    secondsPerQuestion?: SortOrder
+  }
+
+  export type LiveGameMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    hostId?: SortOrder
+    assessmentId?: SortOrder
+    status?: SortOrder
+    currentIndex?: SortOrder
+    questionStartedAt?: SortOrder
+    secondsPerQuestion?: SortOrder
+    teamMode?: SortOrder
+    createdAt?: SortOrder
+    finishedAt?: SortOrder
+  }
+
+  export type LiveGameMinOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    hostId?: SortOrder
+    assessmentId?: SortOrder
+    status?: SortOrder
+    currentIndex?: SortOrder
+    questionStartedAt?: SortOrder
+    secondsPerQuestion?: SortOrder
+    teamMode?: SortOrder
+    createdAt?: SortOrder
+    finishedAt?: SortOrder
+  }
+
+  export type LiveGameSumOrderByAggregateInput = {
+    currentIndex?: SortOrder
+    secondsPerQuestion?: SortOrder
+  }
+
+  export type EnumLiveGameStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LiveGameStatus | EnumLiveGameStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumLiveGameStatusWithAggregatesFilter<$PrismaModel> | $Enums.LiveGameStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLiveGameStatusFilter<$PrismaModel>
+    _max?: NestedEnumLiveGameStatusFilter<$PrismaModel>
+  }
+
+  export type LiveGameScalarRelationFilter = {
+    is?: LiveGameWhereInput
+    isNot?: LiveGameWhereInput
+  }
+
+  export type LivePlayerGameIdStudentIdCompoundUniqueInput = {
+    gameId: string
+    studentId: string
+  }
+
+  export type LivePlayerCountOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    studentId?: SortOrder
+    team?: SortOrder
+    score?: SortOrder
+    joinedAt?: SortOrder
+  }
+
+  export type LivePlayerAvgOrderByAggregateInput = {
+    team?: SortOrder
+    score?: SortOrder
+  }
+
+  export type LivePlayerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    studentId?: SortOrder
+    team?: SortOrder
+    score?: SortOrder
+    joinedAt?: SortOrder
+  }
+
+  export type LivePlayerMinOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    studentId?: SortOrder
+    team?: SortOrder
+    score?: SortOrder
+    joinedAt?: SortOrder
+  }
+
+  export type LivePlayerSumOrderByAggregateInput = {
+    team?: SortOrder
+    score?: SortOrder
+  }
+
+  export type LivePlayerScalarRelationFilter = {
+    is?: LivePlayerWhereInput
+    isNot?: LivePlayerWhereInput
+  }
+
+  export type LiveAnswerPlayerIdQuestionIdCompoundUniqueInput = {
+    playerId: string
+    questionId: string
+  }
+
+  export type LiveAnswerCountOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    playerId?: SortOrder
+    questionId?: SortOrder
+    optionId?: SortOrder
+    isCorrect?: SortOrder
+    points?: SortOrder
+    answeredAt?: SortOrder
+  }
+
+  export type LiveAnswerAvgOrderByAggregateInput = {
+    points?: SortOrder
+  }
+
+  export type LiveAnswerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    playerId?: SortOrder
+    questionId?: SortOrder
+    optionId?: SortOrder
+    isCorrect?: SortOrder
+    points?: SortOrder
+    answeredAt?: SortOrder
+  }
+
+  export type LiveAnswerMinOrderByAggregateInput = {
+    id?: SortOrder
+    gameId?: SortOrder
+    playerId?: SortOrder
+    questionId?: SortOrder
+    optionId?: SortOrder
+    isCorrect?: SortOrder
+    points?: SortOrder
+    answeredAt?: SortOrder
+  }
+
+  export type LiveAnswerSumOrderByAggregateInput = {
+    points?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -88970,6 +93816,13 @@ export namespace Prisma {
     connect?: PeerTutorAssignmentWhereUniqueInput | PeerTutorAssignmentWhereUniqueInput[]
   }
 
+  export type LivePlayerCreateNestedManyWithoutStudentInput = {
+    create?: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput> | LivePlayerCreateWithoutStudentInput[] | LivePlayerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutStudentInput | LivePlayerCreateOrConnectWithoutStudentInput[]
+    createMany?: LivePlayerCreateManyStudentInputEnvelope
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+  }
+
   export type EnrollmentUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -89052,6 +93905,13 @@ export namespace Prisma {
     connectOrCreate?: PeerTutorAssignmentCreateOrConnectWithoutTutorInput | PeerTutorAssignmentCreateOrConnectWithoutTutorInput[]
     createMany?: PeerTutorAssignmentCreateManyTutorInputEnvelope
     connect?: PeerTutorAssignmentWhereUniqueInput | PeerTutorAssignmentWhereUniqueInput[]
+  }
+
+  export type LivePlayerUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput> | LivePlayerCreateWithoutStudentInput[] | LivePlayerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutStudentInput | LivePlayerCreateOrConnectWithoutStudentInput[]
+    createMany?: LivePlayerCreateManyStudentInputEnvelope
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -89256,6 +94116,20 @@ export namespace Prisma {
     deleteMany?: PeerTutorAssignmentScalarWhereInput | PeerTutorAssignmentScalarWhereInput[]
   }
 
+  export type LivePlayerUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput> | LivePlayerCreateWithoutStudentInput[] | LivePlayerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutStudentInput | LivePlayerCreateOrConnectWithoutStudentInput[]
+    upsert?: LivePlayerUpsertWithWhereUniqueWithoutStudentInput | LivePlayerUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: LivePlayerCreateManyStudentInputEnvelope
+    set?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    disconnect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    delete?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    update?: LivePlayerUpdateWithWhereUniqueWithoutStudentInput | LivePlayerUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: LivePlayerUpdateManyWithWhereWithoutStudentInput | LivePlayerUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+  }
+
   export type EnrollmentUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -89424,6 +94298,20 @@ export namespace Prisma {
     deleteMany?: PeerTutorAssignmentScalarWhereInput | PeerTutorAssignmentScalarWhereInput[]
   }
 
+  export type LivePlayerUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput> | LivePlayerCreateWithoutStudentInput[] | LivePlayerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutStudentInput | LivePlayerCreateOrConnectWithoutStudentInput[]
+    upsert?: LivePlayerUpsertWithWhereUniqueWithoutStudentInput | LivePlayerUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: LivePlayerCreateManyStudentInputEnvelope
+    set?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    disconnect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    delete?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    update?: LivePlayerUpdateWithWhereUniqueWithoutStudentInput | LivePlayerUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: LivePlayerUpdateManyWithWhereWithoutStudentInput | LivePlayerUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+  }
+
   export type StudentProfileCreateNestedManyWithoutSectionInput = {
     create?: XOR<StudentProfileCreateWithoutSectionInput, StudentProfileUncheckedCreateWithoutSectionInput> | StudentProfileCreateWithoutSectionInput[] | StudentProfileUncheckedCreateWithoutSectionInput[]
     connectOrCreate?: StudentProfileCreateOrConnectWithoutSectionInput | StudentProfileCreateOrConnectWithoutSectionInput[]
@@ -89492,6 +94380,13 @@ export namespace Prisma {
     connect?: OfficeHourWhereUniqueInput | OfficeHourWhereUniqueInput[]
   }
 
+  export type LiveGameCreateNestedManyWithoutHostInput = {
+    create?: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput> | LiveGameCreateWithoutHostInput[] | LiveGameUncheckedCreateWithoutHostInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutHostInput | LiveGameCreateOrConnectWithoutHostInput[]
+    createMany?: LiveGameCreateManyHostInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+  }
+
   export type SectionUncheckedCreateNestedManyWithoutTeacherInput = {
     create?: XOR<SectionCreateWithoutTeacherInput, SectionUncheckedCreateWithoutTeacherInput> | SectionCreateWithoutTeacherInput[] | SectionUncheckedCreateWithoutTeacherInput[]
     connectOrCreate?: SectionCreateOrConnectWithoutTeacherInput | SectionCreateOrConnectWithoutTeacherInput[]
@@ -89504,6 +94399,13 @@ export namespace Prisma {
     connectOrCreate?: OfficeHourCreateOrConnectWithoutTeacherInput | OfficeHourCreateOrConnectWithoutTeacherInput[]
     createMany?: OfficeHourCreateManyTeacherInputEnvelope
     connect?: OfficeHourWhereUniqueInput | OfficeHourWhereUniqueInput[]
+  }
+
+  export type LiveGameUncheckedCreateNestedManyWithoutHostInput = {
+    create?: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput> | LiveGameCreateWithoutHostInput[] | LiveGameUncheckedCreateWithoutHostInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutHostInput | LiveGameCreateOrConnectWithoutHostInput[]
+    createMany?: LiveGameCreateManyHostInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutTeacherProfileNestedInput = {
@@ -89552,6 +94454,20 @@ export namespace Prisma {
     deleteMany?: OfficeHourScalarWhereInput | OfficeHourScalarWhereInput[]
   }
 
+  export type LiveGameUpdateManyWithoutHostNestedInput = {
+    create?: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput> | LiveGameCreateWithoutHostInput[] | LiveGameUncheckedCreateWithoutHostInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutHostInput | LiveGameCreateOrConnectWithoutHostInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutHostInput | LiveGameUpsertWithWhereUniqueWithoutHostInput[]
+    createMany?: LiveGameCreateManyHostInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutHostInput | LiveGameUpdateWithWhereUniqueWithoutHostInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutHostInput | LiveGameUpdateManyWithWhereWithoutHostInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+  }
+
   export type SectionUncheckedUpdateManyWithoutTeacherNestedInput = {
     create?: XOR<SectionCreateWithoutTeacherInput, SectionUncheckedCreateWithoutTeacherInput> | SectionCreateWithoutTeacherInput[] | SectionUncheckedCreateWithoutTeacherInput[]
     connectOrCreate?: SectionCreateOrConnectWithoutTeacherInput | SectionCreateOrConnectWithoutTeacherInput[]
@@ -89578,6 +94494,20 @@ export namespace Prisma {
     update?: OfficeHourUpdateWithWhereUniqueWithoutTeacherInput | OfficeHourUpdateWithWhereUniqueWithoutTeacherInput[]
     updateMany?: OfficeHourUpdateManyWithWhereWithoutTeacherInput | OfficeHourUpdateManyWithWhereWithoutTeacherInput[]
     deleteMany?: OfficeHourScalarWhereInput | OfficeHourScalarWhereInput[]
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutHostNestedInput = {
+    create?: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput> | LiveGameCreateWithoutHostInput[] | LiveGameUncheckedCreateWithoutHostInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutHostInput | LiveGameCreateOrConnectWithoutHostInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutHostInput | LiveGameUpsertWithWhereUniqueWithoutHostInput[]
+    createMany?: LiveGameCreateManyHostInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutHostInput | LiveGameUpdateWithWhereUniqueWithoutHostInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutHostInput | LiveGameUpdateManyWithWhereWithoutHostInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
   }
 
   export type GuardianLinkCreateNestedManyWithoutGuardianInput = {
@@ -90003,6 +94933,13 @@ export namespace Prisma {
     connect?: PeerTutorAssignmentWhereUniqueInput | PeerTutorAssignmentWhereUniqueInput[]
   }
 
+  export type LiveGameCreateNestedManyWithoutSectionInput = {
+    create?: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput> | LiveGameCreateWithoutSectionInput[] | LiveGameUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutSectionInput | LiveGameCreateOrConnectWithoutSectionInput[]
+    createMany?: LiveGameCreateManySectionInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+  }
+
   export type SectionMeetingUncheckedCreateNestedManyWithoutSectionInput = {
     create?: XOR<SectionMeetingCreateWithoutSectionInput, SectionMeetingUncheckedCreateWithoutSectionInput> | SectionMeetingCreateWithoutSectionInput[] | SectionMeetingUncheckedCreateWithoutSectionInput[]
     connectOrCreate?: SectionMeetingCreateOrConnectWithoutSectionInput | SectionMeetingCreateOrConnectWithoutSectionInput[]
@@ -90078,6 +95015,13 @@ export namespace Prisma {
     connectOrCreate?: PeerTutorAssignmentCreateOrConnectWithoutSectionInput | PeerTutorAssignmentCreateOrConnectWithoutSectionInput[]
     createMany?: PeerTutorAssignmentCreateManySectionInputEnvelope
     connect?: PeerTutorAssignmentWhereUniqueInput | PeerTutorAssignmentWhereUniqueInput[]
+  }
+
+  export type LiveGameUncheckedCreateNestedManyWithoutSectionInput = {
+    create?: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput> | LiveGameCreateWithoutSectionInput[] | LiveGameUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutSectionInput | LiveGameCreateOrConnectWithoutSectionInput[]
+    createMany?: LiveGameCreateManySectionInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
   }
 
   export type CourseUpdateOneRequiredWithoutSectionsNestedInput = {
@@ -90258,6 +95202,20 @@ export namespace Prisma {
     deleteMany?: PeerTutorAssignmentScalarWhereInput | PeerTutorAssignmentScalarWhereInput[]
   }
 
+  export type LiveGameUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput> | LiveGameCreateWithoutSectionInput[] | LiveGameUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutSectionInput | LiveGameCreateOrConnectWithoutSectionInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutSectionInput | LiveGameUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: LiveGameCreateManySectionInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutSectionInput | LiveGameUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutSectionInput | LiveGameUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+  }
+
   export type SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput = {
     create?: XOR<SectionMeetingCreateWithoutSectionInput, SectionMeetingUncheckedCreateWithoutSectionInput> | SectionMeetingCreateWithoutSectionInput[] | SectionMeetingUncheckedCreateWithoutSectionInput[]
     connectOrCreate?: SectionMeetingCreateOrConnectWithoutSectionInput | SectionMeetingCreateOrConnectWithoutSectionInput[]
@@ -90410,6 +95368,20 @@ export namespace Prisma {
     update?: PeerTutorAssignmentUpdateWithWhereUniqueWithoutSectionInput | PeerTutorAssignmentUpdateWithWhereUniqueWithoutSectionInput[]
     updateMany?: PeerTutorAssignmentUpdateManyWithWhereWithoutSectionInput | PeerTutorAssignmentUpdateManyWithWhereWithoutSectionInput[]
     deleteMany?: PeerTutorAssignmentScalarWhereInput | PeerTutorAssignmentScalarWhereInput[]
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput> | LiveGameCreateWithoutSectionInput[] | LiveGameUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutSectionInput | LiveGameCreateOrConnectWithoutSectionInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutSectionInput | LiveGameUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: LiveGameCreateManySectionInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutSectionInput | LiveGameUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutSectionInput | LiveGameUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
   }
 
   export type SectionCreateNestedOneWithoutMeetingsInput = {
@@ -92059,6 +97031,13 @@ export namespace Prisma {
     connect?: QuestionWhereUniqueInput | QuestionWhereUniqueInput[]
   }
 
+  export type LiveGameCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput> | LiveGameCreateWithoutAssessmentInput[] | LiveGameUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAssessmentInput | LiveGameCreateOrConnectWithoutAssessmentInput[]
+    createMany?: LiveGameCreateManyAssessmentInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+  }
+
   export type AssessmentAttemptCreateNestedManyWithoutAssessmentInput = {
     create?: XOR<AssessmentAttemptCreateWithoutAssessmentInput, AssessmentAttemptUncheckedCreateWithoutAssessmentInput> | AssessmentAttemptCreateWithoutAssessmentInput[] | AssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
     connectOrCreate?: AssessmentAttemptCreateOrConnectWithoutAssessmentInput | AssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
@@ -92071,6 +97050,13 @@ export namespace Prisma {
     connectOrCreate?: QuestionCreateOrConnectWithoutAssessmentInput | QuestionCreateOrConnectWithoutAssessmentInput[]
     createMany?: QuestionCreateManyAssessmentInputEnvelope
     connect?: QuestionWhereUniqueInput | QuestionWhereUniqueInput[]
+  }
+
+  export type LiveGameUncheckedCreateNestedManyWithoutAssessmentInput = {
+    create?: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput> | LiveGameCreateWithoutAssessmentInput[] | LiveGameUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAssessmentInput | LiveGameCreateOrConnectWithoutAssessmentInput[]
+    createMany?: LiveGameCreateManyAssessmentInputEnvelope
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
   }
 
   export type AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput = {
@@ -92122,6 +97108,20 @@ export namespace Prisma {
     deleteMany?: QuestionScalarWhereInput | QuestionScalarWhereInput[]
   }
 
+  export type LiveGameUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput> | LiveGameCreateWithoutAssessmentInput[] | LiveGameUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAssessmentInput | LiveGameCreateOrConnectWithoutAssessmentInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutAssessmentInput | LiveGameUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: LiveGameCreateManyAssessmentInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutAssessmentInput | LiveGameUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutAssessmentInput | LiveGameUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+  }
+
   export type AssessmentAttemptUpdateManyWithoutAssessmentNestedInput = {
     create?: XOR<AssessmentAttemptCreateWithoutAssessmentInput, AssessmentAttemptUncheckedCreateWithoutAssessmentInput> | AssessmentAttemptCreateWithoutAssessmentInput[] | AssessmentAttemptUncheckedCreateWithoutAssessmentInput[]
     connectOrCreate?: AssessmentAttemptCreateOrConnectWithoutAssessmentInput | AssessmentAttemptCreateOrConnectWithoutAssessmentInput[]
@@ -92148,6 +97148,20 @@ export namespace Prisma {
     update?: QuestionUpdateWithWhereUniqueWithoutAssessmentInput | QuestionUpdateWithWhereUniqueWithoutAssessmentInput[]
     updateMany?: QuestionUpdateManyWithWhereWithoutAssessmentInput | QuestionUpdateManyWithWhereWithoutAssessmentInput[]
     deleteMany?: QuestionScalarWhereInput | QuestionScalarWhereInput[]
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput = {
+    create?: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput> | LiveGameCreateWithoutAssessmentInput[] | LiveGameUncheckedCreateWithoutAssessmentInput[]
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAssessmentInput | LiveGameCreateOrConnectWithoutAssessmentInput[]
+    upsert?: LiveGameUpsertWithWhereUniqueWithoutAssessmentInput | LiveGameUpsertWithWhereUniqueWithoutAssessmentInput[]
+    createMany?: LiveGameCreateManyAssessmentInputEnvelope
+    set?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    disconnect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    delete?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+    update?: LiveGameUpdateWithWhereUniqueWithoutAssessmentInput | LiveGameUpdateWithWhereUniqueWithoutAssessmentInput[]
+    updateMany?: LiveGameUpdateManyWithWhereWithoutAssessmentInput | LiveGameUpdateManyWithWhereWithoutAssessmentInput[]
+    deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
   }
 
   export type AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput = {
@@ -93197,6 +98211,243 @@ export namespace Prisma {
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutOfficeHourSlotsInput, StudentProfileUpdateWithoutOfficeHourSlotsInput>, StudentProfileUncheckedUpdateWithoutOfficeHourSlotsInput>
   }
 
+  export type LiveGameCreatequestionIdsInput = {
+    set: string[]
+  }
+
+  export type SectionCreateNestedOneWithoutLiveGamesInput = {
+    create?: XOR<SectionCreateWithoutLiveGamesInput, SectionUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: SectionCreateOrConnectWithoutLiveGamesInput
+    connect?: SectionWhereUniqueInput
+  }
+
+  export type TeacherProfileCreateNestedOneWithoutLiveGamesInput = {
+    create?: XOR<TeacherProfileCreateWithoutLiveGamesInput, TeacherProfileUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: TeacherProfileCreateOrConnectWithoutLiveGamesInput
+    connect?: TeacherProfileWhereUniqueInput
+  }
+
+  export type AssessmentCreateNestedOneWithoutLiveGamesInput = {
+    create?: XOR<AssessmentCreateWithoutLiveGamesInput, AssessmentUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: AssessmentCreateOrConnectWithoutLiveGamesInput
+    connect?: AssessmentWhereUniqueInput
+  }
+
+  export type LivePlayerCreateNestedManyWithoutGameInput = {
+    create?: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput> | LivePlayerCreateWithoutGameInput[] | LivePlayerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutGameInput | LivePlayerCreateOrConnectWithoutGameInput[]
+    createMany?: LivePlayerCreateManyGameInputEnvelope
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+  }
+
+  export type LiveAnswerCreateNestedManyWithoutGameInput = {
+    create?: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput> | LiveAnswerCreateWithoutGameInput[] | LiveAnswerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutGameInput | LiveAnswerCreateOrConnectWithoutGameInput[]
+    createMany?: LiveAnswerCreateManyGameInputEnvelope
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+  }
+
+  export type LivePlayerUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput> | LivePlayerCreateWithoutGameInput[] | LivePlayerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutGameInput | LivePlayerCreateOrConnectWithoutGameInput[]
+    createMany?: LivePlayerCreateManyGameInputEnvelope
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+  }
+
+  export type LiveAnswerUncheckedCreateNestedManyWithoutGameInput = {
+    create?: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput> | LiveAnswerCreateWithoutGameInput[] | LiveAnswerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutGameInput | LiveAnswerCreateOrConnectWithoutGameInput[]
+    createMany?: LiveAnswerCreateManyGameInputEnvelope
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+  }
+
+  export type EnumLiveGameStatusFieldUpdateOperationsInput = {
+    set?: $Enums.LiveGameStatus
+  }
+
+  export type LiveGameUpdatequestionIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type SectionUpdateOneRequiredWithoutLiveGamesNestedInput = {
+    create?: XOR<SectionCreateWithoutLiveGamesInput, SectionUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: SectionCreateOrConnectWithoutLiveGamesInput
+    upsert?: SectionUpsertWithoutLiveGamesInput
+    connect?: SectionWhereUniqueInput
+    update?: XOR<XOR<SectionUpdateToOneWithWhereWithoutLiveGamesInput, SectionUpdateWithoutLiveGamesInput>, SectionUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput = {
+    create?: XOR<TeacherProfileCreateWithoutLiveGamesInput, TeacherProfileUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: TeacherProfileCreateOrConnectWithoutLiveGamesInput
+    upsert?: TeacherProfileUpsertWithoutLiveGamesInput
+    connect?: TeacherProfileWhereUniqueInput
+    update?: XOR<XOR<TeacherProfileUpdateToOneWithWhereWithoutLiveGamesInput, TeacherProfileUpdateWithoutLiveGamesInput>, TeacherProfileUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput = {
+    create?: XOR<AssessmentCreateWithoutLiveGamesInput, AssessmentUncheckedCreateWithoutLiveGamesInput>
+    connectOrCreate?: AssessmentCreateOrConnectWithoutLiveGamesInput
+    upsert?: AssessmentUpsertWithoutLiveGamesInput
+    connect?: AssessmentWhereUniqueInput
+    update?: XOR<XOR<AssessmentUpdateToOneWithWhereWithoutLiveGamesInput, AssessmentUpdateWithoutLiveGamesInput>, AssessmentUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type LivePlayerUpdateManyWithoutGameNestedInput = {
+    create?: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput> | LivePlayerCreateWithoutGameInput[] | LivePlayerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutGameInput | LivePlayerCreateOrConnectWithoutGameInput[]
+    upsert?: LivePlayerUpsertWithWhereUniqueWithoutGameInput | LivePlayerUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: LivePlayerCreateManyGameInputEnvelope
+    set?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    disconnect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    delete?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    update?: LivePlayerUpdateWithWhereUniqueWithoutGameInput | LivePlayerUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: LivePlayerUpdateManyWithWhereWithoutGameInput | LivePlayerUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+  }
+
+  export type LiveAnswerUpdateManyWithoutGameNestedInput = {
+    create?: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput> | LiveAnswerCreateWithoutGameInput[] | LiveAnswerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutGameInput | LiveAnswerCreateOrConnectWithoutGameInput[]
+    upsert?: LiveAnswerUpsertWithWhereUniqueWithoutGameInput | LiveAnswerUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: LiveAnswerCreateManyGameInputEnvelope
+    set?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    disconnect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    delete?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    update?: LiveAnswerUpdateWithWhereUniqueWithoutGameInput | LiveAnswerUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: LiveAnswerUpdateManyWithWhereWithoutGameInput | LiveAnswerUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+  }
+
+  export type LivePlayerUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput> | LivePlayerCreateWithoutGameInput[] | LivePlayerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutGameInput | LivePlayerCreateOrConnectWithoutGameInput[]
+    upsert?: LivePlayerUpsertWithWhereUniqueWithoutGameInput | LivePlayerUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: LivePlayerCreateManyGameInputEnvelope
+    set?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    disconnect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    delete?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+    update?: LivePlayerUpdateWithWhereUniqueWithoutGameInput | LivePlayerUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: LivePlayerUpdateManyWithWhereWithoutGameInput | LivePlayerUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+  }
+
+  export type LiveAnswerUncheckedUpdateManyWithoutGameNestedInput = {
+    create?: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput> | LiveAnswerCreateWithoutGameInput[] | LiveAnswerUncheckedCreateWithoutGameInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutGameInput | LiveAnswerCreateOrConnectWithoutGameInput[]
+    upsert?: LiveAnswerUpsertWithWhereUniqueWithoutGameInput | LiveAnswerUpsertWithWhereUniqueWithoutGameInput[]
+    createMany?: LiveAnswerCreateManyGameInputEnvelope
+    set?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    disconnect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    delete?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    update?: LiveAnswerUpdateWithWhereUniqueWithoutGameInput | LiveAnswerUpdateWithWhereUniqueWithoutGameInput[]
+    updateMany?: LiveAnswerUpdateManyWithWhereWithoutGameInput | LiveAnswerUpdateManyWithWhereWithoutGameInput[]
+    deleteMany?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+  }
+
+  export type LiveGameCreateNestedOneWithoutPlayersInput = {
+    create?: XOR<LiveGameCreateWithoutPlayersInput, LiveGameUncheckedCreateWithoutPlayersInput>
+    connectOrCreate?: LiveGameCreateOrConnectWithoutPlayersInput
+    connect?: LiveGameWhereUniqueInput
+  }
+
+  export type StudentProfileCreateNestedOneWithoutLivePlayersInput = {
+    create?: XOR<StudentProfileCreateWithoutLivePlayersInput, StudentProfileUncheckedCreateWithoutLivePlayersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutLivePlayersInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type LiveAnswerCreateNestedManyWithoutPlayerInput = {
+    create?: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput> | LiveAnswerCreateWithoutPlayerInput[] | LiveAnswerUncheckedCreateWithoutPlayerInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutPlayerInput | LiveAnswerCreateOrConnectWithoutPlayerInput[]
+    createMany?: LiveAnswerCreateManyPlayerInputEnvelope
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+  }
+
+  export type LiveAnswerUncheckedCreateNestedManyWithoutPlayerInput = {
+    create?: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput> | LiveAnswerCreateWithoutPlayerInput[] | LiveAnswerUncheckedCreateWithoutPlayerInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutPlayerInput | LiveAnswerCreateOrConnectWithoutPlayerInput[]
+    createMany?: LiveAnswerCreateManyPlayerInputEnvelope
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+  }
+
+  export type LiveGameUpdateOneRequiredWithoutPlayersNestedInput = {
+    create?: XOR<LiveGameCreateWithoutPlayersInput, LiveGameUncheckedCreateWithoutPlayersInput>
+    connectOrCreate?: LiveGameCreateOrConnectWithoutPlayersInput
+    upsert?: LiveGameUpsertWithoutPlayersInput
+    connect?: LiveGameWhereUniqueInput
+    update?: XOR<XOR<LiveGameUpdateToOneWithWhereWithoutPlayersInput, LiveGameUpdateWithoutPlayersInput>, LiveGameUncheckedUpdateWithoutPlayersInput>
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutLivePlayersNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutLivePlayersInput, StudentProfileUncheckedCreateWithoutLivePlayersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutLivePlayersInput
+    upsert?: StudentProfileUpsertWithoutLivePlayersInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutLivePlayersInput, StudentProfileUpdateWithoutLivePlayersInput>, StudentProfileUncheckedUpdateWithoutLivePlayersInput>
+  }
+
+  export type LiveAnswerUpdateManyWithoutPlayerNestedInput = {
+    create?: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput> | LiveAnswerCreateWithoutPlayerInput[] | LiveAnswerUncheckedCreateWithoutPlayerInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutPlayerInput | LiveAnswerCreateOrConnectWithoutPlayerInput[]
+    upsert?: LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput | LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput[]
+    createMany?: LiveAnswerCreateManyPlayerInputEnvelope
+    set?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    disconnect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    delete?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    update?: LiveAnswerUpdateWithWhereUniqueWithoutPlayerInput | LiveAnswerUpdateWithWhereUniqueWithoutPlayerInput[]
+    updateMany?: LiveAnswerUpdateManyWithWhereWithoutPlayerInput | LiveAnswerUpdateManyWithWhereWithoutPlayerInput[]
+    deleteMany?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+  }
+
+  export type LiveAnswerUncheckedUpdateManyWithoutPlayerNestedInput = {
+    create?: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput> | LiveAnswerCreateWithoutPlayerInput[] | LiveAnswerUncheckedCreateWithoutPlayerInput[]
+    connectOrCreate?: LiveAnswerCreateOrConnectWithoutPlayerInput | LiveAnswerCreateOrConnectWithoutPlayerInput[]
+    upsert?: LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput | LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput[]
+    createMany?: LiveAnswerCreateManyPlayerInputEnvelope
+    set?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    disconnect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    delete?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    connect?: LiveAnswerWhereUniqueInput | LiveAnswerWhereUniqueInput[]
+    update?: LiveAnswerUpdateWithWhereUniqueWithoutPlayerInput | LiveAnswerUpdateWithWhereUniqueWithoutPlayerInput[]
+    updateMany?: LiveAnswerUpdateManyWithWhereWithoutPlayerInput | LiveAnswerUpdateManyWithWhereWithoutPlayerInput[]
+    deleteMany?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+  }
+
+  export type LiveGameCreateNestedOneWithoutAnswersInput = {
+    create?: XOR<LiveGameCreateWithoutAnswersInput, LiveGameUncheckedCreateWithoutAnswersInput>
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAnswersInput
+    connect?: LiveGameWhereUniqueInput
+  }
+
+  export type LivePlayerCreateNestedOneWithoutAnswersInput = {
+    create?: XOR<LivePlayerCreateWithoutAnswersInput, LivePlayerUncheckedCreateWithoutAnswersInput>
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutAnswersInput
+    connect?: LivePlayerWhereUniqueInput
+  }
+
+  export type LiveGameUpdateOneRequiredWithoutAnswersNestedInput = {
+    create?: XOR<LiveGameCreateWithoutAnswersInput, LiveGameUncheckedCreateWithoutAnswersInput>
+    connectOrCreate?: LiveGameCreateOrConnectWithoutAnswersInput
+    upsert?: LiveGameUpsertWithoutAnswersInput
+    connect?: LiveGameWhereUniqueInput
+    update?: XOR<XOR<LiveGameUpdateToOneWithWhereWithoutAnswersInput, LiveGameUpdateWithoutAnswersInput>, LiveGameUncheckedUpdateWithoutAnswersInput>
+  }
+
+  export type LivePlayerUpdateOneRequiredWithoutAnswersNestedInput = {
+    create?: XOR<LivePlayerCreateWithoutAnswersInput, LivePlayerUncheckedCreateWithoutAnswersInput>
+    connectOrCreate?: LivePlayerCreateOrConnectWithoutAnswersInput
+    upsert?: LivePlayerUpsertWithoutAnswersInput
+    connect?: LivePlayerWhereUniqueInput
+    update?: XOR<XOR<LivePlayerUpdateToOneWithWhereWithoutAnswersInput, LivePlayerUpdateWithoutAnswersInput>, LivePlayerUncheckedUpdateWithoutAnswersInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -93993,6 +99244,23 @@ export namespace Prisma {
     _max?: NestedEnumBookingStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumLiveGameStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.LiveGameStatus | EnumLiveGameStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumLiveGameStatusFilter<$PrismaModel> | $Enums.LiveGameStatus
+  }
+
+  export type NestedEnumLiveGameStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LiveGameStatus | EnumLiveGameStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LiveGameStatus[] | ListEnumLiveGameStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumLiveGameStatusWithAggregatesFilter<$PrismaModel> | $Enums.LiveGameStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLiveGameStatusFilter<$PrismaModel>
+    _max?: NestedEnumLiveGameStatusFilter<$PrismaModel>
+  }
+
   export type AccountCreateWithoutUserInput = {
     id?: string
     type: string
@@ -94077,6 +99345,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
@@ -94101,6 +99370,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUserInput = {
@@ -94116,6 +99386,7 @@ export namespace Prisma {
     department?: DepartmentCreateNestedOneWithoutTeachersInput
     sections?: SectionCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUncheckedCreateWithoutUserInput = {
@@ -94126,6 +99397,7 @@ export namespace Prisma {
     bio?: string | null
     sections?: SectionUncheckedCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourUncheckedCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileCreateOrConnectWithoutUserInput = {
@@ -94567,6 +99839,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
@@ -94591,6 +99864,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type TeacherProfileUpsertWithoutUserInput = {
@@ -94612,6 +99886,7 @@ export namespace Prisma {
     department?: DepartmentUpdateOneWithoutTeachersNestedInput
     sections?: SectionUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateWithoutUserInput = {
@@ -94622,6 +99897,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     sections?: SectionUncheckedUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUncheckedUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutHostNestedInput
   }
 
   export type FileObjectUpsertWithWhereUniqueWithoutUploadedByInput = {
@@ -95692,6 +100968,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type LivePlayerCreateWithoutStudentInput = {
+    id?: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    game: LiveGameCreateNestedOneWithoutPlayersInput
+    answers?: LiveAnswerCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerUncheckedCreateWithoutStudentInput = {
+    id?: string
+    gameId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerCreateOrConnectWithoutStudentInput = {
+    where: LivePlayerWhereUniqueInput
+    create: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput>
+  }
+
+  export type LivePlayerCreateManyStudentInputEnvelope = {
+    data: LivePlayerCreateManyStudentInput | LivePlayerCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutStudentProfileInput = {
     update: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
@@ -96122,6 +101426,34 @@ export namespace Prisma {
     data: XOR<PeerTutorAssignmentUpdateManyMutationInput, PeerTutorAssignmentUncheckedUpdateManyWithoutTutorInput>
   }
 
+  export type LivePlayerUpsertWithWhereUniqueWithoutStudentInput = {
+    where: LivePlayerWhereUniqueInput
+    update: XOR<LivePlayerUpdateWithoutStudentInput, LivePlayerUncheckedUpdateWithoutStudentInput>
+    create: XOR<LivePlayerCreateWithoutStudentInput, LivePlayerUncheckedCreateWithoutStudentInput>
+  }
+
+  export type LivePlayerUpdateWithWhereUniqueWithoutStudentInput = {
+    where: LivePlayerWhereUniqueInput
+    data: XOR<LivePlayerUpdateWithoutStudentInput, LivePlayerUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type LivePlayerUpdateManyWithWhereWithoutStudentInput = {
+    where: LivePlayerScalarWhereInput
+    data: XOR<LivePlayerUpdateManyMutationInput, LivePlayerUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type LivePlayerScalarWhereInput = {
+    AND?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+    OR?: LivePlayerScalarWhereInput[]
+    NOT?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+    id?: StringFilter<"LivePlayer"> | string
+    gameId?: StringFilter<"LivePlayer"> | string
+    studentId?: StringFilter<"LivePlayer"> | string
+    team?: IntNullableFilter<"LivePlayer"> | number | null
+    score?: IntFilter<"LivePlayer"> | number
+    joinedAt?: DateTimeFilter<"LivePlayer"> | Date | string
+  }
+
   export type StudentProfileCreateWithoutSectionInput = {
     id?: string
     studentNumber: string
@@ -96144,6 +101476,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSectionInput = {
@@ -96168,6 +101501,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSectionInput = {
@@ -96316,6 +101650,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTeacherInput = {
@@ -96338,6 +101673,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTeacherInput = {
@@ -96383,6 +101719,48 @@ export namespace Prisma {
 
   export type OfficeHourCreateManyTeacherInputEnvelope = {
     data: OfficeHourCreateManyTeacherInput | OfficeHourCreateManyTeacherInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type LiveGameCreateWithoutHostInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    section: SectionCreateNestedOneWithoutLiveGamesInput
+    assessment: AssessmentCreateNestedOneWithoutLiveGamesInput
+    players?: LivePlayerCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateWithoutHostInput = {
+    id?: string
+    sectionId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    players?: LivePlayerUncheckedCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameCreateOrConnectWithoutHostInput = {
+    where: LiveGameWhereUniqueInput
+    create: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput>
+  }
+
+  export type LiveGameCreateManyHostInputEnvelope = {
+    data: LiveGameCreateManyHostInput | LiveGameCreateManyHostInput[]
     skipDuplicates?: boolean
   }
 
@@ -96545,6 +101923,40 @@ export namespace Prisma {
     label?: StringNullableFilter<"OfficeHour"> | string | null
   }
 
+  export type LiveGameUpsertWithWhereUniqueWithoutHostInput = {
+    where: LiveGameWhereUniqueInput
+    update: XOR<LiveGameUpdateWithoutHostInput, LiveGameUncheckedUpdateWithoutHostInput>
+    create: XOR<LiveGameCreateWithoutHostInput, LiveGameUncheckedCreateWithoutHostInput>
+  }
+
+  export type LiveGameUpdateWithWhereUniqueWithoutHostInput = {
+    where: LiveGameWhereUniqueInput
+    data: XOR<LiveGameUpdateWithoutHostInput, LiveGameUncheckedUpdateWithoutHostInput>
+  }
+
+  export type LiveGameUpdateManyWithWhereWithoutHostInput = {
+    where: LiveGameScalarWhereInput
+    data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyWithoutHostInput>
+  }
+
+  export type LiveGameScalarWhereInput = {
+    AND?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+    OR?: LiveGameScalarWhereInput[]
+    NOT?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+    id?: StringFilter<"LiveGame"> | string
+    sectionId?: StringFilter<"LiveGame"> | string
+    hostId?: StringFilter<"LiveGame"> | string
+    assessmentId?: StringFilter<"LiveGame"> | string
+    status?: EnumLiveGameStatusFilter<"LiveGame"> | $Enums.LiveGameStatus
+    questionIds?: StringNullableListFilter<"LiveGame">
+    currentIndex?: IntFilter<"LiveGame"> | number
+    questionStartedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+    secondsPerQuestion?: IntFilter<"LiveGame"> | number
+    teamMode?: BoolFilter<"LiveGame"> | boolean
+    createdAt?: DateTimeFilter<"LiveGame"> | Date | string
+    finishedAt?: DateTimeNullableFilter<"LiveGame"> | Date | string | null
+  }
+
   export type GuardianLinkCreateWithoutGuardianInput = {
     id?: string
     isPrimary?: boolean
@@ -96628,6 +102040,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
@@ -96652,6 +102065,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -96721,6 +102135,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
@@ -96745,6 +102160,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAccommodationsInput = {
@@ -96769,6 +102185,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAccommodationsInput = {
@@ -96793,6 +102210,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAccommodationsInput = {
@@ -96833,6 +102251,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAccommodationsInput = {
@@ -96857,6 +102276,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type CourseCreateWithoutDepartmentInput = {
@@ -96901,6 +102321,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutTeacherProfileInput
     sections?: SectionCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUncheckedCreateWithoutDepartmentInput = {
@@ -96911,6 +102332,7 @@ export namespace Prisma {
     bio?: string | null
     sections?: SectionUncheckedCreateNestedManyWithoutTeacherInput
     officeHours?: OfficeHourUncheckedCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileCreateOrConnectWithoutDepartmentInput = {
@@ -97001,6 +102423,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTermInput = {
@@ -97023,6 +102446,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTermInput = {
@@ -97090,6 +102514,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutCourseInput = {
@@ -97112,6 +102537,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutCourseInput = {
@@ -97287,6 +102713,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutTeacherProfileInput
     department?: DepartmentCreateNestedOneWithoutTeachersInput
     officeHours?: OfficeHourCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUncheckedCreateWithoutSectionsInput = {
@@ -97297,6 +102724,7 @@ export namespace Prisma {
     officeLocation?: string | null
     bio?: string | null
     officeHours?: OfficeHourUncheckedCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileCreateOrConnectWithoutSectionsInput = {
@@ -97468,6 +102896,7 @@ export namespace Prisma {
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
   }
 
@@ -97491,6 +102920,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
@@ -97700,6 +103130,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type LiveGameCreateWithoutSectionInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    host: TeacherProfileCreateNestedOneWithoutLiveGamesInput
+    assessment: AssessmentCreateNestedOneWithoutLiveGamesInput
+    players?: LivePlayerCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateWithoutSectionInput = {
+    id?: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    players?: LivePlayerUncheckedCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameCreateOrConnectWithoutSectionInput = {
+    where: LiveGameWhereUniqueInput
+    create: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput>
+  }
+
+  export type LiveGameCreateManySectionInputEnvelope = {
+    data: LiveGameCreateManySectionInput | LiveGameCreateManySectionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CourseUpsertWithoutSectionsInput = {
     update: XOR<CourseUpdateWithoutSectionsInput, CourseUncheckedUpdateWithoutSectionsInput>
     create: XOR<CourseCreateWithoutSectionsInput, CourseUncheckedCreateWithoutSectionsInput>
@@ -97783,6 +103255,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutTeacherProfileNestedInput
     department?: DepartmentUpdateOneWithoutTeachersNestedInput
     officeHours?: OfficeHourUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateWithoutSectionsInput = {
@@ -97793,6 +103266,7 @@ export namespace Prisma {
     officeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     officeHours?: OfficeHourUncheckedUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutHostNestedInput
   }
 
   export type SectionMeetingUpsertWithWhereUniqueWithoutSectionInput = {
@@ -98056,6 +103530,22 @@ export namespace Prisma {
     data: XOR<PeerTutorAssignmentUpdateManyMutationInput, PeerTutorAssignmentUncheckedUpdateManyWithoutSectionInput>
   }
 
+  export type LiveGameUpsertWithWhereUniqueWithoutSectionInput = {
+    where: LiveGameWhereUniqueInput
+    update: XOR<LiveGameUpdateWithoutSectionInput, LiveGameUncheckedUpdateWithoutSectionInput>
+    create: XOR<LiveGameCreateWithoutSectionInput, LiveGameUncheckedCreateWithoutSectionInput>
+  }
+
+  export type LiveGameUpdateWithWhereUniqueWithoutSectionInput = {
+    where: LiveGameWhereUniqueInput
+    data: XOR<LiveGameUpdateWithoutSectionInput, LiveGameUncheckedUpdateWithoutSectionInput>
+  }
+
+  export type LiveGameUpdateManyWithWhereWithoutSectionInput = {
+    where: LiveGameScalarWhereInput
+    data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyWithoutSectionInput>
+  }
+
   export type SectionCreateWithoutMeetingsInput = {
     id?: string
     code: string
@@ -98076,6 +103566,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutMeetingsInput = {
@@ -98098,6 +103589,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutMeetingsInput = {
@@ -98136,6 +103628,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutMeetingsInput = {
@@ -98158,6 +103651,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionCreateWithoutEnrollmentsInput = {
@@ -98180,6 +103674,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutEnrollmentsInput = {
@@ -98202,6 +103697,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutEnrollmentsInput = {
@@ -98231,6 +103727,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutEnrollmentsInput = {
@@ -98255,6 +103752,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutEnrollmentsInput = {
@@ -98319,6 +103817,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutEnrollmentsInput = {
@@ -98341,6 +103840,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type StudentProfileUpsertWithoutEnrollmentsInput = {
@@ -98376,6 +103876,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutEnrollmentsInput = {
@@ -98400,6 +103901,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GradeSnapshotUpsertWithWhereUniqueWithoutEnrollmentInput = {
@@ -98679,6 +104181,7 @@ export namespace Prisma {
     section: SectionCreateNestedOneWithoutAssessmentsInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
   }
 
@@ -98702,6 +104205,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
@@ -99757,6 +105261,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutPacingInput = {
@@ -99779,6 +105284,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutPacingInput = {
@@ -99846,6 +105352,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutPacingInput = {
@@ -99868,6 +105375,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutPacingInput = {
@@ -99972,6 +105480,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonProgressInput = {
@@ -99996,6 +105505,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonProgressInput = {
@@ -100087,6 +105597,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonProgressInput = {
@@ -100111,6 +105622,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LessonCreateWithoutNotesInput = {
@@ -100180,6 +105692,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonNotesInput = {
@@ -100204,6 +105717,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonNotesInput = {
@@ -100295,6 +105809,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonNotesInput = {
@@ -100319,6 +105834,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserCreateWithoutUploadedFilesInput = {
@@ -100613,6 +106129,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutGradeCategoriesInput = {
@@ -100635,6 +106152,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutGradeCategoriesInput = {
@@ -100729,6 +106247,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutGradeCategoriesInput = {
@@ -100751,6 +106270,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type AssignmentUpsertWithWhereUniqueWithoutCategoryInput = {
@@ -100789,6 +106309,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAssignmentsInput = {
@@ -100811,6 +106332,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAssignmentsInput = {
@@ -100996,6 +106518,7 @@ export namespace Prisma {
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
   }
 
@@ -101019,6 +106542,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
@@ -101058,6 +106582,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAssignmentsInput = {
@@ -101080,6 +106605,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutAssignmentsInput = {
@@ -101269,6 +106795,7 @@ export namespace Prisma {
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -101292,6 +106819,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -101794,6 +107322,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSubmissionsInput = {
@@ -101818,6 +107347,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSubmissionsInput = {
@@ -101966,6 +107496,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSubmissionsInput = {
@@ -101990,6 +107521,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SubmissionAttachmentUpsertWithWhereUniqueWithoutSubmissionInput = {
@@ -102647,6 +108179,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAssessmentsInput = {
@@ -102669,6 +108202,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAssessmentsInput = {
@@ -102794,6 +108328,48 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type LiveGameCreateWithoutAssessmentInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    section: SectionCreateNestedOneWithoutLiveGamesInput
+    host: TeacherProfileCreateNestedOneWithoutLiveGamesInput
+    players?: LivePlayerCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateWithoutAssessmentInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    players?: LivePlayerUncheckedCreateNestedManyWithoutGameInput
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameCreateOrConnectWithoutAssessmentInput = {
+    where: LiveGameWhereUniqueInput
+    create: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type LiveGameCreateManyAssessmentInputEnvelope = {
+    data: LiveGameCreateManyAssessmentInput | LiveGameCreateManyAssessmentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AssessmentAttemptCreateWithoutAssessmentInput = {
     id?: string
     attempt?: number
@@ -102869,6 +108445,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAssessmentsInput = {
@@ -102891,6 +108468,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutAssessmentsInput = {
@@ -103017,6 +108595,22 @@ export namespace Prisma {
     tolerance?: FloatNullableFilter<"Question"> | number | null
   }
 
+  export type LiveGameUpsertWithWhereUniqueWithoutAssessmentInput = {
+    where: LiveGameWhereUniqueInput
+    update: XOR<LiveGameUpdateWithoutAssessmentInput, LiveGameUncheckedUpdateWithoutAssessmentInput>
+    create: XOR<LiveGameCreateWithoutAssessmentInput, LiveGameUncheckedCreateWithoutAssessmentInput>
+  }
+
+  export type LiveGameUpdateWithWhereUniqueWithoutAssessmentInput = {
+    where: LiveGameWhereUniqueInput
+    data: XOR<LiveGameUpdateWithoutAssessmentInput, LiveGameUncheckedUpdateWithoutAssessmentInput>
+  }
+
+  export type LiveGameUpdateManyWithWhereWithoutAssessmentInput = {
+    where: LiveGameScalarWhereInput
+    data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyWithoutAssessmentInput>
+  }
+
   export type AssessmentAttemptUpsertWithWhereUniqueWithoutAssessmentInput = {
     where: AssessmentAttemptWhereUniqueInput
     update: XOR<AssessmentAttemptUpdateWithoutAssessmentInput, AssessmentAttemptUncheckedUpdateWithoutAssessmentInput>
@@ -103053,6 +108647,7 @@ export namespace Prisma {
     section: SectionCreateNestedOneWithoutAssessmentsInput
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
   }
 
@@ -103076,6 +108671,7 @@ export namespace Prisma {
     publishedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
     attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
@@ -103187,6 +108783,7 @@ export namespace Prisma {
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -103210,6 +108807,7 @@ export namespace Prisma {
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -103371,6 +108969,7 @@ export namespace Prisma {
     unit?: UnitCreateNestedOneWithoutAssessmentsInput
     assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
     questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameCreateNestedManyWithoutAssessmentInput
   }
 
   export type AssessmentUncheckedCreateWithoutAttemptsInput = {
@@ -103394,6 +108993,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutAssessmentInput
   }
 
   export type AssessmentCreateOrConnectWithoutAttemptsInput = {
@@ -103423,6 +109023,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttemptsInput = {
@@ -103447,6 +109048,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttemptsInput = {
@@ -103554,6 +109156,7 @@ export namespace Prisma {
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
   }
 
   export type AssessmentUncheckedUpdateWithoutAttemptsInput = {
@@ -103577,6 +109180,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
   export type StudentProfileUpsertWithoutAttemptsInput = {
@@ -103612,6 +109216,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttemptsInput = {
@@ -103636,6 +109241,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type QuestionResponseUpsertWithWhereUniqueWithoutAttemptInput = {
@@ -104129,6 +109735,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAttendanceSessionsInput = {
@@ -104151,6 +109758,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAttendanceSessionsInput = {
@@ -104282,6 +109890,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAttendanceSessionsInput = {
@@ -104304,6 +109913,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutAttendanceTakenInput = {
@@ -104442,6 +110052,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendanceInput = {
@@ -104466,6 +110077,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendanceInput = {
@@ -104539,6 +110151,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendanceInput = {
@@ -104563,6 +110176,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAlertsInput = {
@@ -104587,6 +110201,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAlertsInput = {
@@ -104611,6 +110226,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAlertsInput = {
@@ -104638,6 +110254,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventCreateNestedManyWithoutSectionInput
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAlertsInput = {
@@ -104660,6 +110277,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedCreateNestedManyWithoutSectionInput
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAlertsInput = {
@@ -104793,6 +110411,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAlertsInput = {
@@ -104817,6 +110436,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutAlertsInput = {
@@ -104850,6 +110470,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUpdateManyWithoutSectionNestedInput
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAlertsInput = {
@@ -104872,6 +110493,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedUpdateManyWithoutSectionNestedInput
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutAlertsResolvedInput = {
@@ -105199,6 +110821,7 @@ export namespace Prisma {
     guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -105223,6 +110846,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -105252,6 +110876,7 @@ export namespace Prisma {
     guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutoringGivenInput = {
@@ -105276,6 +110901,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutoringGivenInput = {
@@ -105303,6 +110929,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventCreateNestedManyWithoutSectionInput
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -105325,6 +110952,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedCreateNestedManyWithoutSectionInput
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -105365,6 +110993,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -105389,6 +111018,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUpsertWithoutTutoringGivenInput = {
@@ -105424,6 +111054,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutoringGivenInput = {
@@ -105448,6 +111079,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutTutorAssignmentsInput = {
@@ -105481,6 +111113,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUpdateManyWithoutSectionNestedInput
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -105503,6 +111136,7 @@ export namespace Prisma {
     calendarEvents?: CalendarEventUncheckedUpdateManyWithoutSectionNestedInput
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserCreateWithoutAnnouncementsInput = {
@@ -105590,6 +111224,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAnnouncementsInput = {
@@ -105612,6 +111247,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAnnouncementsInput = {
@@ -105743,6 +111379,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAnnouncementsInput = {
@@ -105765,6 +111402,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type AnnouncementReadUpsertWithWhereUniqueWithoutAnnouncementInput = {
@@ -106585,6 +112223,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutCalendarEventsInput = {
@@ -106607,6 +112246,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutCalendarEventsInput = {
@@ -106710,6 +112350,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutCalendarEventsInput = {
@@ -106732,6 +112373,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutCalendarEventsInput = {
@@ -106813,6 +112455,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutTeacherProfileInput
     department?: DepartmentCreateNestedOneWithoutTeachersInput
     sections?: SectionCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileUncheckedCreateWithoutOfficeHoursInput = {
@@ -106823,6 +112466,7 @@ export namespace Prisma {
     officeLocation?: string | null
     bio?: string | null
     sections?: SectionUncheckedCreateNestedManyWithoutTeacherInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutHostInput
   }
 
   export type TeacherProfileCreateOrConnectWithoutOfficeHoursInput = {
@@ -106877,6 +112521,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutTeacherProfileNestedInput
     department?: DepartmentUpdateOneWithoutTeachersNestedInput
     sections?: SectionUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateWithoutOfficeHoursInput = {
@@ -106887,6 +112532,7 @@ export namespace Prisma {
     officeLocation?: NullableStringFieldUpdateOperationsInput | string | null
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     sections?: SectionUncheckedUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutHostNestedInput
   }
 
   export type OfficeHourBookingUpsertWithWhereUniqueWithoutOfficeHourInput = {
@@ -106958,6 +112604,7 @@ export namespace Prisma {
     guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutOfficeHourSlotsInput = {
@@ -106982,6 +112629,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutOfficeHourSlotsInput = {
@@ -107059,6 +112707,7 @@ export namespace Prisma {
     guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutOfficeHourSlotsInput = {
@@ -107083,6 +112732,765 @@ export namespace Prisma {
     guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type SectionCreateWithoutLiveGamesInput = {
+    id?: string
+    code: string
+    period: number
+    room?: string | null
+    capacity?: number
+    joinCode?: string
+    course: CourseCreateNestedOneWithoutSectionsInput
+    term: TermCreateNestedOneWithoutSectionsInput
+    teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
+    meetings?: SectionMeetingCreateNestedManyWithoutSectionInput
+    enrollments?: EnrollmentCreateNestedManyWithoutSectionInput
+    gradeCategories?: GradeCategoryCreateNestedManyWithoutSectionInput
+    assignments?: AssignmentCreateNestedManyWithoutSectionInput
+    assessments?: AssessmentCreateNestedManyWithoutSectionInput
+    attendanceSessions?: AttendanceSessionCreateNestedManyWithoutSectionInput
+    announcements?: AnnouncementCreateNestedManyWithoutSectionInput
+    calendarEvents?: CalendarEventCreateNestedManyWithoutSectionInput
+    pacing?: SectionPacingCreateNestedManyWithoutSectionInput
+    alerts?: AlertCreateNestedManyWithoutSectionInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+  }
+
+  export type SectionUncheckedCreateWithoutLiveGamesInput = {
+    id?: string
+    courseId: string
+    termId: string
+    teacherId: string
+    code: string
+    period: number
+    room?: string | null
+    capacity?: number
+    joinCode?: string
+    meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
+    gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
+    assignments?: AssignmentUncheckedCreateNestedManyWithoutSectionInput
+    assessments?: AssessmentUncheckedCreateNestedManyWithoutSectionInput
+    attendanceSessions?: AttendanceSessionUncheckedCreateNestedManyWithoutSectionInput
+    announcements?: AnnouncementUncheckedCreateNestedManyWithoutSectionInput
+    calendarEvents?: CalendarEventUncheckedCreateNestedManyWithoutSectionInput
+    pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+  }
+
+  export type SectionCreateOrConnectWithoutLiveGamesInput = {
+    where: SectionWhereUniqueInput
+    create: XOR<SectionCreateWithoutLiveGamesInput, SectionUncheckedCreateWithoutLiveGamesInput>
+  }
+
+  export type TeacherProfileCreateWithoutLiveGamesInput = {
+    id?: string
+    employeeNumber: string
+    officeLocation?: string | null
+    bio?: string | null
+    user: UserCreateNestedOneWithoutTeacherProfileInput
+    department?: DepartmentCreateNestedOneWithoutTeachersInput
+    sections?: SectionCreateNestedManyWithoutTeacherInput
+    officeHours?: OfficeHourCreateNestedManyWithoutTeacherInput
+  }
+
+  export type TeacherProfileUncheckedCreateWithoutLiveGamesInput = {
+    id?: string
+    userId: string
+    employeeNumber: string
+    departmentId?: string | null
+    officeLocation?: string | null
+    bio?: string | null
+    sections?: SectionUncheckedCreateNestedManyWithoutTeacherInput
+    officeHours?: OfficeHourUncheckedCreateNestedManyWithoutTeacherInput
+  }
+
+  export type TeacherProfileCreateOrConnectWithoutLiveGamesInput = {
+    where: TeacherProfileWhereUniqueInput
+    create: XOR<TeacherProfileCreateWithoutLiveGamesInput, TeacherProfileUncheckedCreateWithoutLiveGamesInput>
+  }
+
+  export type AssessmentCreateWithoutLiveGamesInput = {
+    id?: string
+    title: string
+    instructions?: string | null
+    standards?: string | null
+    totalPoints: number
+    timeLimitMinutes?: number | null
+    maxAttempts?: number
+    opensAt?: Date | string | null
+    closesAt?: Date | string | null
+    shuffleQuestions?: boolean
+    allowScratchpad?: boolean
+    allowAttachments?: boolean
+    lockdownEnabled?: boolean
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    section: SectionCreateNestedOneWithoutAssessmentsInput
+    unit?: UnitCreateNestedOneWithoutAssessmentsInput
+    assignment?: AssignmentCreateNestedOneWithoutAssessmentInput
+    questions?: QuestionCreateNestedManyWithoutAssessmentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type AssessmentUncheckedCreateWithoutLiveGamesInput = {
+    id?: string
+    sectionId: string
+    unitId?: string | null
+    assignmentId?: string | null
+    title: string
+    instructions?: string | null
+    standards?: string | null
+    totalPoints: number
+    timeLimitMinutes?: number | null
+    maxAttempts?: number
+    opensAt?: Date | string | null
+    closesAt?: Date | string | null
+    shuffleQuestions?: boolean
+    allowScratchpad?: boolean
+    allowAttachments?: boolean
+    lockdownEnabled?: boolean
+    publishedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    questions?: QuestionUncheckedCreateNestedManyWithoutAssessmentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutAssessmentInput
+  }
+
+  export type AssessmentCreateOrConnectWithoutLiveGamesInput = {
+    where: AssessmentWhereUniqueInput
+    create: XOR<AssessmentCreateWithoutLiveGamesInput, AssessmentUncheckedCreateWithoutLiveGamesInput>
+  }
+
+  export type LivePlayerCreateWithoutGameInput = {
+    id?: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutLivePlayersInput
+    answers?: LiveAnswerCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerUncheckedCreateWithoutGameInput = {
+    id?: string
+    studentId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutPlayerInput
+  }
+
+  export type LivePlayerCreateOrConnectWithoutGameInput = {
+    where: LivePlayerWhereUniqueInput
+    create: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput>
+  }
+
+  export type LivePlayerCreateManyGameInputEnvelope = {
+    data: LivePlayerCreateManyGameInput | LivePlayerCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type LiveAnswerCreateWithoutGameInput = {
+    id?: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+    player: LivePlayerCreateNestedOneWithoutAnswersInput
+  }
+
+  export type LiveAnswerUncheckedCreateWithoutGameInput = {
+    id?: string
+    playerId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LiveAnswerCreateOrConnectWithoutGameInput = {
+    where: LiveAnswerWhereUniqueInput
+    create: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput>
+  }
+
+  export type LiveAnswerCreateManyGameInputEnvelope = {
+    data: LiveAnswerCreateManyGameInput | LiveAnswerCreateManyGameInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SectionUpsertWithoutLiveGamesInput = {
+    update: XOR<SectionUpdateWithoutLiveGamesInput, SectionUncheckedUpdateWithoutLiveGamesInput>
+    create: XOR<SectionCreateWithoutLiveGamesInput, SectionUncheckedCreateWithoutLiveGamesInput>
+    where?: SectionWhereInput
+  }
+
+  export type SectionUpdateToOneWithWhereWithoutLiveGamesInput = {
+    where?: SectionWhereInput
+    data: XOR<SectionUpdateWithoutLiveGamesInput, SectionUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type SectionUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    period?: IntFieldUpdateOperationsInput | number
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
+    course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
+    term?: TermUpdateOneRequiredWithoutSectionsNestedInput
+    teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
+    meetings?: SectionMeetingUpdateManyWithoutSectionNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutSectionNestedInput
+    gradeCategories?: GradeCategoryUpdateManyWithoutSectionNestedInput
+    assignments?: AssignmentUpdateManyWithoutSectionNestedInput
+    assessments?: AssessmentUpdateManyWithoutSectionNestedInput
+    attendanceSessions?: AttendanceSessionUpdateManyWithoutSectionNestedInput
+    announcements?: AnnouncementUpdateManyWithoutSectionNestedInput
+    calendarEvents?: CalendarEventUpdateManyWithoutSectionNestedInput
+    pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
+    alerts?: AlertUpdateManyWithoutSectionNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+  }
+
+  export type SectionUncheckedUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    courseId?: StringFieldUpdateOperationsInput | string
+    termId?: StringFieldUpdateOperationsInput | string
+    teacherId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    period?: IntFieldUpdateOperationsInput | number
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
+    meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
+    gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
+    assignments?: AssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    assessments?: AssessmentUncheckedUpdateManyWithoutSectionNestedInput
+    attendanceSessions?: AttendanceSessionUncheckedUpdateManyWithoutSectionNestedInput
+    announcements?: AnnouncementUncheckedUpdateManyWithoutSectionNestedInput
+    calendarEvents?: CalendarEventUncheckedUpdateManyWithoutSectionNestedInput
+    pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+  }
+
+  export type TeacherProfileUpsertWithoutLiveGamesInput = {
+    update: XOR<TeacherProfileUpdateWithoutLiveGamesInput, TeacherProfileUncheckedUpdateWithoutLiveGamesInput>
+    create: XOR<TeacherProfileCreateWithoutLiveGamesInput, TeacherProfileUncheckedCreateWithoutLiveGamesInput>
+    where?: TeacherProfileWhereInput
+  }
+
+  export type TeacherProfileUpdateToOneWithWhereWithoutLiveGamesInput = {
+    where?: TeacherProfileWhereInput
+    data: XOR<TeacherProfileUpdateWithoutLiveGamesInput, TeacherProfileUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type TeacherProfileUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: StringFieldUpdateOperationsInput | string
+    officeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutTeacherProfileNestedInput
+    department?: DepartmentUpdateOneWithoutTeachersNestedInput
+    sections?: SectionUpdateManyWithoutTeacherNestedInput
+    officeHours?: OfficeHourUpdateManyWithoutTeacherNestedInput
+  }
+
+  export type TeacherProfileUncheckedUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    employeeNumber?: StringFieldUpdateOperationsInput | string
+    departmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    officeLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    bio?: NullableStringFieldUpdateOperationsInput | string | null
+    sections?: SectionUncheckedUpdateManyWithoutTeacherNestedInput
+    officeHours?: OfficeHourUncheckedUpdateManyWithoutTeacherNestedInput
+  }
+
+  export type AssessmentUpsertWithoutLiveGamesInput = {
+    update: XOR<AssessmentUpdateWithoutLiveGamesInput, AssessmentUncheckedUpdateWithoutLiveGamesInput>
+    create: XOR<AssessmentCreateWithoutLiveGamesInput, AssessmentUncheckedCreateWithoutLiveGamesInput>
+    where?: AssessmentWhereInput
+  }
+
+  export type AssessmentUpdateToOneWithWhereWithoutLiveGamesInput = {
+    where?: AssessmentWhereInput
+    data: XOR<AssessmentUpdateWithoutLiveGamesInput, AssessmentUncheckedUpdateWithoutLiveGamesInput>
+  }
+
+  export type AssessmentUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    standards?: NullableStringFieldUpdateOperationsInput | string | null
+    totalPoints?: FloatFieldUpdateOperationsInput | number
+    timeLimitMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    opensAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closesAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shuffleQuestions?: BoolFieldUpdateOperationsInput | boolean
+    allowScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    allowAttachments?: BoolFieldUpdateOperationsInput | boolean
+    lockdownEnabled?: BoolFieldUpdateOperationsInput | boolean
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
+    unit?: UnitUpdateOneWithoutAssessmentsNestedInput
+    assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
+    questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type AssessmentUncheckedUpdateWithoutLiveGamesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    unitId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignmentId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    instructions?: NullableStringFieldUpdateOperationsInput | string | null
+    standards?: NullableStringFieldUpdateOperationsInput | string | null
+    totalPoints?: FloatFieldUpdateOperationsInput | number
+    timeLimitMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    opensAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    closesAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shuffleQuestions?: BoolFieldUpdateOperationsInput | boolean
+    allowScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    allowAttachments?: BoolFieldUpdateOperationsInput | boolean
+    lockdownEnabled?: BoolFieldUpdateOperationsInput | boolean
+    publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
+  }
+
+  export type LivePlayerUpsertWithWhereUniqueWithoutGameInput = {
+    where: LivePlayerWhereUniqueInput
+    update: XOR<LivePlayerUpdateWithoutGameInput, LivePlayerUncheckedUpdateWithoutGameInput>
+    create: XOR<LivePlayerCreateWithoutGameInput, LivePlayerUncheckedCreateWithoutGameInput>
+  }
+
+  export type LivePlayerUpdateWithWhereUniqueWithoutGameInput = {
+    where: LivePlayerWhereUniqueInput
+    data: XOR<LivePlayerUpdateWithoutGameInput, LivePlayerUncheckedUpdateWithoutGameInput>
+  }
+
+  export type LivePlayerUpdateManyWithWhereWithoutGameInput = {
+    where: LivePlayerScalarWhereInput
+    data: XOR<LivePlayerUpdateManyMutationInput, LivePlayerUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type LiveAnswerUpsertWithWhereUniqueWithoutGameInput = {
+    where: LiveAnswerWhereUniqueInput
+    update: XOR<LiveAnswerUpdateWithoutGameInput, LiveAnswerUncheckedUpdateWithoutGameInput>
+    create: XOR<LiveAnswerCreateWithoutGameInput, LiveAnswerUncheckedCreateWithoutGameInput>
+  }
+
+  export type LiveAnswerUpdateWithWhereUniqueWithoutGameInput = {
+    where: LiveAnswerWhereUniqueInput
+    data: XOR<LiveAnswerUpdateWithoutGameInput, LiveAnswerUncheckedUpdateWithoutGameInput>
+  }
+
+  export type LiveAnswerUpdateManyWithWhereWithoutGameInput = {
+    where: LiveAnswerScalarWhereInput
+    data: XOR<LiveAnswerUpdateManyMutationInput, LiveAnswerUncheckedUpdateManyWithoutGameInput>
+  }
+
+  export type LiveAnswerScalarWhereInput = {
+    AND?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+    OR?: LiveAnswerScalarWhereInput[]
+    NOT?: LiveAnswerScalarWhereInput | LiveAnswerScalarWhereInput[]
+    id?: StringFilter<"LiveAnswer"> | string
+    gameId?: StringFilter<"LiveAnswer"> | string
+    playerId?: StringFilter<"LiveAnswer"> | string
+    questionId?: StringFilter<"LiveAnswer"> | string
+    optionId?: StringFilter<"LiveAnswer"> | string
+    isCorrect?: BoolFilter<"LiveAnswer"> | boolean
+    points?: IntFilter<"LiveAnswer"> | number
+    answeredAt?: DateTimeFilter<"LiveAnswer"> | Date | string
+  }
+
+  export type LiveGameCreateWithoutPlayersInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    section: SectionCreateNestedOneWithoutLiveGamesInput
+    host: TeacherProfileCreateNestedOneWithoutLiveGamesInput
+    assessment: AssessmentCreateNestedOneWithoutLiveGamesInput
+    answers?: LiveAnswerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateWithoutPlayersInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    answers?: LiveAnswerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameCreateOrConnectWithoutPlayersInput = {
+    where: LiveGameWhereUniqueInput
+    create: XOR<LiveGameCreateWithoutPlayersInput, LiveGameUncheckedCreateWithoutPlayersInput>
+  }
+
+  export type StudentProfileCreateWithoutLivePlayersInput = {
+    id?: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
+    enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordCreateNestedManyWithoutStudentInput
+    alerts?: AlertCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutLivePlayersInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    sectionId?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteUncheckedCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationUncheckedCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutLivePlayersInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutLivePlayersInput, StudentProfileUncheckedCreateWithoutLivePlayersInput>
+  }
+
+  export type LiveAnswerCreateWithoutPlayerInput = {
+    id?: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+    game: LiveGameCreateNestedOneWithoutAnswersInput
+  }
+
+  export type LiveAnswerUncheckedCreateWithoutPlayerInput = {
+    id?: string
+    gameId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LiveAnswerCreateOrConnectWithoutPlayerInput = {
+    where: LiveAnswerWhereUniqueInput
+    create: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput>
+  }
+
+  export type LiveAnswerCreateManyPlayerInputEnvelope = {
+    data: LiveAnswerCreateManyPlayerInput | LiveAnswerCreateManyPlayerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type LiveGameUpsertWithoutPlayersInput = {
+    update: XOR<LiveGameUpdateWithoutPlayersInput, LiveGameUncheckedUpdateWithoutPlayersInput>
+    create: XOR<LiveGameCreateWithoutPlayersInput, LiveGameUncheckedCreateWithoutPlayersInput>
+    where?: LiveGameWhereInput
+  }
+
+  export type LiveGameUpdateToOneWithWhereWithoutPlayersInput = {
+    where?: LiveGameWhereInput
+    data: XOR<LiveGameUpdateWithoutPlayersInput, LiveGameUncheckedUpdateWithoutPlayersInput>
+  }
+
+  export type LiveGameUpdateWithoutPlayersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    section?: SectionUpdateOneRequiredWithoutLiveGamesNestedInput
+    host?: TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput
+    assessment?: AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput
+    answers?: LiveAnswerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateWithoutPlayersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    answers?: LiveAnswerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type StudentProfileUpsertWithoutLivePlayersInput = {
+    update: XOR<StudentProfileUpdateWithoutLivePlayersInput, StudentProfileUncheckedUpdateWithoutLivePlayersInput>
+    create: XOR<StudentProfileCreateWithoutLivePlayersInput, StudentProfileUncheckedCreateWithoutLivePlayersInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutLivePlayersInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutLivePlayersInput, StudentProfileUncheckedUpdateWithoutLivePlayersInput>
+  }
+
+  export type StudentProfileUpdateWithoutLivePlayersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutLivePlayersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUncheckedUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUncheckedUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+  }
+
+  export type LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput = {
+    where: LiveAnswerWhereUniqueInput
+    update: XOR<LiveAnswerUpdateWithoutPlayerInput, LiveAnswerUncheckedUpdateWithoutPlayerInput>
+    create: XOR<LiveAnswerCreateWithoutPlayerInput, LiveAnswerUncheckedCreateWithoutPlayerInput>
+  }
+
+  export type LiveAnswerUpdateWithWhereUniqueWithoutPlayerInput = {
+    where: LiveAnswerWhereUniqueInput
+    data: XOR<LiveAnswerUpdateWithoutPlayerInput, LiveAnswerUncheckedUpdateWithoutPlayerInput>
+  }
+
+  export type LiveAnswerUpdateManyWithWhereWithoutPlayerInput = {
+    where: LiveAnswerScalarWhereInput
+    data: XOR<LiveAnswerUpdateManyMutationInput, LiveAnswerUncheckedUpdateManyWithoutPlayerInput>
+  }
+
+  export type LiveGameCreateWithoutAnswersInput = {
+    id?: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    section: SectionCreateNestedOneWithoutLiveGamesInput
+    host: TeacherProfileCreateNestedOneWithoutLiveGamesInput
+    assessment: AssessmentCreateNestedOneWithoutLiveGamesInput
+    players?: LivePlayerCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameUncheckedCreateWithoutAnswersInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+    players?: LivePlayerUncheckedCreateNestedManyWithoutGameInput
+  }
+
+  export type LiveGameCreateOrConnectWithoutAnswersInput = {
+    where: LiveGameWhereUniqueInput
+    create: XOR<LiveGameCreateWithoutAnswersInput, LiveGameUncheckedCreateWithoutAnswersInput>
+  }
+
+  export type LivePlayerCreateWithoutAnswersInput = {
+    id?: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+    game: LiveGameCreateNestedOneWithoutPlayersInput
+    student: StudentProfileCreateNestedOneWithoutLivePlayersInput
+  }
+
+  export type LivePlayerUncheckedCreateWithoutAnswersInput = {
+    id?: string
+    gameId: string
+    studentId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+  }
+
+  export type LivePlayerCreateOrConnectWithoutAnswersInput = {
+    where: LivePlayerWhereUniqueInput
+    create: XOR<LivePlayerCreateWithoutAnswersInput, LivePlayerUncheckedCreateWithoutAnswersInput>
+  }
+
+  export type LiveGameUpsertWithoutAnswersInput = {
+    update: XOR<LiveGameUpdateWithoutAnswersInput, LiveGameUncheckedUpdateWithoutAnswersInput>
+    create: XOR<LiveGameCreateWithoutAnswersInput, LiveGameUncheckedCreateWithoutAnswersInput>
+    where?: LiveGameWhereInput
+  }
+
+  export type LiveGameUpdateToOneWithWhereWithoutAnswersInput = {
+    where?: LiveGameWhereInput
+    data: XOR<LiveGameUpdateWithoutAnswersInput, LiveGameUncheckedUpdateWithoutAnswersInput>
+  }
+
+  export type LiveGameUpdateWithoutAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    section?: SectionUpdateOneRequiredWithoutLiveGamesNestedInput
+    host?: TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput
+    assessment?: AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput
+    players?: LivePlayerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateWithoutAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    players?: LivePlayerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type LivePlayerUpsertWithoutAnswersInput = {
+    update: XOR<LivePlayerUpdateWithoutAnswersInput, LivePlayerUncheckedUpdateWithoutAnswersInput>
+    create: XOR<LivePlayerCreateWithoutAnswersInput, LivePlayerUncheckedCreateWithoutAnswersInput>
+    where?: LivePlayerWhereInput
+  }
+
+  export type LivePlayerUpdateToOneWithWhereWithoutAnswersInput = {
+    where?: LivePlayerWhereInput
+    data: XOR<LivePlayerUpdateWithoutAnswersInput, LivePlayerUncheckedUpdateWithoutAnswersInput>
+  }
+
+  export type LivePlayerUpdateWithoutAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: LiveGameUpdateOneRequiredWithoutPlayersNestedInput
+    student?: StudentProfileUpdateOneRequiredWithoutLivePlayersNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateWithoutAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AccountCreateManyUserInput = {
@@ -107741,6 +114149,14 @@ export namespace Prisma {
     notes?: string | null
   }
 
+  export type LivePlayerCreateManyStudentInput = {
+    id?: string
+    gameId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+  }
+
   export type EnrollmentUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumEnrollmentStatusFieldUpdateOperationsInput | $Enums.EnrollmentStatus
@@ -108131,6 +114547,32 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type LivePlayerUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: LiveGameUpdateOneRequiredWithoutPlayersNestedInput
+    answers?: LiveAnswerUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    answers?: LiveAnswerUncheckedUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StudentProfileCreateManySectionInput = {
     id?: string
     userId: string
@@ -108165,6 +114607,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSectionInput = {
@@ -108189,6 +114632,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateManyWithoutSectionInput = {
@@ -108226,6 +114670,20 @@ export namespace Prisma {
     label?: string | null
   }
 
+  export type LiveGameCreateManyHostInput = {
+    id?: string
+    sectionId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+  }
+
   export type SectionUpdateWithoutTeacherInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
@@ -108246,6 +114704,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTeacherInput = {
@@ -108268,6 +114727,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutTeacherInput = {
@@ -108317,6 +114777,52 @@ export namespace Prisma {
     meetingUrl?: NullableStringFieldUpdateOperationsInput | string | null
     capacity?: IntFieldUpdateOperationsInput | number
     label?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type LiveGameUpdateWithoutHostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    section?: SectionUpdateOneRequiredWithoutLiveGamesNestedInput
+    assessment?: AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput
+    players?: LivePlayerUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateWithoutHostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    players?: LivePlayerUncheckedUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutHostInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type GuardianLinkCreateManyGuardianInput = {
@@ -108403,6 +114909,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutTeacherProfileNestedInput
     sections?: SectionUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateWithoutDepartmentInput = {
@@ -108413,6 +114920,7 @@ export namespace Prisma {
     bio?: NullableStringFieldUpdateOperationsInput | string | null
     sections?: SectionUncheckedUpdateManyWithoutTeacherNestedInput
     officeHours?: OfficeHourUncheckedUpdateManyWithoutTeacherNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutHostNestedInput
   }
 
   export type TeacherProfileUncheckedUpdateManyWithoutDepartmentInput = {
@@ -108454,6 +114962,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTermInput = {
@@ -108476,6 +114985,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutTermInput = {
@@ -108528,6 +115038,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutCourseInput = {
@@ -108550,6 +115061,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutCourseInput = {
@@ -108729,6 +115241,20 @@ export namespace Prisma {
     notes?: string | null
   }
 
+  export type LiveGameCreateManySectionInput = {
+    id?: string
+    hostId: string
+    assessmentId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+  }
+
   export type SectionMeetingUpdateWithoutSectionInput = {
     id?: StringFieldUpdateOperationsInput | string
     dayOfWeek?: EnumDayOfWeekFieldUpdateOperationsInput | $Enums.DayOfWeek
@@ -108901,6 +115427,7 @@ export namespace Prisma {
     unit?: UnitUpdateOneWithoutAssessmentsNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -108924,6 +115451,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -109147,6 +115675,52 @@ export namespace Prisma {
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type LiveGameUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    host?: TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput
+    assessment?: AssessmentUpdateOneRequiredWithoutLiveGamesNestedInput
+    players?: LivePlayerUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    players?: LivePlayerUncheckedUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type GradeSnapshotCreateManyEnrollmentInput = {
@@ -109408,6 +115982,7 @@ export namespace Prisma {
     section?: SectionUpdateOneRequiredWithoutAssessmentsNestedInput
     assignment?: AssignmentUpdateOneWithoutAssessmentNestedInput
     questions?: QuestionUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -109431,6 +116006,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     questions?: QuestionUncheckedUpdateManyWithoutAssessmentNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutAssessmentNestedInput
     attempts?: AssessmentAttemptUncheckedUpdateManyWithoutAssessmentNestedInput
   }
 
@@ -110207,6 +116783,20 @@ export namespace Prisma {
     tolerance?: number | null
   }
 
+  export type LiveGameCreateManyAssessmentInput = {
+    id?: string
+    sectionId: string
+    hostId: string
+    status?: $Enums.LiveGameStatus
+    questionIds?: LiveGameCreatequestionIdsInput | string[]
+    currentIndex?: number
+    questionStartedAt?: Date | string | null
+    secondsPerQuestion?: number
+    teamMode?: boolean
+    createdAt?: Date | string
+    finishedAt?: Date | string | null
+  }
+
   export type AssessmentAttemptCreateManyAssessmentInput = {
     id?: string
     studentId: string
@@ -110260,6 +116850,52 @@ export namespace Prisma {
     explanation?: NullableStringFieldUpdateOperationsInput | string | null
     answerKey?: NullableStringFieldUpdateOperationsInput | string | null
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
+  }
+
+  export type LiveGameUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    section?: SectionUpdateOneRequiredWithoutLiveGamesNestedInput
+    host?: TeacherProfileUpdateOneRequiredWithoutLiveGamesNestedInput
+    players?: LivePlayerUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    players?: LivePlayerUncheckedUpdateManyWithoutGameNestedInput
+    answers?: LiveAnswerUncheckedUpdateManyWithoutGameNestedInput
+  }
+
+  export type LiveGameUncheckedUpdateManyWithoutAssessmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    hostId?: StringFieldUpdateOperationsInput | string
+    status?: EnumLiveGameStatusFieldUpdateOperationsInput | $Enums.LiveGameStatus
+    questionIds?: LiveGameUpdatequestionIdsInput | string[]
+    currentIndex?: IntFieldUpdateOperationsInput | number
+    questionStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    secondsPerQuestion?: IntFieldUpdateOperationsInput | number
+    teamMode?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type AssessmentAttemptUpdateWithoutAssessmentInput = {
@@ -110709,6 +117345,120 @@ export namespace Prisma {
     status?: EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
     topic?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LivePlayerCreateManyGameInput = {
+    id?: string
+    studentId: string
+    team?: number | null
+    score?: number
+    joinedAt?: Date | string
+  }
+
+  export type LiveAnswerCreateManyGameInput = {
+    id?: string
+    playerId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LivePlayerUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutLivePlayersNestedInput
+    answers?: LiveAnswerUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    answers?: LiveAnswerUncheckedUpdateManyWithoutPlayerNestedInput
+  }
+
+  export type LivePlayerUncheckedUpdateManyWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    team?: NullableIntFieldUpdateOperationsInput | number | null
+    score?: IntFieldUpdateOperationsInput | number
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    player?: LivePlayerUpdateOneRequiredWithoutAnswersNestedInput
+  }
+
+  export type LiveAnswerUncheckedUpdateWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    playerId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerUncheckedUpdateManyWithoutGameInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    playerId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerCreateManyPlayerInput = {
+    id?: string
+    gameId: string
+    questionId: string
+    optionId: string
+    isCorrect: boolean
+    points: number
+    answeredAt?: Date | string
+  }
+
+  export type LiveAnswerUpdateWithoutPlayerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    game?: LiveGameUpdateOneRequiredWithoutAnswersNestedInput
+  }
+
+  export type LiveAnswerUncheckedUpdateWithoutPlayerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LiveAnswerUncheckedUpdateManyWithoutPlayerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    gameId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    optionId?: StringFieldUpdateOperationsInput | string
+    isCorrect?: BoolFieldUpdateOperationsInput | boolean
+    points?: IntFieldUpdateOperationsInput | number
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -729,6 +729,41 @@ exports.Prisma.WaitlistEntryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.LiveGameScalarFieldEnum = {
+  id: 'id',
+  sectionId: 'sectionId',
+  hostId: 'hostId',
+  assessmentId: 'assessmentId',
+  status: 'status',
+  questionIds: 'questionIds',
+  currentIndex: 'currentIndex',
+  questionStartedAt: 'questionStartedAt',
+  secondsPerQuestion: 'secondsPerQuestion',
+  teamMode: 'teamMode',
+  createdAt: 'createdAt',
+  finishedAt: 'finishedAt'
+};
+
+exports.Prisma.LivePlayerScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  studentId: 'studentId',
+  team: 'team',
+  score: 'score',
+  joinedAt: 'joinedAt'
+};
+
+exports.Prisma.LiveAnswerScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  playerId: 'playerId',
+  questionId: 'questionId',
+  optionId: 'optionId',
+  isCorrect: 'isCorrect',
+  points: 'points',
+  answeredAt: 'answeredAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -995,6 +1030,13 @@ exports.BookingStatus = exports.$Enums.BookingStatus = {
   NO_SHOW: 'NO_SHOW'
 };
 
+exports.LiveGameStatus = exports.$Enums.LiveGameStatus = {
+  LOBBY: 'LOBBY',
+  QUESTION: 'QUESTION',
+  REVEAL: 'REVEAL',
+  FINISHED: 'FINISHED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
@@ -1052,7 +1094,10 @@ exports.Prisma.ModelName = {
   CalendarEvent: 'CalendarEvent',
   OfficeHour: 'OfficeHour',
   OfficeHourBooking: 'OfficeHourBooking',
-  WaitlistEntry: 'WaitlistEntry'
+  WaitlistEntry: 'WaitlistEntry',
+  LiveGame: 'LiveGame',
+  LivePlayer: 'LivePlayer',
+  LiveAnswer: 'LiveAnswer'
 };
 
 /**
