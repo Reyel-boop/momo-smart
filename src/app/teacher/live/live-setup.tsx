@@ -34,10 +34,17 @@ export function LiveSetup({ classes }: { classes: Classes }) {
   const [teamMode, setTeamMode] = useState(false);
   const [count, setCount] = useState<QuestionCount>(5);
   // Questions available: one unit's, or every unit's for a mixed review.
+  const allUnits =
+    current?.quizzes.reduce((sum, q) => sum + q.questions, 0) ?? 0;
   const available =
     assessmentId === ALL_UNITS
-      ? (current?.quizzes.reduce((sum, q) => sum + q.questions, 0) ?? 0)
+      ? allUnits
       : (current?.quizzes.find((q) => q.id === assessmentId)?.questions ?? 0);
+  /** Picking more than one unit holds switches to the mixed review. */
+  const chooseCount = (n: QuestionCount) => {
+    setCount(n);
+    if (n > available && n <= allUnits) setAssessmentId(ALL_UNITS);
+  };
   const playableCount =
     count <= available
       ? count
@@ -133,8 +140,8 @@ export function LiveSetup({ classes }: { classes: Classes }) {
               <button
                 key={n}
                 type="button"
-                onClick={() => setCount(n)}
-                disabled={n > available}
+                onClick={() => chooseCount(n)}
+                disabled={n > allUnits}
                 aria-pressed={playableCount === n}
                 className={`rounded-lg border px-3 py-2.5 text-base font-extrabold transition disabled:cursor-not-allowed disabled:opacity-40 ${
                   playableCount === n
@@ -147,9 +154,9 @@ export function LiveSetup({ classes }: { classes: Classes }) {
             ))}
           </div>
           <p className="text-muted mt-1 text-xs">
-            {available < 20
-              ? `${available} questions available here${assessmentId !== ALL_UNITS && (current?.quizzes.length ?? 0) > 1 ? " — choose All units for more" : ""}. `
-              : ""}
+            {assessmentId === ALL_UNITS
+              ? `Mixed from all ${current?.quizzes.length ?? 0} units (${allUnits} questions). `
+              : `This unit has ${available} questions; 10, 15 or 20 mix in questions from all units. `}
             Questions are picked at random.
           </p>
         </fieldset>
