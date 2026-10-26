@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
 import { CODE_LEVELS, codeStars } from "~/lib/games/code-quest";
+import { questStars, replay } from "~/lib/games/quest";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
@@ -13,6 +14,8 @@ import type { PrismaClient } from "../../../../generated/prisma";
  * stars on each level count toward the leaderboard.
  */
 type Game = "code" | "call";
+/** Progress rows also use "quest" (Momo's Quest, one level per unit quiz). */
+type SavedGame = Game | "quest";
 
 const GAMES = {
   code: {
@@ -88,7 +91,7 @@ async function assertPlayable(
 async function saveBest(
   db: PrismaClient,
   studentId: string,
-  game: Game,
+  game: SavedGame,
   levelId: string,
   stars: number,
   score: number,
@@ -218,4 +221,220 @@ export const gameRouter = createTRPCRouter({
           : { best: 0, newStars: 0 };
       return { ...result, ...saved };
     }),
+
+  /** Momo's Quest: the unit quizzes of the student's classes, with best stars. */
+  questUnits: studentProcedure.query(async ({ ctx }) => {
+    const quizzes = await ctx.db.assessment.findMany({
+      where: {
+        assignmentId: null,
+        unitId: { not: null },
+        publishedAt: { not: null },
+        section: {
+          term: { isCurrent: true },
+          enrollments: { some: { studentId: ctx.studentId, status: "ACTIVE" } },
+        },
+      },
+      orderBy: [
+        { section: { course: { name: "asc" } } },
+        { unit: { order: "asc" } },
+      ],
+      select: {
+        id: true,
+        section: { select: { code: true, course: { select: { name: true } } } },
+        unit: { select: { order: true, title: true } },
+        _count: { select: { questions: true } },
+      },
+    });
+    const best = await ctx.db.gameProgress.findMany({
+      where: { studentId: ctx.studentId, game: "quest" },
+      select: { levelId: true, stars: true },
+    });
+    const stars = new Map(best.map((b) => [b.levelId, b.stars]));
+    return quizzes
+      .filter((q) => q._count.questions > 0)
+      .map((q) => ({
+        assessmentId: q.id,
+        className: `${q.section.course.name} — ${q.section.code}`,
+        unit: q.unit!.order,
+        unitTitle: q.unit!.title,
+        questions: q._count.questions,
+        stars: stars.get(q.id) ?? 0,
+      }));
+  }),
+
+  /** Momo's Quest: a unit's questions, shuffled, without the answers. */
+  questQuestions: studentProcedure
+    .input(z.object({ assessmentId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
+      const questions = await ctx.db.question.findMany({
+        where: {
+          type: "MULTIPLE_CHOICE",
+          options: { some: { isCorrect: true } },
+          assessment: {
+            sectionId: quiz.sectionId,
+            OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
+          },
+        },
+        select: {
+          id: true,
+          prompt: true,
+          options: {
+            orderBy: { order: "asc" },
+            select: { id: true, label: true, text: true },
+          },
+        },
+      });
+      for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j]!, questions[i]!];
+      }
+      return {
+        // Unit titles may already start with "Unit 3: …".
+        title: /^unit\s+\d/i.test(quiz.unitTitle)
+          ? quiz.unitTitle
+          : `Unit ${quiz.unitOrder}: ${quiz.unitTitle}`,
+        className: quiz.className,
+        best: quiz.best,
+        questions,
+      };
+    }),
+
+  /** Momo's Quest: checks one answer and gives the rationale. */
+  questAnswer: studentProcedure
+    .input(
+      z.object({
+        assessmentId: z.string(),
+        questionId: z.string(),
+        optionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
+      const question = await questionOf(ctx.db, quiz, input.questionId);
+      const right = question.options.find((o) => o.isCorrect);
+      return {
+        correct: right?.id === input.optionId,
+        correctOptionId: right?.id ?? null,
+        explanation: question.explanation,
+      };
+    }),
+
+  /** Momo's Quest: replays the answers, and saves the stars of a win. */
+  questFinish: studentProcedure
+    .input(
+      z.object({
+        assessmentId: z.string(),
+        answers: z
+          .array(z.object({ questionId: z.string(), optionId: z.string() }))
+          .max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
+      const ids = [...new Set(input.answers.map((a) => a.questionId))];
+      const questions = await ctx.db.question.findMany({
+        where: {
+          id: { in: ids },
+          assessment: {
+            sectionId: quiz.sectionId,
+            OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
+          },
+        },
+        select: {
+          id: true,
+          options: { where: { isCorrect: true }, select: { id: true } },
+        },
+      });
+      const correctOf = new Map(questions.map((q) => [q.id, q.options[0]?.id]));
+      const state = replay(
+        input.answers.map((a) => correctOf.get(a.questionId) === a.optionId),
+      );
+      const stars = questStars(state);
+      const saved =
+        stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "quest",
+              quiz.id,
+              stars,
+              state.lives,
+            )
+          : { best: quiz.best, newStars: 0 };
+      return {
+        won: state.won,
+        dead: state.dead,
+        stars,
+        wrong: state.wrong,
+        ...saved,
+      };
+    }),
 });
+
+/** A unit quiz the student can quest on (enrolled, published). */
+async function questQuiz(
+  db: PrismaClient,
+  studentId: string,
+  assessmentId: string,
+) {
+  const quiz = await db.assessment.findFirst({
+    where: {
+      id: assessmentId,
+      assignmentId: null,
+      unitId: { not: null },
+      publishedAt: { not: null },
+      section: { enrollments: { some: { studentId, status: "ACTIVE" } } },
+    },
+    select: {
+      id: true,
+      sectionId: true,
+      unitId: true,
+      unit: { select: { order: true, title: true } },
+      section: { select: { code: true, course: { select: { name: true } } } },
+    },
+  });
+  if (!quiz?.unitId || !quiz.unit) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "That quest is not in your classes.",
+    });
+  }
+  const best = await db.gameProgress.findUnique({
+    where: { studentId_levelId: { studentId, levelId: quiz.id } },
+    select: { stars: true },
+  });
+  return {
+    id: quiz.id,
+    sectionId: quiz.sectionId,
+    unitId: quiz.unitId,
+    unitOrder: quiz.unit.order,
+    unitTitle: quiz.unit.title,
+    className: `${quiz.section.course.name} — ${quiz.section.code}`,
+    best: best?.stars ?? 0,
+  };
+}
+
+async function questionOf(
+  db: PrismaClient,
+  quiz: { id: string; sectionId: string; unitId: string },
+  questionId: string,
+) {
+  const question = await db.question.findFirst({
+    where: {
+      id: questionId,
+      assessment: {
+        sectionId: quiz.sectionId,
+        OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
+      },
+    },
+    select: {
+      explanation: true,
+      options: { select: { id: true, isCorrect: true } },
+    },
+  });
+  if (!question) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Question not found." });
+  }
+  return question;
+}

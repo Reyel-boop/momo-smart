@@ -8,7 +8,10 @@ import { api } from "~/trpc/react";
 
 /** One tab per class; each shows that class's race with the student's team. */
 export function StudentRace() {
-  const races = api.race.mine.useQuery(undefined, { refetchInterval: 20000 });
+  const races = api.race.mine.useQuery(undefined, {
+    refetchInterval: (q) =>
+      q.state.data?.some((r) => r.session?.running) ? 5000 : 20000,
+  });
   const [picked, setPicked] = useState<string | null>(null);
 
   if (races.isLoading) {

@@ -7,7 +7,12 @@ import {
   teacherProcedure,
 } from "~/server/api/trpc";
 import { assertEnrolled, assertTeachesSection } from "~/server/lib/permissions";
-import { raceFor, reshuffleTeams, TEAM_COUNT } from "~/server/lib/race";
+import {
+  RACE_MINUTES,
+  raceFor,
+  reshuffleTeams,
+  TEAM_COUNT,
+} from "~/server/lib/race";
 
 /**
  * Group Race: five teams per class racing on the stars their members earn
@@ -80,6 +85,47 @@ export const raceRouter = createTRPCRouter({
             t.members.some((m) => m.studentId === ctx.studentId),
           )?.number ?? null,
       };
+    }),
+
+  /** Teacher: starts a timed race (ending any race still running). */
+  start: teacherProcedure
+    .input(
+      z.object({
+        sectionId: z.string(),
+        minutes: z
+          .number()
+          .int()
+          .refine((m) => (RACE_MINUTES as readonly number[]).includes(m)),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
+      const now = new Date();
+      await ctx.db.raceSession.updateMany({
+        where: { sectionId: input.sectionId, endsAt: { gt: now } },
+        data: { endsAt: now },
+      });
+      await ctx.db.raceSession.create({
+        data: {
+          sectionId: input.sectionId,
+          startsAt: now,
+          endsAt: new Date(now.getTime() + input.minutes * 60_000),
+        },
+      });
+      return { ok: true };
+    }),
+
+  /** Teacher: ends the running race now. */
+  stop: teacherProcedure
+    .input(z.object({ sectionId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
+      const now = new Date();
+      await ctx.db.raceSession.updateMany({
+        where: { sectionId: input.sectionId, endsAt: { gt: now } },
+        data: { endsAt: now },
+      });
+      return { ok: true };
     }),
 
   /** Teacher: shuffles the class into five new teams. */

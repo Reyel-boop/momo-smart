@@ -18,6 +18,12 @@ import {
   starTotals,
 } from "~/server/lib/stars";
 
+const GAME_LABELS: Record<string, { title: string; course: string }> = {
+  code: { title: "Code Quest", course: "Computer Programming" },
+  call: { title: "Call Simulator", course: "Telecommunications" },
+  quest: { title: "Momo's Quest", course: "Unit quests" },
+};
+
 export const dashboardRouter = createTRPCRouter({
   /**
    * Teacher Command Center header: enrolment, grading backlog, attendance and
@@ -471,15 +477,18 @@ export const dashboardRouter = createTRPCRouter({
         isPerfect: entry.stars >= entry.totalPoints,
       })),
       ...gameLedger.map((entry) => {
+        const game = GAME_LABELS[entry.game] ?? GAME_LABELS.quest!;
+        // Quest levels are the units played so far; the others are fixed.
         const max =
-          (entry.game === "code" ? CODE_LEVELS : CALL_LEVELS).length * 3;
+          (entry.game === "code"
+            ? CODE_LEVELS.length
+            : entry.game === "call"
+              ? CALL_LEVELS.length
+              : entry.levels) * 3;
         return {
           id: `game-${entry.game}`,
-          title: entry.game === "code" ? "Code Quest" : "Call Simulator",
-          courseName:
-            entry.game === "code"
-              ? "Computer Programming"
-              : "Telecommunications",
+          title: game.title,
+          courseName: game.course,
           type: "GAME",
           releasedAt: entry.playedAt,
           score: entry.stars,

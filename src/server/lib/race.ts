@@ -160,26 +160,28 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
       });
     }
   }
+  // Course games, and Momo's Quest on this class's units (best result).
   const game = courseCode.endsWith("-CP")
     ? "code"
     : courseCode.endsWith("-TEL")
       ? "call"
       : null;
-  if (game) {
-    const played = await db.gameProgress.findMany({
-      where: {
-        game,
-        student: { enrollments: { some: { sectionId, status: "ACTIVE" } } },
-      },
-      select: { studentId: true, stars: true, completedAt: true },
-    });
-    for (const p of played) {
-      events.push({
-        studentId: p.studentId,
-        at: p.completedAt,
-        stars: p.stars,
-      });
-    }
+  const units = await db.assessment.findMany({
+    where: { sectionId, unitId: { not: null }, assignmentId: null },
+    select: { id: true },
+  });
+  const played = await db.gameProgress.findMany({
+    where: {
+      student: { enrollments: { some: { sectionId, status: "ACTIVE" } } },
+      OR: [
+        ...(game ? [{ game }] : []),
+        { game: "quest", levelId: { in: units.map((u) => u.id) } },
+      ],
+    },
+    select: { studentId: true, stars: true, updatedAt: true },
+  });
+  for (const p of played) {
+    events.push({ studentId: p.studentId, at: p.updatedAt, stars: p.stars });
   }
   return events;
 }
@@ -187,11 +189,15 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
 const DAY = 24 * 60 * 60 * 1000;
 const dayKey = (d: Date) => d.toISOString().slice(0, 10);
 
+/** Race lengths a teacher can pick, in minutes. */
+export const RACE_MINUTES = [5, 10, 15, 30, 60, 24 * 60, 7 * 24 * 60] as const;
+
 /**
  * The race for one class: teams ranked by stars, each member's stars, and
- * each team's running total per day for the last `days` days.
+ * each team's running total over time. During or after a timed race only
+ * the stars earned inside it count; with no race yet, all stars do.
  */
-export async function raceFor(db: Db, sectionId: string, days = 14) {
+export async function raceFor(db: Db, sectionId: string) {
   await ensureTeams(db, sectionId);
   const section = await db.section.findUniqueOrThrow({
     where: { id: sectionId },
@@ -199,6 +205,11 @@ export async function raceFor(db: Db, sectionId: string, days = 14) {
       id: true,
       code: true,
       course: { select: { name: true, code: true } },
+      raceSessions: {
+        orderBy: { startsAt: "desc" },
+        take: 1,
+        select: { id: true, startsAt: true, endsAt: true },
+      },
       raceTeams: {
         orderBy: { number: "asc" },
         select: {
@@ -215,41 +226,71 @@ export async function raceFor(db: Db, sectionId: string, days = 14) {
       },
     },
   });
-  const events = await starEvents(db, sectionId, section.course.code);
+  const now = new Date();
+  const session = section.raceSessions[0] ?? null;
+  const all = await starEvents(db, sectionId, section.course.code);
+  const until = session && session.endsAt < now ? session.endsAt : now;
+  const events = session
+    ? all.filter((e) => e.at >= session.startsAt && e.at <= until)
+    : all;
 
   const teamOf = new Map<string, number>();
   for (const t of section.raceTeams) {
     for (const m of t.members) teamOf.set(m.studentId, t.number);
   }
   const perStudent = new Map<string, number>();
-  const weekAgo = Date.now() - 7 * DAY;
-  const weekGain = new Map<number, number>();
   for (const e of events) {
     perStudent.set(e.studentId, (perStudent.get(e.studentId) ?? 0) + e.stars);
-    const team = teamOf.get(e.studentId);
-    if (team !== undefined && e.at.getTime() >= weekAgo) {
-      weekGain.set(team, (weekGain.get(team) ?? 0) + e.stars);
-    }
   }
 
-  // Running totals per day; stars from before the window form the start.
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  const dates = Array.from({ length: days }, (_, i) =>
-    dayKey(new Date(today.getTime() - (days - 1 - i) * DAY)),
-  );
-  const daily = section.raceTeams.map(() => new Array<number>(days).fill(0));
-  for (const e of events) {
-    const team = teamOf.get(e.studentId);
-    if (team === undefined) continue;
-    const key = dayKey(e.at);
-    const index = key < dates[0]! ? 0 : dates.indexOf(key);
-    if (index >= 0) daily[team]![index]! += e.stars;
+  // Running totals: 12 steps across a timed race, or the last 14 days.
+  const buckets: Array<{ end: number; label: string }> = [];
+  if (session) {
+    const start = session.startsAt.getTime();
+    const span = Math.max(60_000, until.getTime() - start);
+    const short = span < 2 * DAY;
+    for (let i = 1; i <= 12; i++) {
+      const end = start + (span * i) / 12;
+      const d = new Date(end);
+      buckets.push({
+        end,
+        label: short
+          ? d.toLocaleTimeString("en-PH", {
+              hour: "numeric",
+              minute: "2-digit",
+              timeZone: "Asia/Manila",
+            })
+          : d.toLocaleDateString("en-PH", {
+              month: "short",
+              day: "numeric",
+              timeZone: "Asia/Manila",
+            }),
+      });
+    }
+  } else {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+    for (let i = 13; i >= 0; i--) {
+      const day = new Date(today.getTime() - i * DAY);
+      buckets.push({
+        end: day.getTime() + DAY - 1,
+        label: new Date(`${dayKey(day)}T00:00:00`).toLocaleDateString("en-PH", {
+          month: "short",
+          day: "numeric",
+        }),
+      });
+    }
   }
-  const history = daily.map((row) => {
-    let sum = 0;
-    return row.map((v) => (sum += v));
-  });
+  const history = section.raceTeams.map((t) =>
+    buckets.map((b) =>
+      events
+        .filter(
+          (e) =>
+            teamOf.get(e.studentId) === t.number && e.at.getTime() <= b.end,
+        )
+        .reduce((sum, e) => sum + e.stars, 0),
+    ),
+  );
 
   const teams = section.raceTeams
     .map((t) => {
@@ -260,7 +301,7 @@ export async function raceFor(db: Db, sectionId: string, days = 14) {
           stars: perStudent.get(m.studentId) ?? 0,
         }))
         .sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
-      const stars = members.reduce((s, m) => s + m.stars, 0);
+      const stars = members.reduce((sum, m) => sum + m.stars, 0);
       return {
         id: t.id,
         number: t.number,
@@ -269,7 +310,6 @@ export async function raceFor(db: Db, sectionId: string, days = 14) {
         average: members.length
           ? Math.round((stars / members.length) * 10) / 10
           : 0,
-        thisWeek: weekGain.get(t.number) ?? 0,
         members,
       };
     })
@@ -285,8 +325,17 @@ export async function raceFor(db: Db, sectionId: string, days = 14) {
   return {
     sectionId: section.id,
     className: `${section.course.name} — ${section.code}`,
+    now: now.toISOString(),
+    session: session
+      ? {
+          id: session.id,
+          startsAt: session.startsAt.toISOString(),
+          endsAt: session.endsAt.toISOString(),
+          running: session.endsAt > now,
+        }
+      : null,
     teams: ranked,
-    dates,
+    labels: buckets.map((b) => b.label),
     history: section.raceTeams.map((t, i) => ({
       number: t.number,
       name: t.name,

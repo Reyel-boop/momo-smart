@@ -321,6 +321,7 @@ model Section {
   tutorAssignments   PeerTutorAssignment[]
   liveGames          LiveGame[]
   raceTeams          RaceTeam[]
+  raceSessions       RaceSession[]
 
   @@unique([termId, courseId, code])
   @@index([teacherId, termId])
@@ -1496,4 +1497,18 @@ model RaceMember {
 
   @@unique([sectionId, studentId])
   @@index([teamId])
+}
+
+/// A timed Group Race in a class: only stars earned between startsAt and
+/// endsAt count. The latest one is the class's current (or last) race.
+model RaceSession {
+  id        String   @id @default(cuid())
+  sectionId String
+  startsAt  DateTime @default(now())
+  endsAt    DateTime
+  createdAt DateTime @default(now())
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId, startsAt])
 }

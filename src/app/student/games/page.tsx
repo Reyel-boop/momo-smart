@@ -6,6 +6,7 @@ import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { api } from "~/trpc/server";
 import { Stars } from "./_components/stars";
+import { Enemy, MomoHero } from "./quest/_components/art";
 
 export const metadata: Metadata = { title: "Games · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -43,11 +44,35 @@ export default async function GamesPage() {
         subtitle="Learn by playing. Each level gives up to 3 Stars, and your stars count on the leaderboard."
       />
 
+      <Link
+        href="/student/games/quest"
+        className="group relative block overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-700 px-6 py-6 text-white shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl"
+      >
+        <div className="relative z-10 max-w-lg">
+          <p className="text-xs font-black tracking-[0.25em] text-amber-300 uppercase">
+            Every class · every unit
+          </p>
+          <h2 className="text-3xl font-black">Momo&apos;s Quest</h2>
+          <p className="mt-1 text-sm text-white/85">
+            Help Momo the super pup defeat King Virus by answering your
+            units&apos; questions. Miss 5 and Momo faints!
+          </p>
+          <span className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-slate-900 group-hover:bg-amber-300">
+            <PlayIcon className="size-4" /> Play
+          </span>
+        </div>
+        <MomoHero className="absolute right-28 -bottom-4 hidden w-44 transition group-hover:-translate-y-1 sm:block" />
+        <Enemy
+          kind="boss"
+          className="absolute right-2 bottom-2 hidden w-24 sm:block"
+        />
+      </Link>
+
       {games.length === 0 && (
         <Card>
           <EmptyState>
-            Games appear here when you join Computer Programming or
-            Telecommunications. Ask your teacher for the class code.
+            Code Quest and Call Simulator appear here when you join Computer
+            Programming or Telecommunications.
           </EmptyState>
         </Card>
       )}
