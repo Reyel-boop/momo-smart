@@ -146,6 +146,15 @@ export const sfx = {
     for (let t = 0; t < seconds; t += 0.05)
       noise(t, 0.05, 1500, 0.08 + t * 0.05);
   },
+  /** An Elemental Burst: a rising charge, a chord, then thunder. */
+  burst() {
+    tone(0, 180, 1400, 0.7, "sawtooth", 0.08);
+    tone(0, 90, 700, 0.7, "triangle", 0.12);
+    [523, 659, 784, 988].forEach((f) =>
+      tone(0.45, f, f, 0.6, "triangle", 0.07),
+    );
+    noise(0.75, 0.5, 4000, 0.25);
+  },
   /** A countdown tick. */
   tick() {
     tone(0, 1800, 1800, 0.04, "square", 0.05);

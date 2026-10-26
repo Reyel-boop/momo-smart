@@ -30,6 +30,7 @@ type Phase =
   | "impact" // the hit lands
   | "enemyDown"
   | "enemyIn"
+  | "burst" // 3 in a row: the Elemental Burst cut-in
   | "miss" // wrong answer: the swing misses
   | "lunge" // the monster strikes back
   | "review"
@@ -165,6 +166,12 @@ export function Battle({
     if (result.correct) {
       const isSuper = next.state.streak >= COMBO_FOR_SUPER;
       setSuperBark(isSuper);
+      if (isSuper) {
+        // Elemental Burst: dim, cut-in with the hero's close-up, then strike.
+        setPhase("burst");
+        sfx.burst();
+        await wait(1500);
+      }
       setPhase("attack");
       sfx.zap();
       await wait(isSuper ? 560 : 420);
@@ -450,15 +457,42 @@ export function Battle({
         {/* Super Bark shockwave */}
         {superBark && phase === "attack" && (
           <>
-            <div className="bark-banner absolute top-[26%] left-1/2 z-40 text-3xl font-black whitespace-nowrap sm:text-5xl">
-              MOMO BARK!
-            </div>
             <div className="bark-wave absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-[6px] border-amber-300" />
             <div className="bark-wave bark-wave-2 absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-4 border-white" />
           </>
         )}
         {phase === "impact" && superBark && (
-          <div className="flash absolute inset-0 z-30 bg-white" />
+          <div className="flash absolute inset-0 z-30 bg-violet-200" />
+        )}
+
+        {/* Elemental Burst cut-in */}
+        {phase === "burst" && (
+          <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden">
+            <div className="burst-dim absolute inset-0" />
+            <div className="burst-band absolute top-1/2 left-[-20%] h-[58%] w-[140%]">
+              <div className="burst-lines absolute inset-0" />
+              <div className="burst-portrait absolute top-[-30%] left-[12%] w-[58%] max-w-[420px]">
+                <Hero className="w-full" />
+                <span className="burst-eye-glow absolute top-[30%] left-[38%] text-2xl text-amber-100">
+                  ✦
+                </span>
+                <span className="burst-eye-glow absolute top-[30%] left-[55%] text-xl text-amber-100">
+                  ✦
+                </span>
+              </div>
+              <div className="burst-pet absolute right-[22%] bottom-[2%] w-[16%] max-w-[110px]">
+                <MomoPet className="w-full" />
+              </div>
+            </div>
+            <div className="burst-name absolute right-[6%] bottom-[12%] text-right">
+              <p className="text-xs font-black tracking-[0.35em] text-violet-200 uppercase">
+                Elemental Burst
+              </p>
+              <p className="text-3xl font-black text-white italic sm:text-5xl">
+                Thunder Star Bark
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Monster */}
@@ -499,6 +533,29 @@ export function Battle({
                   ✦
                 </span>
               ))}
+            {phase === "impact" && superBark && (
+              <div className="pointer-events-none absolute inset-0 z-20">
+                <div className="boom-core absolute top-1/2 left-1/2 size-40 rounded-full" />
+                <div className="boom-ring absolute top-1/2 left-1/2 size-40 rounded-full border-[6px] border-violet-300" />
+                <div className="boom-ring boom-ring-2 absolute top-1/2 left-1/2 size-40 rounded-full border-4 border-amber-200" />
+                {Array.from({ length: 6 }, (_, i) => (
+                  <svg
+                    key={i}
+                    viewBox="0 0 20 60"
+                    className="bolt absolute top-1/2 left-1/2 h-24 w-8"
+                    style={{ ["--a" as string]: `${i * 60 + 15}deg` }}
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M12 0 L4 28 L11 28 L6 60 L18 22 L10 22 Z"
+                      fill="#f5d0fe"
+                      stroke="#a855f7"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                ))}
+              </div>
+            )}
             {phase === "enemyDown" && (
               <>
                 {Array.from({ length: 16 }, (_, i) => (
@@ -797,8 +854,8 @@ export function Battle({
 
         .num { margin-left: -2ch; font-weight: 900; text-align: center; white-space: nowrap; pointer-events: none; z-index: 50; font-family: ui-rounded, system-ui, sans-serif; }
         .num-dmg { color: #fff36b; font-size: 2.1rem; text-shadow: 0 2px 0 #7c2d12, 2px 0 0 #7c2d12, -2px 0 0 #7c2d12, 0 -2px 0 #7c2d12, 0 4px 6px rgba(0,0,0,.35); animation: num-arc 1.2s cubic-bezier(.2,.8,.4,1) forwards; }
-        .num-crit { color: #ff5a3c; font-size: 2.8rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff, 0 0 18px #fde047; animation: num-arc 1.3s cubic-bezier(.2,.8,.4,1) forwards; }
-        .num-crit span { color: #fde047; text-shadow: 0 1px 0 #7c2d12, 0 0 6px #7c2d12; }
+        .num-crit { color: #f5d0fe; font-size: 2.8rem; text-shadow: 0 3px 0 #3b0764, 3px 0 0 #3b0764, -3px 0 0 #3b0764, 0 -3px 0 #3b0764, 0 0 20px #a855f7; animation: num-arc 1.3s cubic-bezier(.2,.8,.4,1) forwards; }
+        .num-crit span { color: #fef08a; text-shadow: 0 1px 0 #7c2d12, 0 0 6px #7c2d12; }
         .num-miss { color: #bae6fd; font-size: 1.8rem; text-shadow: 0 2px 0 #1e3a8a, 2px 0 0 #1e3a8a, -2px 0 0 #1e3a8a, 0 -2px 0 #1e3a8a; animation: num-float 1.1s ease-out forwards; }
         .num-hurt { color: #ff4d6d; font-size: 1.9rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff; animation: num-arc-left 1.2s cubic-bezier(.2,.8,.4,1) forwards; }
         .num-exp { color: #a7f3d0; font-size: 1.3rem; text-shadow: 0 2px 0 #065f46, 2px 0 0 #065f46, -2px 0 0 #065f46, 0 -2px 0 #065f46; animation: num-float 1.3s ease-out forwards; }
@@ -812,6 +869,27 @@ export function Battle({
         .bark-wave-2 { animation-delay: .12s; }
         @keyframes bark-wave { 0% { transform: translateX(0) scale(.4); opacity: 1 } 100% { transform: translateX(min(48vw, 520px)) scale(2.4); opacity: 0 } }
         .flash { animation: flash .35s ease-out forwards; }
+        .burst-dim { background: radial-gradient(ellipse at center, rgba(30,10,60,.55), rgba(10,5,25,.92)); animation: burst-dim 1.5s ease-in-out forwards; }
+        @keyframes burst-dim { 0% { opacity: 0 } 12% { opacity: 1 } 85% { opacity: 1 } 100% { opacity: 0 } }
+        .burst-band { background: linear-gradient(100deg, #2e1065 0%, #7c3aed 35%, #c084fc 55%, #fde68a 75%, #7c3aed 100%); box-shadow: 0 0 40px 10px rgba(168,85,247,.6); overflow: hidden; animation: burst-band 1.5s cubic-bezier(.2,.9,.2,1) forwards; }
+        @keyframes burst-band { 0% { transform: translateY(-50%) skewY(-8deg) translateX(-110%) } 18% { transform: translateY(-50%) skewY(-8deg) translateX(0) } 80% { transform: translateY(-50%) skewY(-8deg) translateX(4%) } 100% { transform: translateY(-50%) skewY(-8deg) translateX(120%) } }
+        .burst-lines { background: repeating-linear-gradient(100deg, rgba(255,255,255,0) 0 22px, rgba(255,255,255,.35) 22px 24px, rgba(255,255,255,0) 24px 60px); animation: burst-lines .3s linear infinite; }
+        @keyframes burst-lines { from { background-position: 0 0 } to { background-position: -120px 0 } }
+        .burst-portrait { animation: burst-portrait 1.5s cubic-bezier(.2,.9,.2,1) forwards; filter: drop-shadow(0 0 18px rgba(253,230,138,.8)); }
+        @keyframes burst-portrait { 0% { transform: skewY(8deg) translateX(-40%) scale(1.1); opacity: 0 } 22% { transform: skewY(8deg) translateX(0) scale(1); opacity: 1 } 80% { transform: skewY(8deg) translateX(6%) scale(1.03); opacity: 1 } 100% { transform: skewY(8deg) translateX(30%); opacity: 0 } }
+        .burst-eye-glow { text-shadow: 0 0 10px #fde68a, 0 0 20px #c084fc; opacity: 0; animation: eye-glow 1.5s ease-in-out forwards; }
+        @keyframes eye-glow { 0%,28% { opacity: 0; transform: scale(.2) rotate(0) } 42% { opacity: 1; transform: scale(1.6) rotate(45deg) } 70% { opacity: .9; transform: scale(1) rotate(90deg) } 100% { opacity: 0 } }
+        .burst-pet { animation: burst-pet 1.5s ease-out forwards; }
+        @keyframes burst-pet { 0%,20% { opacity: 0; transform: skewY(8deg) translateY(40%) } 40% { opacity: 1; transform: skewY(8deg) translateY(-10%) } 80% { opacity: 1; transform: skewY(8deg) translateY(0) } 100% { opacity: 0 } }
+        .burst-name { animation: burst-name 1.5s cubic-bezier(.2,.9,.2,1) forwards; text-shadow: 0 0 14px #a855f7, 0 3px 0 #4c1d95; }
+        @keyframes burst-name { 0%,20% { opacity: 0; transform: translateX(60px) } 38% { opacity: 1; transform: translateX(0) } 82% { opacity: 1; transform: translateX(-8px) } 100% { opacity: 0; transform: translateX(-40px) } }
+        .boom-core { margin: -80px; background: radial-gradient(circle, #fff 0 18%, #f5d0fe 30%, rgba(168,85,247,.85) 50%, rgba(124,58,237,0) 70%); animation: boom-core .7s ease-out forwards; }
+        @keyframes boom-core { 0% { transform: scale(.2); opacity: 1 } 60% { transform: scale(1.6); opacity: .9 } 100% { transform: scale(2.2); opacity: 0 } }
+        .boom-ring { margin: -80px; animation: boom-ring .7s ease-out forwards; box-shadow: 0 0 20px #c084fc; }
+        .boom-ring-2 { animation-delay: .12s; }
+        @keyframes boom-ring { 0% { transform: scale(.1); opacity: 1 } 100% { transform: scale(2.6); opacity: 0 } }
+        .bolt { margin: -48px -16px; transform-origin: 50% 100%; animation: bolt .6s ease-out forwards; filter: drop-shadow(0 0 8px #e879f9); }
+        @keyframes bolt { 0% { transform: rotate(var(--a)) translateY(-10px) scale(.4); opacity: 0 } 25% { opacity: 1 } 100% { transform: rotate(var(--a)) translateY(-90px) scale(1.2); opacity: 0 } }
         @keyframes flash { 0% { opacity: .85 } 100% { opacity: 0 } }
 
         .light-pillar { background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent); box-shadow: 0 0 60px 30px rgba(253,224,71,.35); animation: pillar 1.4s ease-in-out infinite; }
