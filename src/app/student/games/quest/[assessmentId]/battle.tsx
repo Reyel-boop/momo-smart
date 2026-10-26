@@ -18,6 +18,7 @@ import {
 import { api, type RouterOutputs } from "~/trpc/react";
 import { Stars } from "../../_components/stars";
 import { Hero, MomoPet, Monster } from "../_components/art";
+import { MangaCutIn } from "../_components/manga";
 
 type Data = RouterOutputs["game"]["questQuestions"];
 type Question = Data["questions"][number];
@@ -31,6 +32,7 @@ type Phase =
   | "enemyDown"
   | "enemyIn"
   | "burst" // 3 in a row: the Elemental Burst cut-in
+  | "bossIntro" // manga cut-in before the Jelly King
   | "miss" // wrong answer: the swing misses
   | "lunge" // the monster strikes back
   | "review"
@@ -203,12 +205,15 @@ export function Battle({
         await wait(1100);
         if (next.state.won) {
           setPhase("won");
-          sfx.fanfare();
           finish.mutate({ assessmentId, answers: answers.current });
           return;
         }
         setShownEnemy(next.state.enemy);
         setShownHp(QUEST_ENEMIES[next.state.enemy]!.hp);
+        if (next.state.enemy === QUEST_ENEMIES.length - 1) {
+          setPhase("bossIntro");
+          return;
+        }
         setPhase("enemyIn");
         await wait(800);
       }
@@ -228,7 +233,6 @@ export function Battle({
       await wait(700);
       if (next.state.dead) {
         setPhase("dead");
-        sfx.faint();
         finish.mutate({ assessmentId, answers: answers.current });
         return;
       }
@@ -482,7 +486,12 @@ export function Battle({
           </>
         )}
         {phase === "impact" && superBark && (
-          <div className="flash absolute inset-0 z-30 bg-violet-200" />
+          <>
+            <div className="flash absolute inset-0 z-30 bg-violet-200" />
+            <p className="sfx-stamp absolute top-[14%] left-[30%] z-40 text-5xl font-black italic sm:text-7xl">
+              ZUBAAAN!!
+            </p>
+          </>
         )}
 
         {/* Elemental Burst cut-in */}
@@ -631,100 +640,6 @@ export function Battle({
         </div>
 
         {/* Overlays */}
-        {phase === "intro" && (
-          <Overlay>
-            <p className="text-sm font-black tracking-[0.25em] text-amber-200 uppercase">
-              Quest
-            </p>
-            <h2 className="title-glow mt-1 text-3xl font-black text-white sm:text-4xl">
-              The Jelly King awaits!
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-white/90">
-              Answer right to strike with your sword. 3 in a row and Momo
-              unleashes the <b>Momo Bark</b> for double damage! Defeat all 5
-              monsters. You have {QUEST_LIVES} hearts — each wrong answer costs
-              one. Every new correct answer earns ⭐ 1 star, and winning adds up
-              to 3 more.
-            </p>
-            <button
-              type="button"
-              onPointerDown={unlock}
-              onClick={() => {
-                unlock();
-                sfx.select();
-                setPhase("enemyIn");
-                setTimeout(() => setPhase("ask"), 800);
-              }}
-              className="start-btn mt-5 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
-            >
-              ⚔️ Start adventure
-            </button>
-          </Overlay>
-        )}
-        {phase === "dead" && (
-          <Overlay tone="dark">
-            <p className="title-pop text-4xl font-black text-white">
-              You fainted!
-            </p>
-            <p className="mt-2 text-sm text-white/85">
-              5 wrong answers. Read the explanations, then try again — Momo is
-              cheering for you! 🐶
-            </p>
-            <button
-              type="button"
-              onClick={restart}
-              className="start-btn mt-5 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
-            >
-              🔁 Try the quest again
-            </button>
-          </Overlay>
-        )}
-        {phase === "won" && (
-          <>
-            <Confetti />
-            <Overlay>
-              <p className="level-up text-5xl font-black sm:text-6xl">
-                LEVEL UP!
-              </p>
-              <p className="mt-1 font-bold text-white">
-                The Jelly King is defeated!
-              </p>
-              <div className="mt-3 flex justify-center">
-                <Stars
-                  count={finish.data?.stars ?? 0}
-                  className="win-stars size-12"
-                />
-              </div>
-              <p className="mt-2 text-sm text-white/90">
-                {finish.isPending
-                  ? "Saving your stars…"
-                  : finish.data
-                    ? finish.data.newStars > 0
-                      ? `+${finish.data.newStars} Star${finish.data.newStars === 1 ? "" : "s"} on the leaderboard`
-                      : `Your best is still ${finish.data.best} star${finish.data.best === 1 ? "" : "s"}`
-                    : (finish.error?.message ?? "")}
-                {finish.data &&
-                  finish.data.stars < 3 &&
-                  " · Lose fewer hearts for 3 stars"}
-              </p>
-              <div className="mt-5 flex flex-wrap justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={restart}
-                  className="rounded-2xl bg-white px-5 py-2.5 text-sm font-black text-slate-900 hover:bg-white/90"
-                >
-                  Play again
-                </button>
-                <Link
-                  href="/student/games/quest"
-                  className="rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-5 py-2.5 text-sm font-black text-slate-900"
-                >
-                  Next quest →
-                </Link>
-              </div>
-            </Overlay>
-          </>
-        )}
       </div>
 
       {/* Question */}
@@ -792,6 +707,98 @@ export function Battle({
             )}
           </div>
         </Card>
+      )}
+
+      {phase === "intro" && (
+        <MangaCutIn scene="start">
+          <p className="text-sm text-white/85">
+            Answer right to strike. 3 in a row unleashes the <b>Momo Bark</b>.
+            Every new correct answer earns ⭐ 1 star, and winning adds up to 3
+            more. You have {QUEST_LIVES} hearts.
+          </p>
+          <button
+            type="button"
+            onPointerDown={unlock}
+            onClick={() => {
+              unlock();
+              sfx.select();
+              setPhase("enemyIn");
+              setTimeout(() => setPhase("ask"), 800);
+            }}
+            className="start-btn mt-4 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
+          >
+            ⚔️ Start adventure
+          </button>
+        </MangaCutIn>
+      )}
+      {phase === "bossIntro" && (
+        <MangaCutIn scene="boss">
+          <button
+            type="button"
+            onClick={() => {
+              sfx.select();
+              setPhase("enemyIn");
+              setTimeout(nextQuestion, 800);
+            }}
+            className="start-btn rounded-2xl bg-gradient-to-b from-rose-400 to-red-600 px-10 py-3 text-xl font-black text-white shadow-lg ring-4 ring-white/70"
+          >
+            ⚔️ FIGHT!
+          </button>
+        </MangaCutIn>
+      )}
+      {phase === "dead" && (
+        <MangaCutIn scene="faint">
+          <p className="text-sm text-white/85">
+            5 wrong answers — read the explanations, then try again.
+          </p>
+          <button
+            type="button"
+            onClick={restart}
+            className="start-btn mt-4 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
+          >
+            🔁 Try the quest again
+          </button>
+        </MangaCutIn>
+      )}
+      {phase === "won" && (
+        <>
+          <Confetti />
+          <MangaCutIn scene="win">
+            <p className="level-up text-4xl font-black sm:text-5xl">
+              LEVEL UP!
+            </p>
+            <div className="mt-2 flex justify-center">
+              <Stars
+                count={finish.data?.stars ?? 0}
+                className="win-stars size-11"
+              />
+            </div>
+            <p className="mt-1 text-sm text-white/90">
+              {finish.isPending
+                ? "Saving your stars…"
+                : finish.data
+                  ? finish.data.newStars > 0
+                    ? `+${finish.data.newStars} bonus Star${finish.data.newStars === 1 ? "" : "s"} for winning · ${earned} for new correct answers`
+                    : `${earned} star${earned === 1 ? "" : "s"} for new correct answers · your win bonus is still ${finish.data.best}`
+                  : (finish.error?.message ?? "")}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                onClick={restart}
+                className="rounded-2xl bg-white px-5 py-2.5 text-sm font-black text-slate-900 hover:bg-white/90"
+              >
+                Play again
+              </button>
+              <Link
+                href="/student/games/quest"
+                className="rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-5 py-2.5 text-sm font-black text-slate-900"
+              >
+                Next quest →
+              </Link>
+            </div>
+          </MangaCutIn>
+        </>
       )}
 
       <style>{`
@@ -891,6 +898,8 @@ export function Battle({
         .bark-wave-2 { animation-delay: .12s; }
         @keyframes bark-wave { 0% { transform: translateX(0) scale(.4); opacity: 1 } 100% { transform: translateX(min(48vw, 520px)) scale(2.4); opacity: 0 } }
         .flash { animation: flash .35s ease-out forwards; }
+        .sfx-stamp { color: #fff; -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 5px 5px 0 #000; transform: rotate(-12deg); animation: sfx-stamp .7s cubic-bezier(.2,1.8,.4,1) forwards; }
+        @keyframes sfx-stamp { 0% { transform: rotate(-12deg) scale(2.6); opacity: 0 } 30% { transform: rotate(-12deg) scale(1); opacity: 1 } 80% { opacity: 1 } 100% { transform: rotate(-12deg) scale(1.1); opacity: 0 } }
         .burst-dim { background: radial-gradient(ellipse at center, rgba(30,10,60,.55), rgba(10,5,25,.92)); animation: burst-dim 1.5s ease-in-out forwards; }
         @keyframes burst-dim { 0% { opacity: 0 } 12% { opacity: 1 } 85% { opacity: 1 } 100% { opacity: 0 } }
         .burst-band { background: linear-gradient(100deg, #2e1065 0%, #7c3aed 35%, #c084fc 55%, #fde68a 75%, #7c3aed 100%); box-shadow: 0 0 40px 10px rgba(168,85,247,.6); overflow: hidden; animation: burst-band 1.5s cubic-bezier(.2,.9,.2,1) forwards; }
@@ -969,21 +978,5 @@ function Heart({ full, breaking }: { full: boolean; breaking: boolean }) {
         strokeWidth="1.5"
       />
     </svg>
-  );
-}
-
-function Overlay({
-  children,
-  tone = "light",
-}: {
-  children: React.ReactNode;
-  tone?: "light" | "dark";
-}) {
-  return (
-    <div
-      className={`absolute inset-0 z-40 flex items-center justify-center p-4 ${tone === "dark" ? "bg-slate-900/65" : "bg-indigo-950/40"} backdrop-blur-[2px]`}
-    >
-      <div className="overlay-in text-center">{children}</div>
-    </div>
   );
 }

@@ -7,7 +7,16 @@ import type { EnemyKind } from "~/lib/games/quest";
  * battle screen animates (hair, scarf, sword, tail, wings).
  */
 
-export function Hero({ className = "" }: { className?: string }) {
+/** Faces for the manga moments: ready, fired up, laughing, crying, shocked. */
+export type Mood = "normal" | "determined" | "laugh" | "cry" | "shock";
+
+export function Hero({
+  className = "",
+  mood = "normal",
+}: {
+  className?: string;
+  mood?: Mood;
+}) {
   return (
     <svg viewBox="0 0 140 170" className={className} aria-hidden="true">
       <defs>
@@ -103,37 +112,7 @@ export function Hero({ className = "" }: { className?: string }) {
       <ellipse cx="68" cy="56" rx="32" ry="30" fill="url(#hero-skin)" />
       {/* Ear */}
       <ellipse cx="38" cy="60" rx="5" ry="7" fill="#ffd9b8" />
-      {/* Eyes: big anime eyes */}
-      <g>
-        <ellipse cx="60" cy="62" rx="7.5" ry="10" fill="#ffffff" />
-        <ellipse cx="84" cy="62" rx="6.5" ry="9.5" fill="#ffffff" />
-        <ellipse cx="61" cy="64" rx="6" ry="8" fill="url(#hero-eye)" />
-        <ellipse cx="85" cy="64" rx="5.2" ry="7.6" fill="url(#hero-eye)" />
-        <ellipse cx="61.5" cy="65" rx="3" ry="4.4" fill="#0b2e1e" />
-        <ellipse cx="85.5" cy="65" rx="2.6" ry="4.2" fill="#0b2e1e" />
-        <circle cx="59" cy="60" r="2.4" fill="#fff" />
-        <circle cx="83" cy="60" r="2.1" fill="#fff" />
-        <circle cx="63.5" cy="68.5" r="1.1" fill="#fff" />
-        <circle cx="87.2" cy="68.5" r="1" fill="#fff" />
-        <path
-          d="M51 52 Q 60 48 68 52"
-          stroke="#a16207"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          d="M78 52 Q 85 48 92 52"
-          stroke="#a16207"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </g>
-      {/* Blush and mouth */}
-      <ellipse cx="52" cy="73" rx="5" ry="2.6" fill="#fb7185" opacity=".45" />
-      <ellipse cx="92" cy="73" rx="4.5" ry="2.4" fill="#fb7185" opacity=".45" />
-      <path d="M71 76 Q 75 81 79 76 Q 75 78 71 76 Z" fill="#b91c1c" />
+      <HeroFace mood={mood} />
       {/* Front hair spikes and headband */}
       <path
         className="hero-hair"
@@ -541,4 +520,173 @@ function JellyKing() {
       <CuteFace cx={70} cy={88} angry />
     </g>
   );
+}
+
+function HeroFace({ mood }: { mood: Mood }) {
+  const openEyes = (
+    <g>
+      <ellipse cx="60" cy="62" rx="7.5" ry="10" fill="#ffffff" />
+      <ellipse cx="84" cy="62" rx="6.5" ry="9.5" fill="#ffffff" />
+      <ellipse cx="61" cy="64" rx="6" ry="8" fill="url(#hero-eye)" />
+      <ellipse cx="85" cy="64" rx="5.2" ry="7.6" fill="url(#hero-eye)" />
+      <ellipse cx="61.5" cy="65" rx="3" ry="4.4" fill="#0b2e1e" />
+      <ellipse cx="85.5" cy="65" rx="2.6" ry="4.2" fill="#0b2e1e" />
+      <circle cx="59" cy="60" r="2.4" fill="#fff" />
+      <circle cx="83" cy="60" r="2.1" fill="#fff" />
+      <circle cx="63.5" cy="68.5" r="1.1" fill="#fff" />
+      <circle cx="87.2" cy="68.5" r="1" fill="#fff" />
+    </g>
+  );
+  const brow = (d1: string, d2: string) => (
+    <g stroke="#a16207" strokeWidth="2.4" strokeLinecap="round" fill="none">
+      <path d={d1} />
+      <path d={d2} />
+    </g>
+  );
+  const blush = (
+    <g>
+      <ellipse cx="52" cy="73" rx="5" ry="2.6" fill="#fb7185" opacity=".45" />
+      <ellipse cx="92" cy="73" rx="4.5" ry="2.4" fill="#fb7185" opacity=".45" />
+    </g>
+  );
+  switch (mood) {
+    case "determined":
+      return (
+        <g>
+          {openEyes}
+          {/* Fired-up brows and a confident grin */}
+          {brow("M50 50 L 68 55", "M94 50 L 78 55")}
+          <path
+            d="M57 58 l2 -3 l2 3 M81 58 l2 -3 l2 3"
+            stroke="#fff"
+            strokeWidth="1.2"
+            fill="none"
+          />
+          {blush}
+          <path d="M68 76 Q 75 84 82 76 Z" fill="#7f1d1d" />
+          <path d="M70 76.5 h10" stroke="#fff" strokeWidth="2" />
+        </g>
+      );
+    case "laugh":
+      return (
+        <g>
+          {/* Happy closed eyes (^ ^) and a big open laugh */}
+          <path
+            d="M53 64 Q 60 56 67 64"
+            stroke="#3b2412"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M78 64 Q 85 56 92 64"
+            stroke="#3b2412"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d="M52 61 l-3 -2 M93 61 l3 -2"
+            stroke="#3b2412"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+          {brow("M51 50 Q 60 46 68 50", "M78 50 Q 85 46 92 50")}
+          {blush}
+          <path d="M66 74 Q 75 90 84 74 Z" fill="#7f1d1d" />
+          <path d="M70 82 Q 75 86 80 82" fill="#fb7185" />
+        </g>
+      );
+    case "cry":
+      return (
+        <g>
+          {/* >_< eyes, streaming tears and a wobbly mouth */}
+          <path
+            d="M54 58 L 65 63 L 54 68"
+            stroke="#3b2412"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          <path
+            d="M91 58 L 80 63 L 91 68"
+            stroke="#3b2412"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+          {brow("M51 52 L 66 48", "M93 52 L 78 48")}
+          <g className="manga-tears">
+            <path
+              d="M58 69 C 56 78, 60 86, 56 96"
+              stroke="#7dd3fc"
+              strokeWidth="4"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d="M86 69 C 88 78, 84 86, 88 96"
+              stroke="#7dd3fc"
+              strokeWidth="4"
+              strokeLinecap="round"
+              fill="none"
+            />
+          </g>
+          {blush}
+          <path
+            d="M68 79 q 3 -4 6 0 q 3 4 6 0"
+            stroke="#7f1d1d"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            fill="none"
+          />
+        </g>
+      );
+    case "shock":
+      return (
+        <g>
+          <ellipse
+            cx="60"
+            cy="62"
+            rx="7.5"
+            ry="10"
+            fill="#fff"
+            stroke="#3b2412"
+            strokeWidth="1.2"
+          />
+          <ellipse
+            cx="84"
+            cy="62"
+            rx="6.5"
+            ry="9.5"
+            fill="#fff"
+            stroke="#3b2412"
+            strokeWidth="1.2"
+          />
+          <circle cx="61" cy="63" r="2" fill="#0b2e1e" />
+          <circle cx="85" cy="63" r="1.8" fill="#0b2e1e" />
+          {brow("M51 48 Q 60 42 68 47", "M78 47 Q 85 42 92 48")}
+          {/* Sweat drop */}
+          <path
+            className="manga-sweat"
+            d="M98 44 C 94 52, 96 58, 100 58 C 104 58, 106 52, 98 44 Z"
+            fill="#bae6fd"
+            stroke="#0369a1"
+            strokeWidth="1.2"
+          />
+          <ellipse cx="75" cy="79" rx="4" ry="5" fill="#7f1d1d" />
+        </g>
+      );
+    default:
+      return (
+        <g>
+          {openEyes}
+          {brow("M51 52 Q 60 48 68 52", "M78 52 Q 85 48 92 52")}
+          {blush}
+          <path d="M71 76 Q 75 81 79 76 Q 75 78 71 76 Z" fill="#b91c1c" />
+        </g>
+      );
+  }
 }
