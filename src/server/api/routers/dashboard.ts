@@ -1,3 +1,5 @@
+import { CALL_LEVELS } from "~/lib/games/call-sim";
+import { CODE_LEVELS } from "~/lib/games/code-quest";
 import { z } from "zod";
 
 import {
@@ -8,6 +10,7 @@ import {
 import { dayOfWeekOf, toDateOnly, weekOfTerm } from "~/server/lib/dates";
 import { computeGpa, distributionOf, round } from "~/server/lib/grading";
 import {
+  gameStarLedger,
   questionStarLedger,
   rewardProgress,
   STAR_ASSIGNMENT_TYPES,
@@ -362,7 +365,7 @@ export const dashboardRouter = createTRPCRouter({
       select: { gradeLevel: true },
     });
 
-    const [mine, cohort, cohortSize, totals, questionLedger] =
+    const [mine, cohort, cohortSize, totals, questionLedger, gameLedger] =
       await Promise.all([
         ctx.db.grade.findMany({
           where: {
@@ -400,6 +403,7 @@ export const dashboardRouter = createTRPCRouter({
         }),
         starTotals(ctx.db),
         questionStarLedger(ctx.db, ctx.studentId),
+        gameStarLedger(ctx.db, ctx.studentId),
       ]);
 
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -422,7 +426,15 @@ export const dashboardRouter = createTRPCRouter({
         thisWeek += entry.stars;
       }
     }
-    const total = tests + coursework + questions;
+    // Up to three stars per game level (best result counts).
+    let games = 0;
+    for (const entry of gameLedger) {
+      games += entry.stars;
+      if (entry.playedAt && entry.playedAt.getTime() >= weekAgo) {
+        thisWeek += entry.stars;
+      }
+    }
+    const total = tests + coursework + questions + games;
 
     // Rank is one more than the number of grade-mates who have out-earned us.
     const ahead = cohort.filter(
@@ -458,6 +470,24 @@ export const dashboardRouter = createTRPCRouter({
         stars: entry.stars,
         isPerfect: entry.stars >= entry.totalPoints,
       })),
+      ...gameLedger.map((entry) => {
+        const max =
+          (entry.game === "code" ? CODE_LEVELS : CALL_LEVELS).length * 3;
+        return {
+          id: `game-${entry.game}`,
+          title: entry.game === "code" ? "Code Quest" : "Call Simulator",
+          courseName:
+            entry.game === "code"
+              ? "Computer Programming"
+              : "Telecommunications",
+          type: "GAME",
+          releasedAt: entry.playedAt,
+          score: entry.stars,
+          pointsPossible: max,
+          stars: entry.stars,
+          isPerfect: entry.stars >= max,
+        };
+      }),
     ].sort(
       (a, b) => (b.releasedAt?.getTime() ?? 0) - (a.releasedAt?.getTime() ?? 0),
     );
@@ -467,6 +497,7 @@ export const dashboardRouter = createTRPCRouter({
       tests,
       coursework,
       questions,
+      games,
       thisWeek,
       gradeLevel: profile.gradeLevel,
       rank: ahead + 1,
@@ -522,6 +553,7 @@ export const dashboardRouter = createTRPCRouter({
             stars: t?.total ?? 0,
             questionStars: t?.questions ?? 0,
             gradedStars: t?.graded ?? 0,
+            gameStars: t?.games ?? 0,
             isMe: s.id === ctx.studentId,
           };
         })

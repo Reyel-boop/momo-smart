@@ -9,6 +9,7 @@ import { courseRouter } from "~/server/api/routers/course";
 import { dashboardRouter } from "~/server/api/routers/dashboard";
 import { gradingRouter } from "~/server/api/routers/grading";
 import { lessonRouter } from "~/server/api/routers/lesson";
+import { gameRouter } from "~/server/api/routers/game";
 import { liveRouter } from "~/server/api/routers/live";
 import { messageRouter } from "~/server/api/routers/message";
 import { notificationRouter } from "~/server/api/routers/notification";
@@ -22,6 +23,8 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  *   user          identity, profiles, roster search
  *   course        sections, rosters, syllabus, enrolment
  *   lesson        lesson delivery, video progress, notes
+ *   live          Kahoot-style Live Quiz games
+ *   game          course games: Code Quest, Call Simulator
  *   assignment    assignment + rubric authoring, "due soon"
  *   submission    student submissions and attachments
  *   grading       priority queue, rubric grading, gradebook
@@ -41,6 +44,7 @@ export const appRouter = createTRPCRouter({
   course: courseRouter,
   lesson: lessonRouter,
   live: liveRouter,
+  game: gameRouter,
   assignment: assignmentRouter,
   submission: submissionRouter,
   grading: gradingRouter,

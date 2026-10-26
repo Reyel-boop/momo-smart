@@ -765,6 +765,17 @@ exports.Prisma.LiveAnswerScalarFieldEnum = {
   answeredAt: 'answeredAt'
 };
 
+exports.Prisma.GameProgressScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  game: 'game',
+  levelId: 'levelId',
+  stars: 'stars',
+  score: 'score',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1098,7 +1109,8 @@ exports.Prisma.ModelName = {
   WaitlistEntry: 'WaitlistEntry',
   LiveGame: 'LiveGame',
   LivePlayer: 'LivePlayer',
-  LiveAnswer: 'LiveAnswer'
+  LiveAnswer: 'LiveAnswer',
+  GameProgress: 'GameProgress'
 };
 
 /**

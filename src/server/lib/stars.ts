@@ -7,7 +7,9 @@ import type {
 /**
  * Star Points: a student earns one star for every Unit Question answered
  * correctly (each question counts once, so retries can't farm stars) and
- * one star per point scored on graded work, once the grade is released.
+ * one star per point scored on graded work, once the grade is released,
+ * plus up to three stars per level of a course game (Code Quest, Call
+ * Simulator).
  * Stars are derived from the answers and the gradebook rather than stored,
  * so a total can never drift from the work behind it.
  */
@@ -63,15 +65,20 @@ export function rewardProgress(total: number) {
 }
 
 type Db = PrismaClient | Prisma.TransactionClient;
-export type StarTotal = { questions: number; graded: number; total: number };
+export type StarTotal = {
+  questions: number;
+  graded: number;
+  games: number;
+  total: number;
+};
 
 /**
  * Every student's stars: one per Unit Question answered correctly — on
  * their own or in a Live Quiz, each question once — plus one per point of
- * released graded work.
+ * released graded work, plus the best stars of each game level.
  */
 export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
-  const [answers, grades] = await Promise.all([
+  const [answers, grades, games] = await Promise.all([
     db.$queryRaw<Array<{ studentId: string; stars: bigint }>>`
       SELECT correct."studentId", COUNT(DISTINCT correct."questionId") AS stars
       FROM (
@@ -94,13 +101,14 @@ export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
       },
       select: { score: true, submission: { select: { studentId: true } } },
     }),
+    db.gameProgress.groupBy({ by: ["studentId"], _sum: { stars: true } }),
   ]);
 
   const totals = new Map<string, StarTotal>();
   const entry = (id: string) => {
     let row = totals.get(id);
     if (!row) {
-      row = { questions: 0, graded: 0, total: 0 };
+      row = { questions: 0, graded: 0, games: 0, total: 0 };
       totals.set(id, row);
     }
     return row;
@@ -117,7 +125,30 @@ export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
     t.graded += stars;
     t.total += stars;
   }
+  for (const row of games) {
+    const stars = row._sum.stars ?? 0;
+    const t = entry(row.studentId);
+    t.games += stars;
+    t.total += stars;
+  }
   return totals;
+}
+
+/** One student's game stars, per game, with the latest level finished. */
+export async function gameStarLedger(db: Db, studentId: string) {
+  const rows = await db.gameProgress.groupBy({
+    by: ["game"],
+    where: { studentId },
+    _sum: { stars: true },
+    _count: { _all: true },
+    _max: { updatedAt: true },
+  });
+  return rows.map((row) => ({
+    game: row.game,
+    stars: row._sum.stars ?? 0,
+    levels: row._count._all,
+    playedAt: row._max.updatedAt,
+  }));
 }
 
 /**

@@ -12,6 +12,7 @@ import {
   PlusCircleIcon,
   SettingsIcon,
   StarIcon,
+  TrophyIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
 
@@ -29,6 +30,7 @@ export function Sidebar({
     { label: "Courses", href: "/student/courses" },
     { label: "Assignments", href: "/student/assignments", badge: dueCount },
     { label: "Live Quiz", href: "/student/live" },
+    { label: "Games", href: "/student/games" },
     { label: "Scores", href: "/student/scores" },
     { label: "Calendar", href: "/student/calendar" },
     { label: "Messages", href: "/student/messages", dot: unreadMessages > 0 },
@@ -39,6 +41,7 @@ export function Sidebar({
     Courses: <CapIcon className="size-[18px]" />,
     Assignments: <ClipboardIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
+    Games: <TrophyIcon className="size-[18px]" />,
     Scores: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,

@@ -317,6 +317,13 @@ export type LivePlayer = $Result.DefaultSelection<Prisma.$LivePlayerPayload>
  * One player's answer to one question of a live game.
  */
 export type LiveAnswer = $Result.DefaultSelection<Prisma.$LiveAnswerPayload>
+/**
+ * Model GameProgress
+ * A student's best result on one level of a course game: Code Quest
+ * (Computer Programming) or Call Simulator (Telecommunications). Stars
+ * (1–3) count toward the leaderboard.
+ */
+export type GameProgress = $Result.DefaultSelection<Prisma.$GameProgressPayload>
 
 /**
  * Enums
@@ -1512,6 +1519,16 @@ export class PrismaClient<
     * ```
     */
   get liveAnswer(): Prisma.LiveAnswerDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.gameProgress`: Exposes CRUD operations for the **GameProgress** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GameProgresses
+    * const gameProgresses = await prisma.gameProgress.findMany()
+    * ```
+    */
+  get gameProgress(): Prisma.GameProgressDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -2012,7 +2029,8 @@ export namespace Prisma {
     WaitlistEntry: 'WaitlistEntry',
     LiveGame: 'LiveGame',
     LivePlayer: 'LivePlayer',
-    LiveAnswer: 'LiveAnswer'
+    LiveAnswer: 'LiveAnswer',
+    GameProgress: 'GameProgress'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2031,7 +2049,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer" | "gameProgress"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6475,6 +6493,80 @@ export namespace Prisma {
           }
         }
       }
+      GameProgress: {
+        payload: Prisma.$GameProgressPayload<ExtArgs>
+        fields: Prisma.GameProgressFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GameProgressFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GameProgressFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          findFirst: {
+            args: Prisma.GameProgressFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GameProgressFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          findMany: {
+            args: Prisma.GameProgressFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>[]
+          }
+          create: {
+            args: Prisma.GameProgressCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          createMany: {
+            args: Prisma.GameProgressCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GameProgressCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>[]
+          }
+          delete: {
+            args: Prisma.GameProgressDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          update: {
+            args: Prisma.GameProgressUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          deleteMany: {
+            args: Prisma.GameProgressDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GameProgressUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GameProgressUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>[]
+          }
+          upsert: {
+            args: Prisma.GameProgressUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GameProgressPayload>
+          }
+          aggregate: {
+            args: Prisma.GameProgressAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGameProgress>
+          }
+          groupBy: {
+            args: Prisma.GameProgressGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GameProgressGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GameProgressCountArgs<ExtArgs>
+            result: $Utils.Optional<GameProgressCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6631,6 +6723,7 @@ export namespace Prisma {
     liveGame?: LiveGameOmit
     livePlayer?: LivePlayerOmit
     liveAnswer?: LiveAnswerOmit
+    gameProgress?: GameProgressOmit
   }
 
   /* Types for Logging */
@@ -6863,6 +6956,7 @@ export namespace Prisma {
     tutorAssignments: number
     tutoringGiven: number
     livePlayers: number
+    gameProgress: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6879,6 +6973,7 @@ export namespace Prisma {
     tutorAssignments?: boolean | StudentProfileCountOutputTypeCountTutorAssignmentsArgs
     tutoringGiven?: boolean | StudentProfileCountOutputTypeCountTutoringGivenArgs
     livePlayers?: boolean | StudentProfileCountOutputTypeCountLivePlayersArgs
+    gameProgress?: boolean | StudentProfileCountOutputTypeCountGameProgressArgs
   }
 
   // Custom InputTypes
@@ -6981,6 +7076,13 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountLivePlayersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LivePlayerWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountGameProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GameProgressWhereInput
   }
 
 
@@ -13238,6 +13340,7 @@ export namespace Prisma {
     tutorAssignments?: boolean | StudentProfile$tutorAssignmentsArgs<ExtArgs>
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
+    gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
@@ -13301,6 +13404,7 @@ export namespace Prisma {
     tutorAssignments?: boolean | StudentProfile$tutorAssignmentsArgs<ExtArgs>
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
+    gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13330,6 +13434,7 @@ export namespace Prisma {
       tutorAssignments: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
       tutoringGiven: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
       livePlayers: Prisma.$LivePlayerPayload<ExtArgs>[]
+      gameProgress: Prisma.$GameProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13763,6 +13868,7 @@ export namespace Prisma {
     tutorAssignments<T extends StudentProfile$tutorAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$tutorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tutoringGiven<T extends StudentProfile$tutoringGivenArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$tutoringGivenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     livePlayers<T extends StudentProfile$livePlayersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$livePlayersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    gameProgress<T extends StudentProfile$gameProgressArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$gameProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14526,6 +14632,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LivePlayerScalarFieldEnum | LivePlayerScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.gameProgress
+   */
+  export type StudentProfile$gameProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    where?: GameProgressWhereInput
+    orderBy?: GameProgressOrderByWithRelationInput | GameProgressOrderByWithRelationInput[]
+    cursor?: GameProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GameProgressScalarFieldEnum | GameProgressScalarFieldEnum[]
   }
 
   /**
@@ -78380,6 +78510,1150 @@ export namespace Prisma {
 
 
   /**
+   * Model GameProgress
+   */
+
+  export type AggregateGameProgress = {
+    _count: GameProgressCountAggregateOutputType | null
+    _avg: GameProgressAvgAggregateOutputType | null
+    _sum: GameProgressSumAggregateOutputType | null
+    _min: GameProgressMinAggregateOutputType | null
+    _max: GameProgressMaxAggregateOutputType | null
+  }
+
+  export type GameProgressAvgAggregateOutputType = {
+    stars: number | null
+    score: number | null
+  }
+
+  export type GameProgressSumAggregateOutputType = {
+    stars: number | null
+    score: number | null
+  }
+
+  export type GameProgressMinAggregateOutputType = {
+    id: string | null
+    studentId: string | null
+    game: string | null
+    levelId: string | null
+    stars: number | null
+    score: number | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GameProgressMaxAggregateOutputType = {
+    id: string | null
+    studentId: string | null
+    game: string | null
+    levelId: string | null
+    stars: number | null
+    score: number | null
+    completedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GameProgressCountAggregateOutputType = {
+    id: number
+    studentId: number
+    game: number
+    levelId: number
+    stars: number
+    score: number
+    completedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GameProgressAvgAggregateInputType = {
+    stars?: true
+    score?: true
+  }
+
+  export type GameProgressSumAggregateInputType = {
+    stars?: true
+    score?: true
+  }
+
+  export type GameProgressMinAggregateInputType = {
+    id?: true
+    studentId?: true
+    game?: true
+    levelId?: true
+    stars?: true
+    score?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type GameProgressMaxAggregateInputType = {
+    id?: true
+    studentId?: true
+    game?: true
+    levelId?: true
+    stars?: true
+    score?: true
+    completedAt?: true
+    updatedAt?: true
+  }
+
+  export type GameProgressCountAggregateInputType = {
+    id?: true
+    studentId?: true
+    game?: true
+    levelId?: true
+    stars?: true
+    score?: true
+    completedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GameProgressAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GameProgress to aggregate.
+     */
+    where?: GameProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameProgresses to fetch.
+     */
+    orderBy?: GameProgressOrderByWithRelationInput | GameProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GameProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GameProgresses
+    **/
+    _count?: true | GameProgressCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: GameProgressAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: GameProgressSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GameProgressMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GameProgressMaxAggregateInputType
+  }
+
+  export type GetGameProgressAggregateType<T extends GameProgressAggregateArgs> = {
+        [P in keyof T & keyof AggregateGameProgress]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGameProgress[P]>
+      : GetScalarType<T[P], AggregateGameProgress[P]>
+  }
+
+
+
+
+  export type GameProgressGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GameProgressWhereInput
+    orderBy?: GameProgressOrderByWithAggregationInput | GameProgressOrderByWithAggregationInput[]
+    by: GameProgressScalarFieldEnum[] | GameProgressScalarFieldEnum
+    having?: GameProgressScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GameProgressCountAggregateInputType | true
+    _avg?: GameProgressAvgAggregateInputType
+    _sum?: GameProgressSumAggregateInputType
+    _min?: GameProgressMinAggregateInputType
+    _max?: GameProgressMaxAggregateInputType
+  }
+
+  export type GameProgressGroupByOutputType = {
+    id: string
+    studentId: string
+    game: string
+    levelId: string
+    stars: number
+    score: number
+    completedAt: Date
+    updatedAt: Date
+    _count: GameProgressCountAggregateOutputType | null
+    _avg: GameProgressAvgAggregateOutputType | null
+    _sum: GameProgressSumAggregateOutputType | null
+    _min: GameProgressMinAggregateOutputType | null
+    _max: GameProgressMaxAggregateOutputType | null
+  }
+
+  type GetGameProgressGroupByPayload<T extends GameProgressGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GameProgressGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GameProgressGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GameProgressGroupByOutputType[P]>
+            : GetScalarType<T[P], GameProgressGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GameProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    game?: boolean
+    levelId?: boolean
+    stars?: boolean
+    score?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gameProgress"]>
+
+  export type GameProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    game?: boolean
+    levelId?: boolean
+    stars?: boolean
+    score?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gameProgress"]>
+
+  export type GameProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    game?: boolean
+    levelId?: boolean
+    stars?: boolean
+    score?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["gameProgress"]>
+
+  export type GameProgressSelectScalar = {
+    id?: boolean
+    studentId?: boolean
+    game?: boolean
+    levelId?: boolean
+    stars?: boolean
+    score?: boolean
+    completedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type GameProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "studentId" | "game" | "levelId" | "stars" | "score" | "completedAt" | "updatedAt", ExtArgs["result"]["gameProgress"]>
+  export type GameProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+  export type GameProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+  export type GameProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+
+  export type $GameProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GameProgress"
+    objects: {
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentId: string
+      /**
+       * "code" or "call".
+       */
+      game: string
+      /**
+       * The level's id in the game's content, e.g. "cp-3-2".
+       */
+      levelId: string
+      stars: number
+      /**
+       * Best score: hints left for Code Quest, call points for Call Simulator.
+       */
+      score: number
+      completedAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["gameProgress"]>
+    composites: {}
+  }
+
+  type GameProgressGetPayload<S extends boolean | null | undefined | GameProgressDefaultArgs> = $Result.GetResult<Prisma.$GameProgressPayload, S>
+
+  type GameProgressCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GameProgressFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GameProgressCountAggregateInputType | true
+    }
+
+  export interface GameProgressDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GameProgress'], meta: { name: 'GameProgress' } }
+    /**
+     * Find zero or one GameProgress that matches the filter.
+     * @param {GameProgressFindUniqueArgs} args - Arguments to find a GameProgress
+     * @example
+     * // Get one GameProgress
+     * const gameProgress = await prisma.gameProgress.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GameProgressFindUniqueArgs>(args: SelectSubset<T, GameProgressFindUniqueArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GameProgress that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GameProgressFindUniqueOrThrowArgs} args - Arguments to find a GameProgress
+     * @example
+     * // Get one GameProgress
+     * const gameProgress = await prisma.gameProgress.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GameProgressFindUniqueOrThrowArgs>(args: SelectSubset<T, GameProgressFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GameProgress that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressFindFirstArgs} args - Arguments to find a GameProgress
+     * @example
+     * // Get one GameProgress
+     * const gameProgress = await prisma.gameProgress.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GameProgressFindFirstArgs>(args?: SelectSubset<T, GameProgressFindFirstArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GameProgress that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressFindFirstOrThrowArgs} args - Arguments to find a GameProgress
+     * @example
+     * // Get one GameProgress
+     * const gameProgress = await prisma.gameProgress.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GameProgressFindFirstOrThrowArgs>(args?: SelectSubset<T, GameProgressFindFirstOrThrowArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GameProgresses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GameProgresses
+     * const gameProgresses = await prisma.gameProgress.findMany()
+     * 
+     * // Get first 10 GameProgresses
+     * const gameProgresses = await prisma.gameProgress.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const gameProgressWithIdOnly = await prisma.gameProgress.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GameProgressFindManyArgs>(args?: SelectSubset<T, GameProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GameProgress.
+     * @param {GameProgressCreateArgs} args - Arguments to create a GameProgress.
+     * @example
+     * // Create one GameProgress
+     * const GameProgress = await prisma.gameProgress.create({
+     *   data: {
+     *     // ... data to create a GameProgress
+     *   }
+     * })
+     * 
+     */
+    create<T extends GameProgressCreateArgs>(args: SelectSubset<T, GameProgressCreateArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GameProgresses.
+     * @param {GameProgressCreateManyArgs} args - Arguments to create many GameProgresses.
+     * @example
+     * // Create many GameProgresses
+     * const gameProgress = await prisma.gameProgress.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GameProgressCreateManyArgs>(args?: SelectSubset<T, GameProgressCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GameProgresses and returns the data saved in the database.
+     * @param {GameProgressCreateManyAndReturnArgs} args - Arguments to create many GameProgresses.
+     * @example
+     * // Create many GameProgresses
+     * const gameProgress = await prisma.gameProgress.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GameProgresses and only return the `id`
+     * const gameProgressWithIdOnly = await prisma.gameProgress.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GameProgressCreateManyAndReturnArgs>(args?: SelectSubset<T, GameProgressCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a GameProgress.
+     * @param {GameProgressDeleteArgs} args - Arguments to delete one GameProgress.
+     * @example
+     * // Delete one GameProgress
+     * const GameProgress = await prisma.gameProgress.delete({
+     *   where: {
+     *     // ... filter to delete one GameProgress
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GameProgressDeleteArgs>(args: SelectSubset<T, GameProgressDeleteArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GameProgress.
+     * @param {GameProgressUpdateArgs} args - Arguments to update one GameProgress.
+     * @example
+     * // Update one GameProgress
+     * const gameProgress = await prisma.gameProgress.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GameProgressUpdateArgs>(args: SelectSubset<T, GameProgressUpdateArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GameProgresses.
+     * @param {GameProgressDeleteManyArgs} args - Arguments to filter GameProgresses to delete.
+     * @example
+     * // Delete a few GameProgresses
+     * const { count } = await prisma.gameProgress.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GameProgressDeleteManyArgs>(args?: SelectSubset<T, GameProgressDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GameProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GameProgresses
+     * const gameProgress = await prisma.gameProgress.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GameProgressUpdateManyArgs>(args: SelectSubset<T, GameProgressUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GameProgresses and returns the data updated in the database.
+     * @param {GameProgressUpdateManyAndReturnArgs} args - Arguments to update many GameProgresses.
+     * @example
+     * // Update many GameProgresses
+     * const gameProgress = await prisma.gameProgress.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GameProgresses and only return the `id`
+     * const gameProgressWithIdOnly = await prisma.gameProgress.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GameProgressUpdateManyAndReturnArgs>(args: SelectSubset<T, GameProgressUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one GameProgress.
+     * @param {GameProgressUpsertArgs} args - Arguments to update or create a GameProgress.
+     * @example
+     * // Update or create a GameProgress
+     * const gameProgress = await prisma.gameProgress.upsert({
+     *   create: {
+     *     // ... data to create a GameProgress
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GameProgress we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GameProgressUpsertArgs>(args: SelectSubset<T, GameProgressUpsertArgs<ExtArgs>>): Prisma__GameProgressClient<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GameProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressCountArgs} args - Arguments to filter GameProgresses to count.
+     * @example
+     * // Count the number of GameProgresses
+     * const count = await prisma.gameProgress.count({
+     *   where: {
+     *     // ... the filter for the GameProgresses we want to count
+     *   }
+     * })
+    **/
+    count<T extends GameProgressCountArgs>(
+      args?: Subset<T, GameProgressCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GameProgressCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GameProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GameProgressAggregateArgs>(args: Subset<T, GameProgressAggregateArgs>): Prisma.PrismaPromise<GetGameProgressAggregateType<T>>
+
+    /**
+     * Group by GameProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GameProgressGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GameProgressGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GameProgressGroupByArgs['orderBy'] }
+        : { orderBy?: GameProgressGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GameProgressGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGameProgressGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GameProgress model
+   */
+  readonly fields: GameProgressFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GameProgress.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GameProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GameProgress model
+   */
+  interface GameProgressFieldRefs {
+    readonly id: FieldRef<"GameProgress", 'String'>
+    readonly studentId: FieldRef<"GameProgress", 'String'>
+    readonly game: FieldRef<"GameProgress", 'String'>
+    readonly levelId: FieldRef<"GameProgress", 'String'>
+    readonly stars: FieldRef<"GameProgress", 'Int'>
+    readonly score: FieldRef<"GameProgress", 'Int'>
+    readonly completedAt: FieldRef<"GameProgress", 'DateTime'>
+    readonly updatedAt: FieldRef<"GameProgress", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GameProgress findUnique
+   */
+  export type GameProgressFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which GameProgress to fetch.
+     */
+    where: GameProgressWhereUniqueInput
+  }
+
+  /**
+   * GameProgress findUniqueOrThrow
+   */
+  export type GameProgressFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which GameProgress to fetch.
+     */
+    where: GameProgressWhereUniqueInput
+  }
+
+  /**
+   * GameProgress findFirst
+   */
+  export type GameProgressFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which GameProgress to fetch.
+     */
+    where?: GameProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameProgresses to fetch.
+     */
+    orderBy?: GameProgressOrderByWithRelationInput | GameProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GameProgresses.
+     */
+    cursor?: GameProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GameProgresses.
+     */
+    distinct?: GameProgressScalarFieldEnum | GameProgressScalarFieldEnum[]
+  }
+
+  /**
+   * GameProgress findFirstOrThrow
+   */
+  export type GameProgressFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which GameProgress to fetch.
+     */
+    where?: GameProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameProgresses to fetch.
+     */
+    orderBy?: GameProgressOrderByWithRelationInput | GameProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GameProgresses.
+     */
+    cursor?: GameProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GameProgresses.
+     */
+    distinct?: GameProgressScalarFieldEnum | GameProgressScalarFieldEnum[]
+  }
+
+  /**
+   * GameProgress findMany
+   */
+  export type GameProgressFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which GameProgresses to fetch.
+     */
+    where?: GameProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GameProgresses to fetch.
+     */
+    orderBy?: GameProgressOrderByWithRelationInput | GameProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GameProgresses.
+     */
+    cursor?: GameProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GameProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GameProgresses.
+     */
+    skip?: number
+    distinct?: GameProgressScalarFieldEnum | GameProgressScalarFieldEnum[]
+  }
+
+  /**
+   * GameProgress create
+   */
+  export type GameProgressCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GameProgress.
+     */
+    data: XOR<GameProgressCreateInput, GameProgressUncheckedCreateInput>
+  }
+
+  /**
+   * GameProgress createMany
+   */
+  export type GameProgressCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GameProgresses.
+     */
+    data: GameProgressCreateManyInput | GameProgressCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GameProgress createManyAndReturn
+   */
+  export type GameProgressCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * The data used to create many GameProgresses.
+     */
+    data: GameProgressCreateManyInput | GameProgressCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GameProgress update
+   */
+  export type GameProgressUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GameProgress.
+     */
+    data: XOR<GameProgressUpdateInput, GameProgressUncheckedUpdateInput>
+    /**
+     * Choose, which GameProgress to update.
+     */
+    where: GameProgressWhereUniqueInput
+  }
+
+  /**
+   * GameProgress updateMany
+   */
+  export type GameProgressUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GameProgresses.
+     */
+    data: XOR<GameProgressUpdateManyMutationInput, GameProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which GameProgresses to update
+     */
+    where?: GameProgressWhereInput
+    /**
+     * Limit how many GameProgresses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GameProgress updateManyAndReturn
+   */
+  export type GameProgressUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * The data used to update GameProgresses.
+     */
+    data: XOR<GameProgressUpdateManyMutationInput, GameProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which GameProgresses to update
+     */
+    where?: GameProgressWhereInput
+    /**
+     * Limit how many GameProgresses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GameProgress upsert
+   */
+  export type GameProgressUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GameProgress to update in case it exists.
+     */
+    where: GameProgressWhereUniqueInput
+    /**
+     * In case the GameProgress found by the `where` argument doesn't exist, create a new GameProgress with this data.
+     */
+    create: XOR<GameProgressCreateInput, GameProgressUncheckedCreateInput>
+    /**
+     * In case the GameProgress was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GameProgressUpdateInput, GameProgressUncheckedUpdateInput>
+  }
+
+  /**
+   * GameProgress delete
+   */
+  export type GameProgressDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+    /**
+     * Filter which GameProgress to delete.
+     */
+    where: GameProgressWhereUniqueInput
+  }
+
+  /**
+   * GameProgress deleteMany
+   */
+  export type GameProgressDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GameProgresses to delete
+     */
+    where?: GameProgressWhereInput
+    /**
+     * Limit how many GameProgresses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GameProgress without action
+   */
+  export type GameProgressDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GameProgress
+     */
+    select?: GameProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GameProgress
+     */
+    omit?: GameProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GameProgressInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -79215,6 +80489,20 @@ export namespace Prisma {
   };
 
   export type LiveAnswerScalarFieldEnum = (typeof LiveAnswerScalarFieldEnum)[keyof typeof LiveAnswerScalarFieldEnum]
+
+
+  export const GameProgressScalarFieldEnum: {
+    id: 'id',
+    studentId: 'studentId',
+    game: 'game',
+    levelId: 'levelId',
+    stars: 'stars',
+    score: 'score',
+    completedAt: 'completedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GameProgressScalarFieldEnum = (typeof GameProgressScalarFieldEnum)[keyof typeof GameProgressScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -80148,6 +81436,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
     livePlayers?: LivePlayerListRelationFilter
+    gameProgress?: GameProgressListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
@@ -80176,6 +81465,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentOrderByRelationAggregateInput
     tutoringGiven?: PeerTutorAssignmentOrderByRelationAggregateInput
     livePlayers?: LivePlayerOrderByRelationAggregateInput
+    gameProgress?: GameProgressOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -80207,6 +81497,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
     livePlayers?: LivePlayerListRelationFilter
+    gameProgress?: GameProgressListRelationFilter
   }, "id" | "userId" | "studentNumber">
 
   export type StudentProfileOrderByWithAggregationInput = {
@@ -84392,6 +85683,79 @@ export namespace Prisma {
     answeredAt?: DateTimeWithAggregatesFilter<"LiveAnswer"> | Date | string
   }
 
+  export type GameProgressWhereInput = {
+    AND?: GameProgressWhereInput | GameProgressWhereInput[]
+    OR?: GameProgressWhereInput[]
+    NOT?: GameProgressWhereInput | GameProgressWhereInput[]
+    id?: StringFilter<"GameProgress"> | string
+    studentId?: StringFilter<"GameProgress"> | string
+    game?: StringFilter<"GameProgress"> | string
+    levelId?: StringFilter<"GameProgress"> | string
+    stars?: IntFilter<"GameProgress"> | number
+    score?: IntFilter<"GameProgress"> | number
+    completedAt?: DateTimeFilter<"GameProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"GameProgress"> | Date | string
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+  }
+
+  export type GameProgressOrderByWithRelationInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    game?: SortOrder
+    levelId?: SortOrder
+    stars?: SortOrder
+    score?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+    student?: StudentProfileOrderByWithRelationInput
+  }
+
+  export type GameProgressWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    studentId_levelId?: GameProgressStudentIdLevelIdCompoundUniqueInput
+    AND?: GameProgressWhereInput | GameProgressWhereInput[]
+    OR?: GameProgressWhereInput[]
+    NOT?: GameProgressWhereInput | GameProgressWhereInput[]
+    studentId?: StringFilter<"GameProgress"> | string
+    game?: StringFilter<"GameProgress"> | string
+    levelId?: StringFilter<"GameProgress"> | string
+    stars?: IntFilter<"GameProgress"> | number
+    score?: IntFilter<"GameProgress"> | number
+    completedAt?: DateTimeFilter<"GameProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"GameProgress"> | Date | string
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+  }, "id" | "studentId_levelId">
+
+  export type GameProgressOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    game?: SortOrder
+    levelId?: SortOrder
+    stars?: SortOrder
+    score?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: GameProgressCountOrderByAggregateInput
+    _avg?: GameProgressAvgOrderByAggregateInput
+    _max?: GameProgressMaxOrderByAggregateInput
+    _min?: GameProgressMinOrderByAggregateInput
+    _sum?: GameProgressSumOrderByAggregateInput
+  }
+
+  export type GameProgressScalarWhereWithAggregatesInput = {
+    AND?: GameProgressScalarWhereWithAggregatesInput | GameProgressScalarWhereWithAggregatesInput[]
+    OR?: GameProgressScalarWhereWithAggregatesInput[]
+    NOT?: GameProgressScalarWhereWithAggregatesInput | GameProgressScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GameProgress"> | string
+    studentId?: StringWithAggregatesFilter<"GameProgress"> | string
+    game?: StringWithAggregatesFilter<"GameProgress"> | string
+    levelId?: StringWithAggregatesFilter<"GameProgress"> | string
+    stars?: IntWithAggregatesFilter<"GameProgress"> | number
+    score?: IntWithAggregatesFilter<"GameProgress"> | number
+    completedAt?: DateTimeWithAggregatesFilter<"GameProgress"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"GameProgress"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -84789,6 +86153,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
@@ -84815,6 +86180,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
@@ -84841,6 +86207,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
@@ -84867,6 +86234,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
@@ -89182,6 +90550,82 @@ export namespace Prisma {
     answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GameProgressCreateInput = {
+    id?: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutGameProgressInput
+  }
+
+  export type GameProgressUncheckedCreateInput = {
+    id?: string
+    studentId: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GameProgressUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutGameProgressNestedInput
+  }
+
+  export type GameProgressUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GameProgressCreateManyInput = {
+    id?: string
+    studentId: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GameProgressUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GameProgressUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -89753,6 +91197,12 @@ export namespace Prisma {
     none?: LivePlayerWhereInput
   }
 
+  export type GameProgressListRelationFilter = {
+    every?: GameProgressWhereInput
+    some?: GameProgressWhereInput
+    none?: GameProgressWhereInput
+  }
+
   export type EnrollmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -89794,6 +91244,10 @@ export namespace Prisma {
   }
 
   export type LivePlayerOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type GameProgressOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -93159,6 +94613,54 @@ export namespace Prisma {
     points?: SortOrder
   }
 
+  export type GameProgressStudentIdLevelIdCompoundUniqueInput = {
+    studentId: string
+    levelId: string
+  }
+
+  export type GameProgressCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    game?: SortOrder
+    levelId?: SortOrder
+    stars?: SortOrder
+    score?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GameProgressAvgOrderByAggregateInput = {
+    stars?: SortOrder
+    score?: SortOrder
+  }
+
+  export type GameProgressMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    game?: SortOrder
+    levelId?: SortOrder
+    stars?: SortOrder
+    score?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GameProgressMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    game?: SortOrder
+    levelId?: SortOrder
+    stars?: SortOrder
+    score?: SortOrder
+    completedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GameProgressSumOrderByAggregateInput = {
+    stars?: SortOrder
+    score?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -93932,6 +95434,13 @@ export namespace Prisma {
     connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
   }
 
+  export type GameProgressCreateNestedManyWithoutStudentInput = {
+    create?: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput> | GameProgressCreateWithoutStudentInput[] | GameProgressUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: GameProgressCreateOrConnectWithoutStudentInput | GameProgressCreateOrConnectWithoutStudentInput[]
+    createMany?: GameProgressCreateManyStudentInputEnvelope
+    connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+  }
+
   export type EnrollmentUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -94021,6 +95530,13 @@ export namespace Prisma {
     connectOrCreate?: LivePlayerCreateOrConnectWithoutStudentInput | LivePlayerCreateOrConnectWithoutStudentInput[]
     createMany?: LivePlayerCreateManyStudentInputEnvelope
     connect?: LivePlayerWhereUniqueInput | LivePlayerWhereUniqueInput[]
+  }
+
+  export type GameProgressUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput> | GameProgressCreateWithoutStudentInput[] | GameProgressUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: GameProgressCreateOrConnectWithoutStudentInput | GameProgressCreateOrConnectWithoutStudentInput[]
+    createMany?: GameProgressCreateManyStudentInputEnvelope
+    connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -94239,6 +95755,20 @@ export namespace Prisma {
     deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
   }
 
+  export type GameProgressUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput> | GameProgressCreateWithoutStudentInput[] | GameProgressUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: GameProgressCreateOrConnectWithoutStudentInput | GameProgressCreateOrConnectWithoutStudentInput[]
+    upsert?: GameProgressUpsertWithWhereUniqueWithoutStudentInput | GameProgressUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: GameProgressCreateManyStudentInputEnvelope
+    set?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    disconnect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    delete?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    update?: GameProgressUpdateWithWhereUniqueWithoutStudentInput | GameProgressUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: GameProgressUpdateManyWithWhereWithoutStudentInput | GameProgressUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
+  }
+
   export type EnrollmentUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -94419,6 +95949,20 @@ export namespace Prisma {
     update?: LivePlayerUpdateWithWhereUniqueWithoutStudentInput | LivePlayerUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: LivePlayerUpdateManyWithWhereWithoutStudentInput | LivePlayerUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: LivePlayerScalarWhereInput | LivePlayerScalarWhereInput[]
+  }
+
+  export type GameProgressUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput> | GameProgressCreateWithoutStudentInput[] | GameProgressUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: GameProgressCreateOrConnectWithoutStudentInput | GameProgressCreateOrConnectWithoutStudentInput[]
+    upsert?: GameProgressUpsertWithWhereUniqueWithoutStudentInput | GameProgressUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: GameProgressCreateManyStudentInputEnvelope
+    set?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    disconnect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    delete?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+    update?: GameProgressUpdateWithWhereUniqueWithoutStudentInput | GameProgressUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: GameProgressUpdateManyWithWhereWithoutStudentInput | GameProgressUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
   }
 
   export type StudentProfileCreateNestedManyWithoutSectionInput = {
@@ -98615,6 +100159,20 @@ export namespace Prisma {
     update?: XOR<XOR<LivePlayerUpdateToOneWithWhereWithoutAnswersInput, LivePlayerUpdateWithoutAnswersInput>, LivePlayerUncheckedUpdateWithoutAnswersInput>
   }
 
+  export type StudentProfileCreateNestedOneWithoutGameProgressInput = {
+    create?: XOR<StudentProfileCreateWithoutGameProgressInput, StudentProfileUncheckedCreateWithoutGameProgressInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutGameProgressInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutGameProgressNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutGameProgressInput, StudentProfileUncheckedCreateWithoutGameProgressInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutGameProgressInput
+    upsert?: StudentProfileUpsertWithoutGameProgressInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutGameProgressInput, StudentProfileUpdateWithoutGameProgressInput>, StudentProfileUncheckedUpdateWithoutGameProgressInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -99513,6 +101071,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
@@ -99538,6 +101097,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUserInput = {
@@ -100007,6 +101567,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
@@ -100032,6 +101593,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type TeacherProfileUpsertWithoutUserInput = {
@@ -101163,6 +102725,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GameProgressCreateWithoutStudentInput = {
+    id?: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GameProgressUncheckedCreateWithoutStudentInput = {
+    id?: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GameProgressCreateOrConnectWithoutStudentInput = {
+    where: GameProgressWhereUniqueInput
+    create: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput>
+  }
+
+  export type GameProgressCreateManyStudentInputEnvelope = {
+    data: GameProgressCreateManyStudentInput | GameProgressCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutStudentProfileInput = {
     update: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
@@ -101621,6 +103213,36 @@ export namespace Prisma {
     joinedAt?: DateTimeFilter<"LivePlayer"> | Date | string
   }
 
+  export type GameProgressUpsertWithWhereUniqueWithoutStudentInput = {
+    where: GameProgressWhereUniqueInput
+    update: XOR<GameProgressUpdateWithoutStudentInput, GameProgressUncheckedUpdateWithoutStudentInput>
+    create: XOR<GameProgressCreateWithoutStudentInput, GameProgressUncheckedCreateWithoutStudentInput>
+  }
+
+  export type GameProgressUpdateWithWhereUniqueWithoutStudentInput = {
+    where: GameProgressWhereUniqueInput
+    data: XOR<GameProgressUpdateWithoutStudentInput, GameProgressUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type GameProgressUpdateManyWithWhereWithoutStudentInput = {
+    where: GameProgressScalarWhereInput
+    data: XOR<GameProgressUpdateManyMutationInput, GameProgressUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type GameProgressScalarWhereInput = {
+    AND?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
+    OR?: GameProgressScalarWhereInput[]
+    NOT?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
+    id?: StringFilter<"GameProgress"> | string
+    studentId?: StringFilter<"GameProgress"> | string
+    game?: StringFilter<"GameProgress"> | string
+    levelId?: StringFilter<"GameProgress"> | string
+    stars?: IntFilter<"GameProgress"> | number
+    score?: IntFilter<"GameProgress"> | number
+    completedAt?: DateTimeFilter<"GameProgress"> | Date | string
+    updatedAt?: DateTimeFilter<"GameProgress"> | Date | string
+  }
+
   export type StudentProfileCreateWithoutSectionInput = {
     id?: string
     studentNumber: string
@@ -101644,6 +103266,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSectionInput = {
@@ -101669,6 +103292,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSectionInput = {
@@ -102208,6 +103832,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
@@ -102233,6 +103858,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -102303,6 +103929,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
@@ -102328,6 +103955,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAccommodationsInput = {
@@ -102353,6 +103981,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAccommodationsInput = {
@@ -102378,6 +104007,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAccommodationsInput = {
@@ -102419,6 +104049,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAccommodationsInput = {
@@ -102444,6 +104075,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type CourseCreateWithoutDepartmentInput = {
@@ -103900,6 +105532,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutEnrollmentsInput = {
@@ -103925,6 +105558,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutEnrollmentsInput = {
@@ -104049,6 +105683,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutEnrollmentsInput = {
@@ -104074,6 +105709,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GradeSnapshotUpsertWithWhereUniqueWithoutEnrollmentInput = {
@@ -105739,6 +107375,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonProgressInput = {
@@ -105764,6 +107401,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonProgressInput = {
@@ -105856,6 +107494,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonProgressInput = {
@@ -105881,6 +107520,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LessonCreateWithoutNotesInput = {
@@ -105951,6 +107591,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonNotesInput = {
@@ -105976,6 +107617,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonNotesInput = {
@@ -106068,6 +107710,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonNotesInput = {
@@ -106093,6 +107736,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserCreateWithoutUploadedFilesInput = {
@@ -107589,6 +109233,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSubmissionsInput = {
@@ -107614,6 +109259,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSubmissionsInput = {
@@ -107763,6 +109409,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSubmissionsInput = {
@@ -107788,6 +109435,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SubmissionAttachmentUpsertWithWhereUniqueWithoutSubmissionInput = {
@@ -109368,6 +111016,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttemptsInput = {
@@ -109393,6 +111042,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttemptsInput = {
@@ -109563,6 +111213,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttemptsInput = {
@@ -109588,6 +111239,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type QuestionResponseUpsertWithWhereUniqueWithoutAttemptInput = {
@@ -110399,6 +112051,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendanceInput = {
@@ -110424,6 +112077,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendanceInput = {
@@ -110498,6 +112152,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendanceInput = {
@@ -110523,6 +112178,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAlertsInput = {
@@ -110548,6 +112204,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAlertsInput = {
@@ -110573,6 +112230,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAlertsInput = {
@@ -110758,6 +112416,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAlertsInput = {
@@ -110783,6 +112442,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutAlertsInput = {
@@ -111168,6 +112828,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -111193,6 +112854,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -111223,6 +112885,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutoringGivenInput = {
@@ -111248,6 +112911,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutoringGivenInput = {
@@ -111340,6 +113004,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -111365,6 +113030,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUpsertWithoutTutoringGivenInput = {
@@ -111401,6 +113067,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutoringGivenInput = {
@@ -111426,6 +113093,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutTutorAssignmentsInput = {
@@ -112951,6 +114619,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutOfficeHourSlotsInput = {
@@ -112976,6 +114645,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutOfficeHourSlotsInput = {
@@ -113054,6 +114724,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutOfficeHourSlotsInput = {
@@ -113079,6 +114750,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionCreateWithoutLiveGamesInput = {
@@ -113529,6 +115201,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLivePlayersInput = {
@@ -113554,6 +115227,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLivePlayersInput = {
@@ -113668,6 +115342,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLivePlayersInput = {
@@ -113693,6 +115368,7 @@ export namespace Prisma {
     officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput = {
@@ -113841,6 +115517,126 @@ export namespace Prisma {
     team?: NullableIntFieldUpdateOperationsInput | number | null
     score?: IntFieldUpdateOperationsInput | number
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentProfileCreateWithoutGameProgressInput = {
+    id?: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
+    enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordCreateNestedManyWithoutStudentInput
+    alerts?: AlertCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutGameProgressInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    sectionId?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteUncheckedCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationUncheckedCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutGameProgressInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutGameProgressInput, StudentProfileUncheckedCreateWithoutGameProgressInput>
+  }
+
+  export type StudentProfileUpsertWithoutGameProgressInput = {
+    update: XOR<StudentProfileUpdateWithoutGameProgressInput, StudentProfileUncheckedUpdateWithoutGameProgressInput>
+    create: XOR<StudentProfileCreateWithoutGameProgressInput, StudentProfileUncheckedCreateWithoutGameProgressInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutGameProgressInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutGameProgressInput, StudentProfileUncheckedUpdateWithoutGameProgressInput>
+  }
+
+  export type StudentProfileUpdateWithoutGameProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutGameProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUncheckedUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUncheckedUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -114507,6 +116303,16 @@ export namespace Prisma {
     joinedAt?: Date | string
   }
 
+  export type GameProgressCreateManyStudentInput = {
+    id?: string
+    game: string
+    levelId: string
+    stars: number
+    score?: number
+    completedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type EnrollmentUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumEnrollmentStatusFieldUpdateOperationsInput | $Enums.EnrollmentStatus
@@ -114923,6 +116729,36 @@ export namespace Prisma {
     joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GameProgressUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GameProgressUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GameProgressUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    game?: StringFieldUpdateOperationsInput | string
+    levelId?: StringFieldUpdateOperationsInput | string
+    stars?: IntFieldUpdateOperationsInput | number
+    score?: IntFieldUpdateOperationsInput | number
+    completedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StudentProfileCreateManySectionInput = {
     id?: string
     userId: string
@@ -114958,6 +116794,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSectionInput = {
@@ -114983,6 +116820,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateManyWithoutSectionInput = {

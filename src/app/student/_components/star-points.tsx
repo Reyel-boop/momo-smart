@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   CheckCircleIcon,
   ClipboardIcon,
+  PlayIcon,
   StarIcon,
   TimerIcon,
   TrophyIcon,
@@ -34,6 +35,12 @@ export function StarPoints({ stars }: { stars: Stars }) {
       icon: TimerIcon,
       note: "1 Star per point",
     },
+    {
+      label: "Games",
+      value: stars.games,
+      icon: PlayIcon,
+      note: "Up to 3 Stars per level",
+    },
   ];
 
   return (
@@ -51,7 +58,7 @@ export function StarPoints({ stars }: { stars: Stars }) {
               <Pill tone="amber">{stars.total.toLocaleString()} Stars</Pill>
             </div>
             <p className="text-muted mt-0.5 text-xs">
-              1 Star per correct answer and per graded point
+              1 Star per correct answer and graded point, up to 3 per game level
             </p>
           </div>
         </div>
@@ -98,7 +105,7 @@ export function StarPoints({ stars }: { stars: Stars }) {
         </div>
       </div>
 
-      <div className="grid gap-3 px-5 pt-5 sm:grid-cols-3">
+      <div className="grid gap-3 px-5 pt-5 sm:grid-cols-2">
         {tallies.map((tally) => (
           <div
             key={tally.label}
