@@ -799,6 +799,13 @@ exports.Prisma.RaceSessionScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.QuestAnswerScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  questionId: 'questionId',
+  answeredAt: 'answeredAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1136,7 +1143,8 @@ exports.Prisma.ModelName = {
   GameProgress: 'GameProgress',
   RaceTeam: 'RaceTeam',
   RaceMember: 'RaceMember',
-  RaceSession: 'RaceSession'
+  RaceSession: 'RaceSession',
+  QuestAnswer: 'QuestAnswer'
 };
 
 /**

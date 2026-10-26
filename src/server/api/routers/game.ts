@@ -313,8 +313,40 @@ export const gameRouter = createTRPCRouter({
       const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
       const question = await questionOf(ctx.db, quiz, input.questionId);
       const right = question.options.find((o) => o.isCorrect);
+      const correct = right?.id === input.optionId;
+      // One star per question, once — shared with Unit Questions and Live Quiz.
+      let newStar = false;
+      if (correct) {
+        const [earlier, live, quest] = await Promise.all([
+          ctx.db.questionResponse.count({
+            where: {
+              questionId: input.questionId,
+              isCorrect: true,
+              attempt: { studentId: ctx.studentId },
+            },
+          }),
+          ctx.db.liveAnswer.count({
+            where: {
+              questionId: input.questionId,
+              isCorrect: true,
+              player: { studentId: ctx.studentId },
+            },
+          }),
+          ctx.db.questAnswer.count({
+            where: { questionId: input.questionId, studentId: ctx.studentId },
+          }),
+        ]);
+        if (quest === 0) {
+          await ctx.db.questAnswer.createMany({
+            data: [{ studentId: ctx.studentId, questionId: input.questionId }],
+            skipDuplicates: true,
+          });
+        }
+        newStar = earlier + live + quest === 0;
+      }
       return {
-        correct: right?.id === input.optionId,
+        correct,
+        newStar,
         correctOptionId: right?.id ?? null,
         explanation: question.explanation,
       };

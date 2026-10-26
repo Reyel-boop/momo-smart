@@ -74,7 +74,7 @@ export type StarTotal = {
 
 /**
  * Every student's stars: one per Unit Question answered correctly — on
- * their own or in a Live Quiz, each question once — plus one per point of
+ * their own, in a Live Quiz or in Momo's Quest, each question once — plus one per point of
  * released graded work, plus the best stars of each game level.
  */
 export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
@@ -92,6 +92,9 @@ export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
         FROM "LiveAnswer" l
         JOIN "LivePlayer" p ON p."id" = l."playerId"
         WHERE l."isCorrect" = true
+        UNION
+        SELECT qa."studentId", qa."questionId"
+        FROM "QuestAnswer" qa
       ) correct
       GROUP BY correct."studentId"`,
     db.grade.findMany({
@@ -179,6 +182,10 @@ export async function questionStarLedger(db: Db, studentId: string) {
       FROM "LiveAnswer" l
       JOIN "LivePlayer" p ON p."id" = l."playerId"
       WHERE p."studentId" = ${studentId} AND l."isCorrect" = true
+      UNION ALL
+      SELECT qa."questionId", qa."answeredAt"
+      FROM "QuestAnswer" qa
+      WHERE qa."studentId" = ${studentId}
     ) correct
     JOIN "Question" qu ON qu."id" = correct."questionId"
     JOIN "Assessment" q ON q."id" = qu."assessmentId"

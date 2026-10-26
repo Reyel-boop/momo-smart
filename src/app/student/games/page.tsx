@@ -55,7 +55,8 @@ export default async function GamesPage() {
           <h2 className="text-3xl font-black">Momo&apos;s Quest</h2>
           <p className="mt-1 text-sm text-white/85">
             Team up with Momo the super pup and defeat the Jelly King with your
-            units&apos; questions. Miss 5 and you faint!
+            units&apos; questions. Earn ⭐ 1 star for every new correct answer,
+            plus up to 3 for winning. Miss 5 and you faint!
           </p>
           <span className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-slate-900 group-hover:bg-amber-300">
             <PlayIcon className="size-4" /> Play

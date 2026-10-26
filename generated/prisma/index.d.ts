@@ -341,6 +341,12 @@ export type RaceMember = $Result.DefaultSelection<Prisma.$RaceMemberPayload>
  * endsAt count. The latest one is the class's current (or last) race.
  */
 export type RaceSession = $Result.DefaultSelection<Prisma.$RaceSessionPayload>
+/**
+ * Model QuestAnswer
+ * A question a student first answered correctly in Momo's Quest. Like
+ * Unit Questions and Live Quiz, each question earns one star, once.
+ */
+export type QuestAnswer = $Result.DefaultSelection<Prisma.$QuestAnswerPayload>
 
 /**
  * Enums
@@ -1576,6 +1582,16 @@ export class PrismaClient<
     * ```
     */
   get raceSession(): Prisma.RaceSessionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.questAnswer`: Exposes CRUD operations for the **QuestAnswer** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more QuestAnswers
+    * const questAnswers = await prisma.questAnswer.findMany()
+    * ```
+    */
+  get questAnswer(): Prisma.QuestAnswerDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -2080,7 +2096,8 @@ export namespace Prisma {
     GameProgress: 'GameProgress',
     RaceTeam: 'RaceTeam',
     RaceMember: 'RaceMember',
-    RaceSession: 'RaceSession'
+    RaceSession: 'RaceSession',
+    QuestAnswer: 'QuestAnswer'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2099,7 +2116,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer" | "gameProgress" | "raceTeam" | "raceMember" | "raceSession"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer" | "gameProgress" | "raceTeam" | "raceMember" | "raceSession" | "questAnswer"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6839,6 +6856,80 @@ export namespace Prisma {
           }
         }
       }
+      QuestAnswer: {
+        payload: Prisma.$QuestAnswerPayload<ExtArgs>
+        fields: Prisma.QuestAnswerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.QuestAnswerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.QuestAnswerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          findFirst: {
+            args: Prisma.QuestAnswerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.QuestAnswerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          findMany: {
+            args: Prisma.QuestAnswerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>[]
+          }
+          create: {
+            args: Prisma.QuestAnswerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          createMany: {
+            args: Prisma.QuestAnswerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.QuestAnswerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>[]
+          }
+          delete: {
+            args: Prisma.QuestAnswerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          update: {
+            args: Prisma.QuestAnswerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          deleteMany: {
+            args: Prisma.QuestAnswerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.QuestAnswerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.QuestAnswerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>[]
+          }
+          upsert: {
+            args: Prisma.QuestAnswerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$QuestAnswerPayload>
+          }
+          aggregate: {
+            args: Prisma.QuestAnswerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateQuestAnswer>
+          }
+          groupBy: {
+            args: Prisma.QuestAnswerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<QuestAnswerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.QuestAnswerCountArgs<ExtArgs>
+            result: $Utils.Optional<QuestAnswerCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6999,6 +7090,7 @@ export namespace Prisma {
     raceTeam?: RaceTeamOmit
     raceMember?: RaceMemberOmit
     raceSession?: RaceSessionOmit
+    questAnswer?: QuestAnswerOmit
   }
 
   /* Types for Logging */
@@ -7233,6 +7325,7 @@ export namespace Prisma {
     livePlayers: number
     gameProgress: number
     raceMembers: number
+    questAnswers: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7251,6 +7344,7 @@ export namespace Prisma {
     livePlayers?: boolean | StudentProfileCountOutputTypeCountLivePlayersArgs
     gameProgress?: boolean | StudentProfileCountOutputTypeCountGameProgressArgs
     raceMembers?: boolean | StudentProfileCountOutputTypeCountRaceMembersArgs
+    questAnswers?: boolean | StudentProfileCountOutputTypeCountQuestAnswersArgs
   }
 
   // Custom InputTypes
@@ -7367,6 +7461,13 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountRaceMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RaceMemberWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountQuestAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: QuestAnswerWhereInput
   }
 
 
@@ -8254,11 +8355,13 @@ export namespace Prisma {
   export type QuestionCountOutputType = {
     options: number
     responses: number
+    questAnswers: number
   }
 
   export type QuestionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     options?: boolean | QuestionCountOutputTypeCountOptionsArgs
     responses?: boolean | QuestionCountOutputTypeCountResponsesArgs
+    questAnswers?: boolean | QuestionCountOutputTypeCountQuestAnswersArgs
   }
 
   // Custom InputTypes
@@ -8284,6 +8387,13 @@ export namespace Prisma {
    */
   export type QuestionCountOutputTypeCountResponsesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: QuestionResponseWhereInput
+  }
+
+  /**
+   * QuestionCountOutputType without action
+   */
+  export type QuestionCountOutputTypeCountQuestAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: QuestAnswerWhereInput
   }
 
 
@@ -13675,6 +13785,7 @@ export namespace Prisma {
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
     raceMembers?: boolean | StudentProfile$raceMembersArgs<ExtArgs>
+    questAnswers?: boolean | StudentProfile$questAnswersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
@@ -13740,6 +13851,7 @@ export namespace Prisma {
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
     raceMembers?: boolean | StudentProfile$raceMembersArgs<ExtArgs>
+    questAnswers?: boolean | StudentProfile$questAnswersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13771,6 +13883,7 @@ export namespace Prisma {
       livePlayers: Prisma.$LivePlayerPayload<ExtArgs>[]
       gameProgress: Prisma.$GameProgressPayload<ExtArgs>[]
       raceMembers: Prisma.$RaceMemberPayload<ExtArgs>[]
+      questAnswers: Prisma.$QuestAnswerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -14206,6 +14319,7 @@ export namespace Prisma {
     livePlayers<T extends StudentProfile$livePlayersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$livePlayersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     gameProgress<T extends StudentProfile$gameProgressArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$gameProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     raceMembers<T extends StudentProfile$raceMembersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$raceMembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    questAnswers<T extends StudentProfile$questAnswersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$questAnswersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15017,6 +15131,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.questAnswers
+   */
+  export type StudentProfile$questAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    where?: QuestAnswerWhereInput
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    cursor?: QuestAnswerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: QuestAnswerScalarFieldEnum | QuestAnswerScalarFieldEnum[]
   }
 
   /**
@@ -51848,6 +51986,7 @@ export namespace Prisma {
     assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
     options?: boolean | Question$optionsArgs<ExtArgs>
     responses?: boolean | Question$responsesArgs<ExtArgs>
+    questAnswers?: boolean | Question$questAnswersArgs<ExtArgs>
     _count?: boolean | QuestionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["question"]>
 
@@ -51897,6 +52036,7 @@ export namespace Prisma {
     assessment?: boolean | AssessmentDefaultArgs<ExtArgs>
     options?: boolean | Question$optionsArgs<ExtArgs>
     responses?: boolean | Question$responsesArgs<ExtArgs>
+    questAnswers?: boolean | Question$questAnswersArgs<ExtArgs>
     _count?: boolean | QuestionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type QuestionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -51912,6 +52052,7 @@ export namespace Prisma {
       assessment: Prisma.$AssessmentPayload<ExtArgs>
       options: Prisma.$QuestionOptionPayload<ExtArgs>[]
       responses: Prisma.$QuestionResponsePayload<ExtArgs>[]
+      questAnswers: Prisma.$QuestAnswerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -52330,6 +52471,7 @@ export namespace Prisma {
     assessment<T extends AssessmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AssessmentDefaultArgs<ExtArgs>>): Prisma__AssessmentClient<$Result.GetResult<Prisma.$AssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     options<T extends Question$optionsArgs<ExtArgs> = {}>(args?: Subset<T, Question$optionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestionOptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     responses<T extends Question$responsesArgs<ExtArgs> = {}>(args?: Subset<T, Question$responsesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestionResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    questAnswers<T extends Question$questAnswersArgs<ExtArgs> = {}>(args?: Subset<T, Question$questAnswersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -52810,6 +52952,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: QuestionResponseScalarFieldEnum | QuestionResponseScalarFieldEnum[]
+  }
+
+  /**
+   * Question.questAnswers
+   */
+  export type Question$questAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    where?: QuestAnswerWhereInput
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    cursor?: QuestAnswerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: QuestAnswerScalarFieldEnum | QuestAnswerScalarFieldEnum[]
   }
 
   /**
@@ -83307,6 +83473,1059 @@ export namespace Prisma {
 
 
   /**
+   * Model QuestAnswer
+   */
+
+  export type AggregateQuestAnswer = {
+    _count: QuestAnswerCountAggregateOutputType | null
+    _min: QuestAnswerMinAggregateOutputType | null
+    _max: QuestAnswerMaxAggregateOutputType | null
+  }
+
+  export type QuestAnswerMinAggregateOutputType = {
+    id: string | null
+    studentId: string | null
+    questionId: string | null
+    answeredAt: Date | null
+  }
+
+  export type QuestAnswerMaxAggregateOutputType = {
+    id: string | null
+    studentId: string | null
+    questionId: string | null
+    answeredAt: Date | null
+  }
+
+  export type QuestAnswerCountAggregateOutputType = {
+    id: number
+    studentId: number
+    questionId: number
+    answeredAt: number
+    _all: number
+  }
+
+
+  export type QuestAnswerMinAggregateInputType = {
+    id?: true
+    studentId?: true
+    questionId?: true
+    answeredAt?: true
+  }
+
+  export type QuestAnswerMaxAggregateInputType = {
+    id?: true
+    studentId?: true
+    questionId?: true
+    answeredAt?: true
+  }
+
+  export type QuestAnswerCountAggregateInputType = {
+    id?: true
+    studentId?: true
+    questionId?: true
+    answeredAt?: true
+    _all?: true
+  }
+
+  export type QuestAnswerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which QuestAnswer to aggregate.
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of QuestAnswers to fetch.
+     */
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: QuestAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` QuestAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` QuestAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned QuestAnswers
+    **/
+    _count?: true | QuestAnswerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: QuestAnswerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: QuestAnswerMaxAggregateInputType
+  }
+
+  export type GetQuestAnswerAggregateType<T extends QuestAnswerAggregateArgs> = {
+        [P in keyof T & keyof AggregateQuestAnswer]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateQuestAnswer[P]>
+      : GetScalarType<T[P], AggregateQuestAnswer[P]>
+  }
+
+
+
+
+  export type QuestAnswerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: QuestAnswerWhereInput
+    orderBy?: QuestAnswerOrderByWithAggregationInput | QuestAnswerOrderByWithAggregationInput[]
+    by: QuestAnswerScalarFieldEnum[] | QuestAnswerScalarFieldEnum
+    having?: QuestAnswerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: QuestAnswerCountAggregateInputType | true
+    _min?: QuestAnswerMinAggregateInputType
+    _max?: QuestAnswerMaxAggregateInputType
+  }
+
+  export type QuestAnswerGroupByOutputType = {
+    id: string
+    studentId: string
+    questionId: string
+    answeredAt: Date
+    _count: QuestAnswerCountAggregateOutputType | null
+    _min: QuestAnswerMinAggregateOutputType | null
+    _max: QuestAnswerMaxAggregateOutputType | null
+  }
+
+  type GetQuestAnswerGroupByPayload<T extends QuestAnswerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<QuestAnswerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof QuestAnswerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], QuestAnswerGroupByOutputType[P]>
+            : GetScalarType<T[P], QuestAnswerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type QuestAnswerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    questionId?: boolean
+    answeredAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["questAnswer"]>
+
+  export type QuestAnswerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    questionId?: boolean
+    answeredAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["questAnswer"]>
+
+  export type QuestAnswerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentId?: boolean
+    questionId?: boolean
+    answeredAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["questAnswer"]>
+
+  export type QuestAnswerSelectScalar = {
+    id?: boolean
+    studentId?: boolean
+    questionId?: boolean
+    answeredAt?: boolean
+  }
+
+  export type QuestAnswerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "studentId" | "questionId" | "answeredAt", ExtArgs["result"]["questAnswer"]>
+  export type QuestAnswerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }
+  export type QuestAnswerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }
+  export type QuestAnswerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    question?: boolean | QuestionDefaultArgs<ExtArgs>
+  }
+
+  export type $QuestAnswerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "QuestAnswer"
+    objects: {
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+      question: Prisma.$QuestionPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentId: string
+      questionId: string
+      answeredAt: Date
+    }, ExtArgs["result"]["questAnswer"]>
+    composites: {}
+  }
+
+  type QuestAnswerGetPayload<S extends boolean | null | undefined | QuestAnswerDefaultArgs> = $Result.GetResult<Prisma.$QuestAnswerPayload, S>
+
+  type QuestAnswerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<QuestAnswerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: QuestAnswerCountAggregateInputType | true
+    }
+
+  export interface QuestAnswerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['QuestAnswer'], meta: { name: 'QuestAnswer' } }
+    /**
+     * Find zero or one QuestAnswer that matches the filter.
+     * @param {QuestAnswerFindUniqueArgs} args - Arguments to find a QuestAnswer
+     * @example
+     * // Get one QuestAnswer
+     * const questAnswer = await prisma.questAnswer.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends QuestAnswerFindUniqueArgs>(args: SelectSubset<T, QuestAnswerFindUniqueArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one QuestAnswer that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {QuestAnswerFindUniqueOrThrowArgs} args - Arguments to find a QuestAnswer
+     * @example
+     * // Get one QuestAnswer
+     * const questAnswer = await prisma.questAnswer.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends QuestAnswerFindUniqueOrThrowArgs>(args: SelectSubset<T, QuestAnswerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first QuestAnswer that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerFindFirstArgs} args - Arguments to find a QuestAnswer
+     * @example
+     * // Get one QuestAnswer
+     * const questAnswer = await prisma.questAnswer.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends QuestAnswerFindFirstArgs>(args?: SelectSubset<T, QuestAnswerFindFirstArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first QuestAnswer that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerFindFirstOrThrowArgs} args - Arguments to find a QuestAnswer
+     * @example
+     * // Get one QuestAnswer
+     * const questAnswer = await prisma.questAnswer.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends QuestAnswerFindFirstOrThrowArgs>(args?: SelectSubset<T, QuestAnswerFindFirstOrThrowArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more QuestAnswers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all QuestAnswers
+     * const questAnswers = await prisma.questAnswer.findMany()
+     * 
+     * // Get first 10 QuestAnswers
+     * const questAnswers = await prisma.questAnswer.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const questAnswerWithIdOnly = await prisma.questAnswer.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends QuestAnswerFindManyArgs>(args?: SelectSubset<T, QuestAnswerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a QuestAnswer.
+     * @param {QuestAnswerCreateArgs} args - Arguments to create a QuestAnswer.
+     * @example
+     * // Create one QuestAnswer
+     * const QuestAnswer = await prisma.questAnswer.create({
+     *   data: {
+     *     // ... data to create a QuestAnswer
+     *   }
+     * })
+     * 
+     */
+    create<T extends QuestAnswerCreateArgs>(args: SelectSubset<T, QuestAnswerCreateArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many QuestAnswers.
+     * @param {QuestAnswerCreateManyArgs} args - Arguments to create many QuestAnswers.
+     * @example
+     * // Create many QuestAnswers
+     * const questAnswer = await prisma.questAnswer.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends QuestAnswerCreateManyArgs>(args?: SelectSubset<T, QuestAnswerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many QuestAnswers and returns the data saved in the database.
+     * @param {QuestAnswerCreateManyAndReturnArgs} args - Arguments to create many QuestAnswers.
+     * @example
+     * // Create many QuestAnswers
+     * const questAnswer = await prisma.questAnswer.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many QuestAnswers and only return the `id`
+     * const questAnswerWithIdOnly = await prisma.questAnswer.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends QuestAnswerCreateManyAndReturnArgs>(args?: SelectSubset<T, QuestAnswerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a QuestAnswer.
+     * @param {QuestAnswerDeleteArgs} args - Arguments to delete one QuestAnswer.
+     * @example
+     * // Delete one QuestAnswer
+     * const QuestAnswer = await prisma.questAnswer.delete({
+     *   where: {
+     *     // ... filter to delete one QuestAnswer
+     *   }
+     * })
+     * 
+     */
+    delete<T extends QuestAnswerDeleteArgs>(args: SelectSubset<T, QuestAnswerDeleteArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one QuestAnswer.
+     * @param {QuestAnswerUpdateArgs} args - Arguments to update one QuestAnswer.
+     * @example
+     * // Update one QuestAnswer
+     * const questAnswer = await prisma.questAnswer.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends QuestAnswerUpdateArgs>(args: SelectSubset<T, QuestAnswerUpdateArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more QuestAnswers.
+     * @param {QuestAnswerDeleteManyArgs} args - Arguments to filter QuestAnswers to delete.
+     * @example
+     * // Delete a few QuestAnswers
+     * const { count } = await prisma.questAnswer.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends QuestAnswerDeleteManyArgs>(args?: SelectSubset<T, QuestAnswerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more QuestAnswers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many QuestAnswers
+     * const questAnswer = await prisma.questAnswer.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends QuestAnswerUpdateManyArgs>(args: SelectSubset<T, QuestAnswerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more QuestAnswers and returns the data updated in the database.
+     * @param {QuestAnswerUpdateManyAndReturnArgs} args - Arguments to update many QuestAnswers.
+     * @example
+     * // Update many QuestAnswers
+     * const questAnswer = await prisma.questAnswer.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more QuestAnswers and only return the `id`
+     * const questAnswerWithIdOnly = await prisma.questAnswer.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends QuestAnswerUpdateManyAndReturnArgs>(args: SelectSubset<T, QuestAnswerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one QuestAnswer.
+     * @param {QuestAnswerUpsertArgs} args - Arguments to update or create a QuestAnswer.
+     * @example
+     * // Update or create a QuestAnswer
+     * const questAnswer = await prisma.questAnswer.upsert({
+     *   create: {
+     *     // ... data to create a QuestAnswer
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the QuestAnswer we want to update
+     *   }
+     * })
+     */
+    upsert<T extends QuestAnswerUpsertArgs>(args: SelectSubset<T, QuestAnswerUpsertArgs<ExtArgs>>): Prisma__QuestAnswerClient<$Result.GetResult<Prisma.$QuestAnswerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of QuestAnswers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerCountArgs} args - Arguments to filter QuestAnswers to count.
+     * @example
+     * // Count the number of QuestAnswers
+     * const count = await prisma.questAnswer.count({
+     *   where: {
+     *     // ... the filter for the QuestAnswers we want to count
+     *   }
+     * })
+    **/
+    count<T extends QuestAnswerCountArgs>(
+      args?: Subset<T, QuestAnswerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], QuestAnswerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a QuestAnswer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends QuestAnswerAggregateArgs>(args: Subset<T, QuestAnswerAggregateArgs>): Prisma.PrismaPromise<GetQuestAnswerAggregateType<T>>
+
+    /**
+     * Group by QuestAnswer.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {QuestAnswerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends QuestAnswerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: QuestAnswerGroupByArgs['orderBy'] }
+        : { orderBy?: QuestAnswerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, QuestAnswerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetQuestAnswerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the QuestAnswer model
+   */
+  readonly fields: QuestAnswerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for QuestAnswer.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__QuestAnswerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    question<T extends QuestionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, QuestionDefaultArgs<ExtArgs>>): Prisma__QuestionClient<$Result.GetResult<Prisma.$QuestionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the QuestAnswer model
+   */
+  interface QuestAnswerFieldRefs {
+    readonly id: FieldRef<"QuestAnswer", 'String'>
+    readonly studentId: FieldRef<"QuestAnswer", 'String'>
+    readonly questionId: FieldRef<"QuestAnswer", 'String'>
+    readonly answeredAt: FieldRef<"QuestAnswer", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * QuestAnswer findUnique
+   */
+  export type QuestAnswerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which QuestAnswer to fetch.
+     */
+    where: QuestAnswerWhereUniqueInput
+  }
+
+  /**
+   * QuestAnswer findUniqueOrThrow
+   */
+  export type QuestAnswerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which QuestAnswer to fetch.
+     */
+    where: QuestAnswerWhereUniqueInput
+  }
+
+  /**
+   * QuestAnswer findFirst
+   */
+  export type QuestAnswerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which QuestAnswer to fetch.
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of QuestAnswers to fetch.
+     */
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for QuestAnswers.
+     */
+    cursor?: QuestAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` QuestAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` QuestAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of QuestAnswers.
+     */
+    distinct?: QuestAnswerScalarFieldEnum | QuestAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * QuestAnswer findFirstOrThrow
+   */
+  export type QuestAnswerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which QuestAnswer to fetch.
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of QuestAnswers to fetch.
+     */
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for QuestAnswers.
+     */
+    cursor?: QuestAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` QuestAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` QuestAnswers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of QuestAnswers.
+     */
+    distinct?: QuestAnswerScalarFieldEnum | QuestAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * QuestAnswer findMany
+   */
+  export type QuestAnswerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter, which QuestAnswers to fetch.
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of QuestAnswers to fetch.
+     */
+    orderBy?: QuestAnswerOrderByWithRelationInput | QuestAnswerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing QuestAnswers.
+     */
+    cursor?: QuestAnswerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` QuestAnswers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` QuestAnswers.
+     */
+    skip?: number
+    distinct?: QuestAnswerScalarFieldEnum | QuestAnswerScalarFieldEnum[]
+  }
+
+  /**
+   * QuestAnswer create
+   */
+  export type QuestAnswerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a QuestAnswer.
+     */
+    data: XOR<QuestAnswerCreateInput, QuestAnswerUncheckedCreateInput>
+  }
+
+  /**
+   * QuestAnswer createMany
+   */
+  export type QuestAnswerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many QuestAnswers.
+     */
+    data: QuestAnswerCreateManyInput | QuestAnswerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * QuestAnswer createManyAndReturn
+   */
+  export type QuestAnswerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * The data used to create many QuestAnswers.
+     */
+    data: QuestAnswerCreateManyInput | QuestAnswerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * QuestAnswer update
+   */
+  export type QuestAnswerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a QuestAnswer.
+     */
+    data: XOR<QuestAnswerUpdateInput, QuestAnswerUncheckedUpdateInput>
+    /**
+     * Choose, which QuestAnswer to update.
+     */
+    where: QuestAnswerWhereUniqueInput
+  }
+
+  /**
+   * QuestAnswer updateMany
+   */
+  export type QuestAnswerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update QuestAnswers.
+     */
+    data: XOR<QuestAnswerUpdateManyMutationInput, QuestAnswerUncheckedUpdateManyInput>
+    /**
+     * Filter which QuestAnswers to update
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * Limit how many QuestAnswers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * QuestAnswer updateManyAndReturn
+   */
+  export type QuestAnswerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * The data used to update QuestAnswers.
+     */
+    data: XOR<QuestAnswerUpdateManyMutationInput, QuestAnswerUncheckedUpdateManyInput>
+    /**
+     * Filter which QuestAnswers to update
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * Limit how many QuestAnswers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * QuestAnswer upsert
+   */
+  export type QuestAnswerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the QuestAnswer to update in case it exists.
+     */
+    where: QuestAnswerWhereUniqueInput
+    /**
+     * In case the QuestAnswer found by the `where` argument doesn't exist, create a new QuestAnswer with this data.
+     */
+    create: XOR<QuestAnswerCreateInput, QuestAnswerUncheckedCreateInput>
+    /**
+     * In case the QuestAnswer was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<QuestAnswerUpdateInput, QuestAnswerUncheckedUpdateInput>
+  }
+
+  /**
+   * QuestAnswer delete
+   */
+  export type QuestAnswerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+    /**
+     * Filter which QuestAnswer to delete.
+     */
+    where: QuestAnswerWhereUniqueInput
+  }
+
+  /**
+   * QuestAnswer deleteMany
+   */
+  export type QuestAnswerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which QuestAnswers to delete
+     */
+    where?: QuestAnswerWhereInput
+    /**
+     * Limit how many QuestAnswers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * QuestAnswer without action
+   */
+  export type QuestAnswerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the QuestAnswer
+     */
+    select?: QuestAnswerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the QuestAnswer
+     */
+    omit?: QuestAnswerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: QuestAnswerInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -84188,6 +85407,16 @@ export namespace Prisma {
   };
 
   export type RaceSessionScalarFieldEnum = (typeof RaceSessionScalarFieldEnum)[keyof typeof RaceSessionScalarFieldEnum]
+
+
+  export const QuestAnswerScalarFieldEnum: {
+    id: 'id',
+    studentId: 'studentId',
+    questionId: 'questionId',
+    answeredAt: 'answeredAt'
+  };
+
+  export type QuestAnswerScalarFieldEnum = (typeof QuestAnswerScalarFieldEnum)[keyof typeof QuestAnswerScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -85123,6 +86352,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerListRelationFilter
     gameProgress?: GameProgressListRelationFilter
     raceMembers?: RaceMemberListRelationFilter
+    questAnswers?: QuestAnswerListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
@@ -85153,6 +86383,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerOrderByRelationAggregateInput
     gameProgress?: GameProgressOrderByRelationAggregateInput
     raceMembers?: RaceMemberOrderByRelationAggregateInput
+    questAnswers?: QuestAnswerOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -85186,6 +86417,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerListRelationFilter
     gameProgress?: GameProgressListRelationFilter
     raceMembers?: RaceMemberListRelationFilter
+    questAnswers?: QuestAnswerListRelationFilter
   }, "id" | "userId" | "studentNumber">
 
   export type StudentProfileOrderByWithAggregationInput = {
@@ -87597,6 +88829,7 @@ export namespace Prisma {
     assessment?: XOR<AssessmentScalarRelationFilter, AssessmentWhereInput>
     options?: QuestionOptionListRelationFilter
     responses?: QuestionResponseListRelationFilter
+    questAnswers?: QuestAnswerListRelationFilter
   }
 
   export type QuestionOrderByWithRelationInput = {
@@ -87613,6 +88846,7 @@ export namespace Prisma {
     assessment?: AssessmentOrderByWithRelationInput
     options?: QuestionOptionOrderByRelationAggregateInput
     responses?: QuestionResponseOrderByRelationAggregateInput
+    questAnswers?: QuestAnswerOrderByRelationAggregateInput
   }
 
   export type QuestionWhereUniqueInput = Prisma.AtLeast<{
@@ -87633,6 +88867,7 @@ export namespace Prisma {
     assessment?: XOR<AssessmentScalarRelationFilter, AssessmentWhereInput>
     options?: QuestionOptionListRelationFilter
     responses?: QuestionResponseListRelationFilter
+    questAnswers?: QuestAnswerListRelationFilter
   }, "id" | "assessmentId_order">
 
   export type QuestionOrderByWithAggregationInput = {
@@ -89620,6 +90855,60 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"RaceSession"> | Date | string
   }
 
+  export type QuestAnswerWhereInput = {
+    AND?: QuestAnswerWhereInput | QuestAnswerWhereInput[]
+    OR?: QuestAnswerWhereInput[]
+    NOT?: QuestAnswerWhereInput | QuestAnswerWhereInput[]
+    id?: StringFilter<"QuestAnswer"> | string
+    studentId?: StringFilter<"QuestAnswer"> | string
+    questionId?: StringFilter<"QuestAnswer"> | string
+    answeredAt?: DateTimeFilter<"QuestAnswer"> | Date | string
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+    question?: XOR<QuestionScalarRelationFilter, QuestionWhereInput>
+  }
+
+  export type QuestAnswerOrderByWithRelationInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    questionId?: SortOrder
+    answeredAt?: SortOrder
+    student?: StudentProfileOrderByWithRelationInput
+    question?: QuestionOrderByWithRelationInput
+  }
+
+  export type QuestAnswerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    studentId_questionId?: QuestAnswerStudentIdQuestionIdCompoundUniqueInput
+    AND?: QuestAnswerWhereInput | QuestAnswerWhereInput[]
+    OR?: QuestAnswerWhereInput[]
+    NOT?: QuestAnswerWhereInput | QuestAnswerWhereInput[]
+    studentId?: StringFilter<"QuestAnswer"> | string
+    questionId?: StringFilter<"QuestAnswer"> | string
+    answeredAt?: DateTimeFilter<"QuestAnswer"> | Date | string
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+    question?: XOR<QuestionScalarRelationFilter, QuestionWhereInput>
+  }, "id" | "studentId_questionId">
+
+  export type QuestAnswerOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    questionId?: SortOrder
+    answeredAt?: SortOrder
+    _count?: QuestAnswerCountOrderByAggregateInput
+    _max?: QuestAnswerMaxOrderByAggregateInput
+    _min?: QuestAnswerMinOrderByAggregateInput
+  }
+
+  export type QuestAnswerScalarWhereWithAggregatesInput = {
+    AND?: QuestAnswerScalarWhereWithAggregatesInput | QuestAnswerScalarWhereWithAggregatesInput[]
+    OR?: QuestAnswerScalarWhereWithAggregatesInput[]
+    NOT?: QuestAnswerScalarWhereWithAggregatesInput | QuestAnswerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"QuestAnswer"> | string
+    studentId?: StringWithAggregatesFilter<"QuestAnswer"> | string
+    questionId?: StringWithAggregatesFilter<"QuestAnswer"> | string
+    answeredAt?: DateTimeWithAggregatesFilter<"QuestAnswer"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -90019,6 +91308,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
@@ -90047,6 +91337,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
@@ -90075,6 +91366,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
@@ -90103,6 +91395,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
@@ -92591,6 +93884,7 @@ export namespace Prisma {
     assessment: AssessmentCreateNestedOneWithoutQuestionsInput
     options?: QuestionOptionCreateNestedManyWithoutQuestionInput
     responses?: QuestionResponseCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionUncheckedCreateInput = {
@@ -92606,6 +93900,7 @@ export namespace Prisma {
     tolerance?: number | null
     options?: QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
     responses?: QuestionResponseUncheckedCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionUpdateInput = {
@@ -92621,6 +93916,7 @@ export namespace Prisma {
     assessment?: AssessmentUpdateOneRequiredWithoutQuestionsNestedInput
     options?: QuestionOptionUpdateManyWithoutQuestionNestedInput
     responses?: QuestionResponseUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionUncheckedUpdateInput = {
@@ -92636,6 +93932,7 @@ export namespace Prisma {
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     options?: QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
     responses?: QuestionResponseUncheckedUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionCreateManyInput = {
@@ -94663,6 +95960,53 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type QuestAnswerCreateInput = {
+    id?: string
+    answeredAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutQuestAnswersInput
+    question: QuestionCreateNestedOneWithoutQuestAnswersInput
+  }
+
+  export type QuestAnswerUncheckedCreateInput = {
+    id?: string
+    studentId: string
+    questionId: string
+    answeredAt?: Date | string
+  }
+
+  export type QuestAnswerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutQuestAnswersNestedInput
+    question?: QuestionUpdateOneRequiredWithoutQuestAnswersNestedInput
+  }
+
+  export type QuestAnswerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type QuestAnswerCreateManyInput = {
+    id?: string
+    studentId: string
+    questionId: string
+    answeredAt?: Date | string
+  }
+
+  export type QuestAnswerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type QuestAnswerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -95246,6 +96590,12 @@ export namespace Prisma {
     none?: RaceMemberWhereInput
   }
 
+  export type QuestAnswerListRelationFilter = {
+    every?: QuestAnswerWhereInput
+    some?: QuestAnswerWhereInput
+    none?: QuestAnswerWhereInput
+  }
+
   export type EnrollmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -95295,6 +96645,10 @@ export namespace Prisma {
   }
 
   export type RaceMemberOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type QuestAnswerOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -98820,6 +100174,32 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type QuestAnswerStudentIdQuestionIdCompoundUniqueInput = {
+    studentId: string
+    questionId: string
+  }
+
+  export type QuestAnswerCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    questionId?: SortOrder
+    answeredAt?: SortOrder
+  }
+
+  export type QuestAnswerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    questionId?: SortOrder
+    answeredAt?: SortOrder
+  }
+
+  export type QuestAnswerMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentId?: SortOrder
+    questionId?: SortOrder
+    answeredAt?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -99607,6 +100987,13 @@ export namespace Prisma {
     connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
   }
 
+  export type QuestAnswerCreateNestedManyWithoutStudentInput = {
+    create?: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput> | QuestAnswerCreateWithoutStudentInput[] | QuestAnswerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutStudentInput | QuestAnswerCreateOrConnectWithoutStudentInput[]
+    createMany?: QuestAnswerCreateManyStudentInputEnvelope
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+  }
+
   export type EnrollmentUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -99710,6 +101097,13 @@ export namespace Prisma {
     connectOrCreate?: RaceMemberCreateOrConnectWithoutStudentInput | RaceMemberCreateOrConnectWithoutStudentInput[]
     createMany?: RaceMemberCreateManyStudentInputEnvelope
     connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+  }
+
+  export type QuestAnswerUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput> | QuestAnswerCreateWithoutStudentInput[] | QuestAnswerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutStudentInput | QuestAnswerCreateOrConnectWithoutStudentInput[]
+    createMany?: QuestAnswerCreateManyStudentInputEnvelope
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -99956,6 +101350,20 @@ export namespace Prisma {
     deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
   }
 
+  export type QuestAnswerUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput> | QuestAnswerCreateWithoutStudentInput[] | QuestAnswerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutStudentInput | QuestAnswerCreateOrConnectWithoutStudentInput[]
+    upsert?: QuestAnswerUpsertWithWhereUniqueWithoutStudentInput | QuestAnswerUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: QuestAnswerCreateManyStudentInputEnvelope
+    set?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    disconnect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    delete?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    update?: QuestAnswerUpdateWithWhereUniqueWithoutStudentInput | QuestAnswerUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: QuestAnswerUpdateManyWithWhereWithoutStudentInput | QuestAnswerUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
+  }
+
   export type EnrollmentUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -100164,6 +101572,20 @@ export namespace Prisma {
     update?: RaceMemberUpdateWithWhereUniqueWithoutStudentInput | RaceMemberUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: RaceMemberUpdateManyWithWhereWithoutStudentInput | RaceMemberUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+  }
+
+  export type QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput> | QuestAnswerCreateWithoutStudentInput[] | QuestAnswerUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutStudentInput | QuestAnswerCreateOrConnectWithoutStudentInput[]
+    upsert?: QuestAnswerUpsertWithWhereUniqueWithoutStudentInput | QuestAnswerUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: QuestAnswerCreateManyStudentInputEnvelope
+    set?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    disconnect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    delete?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    update?: QuestAnswerUpdateWithWhereUniqueWithoutStudentInput | QuestAnswerUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: QuestAnswerUpdateManyWithWhereWithoutStudentInput | QuestAnswerUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
   }
 
   export type StudentProfileCreateNestedManyWithoutSectionInput = {
@@ -103194,6 +104616,13 @@ export namespace Prisma {
     connect?: QuestionResponseWhereUniqueInput | QuestionResponseWhereUniqueInput[]
   }
 
+  export type QuestAnswerCreateNestedManyWithoutQuestionInput = {
+    create?: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput> | QuestAnswerCreateWithoutQuestionInput[] | QuestAnswerUncheckedCreateWithoutQuestionInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutQuestionInput | QuestAnswerCreateOrConnectWithoutQuestionInput[]
+    createMany?: QuestAnswerCreateManyQuestionInputEnvelope
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+  }
+
   export type QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput = {
     create?: XOR<QuestionOptionCreateWithoutQuestionInput, QuestionOptionUncheckedCreateWithoutQuestionInput> | QuestionOptionCreateWithoutQuestionInput[] | QuestionOptionUncheckedCreateWithoutQuestionInput[]
     connectOrCreate?: QuestionOptionCreateOrConnectWithoutQuestionInput | QuestionOptionCreateOrConnectWithoutQuestionInput[]
@@ -103206,6 +104635,13 @@ export namespace Prisma {
     connectOrCreate?: QuestionResponseCreateOrConnectWithoutQuestionInput | QuestionResponseCreateOrConnectWithoutQuestionInput[]
     createMany?: QuestionResponseCreateManyQuestionInputEnvelope
     connect?: QuestionResponseWhereUniqueInput | QuestionResponseWhereUniqueInput[]
+  }
+
+  export type QuestAnswerUncheckedCreateNestedManyWithoutQuestionInput = {
+    create?: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput> | QuestAnswerCreateWithoutQuestionInput[] | QuestAnswerUncheckedCreateWithoutQuestionInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutQuestionInput | QuestAnswerCreateOrConnectWithoutQuestionInput[]
+    createMany?: QuestAnswerCreateManyQuestionInputEnvelope
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
   }
 
   export type EnumQuestionTypeFieldUpdateOperationsInput = {
@@ -103248,6 +104684,20 @@ export namespace Prisma {
     deleteMany?: QuestionResponseScalarWhereInput | QuestionResponseScalarWhereInput[]
   }
 
+  export type QuestAnswerUpdateManyWithoutQuestionNestedInput = {
+    create?: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput> | QuestAnswerCreateWithoutQuestionInput[] | QuestAnswerUncheckedCreateWithoutQuestionInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutQuestionInput | QuestAnswerCreateOrConnectWithoutQuestionInput[]
+    upsert?: QuestAnswerUpsertWithWhereUniqueWithoutQuestionInput | QuestAnswerUpsertWithWhereUniqueWithoutQuestionInput[]
+    createMany?: QuestAnswerCreateManyQuestionInputEnvelope
+    set?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    disconnect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    delete?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    update?: QuestAnswerUpdateWithWhereUniqueWithoutQuestionInput | QuestAnswerUpdateWithWhereUniqueWithoutQuestionInput[]
+    updateMany?: QuestAnswerUpdateManyWithWhereWithoutQuestionInput | QuestAnswerUpdateManyWithWhereWithoutQuestionInput[]
+    deleteMany?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
+  }
+
   export type QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput = {
     create?: XOR<QuestionOptionCreateWithoutQuestionInput, QuestionOptionUncheckedCreateWithoutQuestionInput> | QuestionOptionCreateWithoutQuestionInput[] | QuestionOptionUncheckedCreateWithoutQuestionInput[]
     connectOrCreate?: QuestionOptionCreateOrConnectWithoutQuestionInput | QuestionOptionCreateOrConnectWithoutQuestionInput[]
@@ -103274,6 +104724,20 @@ export namespace Prisma {
     update?: QuestionResponseUpdateWithWhereUniqueWithoutQuestionInput | QuestionResponseUpdateWithWhereUniqueWithoutQuestionInput[]
     updateMany?: QuestionResponseUpdateManyWithWhereWithoutQuestionInput | QuestionResponseUpdateManyWithWhereWithoutQuestionInput[]
     deleteMany?: QuestionResponseScalarWhereInput | QuestionResponseScalarWhereInput[]
+  }
+
+  export type QuestAnswerUncheckedUpdateManyWithoutQuestionNestedInput = {
+    create?: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput> | QuestAnswerCreateWithoutQuestionInput[] | QuestAnswerUncheckedCreateWithoutQuestionInput[]
+    connectOrCreate?: QuestAnswerCreateOrConnectWithoutQuestionInput | QuestAnswerCreateOrConnectWithoutQuestionInput[]
+    upsert?: QuestAnswerUpsertWithWhereUniqueWithoutQuestionInput | QuestAnswerUpsertWithWhereUniqueWithoutQuestionInput[]
+    createMany?: QuestAnswerCreateManyQuestionInputEnvelope
+    set?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    disconnect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    delete?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    connect?: QuestAnswerWhereUniqueInput | QuestAnswerWhereUniqueInput[]
+    update?: QuestAnswerUpdateWithWhereUniqueWithoutQuestionInput | QuestAnswerUpdateWithWhereUniqueWithoutQuestionInput[]
+    updateMany?: QuestAnswerUpdateManyWithWhereWithoutQuestionInput | QuestAnswerUpdateManyWithWhereWithoutQuestionInput[]
+    deleteMany?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
   }
 
   export type QuestionCreateNestedOneWithoutOptionsInput = {
@@ -104556,6 +106020,34 @@ export namespace Prisma {
     update?: XOR<XOR<SectionUpdateToOneWithWhereWithoutRaceSessionsInput, SectionUpdateWithoutRaceSessionsInput>, SectionUncheckedUpdateWithoutRaceSessionsInput>
   }
 
+  export type StudentProfileCreateNestedOneWithoutQuestAnswersInput = {
+    create?: XOR<StudentProfileCreateWithoutQuestAnswersInput, StudentProfileUncheckedCreateWithoutQuestAnswersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutQuestAnswersInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type QuestionCreateNestedOneWithoutQuestAnswersInput = {
+    create?: XOR<QuestionCreateWithoutQuestAnswersInput, QuestionUncheckedCreateWithoutQuestAnswersInput>
+    connectOrCreate?: QuestionCreateOrConnectWithoutQuestAnswersInput
+    connect?: QuestionWhereUniqueInput
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutQuestAnswersNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutQuestAnswersInput, StudentProfileUncheckedCreateWithoutQuestAnswersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutQuestAnswersInput
+    upsert?: StudentProfileUpsertWithoutQuestAnswersInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutQuestAnswersInput, StudentProfileUpdateWithoutQuestAnswersInput>, StudentProfileUncheckedUpdateWithoutQuestAnswersInput>
+  }
+
+  export type QuestionUpdateOneRequiredWithoutQuestAnswersNestedInput = {
+    create?: XOR<QuestionCreateWithoutQuestAnswersInput, QuestionUncheckedCreateWithoutQuestAnswersInput>
+    connectOrCreate?: QuestionCreateOrConnectWithoutQuestAnswersInput
+    upsert?: QuestionUpsertWithoutQuestAnswersInput
+    connect?: QuestionWhereUniqueInput
+    update?: XOR<XOR<QuestionUpdateToOneWithWhereWithoutQuestAnswersInput, QuestionUpdateWithoutQuestAnswersInput>, QuestionUncheckedUpdateWithoutQuestAnswersInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -105456,6 +106948,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
@@ -105483,6 +106976,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUserInput = {
@@ -105954,6 +107448,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
@@ -105981,6 +107476,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type TeacherProfileUpsertWithoutUserInput = {
@@ -107164,6 +108660,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type QuestAnswerCreateWithoutStudentInput = {
+    id?: string
+    answeredAt?: Date | string
+    question: QuestionCreateNestedOneWithoutQuestAnswersInput
+  }
+
+  export type QuestAnswerUncheckedCreateWithoutStudentInput = {
+    id?: string
+    questionId: string
+    answeredAt?: Date | string
+  }
+
+  export type QuestAnswerCreateOrConnectWithoutStudentInput = {
+    where: QuestAnswerWhereUniqueInput
+    create: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput>
+  }
+
+  export type QuestAnswerCreateManyStudentInputEnvelope = {
+    data: QuestAnswerCreateManyStudentInput | QuestAnswerCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutStudentProfileInput = {
     update: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
@@ -107678,6 +109196,32 @@ export namespace Prisma {
     studentId?: StringFilter<"RaceMember"> | string
   }
 
+  export type QuestAnswerUpsertWithWhereUniqueWithoutStudentInput = {
+    where: QuestAnswerWhereUniqueInput
+    update: XOR<QuestAnswerUpdateWithoutStudentInput, QuestAnswerUncheckedUpdateWithoutStudentInput>
+    create: XOR<QuestAnswerCreateWithoutStudentInput, QuestAnswerUncheckedCreateWithoutStudentInput>
+  }
+
+  export type QuestAnswerUpdateWithWhereUniqueWithoutStudentInput = {
+    where: QuestAnswerWhereUniqueInput
+    data: XOR<QuestAnswerUpdateWithoutStudentInput, QuestAnswerUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type QuestAnswerUpdateManyWithWhereWithoutStudentInput = {
+    where: QuestAnswerScalarWhereInput
+    data: XOR<QuestAnswerUpdateManyMutationInput, QuestAnswerUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type QuestAnswerScalarWhereInput = {
+    AND?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
+    OR?: QuestAnswerScalarWhereInput[]
+    NOT?: QuestAnswerScalarWhereInput | QuestAnswerScalarWhereInput[]
+    id?: StringFilter<"QuestAnswer"> | string
+    studentId?: StringFilter<"QuestAnswer"> | string
+    questionId?: StringFilter<"QuestAnswer"> | string
+    answeredAt?: DateTimeFilter<"QuestAnswer"> | Date | string
+  }
+
   export type StudentProfileCreateWithoutSectionInput = {
     id?: string
     studentNumber: string
@@ -107703,6 +109247,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSectionInput = {
@@ -107730,6 +109275,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSectionInput = {
@@ -108275,6 +109821,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
@@ -108302,6 +109849,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -108374,6 +109922,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
@@ -108401,6 +109950,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAccommodationsInput = {
@@ -108428,6 +109978,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAccommodationsInput = {
@@ -108455,6 +110006,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAccommodationsInput = {
@@ -108498,6 +110050,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAccommodationsInput = {
@@ -108525,6 +110078,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type CourseCreateWithoutDepartmentInput = {
@@ -110107,6 +111661,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutEnrollmentsInput = {
@@ -110134,6 +111689,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutEnrollmentsInput = {
@@ -110264,6 +111820,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutEnrollmentsInput = {
@@ -110291,6 +111848,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GradeSnapshotUpsertWithWhereUniqueWithoutEnrollmentInput = {
@@ -111966,6 +113524,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonProgressInput = {
@@ -111993,6 +113552,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonProgressInput = {
@@ -112087,6 +113647,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonProgressInput = {
@@ -112114,6 +113675,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LessonCreateWithoutNotesInput = {
@@ -112186,6 +113748,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonNotesInput = {
@@ -112213,6 +113776,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonNotesInput = {
@@ -112307,6 +113871,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonNotesInput = {
@@ -112334,6 +113899,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserCreateWithoutUploadedFilesInput = {
@@ -113848,6 +115414,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSubmissionsInput = {
@@ -113875,6 +115442,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSubmissionsInput = {
@@ -114026,6 +115594,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSubmissionsInput = {
@@ -114053,6 +115622,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SubmissionAttachmentUpsertWithWhereUniqueWithoutSubmissionInput = {
@@ -114870,6 +116440,7 @@ export namespace Prisma {
     tolerance?: number | null
     options?: QuestionOptionCreateNestedManyWithoutQuestionInput
     responses?: QuestionResponseCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionUncheckedCreateWithoutAssessmentInput = {
@@ -114884,6 +116455,7 @@ export namespace Prisma {
     tolerance?: number | null
     options?: QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
     responses?: QuestionResponseUncheckedCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionCreateOrConnectWithoutAssessmentInput = {
@@ -115365,6 +116937,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type QuestAnswerCreateWithoutQuestionInput = {
+    id?: string
+    answeredAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutQuestAnswersInput
+  }
+
+  export type QuestAnswerUncheckedCreateWithoutQuestionInput = {
+    id?: string
+    studentId: string
+    answeredAt?: Date | string
+  }
+
+  export type QuestAnswerCreateOrConnectWithoutQuestionInput = {
+    where: QuestAnswerWhereUniqueInput
+    create: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput>
+  }
+
+  export type QuestAnswerCreateManyQuestionInputEnvelope = {
+    data: QuestAnswerCreateManyQuestionInput | QuestAnswerCreateManyQuestionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AssessmentUpsertWithoutQuestionsInput = {
     update: XOR<AssessmentUpdateWithoutQuestionsInput, AssessmentUncheckedUpdateWithoutQuestionsInput>
     create: XOR<AssessmentCreateWithoutQuestionsInput, AssessmentUncheckedCreateWithoutQuestionsInput>
@@ -115491,6 +117085,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"QuestionResponse"> | Date | string
   }
 
+  export type QuestAnswerUpsertWithWhereUniqueWithoutQuestionInput = {
+    where: QuestAnswerWhereUniqueInput
+    update: XOR<QuestAnswerUpdateWithoutQuestionInput, QuestAnswerUncheckedUpdateWithoutQuestionInput>
+    create: XOR<QuestAnswerCreateWithoutQuestionInput, QuestAnswerUncheckedCreateWithoutQuestionInput>
+  }
+
+  export type QuestAnswerUpdateWithWhereUniqueWithoutQuestionInput = {
+    where: QuestAnswerWhereUniqueInput
+    data: XOR<QuestAnswerUpdateWithoutQuestionInput, QuestAnswerUncheckedUpdateWithoutQuestionInput>
+  }
+
+  export type QuestAnswerUpdateManyWithWhereWithoutQuestionInput = {
+    where: QuestAnswerScalarWhereInput
+    data: XOR<QuestAnswerUpdateManyMutationInput, QuestAnswerUncheckedUpdateManyWithoutQuestionInput>
+  }
+
   export type QuestionCreateWithoutOptionsInput = {
     id?: string
     order: number
@@ -115503,6 +117113,7 @@ export namespace Prisma {
     tolerance?: number | null
     assessment: AssessmentCreateNestedOneWithoutQuestionsInput
     responses?: QuestionResponseCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionUncheckedCreateWithoutOptionsInput = {
@@ -115517,6 +117128,7 @@ export namespace Prisma {
     answerKey?: string | null
     tolerance?: number | null
     responses?: QuestionResponseUncheckedCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionCreateOrConnectWithoutOptionsInput = {
@@ -115547,6 +117159,7 @@ export namespace Prisma {
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     assessment?: AssessmentUpdateOneRequiredWithoutQuestionsNestedInput
     responses?: QuestionResponseUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionUncheckedUpdateWithoutOptionsInput = {
@@ -115561,6 +117174,7 @@ export namespace Prisma {
     answerKey?: NullableStringFieldUpdateOperationsInput | string | null
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     responses?: QuestionResponseUncheckedUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutQuestionNestedInput
   }
 
   export type AssessmentCreateWithoutAttemptsInput = {
@@ -115643,6 +117257,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttemptsInput = {
@@ -115670,6 +117285,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttemptsInput = {
@@ -115842,6 +117458,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttemptsInput = {
@@ -115869,6 +117486,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type QuestionResponseUpsertWithWhereUniqueWithoutAttemptInput = {
@@ -115965,6 +117583,7 @@ export namespace Prisma {
     tolerance?: number | null
     assessment: AssessmentCreateNestedOneWithoutQuestionsInput
     options?: QuestionOptionCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionUncheckedCreateWithoutResponsesInput = {
@@ -115979,6 +117598,7 @@ export namespace Prisma {
     answerKey?: string | null
     tolerance?: number | null
     options?: QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutQuestionInput
   }
 
   export type QuestionCreateOrConnectWithoutResponsesInput = {
@@ -116074,6 +117694,7 @@ export namespace Prisma {
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     assessment?: AssessmentUpdateOneRequiredWithoutQuestionsNestedInput
     options?: QuestionOptionUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionUncheckedUpdateWithoutResponsesInput = {
@@ -116088,6 +117709,7 @@ export namespace Prisma {
     answerKey?: NullableStringFieldUpdateOperationsInput | string | null
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     options?: QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutQuestionNestedInput
   }
 
   export type ResponseAttachmentUpsertWithWhereUniqueWithoutResponseInput = {
@@ -116690,6 +118312,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendanceInput = {
@@ -116717,6 +118340,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendanceInput = {
@@ -116793,6 +118417,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendanceInput = {
@@ -116820,6 +118445,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAlertsInput = {
@@ -116847,6 +118473,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAlertsInput = {
@@ -116874,6 +118501,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAlertsInput = {
@@ -117065,6 +118693,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAlertsInput = {
@@ -117092,6 +118721,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutAlertsInput = {
@@ -117483,6 +119113,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -117510,6 +119141,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -117542,6 +119174,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutoringGivenInput = {
@@ -117569,6 +119202,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutoringGivenInput = {
@@ -117667,6 +119301,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -117694,6 +119329,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUpsertWithoutTutoringGivenInput = {
@@ -117732,6 +119368,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutoringGivenInput = {
@@ -117759,6 +119396,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutTutorAssignmentsInput = {
@@ -119306,6 +120944,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutOfficeHourSlotsInput = {
@@ -119333,6 +120972,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutOfficeHourSlotsInput = {
@@ -119413,6 +121053,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutOfficeHourSlotsInput = {
@@ -119440,6 +121081,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionCreateWithoutLiveGamesInput = {
@@ -119900,6 +121542,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLivePlayersInput = {
@@ -119927,6 +121570,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLivePlayersInput = {
@@ -120043,6 +121687,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLivePlayersInput = {
@@ -120070,6 +121715,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput = {
@@ -120245,6 +121891,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGameProgressInput = {
@@ -120272,6 +121919,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGameProgressInput = {
@@ -120315,6 +121963,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGameProgressInput = {
@@ -120342,6 +121991,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionCreateWithoutRaceTeamsInput = {
@@ -120544,6 +122194,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutRaceMembersInput = {
@@ -120571,6 +122222,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    questAnswers?: QuestAnswerUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutRaceMembersInput = {
@@ -120641,6 +122293,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutRaceMembersInput = {
@@ -120668,6 +122321,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionCreateWithoutRaceSessionsInput = {
@@ -120784,6 +122438,210 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
     raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
+  }
+
+  export type StudentProfileCreateWithoutQuestAnswersInput = {
+    id?: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
+    enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordCreateNestedManyWithoutStudentInput
+    alerts?: AlertCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutQuestAnswersInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    sectionId?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteUncheckedCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationUncheckedCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutQuestAnswersInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutQuestAnswersInput, StudentProfileUncheckedCreateWithoutQuestAnswersInput>
+  }
+
+  export type QuestionCreateWithoutQuestAnswersInput = {
+    id?: string
+    order: number
+    type: $Enums.QuestionType
+    prompt: string
+    helperText?: string | null
+    points?: number
+    explanation?: string | null
+    answerKey?: string | null
+    tolerance?: number | null
+    assessment: AssessmentCreateNestedOneWithoutQuestionsInput
+    options?: QuestionOptionCreateNestedManyWithoutQuestionInput
+    responses?: QuestionResponseCreateNestedManyWithoutQuestionInput
+  }
+
+  export type QuestionUncheckedCreateWithoutQuestAnswersInput = {
+    id?: string
+    assessmentId: string
+    order: number
+    type: $Enums.QuestionType
+    prompt: string
+    helperText?: string | null
+    points?: number
+    explanation?: string | null
+    answerKey?: string | null
+    tolerance?: number | null
+    options?: QuestionOptionUncheckedCreateNestedManyWithoutQuestionInput
+    responses?: QuestionResponseUncheckedCreateNestedManyWithoutQuestionInput
+  }
+
+  export type QuestionCreateOrConnectWithoutQuestAnswersInput = {
+    where: QuestionWhereUniqueInput
+    create: XOR<QuestionCreateWithoutQuestAnswersInput, QuestionUncheckedCreateWithoutQuestAnswersInput>
+  }
+
+  export type StudentProfileUpsertWithoutQuestAnswersInput = {
+    update: XOR<StudentProfileUpdateWithoutQuestAnswersInput, StudentProfileUncheckedUpdateWithoutQuestAnswersInput>
+    create: XOR<StudentProfileCreateWithoutQuestAnswersInput, StudentProfileUncheckedCreateWithoutQuestAnswersInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutQuestAnswersInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutQuestAnswersInput, StudentProfileUncheckedUpdateWithoutQuestAnswersInput>
+  }
+
+  export type StudentProfileUpdateWithoutQuestAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutQuestAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUncheckedUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUncheckedUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type QuestionUpsertWithoutQuestAnswersInput = {
+    update: XOR<QuestionUpdateWithoutQuestAnswersInput, QuestionUncheckedUpdateWithoutQuestAnswersInput>
+    create: XOR<QuestionCreateWithoutQuestAnswersInput, QuestionUncheckedCreateWithoutQuestAnswersInput>
+    where?: QuestionWhereInput
+  }
+
+  export type QuestionUpdateToOneWithWhereWithoutQuestAnswersInput = {
+    where?: QuestionWhereInput
+    data: XOR<QuestionUpdateWithoutQuestAnswersInput, QuestionUncheckedUpdateWithoutQuestAnswersInput>
+  }
+
+  export type QuestionUpdateWithoutQuestAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    type?: EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+    prompt?: StringFieldUpdateOperationsInput | string
+    helperText?: NullableStringFieldUpdateOperationsInput | string | null
+    points?: FloatFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    answerKey?: NullableStringFieldUpdateOperationsInput | string | null
+    tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
+    assessment?: AssessmentUpdateOneRequiredWithoutQuestionsNestedInput
+    options?: QuestionOptionUpdateManyWithoutQuestionNestedInput
+    responses?: QuestionResponseUpdateManyWithoutQuestionNestedInput
+  }
+
+  export type QuestionUncheckedUpdateWithoutQuestAnswersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assessmentId?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    type?: EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+    prompt?: StringFieldUpdateOperationsInput | string
+    helperText?: NullableStringFieldUpdateOperationsInput | string | null
+    points?: FloatFieldUpdateOperationsInput | number
+    explanation?: NullableStringFieldUpdateOperationsInput | string | null
+    answerKey?: NullableStringFieldUpdateOperationsInput | string | null
+    tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
+    options?: QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
+    responses?: QuestionResponseUncheckedUpdateManyWithoutQuestionNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -121466,6 +123324,12 @@ export namespace Prisma {
     sectionId: string
   }
 
+  export type QuestAnswerCreateManyStudentInput = {
+    id?: string
+    questionId: string
+    answeredAt?: Date | string
+  }
+
   export type EnrollmentUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumEnrollmentStatusFieldUpdateOperationsInput | $Enums.EnrollmentStatus
@@ -121930,6 +123794,24 @@ export namespace Prisma {
     sectionId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type QuestAnswerUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    question?: QuestionUpdateOneRequiredWithoutQuestAnswersNestedInput
+  }
+
+  export type QuestAnswerUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type QuestAnswerUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    questionId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StudentProfileCreateManySectionInput = {
     id?: string
     userId: string
@@ -121967,6 +123849,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSectionInput = {
@@ -121994,6 +123877,7 @@ export namespace Prisma {
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
     raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateManyWithoutSectionInput = {
@@ -124359,6 +126243,7 @@ export namespace Prisma {
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     options?: QuestionOptionUpdateManyWithoutQuestionNestedInput
     responses?: QuestionResponseUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionUncheckedUpdateWithoutAssessmentInput = {
@@ -124373,6 +126258,7 @@ export namespace Prisma {
     tolerance?: NullableFloatFieldUpdateOperationsInput | number | null
     options?: QuestionOptionUncheckedUpdateManyWithoutQuestionNestedInput
     responses?: QuestionResponseUncheckedUpdateManyWithoutQuestionNestedInput
+    questAnswers?: QuestAnswerUncheckedUpdateManyWithoutQuestionNestedInput
   }
 
   export type QuestionUncheckedUpdateManyWithoutAssessmentInput = {
@@ -124507,6 +126393,12 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type QuestAnswerCreateManyQuestionInput = {
+    id?: string
+    studentId: string
+    answeredAt?: Date | string
+  }
+
   export type QuestionOptionUpdateWithoutQuestionInput = {
     id?: StringFieldUpdateOperationsInput | string
     label?: StringFieldUpdateOperationsInput | string
@@ -124582,6 +126474,24 @@ export namespace Prisma {
     graderComment?: NullableStringFieldUpdateOperationsInput | string | null
     answeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type QuestAnswerUpdateWithoutQuestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutQuestAnswersNestedInput
+  }
+
+  export type QuestAnswerUncheckedUpdateWithoutQuestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type QuestAnswerUncheckedUpdateManyWithoutQuestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type QuestionResponseCreateManyAttemptInput = {

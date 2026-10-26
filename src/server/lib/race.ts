@@ -130,6 +130,12 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
         JOIN "LivePlayer" p ON p."id" = l."playerId"
         JOIN "LiveGame" g ON g."id" = p."gameId"
         WHERE l."isCorrect" = true AND g."sectionId" = ${sectionId}
+        UNION ALL
+        SELECT qa."studentId", qa."questionId", qa."answeredAt" AS at
+        FROM "QuestAnswer" qa
+        JOIN "Question" qu ON qu."id" = qa."questionId"
+        JOIN "Assessment" q ON q."id" = qu."assessmentId"
+        WHERE q."sectionId" = ${sectionId}
       ) x
       GROUP BY x."studentId", x."questionId"`,
     db.grade.findMany({

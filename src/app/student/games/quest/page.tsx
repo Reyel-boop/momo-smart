@@ -33,8 +33,8 @@ export default async function QuestPage() {
             Join the adventurer and Momo the super pup! Answer a unit&apos;s
             questions to defeat Pinky Jelly, Leafy Jelly, Bubble Bat, Ghosty and
             the boss, Jelly King. 3 right in a row unleashes Momo&apos;s Bark
-            (double damage). Miss 5 and you faint — then try again. Win for up
-            to 3 Stars.
+            (double damage). Miss 5 and you faint — then try again. Earn ⭐ 1
+            star for every new correct answer, plus up to 3 for winning.
           </p>
         </div>
         <Hero className="absolute right-28 -bottom-4 hidden w-32 sm:block" />

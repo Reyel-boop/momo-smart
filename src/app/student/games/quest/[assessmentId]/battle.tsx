@@ -40,7 +40,7 @@ type Phase =
 type Pop = {
   id: number;
   text: string;
-  kind: "dmg" | "crit" | "miss" | "hurt" | "exp";
+  kind: "dmg" | "crit" | "miss" | "hurt" | "exp" | "star";
 };
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -98,6 +98,8 @@ export function Battle({
   const [brokenHeart, setBrokenHeart] = useState<number | null>(null);
   const [enemyPops, setEnemyPops] = useState<Pop[]>([]);
   const [heroPops, setHeroPops] = useState<Pop[]>([]);
+  // Stars earned this visit: one per new correct answer.
+  const [earned, setEarned] = useState(0);
   const answers = useRef<Array<{ questionId: string; optionId: string }>>([]);
 
   const question = deck[cursor % Math.max(1, deck.length)];
@@ -162,6 +164,13 @@ export function Battle({
     setRightId(result.correctOptionId);
     setExplanation(result.explanation);
     const next = step(state, result.correct);
+    if (result.newStar) {
+      setEarned((n) => n + 1);
+      setTimeout(() => {
+        sfx.coin();
+        pop("hero", "+1 ⭐", "star");
+      }, 300);
+    }
 
     if (result.correct) {
       const isSuper = next.state.streak >= COMBO_FOR_SUPER;
@@ -370,7 +379,15 @@ export function Battle({
         <div className="ro-window absolute top-3 left-3 z-30 w-[46%] max-w-[250px] rounded-xl px-3 py-2">
           <div className="flex items-center justify-between text-[11px] font-black text-white">
             <span>Adventurer &amp; Momo</span>
-            <span className="text-amber-200">Lv. {level}</span>
+            <span className="flex items-center gap-2">
+              <span
+                className="rounded-full bg-amber-300/90 px-1.5 text-[10px] text-amber-950"
+                title="Stars earned this quest"
+              >
+                ⭐ {earned}
+              </span>
+              <span className="text-amber-200">Lv. {level}</span>
+            </span>
           </div>
           <div className="mt-1 flex gap-1">
             {Array.from({ length: QUEST_LIVES }, (_, i) => (
@@ -448,7 +465,10 @@ export function Battle({
             </div>
           )}
           {heroPops.map((p) => (
-            <span key={p.id} className="num num-hurt absolute top-0 left-1/2">
+            <span
+              key={p.id}
+              className={`num num-${p.kind} absolute top-0 left-1/2`}
+            >
               {p.text}
             </span>
           ))}
@@ -623,7 +643,8 @@ export function Battle({
               Answer right to strike with your sword. 3 in a row and Momo
               unleashes the <b>Momo Bark</b> for double damage! Defeat all 5
               monsters. You have {QUEST_LIVES} hearts — each wrong answer costs
-              one.
+              one. Every new correct answer earns ⭐ 1 star, and winning adds up
+              to 3 more.
             </p>
             <button
               type="button"
@@ -858,6 +879,7 @@ export function Battle({
         .num-crit span { color: #fef08a; text-shadow: 0 1px 0 #7c2d12, 0 0 6px #7c2d12; }
         .num-miss { color: #bae6fd; font-size: 1.8rem; text-shadow: 0 2px 0 #1e3a8a, 2px 0 0 #1e3a8a, -2px 0 0 #1e3a8a, 0 -2px 0 #1e3a8a; animation: num-float 1.1s ease-out forwards; }
         .num-hurt { color: #ff4d6d; font-size: 1.9rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff; animation: num-arc-left 1.2s cubic-bezier(.2,.8,.4,1) forwards; }
+        .num-star { color: #fde047; font-size: 1.6rem; text-shadow: 0 2px 0 #92400e, 2px 0 0 #92400e, -2px 0 0 #92400e, 0 -2px 0 #92400e, 0 0 14px #fde047; animation: num-float 1.3s ease-out forwards; }
         .num-exp { color: #a7f3d0; font-size: 1.3rem; text-shadow: 0 2px 0 #065f46, 2px 0 0 #065f46, -2px 0 0 #065f46, 0 -2px 0 #065f46; animation: num-float 1.3s ease-out forwards; }
         @keyframes num-arc { 0% { transform: translate(0, 10px) scale(.4); opacity: 0 } 15% { transform: translate(8px, -40px) scale(1.25); opacity: 1 } 45% { transform: translate(22px, -66px) scale(1) } 100% { transform: translate(46px, -10px) scale(.9); opacity: 0 } }
         @keyframes num-arc-left { 0% { transform: translate(0, 10px) scale(.4); opacity: 0 } 15% { transform: translate(-8px, -40px) scale(1.25); opacity: 1 } 45% { transform: translate(-22px, -60px) } 100% { transform: translate(-46px, -6px); opacity: 0 } }
