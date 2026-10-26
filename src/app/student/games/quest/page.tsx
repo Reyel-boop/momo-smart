@@ -5,7 +5,7 @@ import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState } from "~/app/_components/ui";
 import { api } from "~/trpc/server";
 import { Stars } from "../_components/stars";
-import { Enemy, MomoHero } from "./_components/art";
+import { Hero, MomoPet, Monster } from "./_components/art";
 
 export const metadata: Metadata = { title: "Momo's Quest · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -30,14 +30,16 @@ export default async function QuestPage() {
           </p>
           <h1 className="text-3xl font-black">Momo&apos;s Quest</h1>
           <p className="mt-1 text-sm text-white/85">
-            Momo the super pup needs you! Answer a unit&apos;s questions to
-            blast Bug Bot, Glitch Slime, Spam Bat, Error Ghost and the boss,
-            King Virus. 3 right in a row unleashes a Super Bark. Miss 5 and Momo
-            faints — then try again. Win for up to 3 Stars.
+            Join the adventurer and Momo the super pup! Answer a unit&apos;s
+            questions to defeat Pinky Jelly, Leafy Jelly, Bubble Bat, Ghosty and
+            the boss, Jelly King. 3 right in a row unleashes Momo&apos;s Bark (double
+            damage). Miss 5 and you faint — then try again. Win for up to 3
+            Stars.
           </p>
         </div>
-        <MomoHero className="absolute right-28 -bottom-4 hidden w-48 sm:block" />
-        <Enemy
+        <Hero className="absolute right-28 -bottom-4 hidden w-32 sm:block" />
+        <MomoPet className="absolute right-[13.5rem] bottom-1 hidden w-20 sm:block" />
+        <Monster
           kind="boss"
           className="absolute right-2 bottom-2 hidden w-28 sm:block"
         />

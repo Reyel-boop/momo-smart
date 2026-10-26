@@ -6,7 +6,7 @@ import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { api } from "~/trpc/server";
 import { Stars } from "./_components/stars";
-import { Enemy, MomoHero } from "./quest/_components/art";
+import { Hero, MomoPet, Monster } from "./quest/_components/art";
 
 export const metadata: Metadata = { title: "Games · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -54,15 +54,16 @@ export default async function GamesPage() {
           </p>
           <h2 className="text-3xl font-black">Momo&apos;s Quest</h2>
           <p className="mt-1 text-sm text-white/85">
-            Help Momo the super pup defeat King Virus by answering your
-            units&apos; questions. Miss 5 and Momo faints!
+            Team up with Momo the super pup and defeat the Jelly King with your
+            units&apos; questions. Miss 5 and you faint!
           </p>
           <span className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-amber-400 px-4 py-2 text-sm font-black text-slate-900 group-hover:bg-amber-300">
             <PlayIcon className="size-4" /> Play
           </span>
         </div>
-        <MomoHero className="absolute right-28 -bottom-4 hidden w-44 transition group-hover:-translate-y-1 sm:block" />
-        <Enemy
+        <Hero className="absolute right-28 -bottom-4 hidden w-32 transition group-hover:-translate-y-1 sm:block" />
+        <MomoPet className="absolute right-[13.5rem] bottom-1 hidden w-20 sm:block" />
+        <Monster
           kind="boss"
           className="absolute right-2 bottom-2 hidden w-24 sm:block"
         />

@@ -1,8 +1,9 @@
 /**
- * Momo's Quest: Momo, the golden-retriever superhero, battles a line of
- * enemies using a unit's questions. A correct answer is an attack; three in
- * a row power up a Super Bark that hits twice as hard. A wrong answer costs
- * Momo a heart, and after five Momo faints and the quest starts over.
+ * Momo's Quest: an adventurer and Momo, the golden-retriever super pet,
+ * battle a line of monsters using a unit's questions. A correct answer is a
+ * sword strike; three in a row unleash Momo's Super Bark, which hits twice
+ * as hard. A wrong answer costs a heart, and after five the hero faints and
+ * the quest starts over.
  *
  * The rules live here so the screen and the server agree on every result.
  */
@@ -11,18 +12,18 @@ export const QUEST_LIVES = 5;
 /** Correct answers in a row before attacks become Super Barks. */
 export const COMBO_FOR_SUPER = 3;
 
-export type EnemyKind = "bug" | "slime" | "bat" | "ghost" | "boss";
+export type EnemyKind = "pink" | "leaf" | "bat" | "ghost" | "boss";
 
 export const QUEST_ENEMIES: Array<{
   kind: EnemyKind;
   name: string;
   hp: number;
 }> = [
-  { kind: "bug", name: "Bug Bot", hp: 2 },
-  { kind: "slime", name: "Glitch Slime", hp: 2 },
-  { kind: "bat", name: "Spam Bat", hp: 3 },
-  { kind: "ghost", name: "Error Ghost", hp: 3 },
-  { kind: "boss", name: "King Virus", hp: 5 },
+  { kind: "pink", name: "Pinky Jelly", hp: 2 },
+  { kind: "leaf", name: "Leafy Jelly", hp: 2 },
+  { kind: "bat", name: "Bubble Bat", hp: 3 },
+  { kind: "ghost", name: "Ghosty", hp: 3 },
+  { kind: "boss", name: "Jelly King", hp: 5 },
 ];
 
 export type QuestState = {

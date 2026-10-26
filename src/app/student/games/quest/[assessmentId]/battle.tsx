@@ -17,7 +17,7 @@ import {
 } from "~/lib/games/quest";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { Stars } from "../../_components/stars";
-import { Enemy, MomoHero } from "../_components/art";
+import { Hero, MomoPet, Monster } from "../_components/art";
 
 type Data = RouterOutputs["game"]["questQuestions"];
 type Question = Data["questions"][number];
@@ -26,14 +26,21 @@ type Phase =
   | "intro"
   | "ask"
   | "checking"
-  | "attack" // blast flying
-  | "impact" // enemy hit
+  | "attack" // hero dashes and swings
+  | "impact" // the hit lands
   | "enemyDown"
   | "enemyIn"
-  | "lunge" // enemy attacks
-  | "review" // wrong answer: read the rationale
+  | "miss" // wrong answer: the swing misses
+  | "lunge" // the monster strikes back
+  | "review"
   | "won"
   | "dead";
+
+type Pop = {
+  id: number;
+  text: string;
+  kind: "dmg" | "crit" | "miss" | "hurt" | "exp";
+};
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const shuffle = <T,>(a: T[]) => {
@@ -46,18 +53,18 @@ const shuffle = <T,>(a: T[]) => {
 };
 
 const OPTION_STYLES = [
-  "from-blue-500 to-blue-600",
-  "from-emerald-500 to-emerald-600",
-  "from-orange-500 to-orange-600",
-  "from-rose-500 to-rose-600",
+  "from-sky-400 to-blue-500",
+  "from-emerald-400 to-green-500",
+  "from-amber-400 to-orange-500",
+  "from-pink-400 to-rose-500",
 ];
 
 /**
- * A Momo's Quest battle. Correct answers make Momo blast the enemy (three in
- * a row: Super Bark, double damage); wrong answers let the enemy strike and
- * cost a heart. Beat all five enemies to win; lose five hearts and Momo
- * faints. The server checks every answer and replays the quest to award
- * stars.
+ * A Momo's Quest battle in a bright chibi-anime world. A correct answer is a
+ * sword strike (three in a row: Momo's Super Bark, double damage); a wrong
+ * answer misses, the monster strikes back, and a heart is lost. Defeat all
+ * five monsters to level up; lose five hearts and the hero faints. The
+ * server checks every answer and replays the quest to award stars.
  */
 export function Battle({
   assessmentId,
@@ -80,21 +87,28 @@ export function Battle({
   const [deck, setDeck] = useState<Question[]>(data.questions);
   const [cursor, setCursor] = useState(0);
   const [state, setState] = useState<QuestState>(startState);
-  // The enemy on screen lags the state while it is being defeated.
   const [shownEnemy, setShownEnemy] = useState(0);
   const [shownHp, setShownHp] = useState(QUEST_ENEMIES[0]!.hp);
   const [phase, setPhase] = useState<Phase>("intro");
   const [picked, setPicked] = useState<string | null>(null);
   const [rightId, setRightId] = useState<string | null>(null);
   const [explanation, setExplanation] = useState<string | null>(null);
-  const [damage, setDamage] = useState<{ id: number; n: number } | null>(null);
   const [superBark, setSuperBark] = useState(false);
   const [brokenHeart, setBrokenHeart] = useState<number | null>(null);
+  const [enemyPops, setEnemyPops] = useState<Pop[]>([]);
+  const [heroPops, setHeroPops] = useState<Pop[]>([]);
   const answers = useRef<Array<{ questionId: string; optionId: string }>>([]);
 
   const question = deck[cursor % Math.max(1, deck.length)];
   const enemy = QUEST_ENEMIES[Math.min(shownEnemy, QUEST_ENEMIES.length - 1)]!;
   const boss = enemy.kind === "boss";
+
+  const pop = (side: "enemy" | "hero", text: string, kind: Pop["kind"]) => {
+    const p = { id: Math.random(), text, kind };
+    const set = side === "enemy" ? setEnemyPops : setHeroPops;
+    set((all) => [...all, p]);
+    setTimeout(() => set((all) => all.filter((x) => x.id !== p.id)), 1400);
+  };
 
   const restart = () => {
     answers.current = [];
@@ -106,18 +120,16 @@ export function Battle({
     setPicked(null);
     setRightId(null);
     setExplanation(null);
-    setDamage(null);
     setBrokenHeart(null);
     setRun((r) => r + 1);
     finish.reset();
     setPhase("enemyIn");
-    setTimeout(() => setPhase("ask"), 700);
+    setTimeout(() => setPhase("ask"), 800);
   };
 
   const nextQuestion = useCallback(() => {
     setCursor((c) => {
       const n = c + 1;
-      // Ran through every question: shuffle and go again.
       if (n % deck.length === 0) setDeck((d) => shuffle(d));
       return n;
     });
@@ -155,18 +167,24 @@ export function Battle({
       setSuperBark(isSuper);
       setPhase("attack");
       sfx.zap();
-      await wait(480);
+      await wait(isSuper ? 560 : 420);
       setPhase("impact");
       if (isSuper) sfx.superHit();
       else sfx.hit();
-      setDamage({ id: Math.random(), n: next.damage });
+      const base = 90 + Math.floor(Math.random() * 60);
+      pop(
+        "enemy",
+        String(base * next.damage * (isSuper ? 2 : 1)),
+        isSuper ? "crit" : "dmg",
+      );
       setShownHp((hp) => Math.max(0, hp - next.damage));
       setState(next.state);
-      await wait(650);
+      await wait(700);
       if (next.defeated) {
         setPhase("enemyDown");
         sfx.boom();
-        await wait(1000);
+        pop("enemy", `+${next.state.enemy * 25} EXP`, "exp");
+        await wait(1100);
         if (next.state.won) {
           setPhase("won");
           sfx.fanfare();
@@ -176,13 +194,19 @@ export function Battle({
         setShownEnemy(next.state.enemy);
         setShownHp(QUEST_ENEMIES[next.state.enemy]!.hp);
         setPhase("enemyIn");
-        await wait(750);
+        await wait(800);
       }
       nextQuestion();
     } else {
+      setPhase("miss");
+      sfx.zap();
+      await wait(250);
+      pop("enemy", "MISS", "miss");
+      await wait(300);
       setPhase("lunge");
-      await wait(380);
+      await wait(330);
       sfx.hurt();
+      pop("hero", String(40 + Math.floor(Math.random() * 40)), "hurt");
       setBrokenHeart(next.state.lives);
       setState(next.state);
       await wait(700);
@@ -211,28 +235,41 @@ export function Battle({
   });
 
   const hpPct = (shownHp / enemy.hp) * 100;
-  const momoClass =
+  const level = state.enemy + 1;
+  const heroClass =
     phase === "dead"
-      ? "momo-dead"
+      ? "hero-dead"
       : phase === "won"
-        ? "momo-win"
-        : phase === "attack"
-          ? "momo-dash"
+        ? "hero-win"
+        : phase === "attack" || phase === "miss"
+          ? superBark && phase === "attack"
+            ? "hero-cheer"
+            : "hero-attack"
           : phase === "lunge"
-            ? "momo-brace"
-            : "momo-idle";
+            ? "hero-hurt"
+            : phase === "checking"
+              ? "hero-ready"
+              : "hero-idle";
+  const petClass =
+    phase === "attack" && superBark
+      ? "pet-super"
+      : phase === "dead"
+        ? "pet-sad"
+        : phase === "won"
+          ? "pet-win"
+          : "pet-idle";
   const enemyClass =
     phase === "impact"
-      ? "enemy-hit"
+      ? "mon-hit"
       : phase === "enemyDown"
-        ? "enemy-down"
+        ? "mon-down"
         : phase === "enemyIn"
-          ? "enemy-in"
+          ? "mon-in"
           : phase === "lunge"
-            ? "enemy-lunge"
+            ? "mon-lunge"
             : phase === "won"
               ? "hidden"
-              : "enemy-idle";
+              : "mon-idle";
 
   return (
     <div className="mx-auto max-w-5xl space-y-4" key={run}>
@@ -262,190 +299,274 @@ export function Battle({
 
       {/* Arena */}
       <div
-        className={`relative h-[300px] overflow-hidden rounded-3xl shadow-xl sm:h-[360px] ${
+        className={`relative h-[320px] overflow-hidden rounded-3xl shadow-xl ring-4 ring-white sm:h-[400px] ${
           phase === "lunge" ? "arena-shake" : ""
-        } ${boss ? "bg-gradient-to-b from-[#1e0b3a] via-[#4c1d95] to-[#9d174d]" : "bg-gradient-to-b from-sky-400 via-sky-300 to-amber-100"}`}
+        } ${boss ? "sky-boss" : "sky-day"}`}
       >
-        {/* Sky decor */}
-        {boss ? (
-          <div className="absolute inset-0">
-            {Array.from({ length: 24 }, (_, i) => (
-              <span
+        {/* Sun rays and sparkles */}
+        <div className="sun-rays absolute -top-40 -left-40 size-[520px] rounded-full opacity-60" />
+        <div className="absolute top-6 left-10 size-16 rounded-full bg-white/90 shadow-[0_0_80px_40px_rgba(255,255,255,.75)]" />
+        {Array.from({ length: 14 }, (_, i) => (
+          <span
+            key={i}
+            className="twinkle absolute text-white"
+            style={{
+              left: `${(i * 29 + 7) % 96}%`,
+              top: `${(i * 17 + 4) % 50}%`,
+              fontSize: 8 + (i % 4) * 4,
+              animationDelay: `${(i % 6) * 0.35}s`,
+            }}
+          >
+            ✦
+          </span>
+        ))}
+        {/* Clouds */}
+        <Cloud className="cloud-a top-[12%]" />
+        <Cloud className="cloud-b top-[30%] scale-75 opacity-80" />
+        <Cloud className="cloud-c top-[4%] scale-50 opacity-70" />
+        {boss && (
+          <svg
+            viewBox="0 0 200 80"
+            className="absolute right-[18%] bottom-[30%] w-56 opacity-50"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 80 V40 h10 v-8 h8 v8 h10 V20 h8 v-8 h8 v8 h8 v20 h10 v-8 h8 v8 h10 V30 h8 v-10 h8 v10 h8 v50 Z"
+              fill="#5b2a86"
+            />
+          </svg>
+        )}
+        {/* Hills, field and path */}
+        <div
+          className={`absolute -bottom-24 -left-16 h-56 w-[70%] rounded-[50%] ${boss ? "bg-[#9b6fd1]" : "bg-[#a6e3a1]"}`}
+        />
+        <div
+          className={`absolute -right-20 -bottom-28 h-60 w-[75%] rounded-[50%] ${boss ? "bg-[#8256be]" : "bg-[#8fd88a]"}`}
+        />
+        <div
+          className={`absolute inset-x-0 bottom-0 h-20 ${boss ? "bg-gradient-to-b from-[#7a4bb3] to-[#5b2a86]" : "bg-gradient-to-b from-[#7cce6c] to-[#5bb350]"}`}
+        />
+        <div className="absolute bottom-3 left-1/2 h-10 w-[85%] -translate-x-1/2 rounded-[50%] bg-[#e9d6a8]/70" />
+        {Array.from({ length: 10 }, (_, i) => (
+          <span
+            key={i}
+            className="absolute size-2 rounded-full"
+            style={{
+              left: `${(i * 11 + 3) % 98}%`,
+              bottom: `${4 + (i % 3) * 5}%`,
+              backgroundColor: ["#fff", "#fde047", "#f9a8d4"][i % 3],
+            }}
+          />
+        ))}
+
+        {/* HUD: status window */}
+        <div className="ro-window absolute top-3 left-3 z-30 w-[46%] max-w-[250px] rounded-xl px-3 py-2">
+          <div className="flex items-center justify-between text-[11px] font-black text-white">
+            <span>Adventurer &amp; Momo</span>
+            <span className="text-amber-200">Lv. {level}</span>
+          </div>
+          <div className="mt-1 flex gap-1">
+            {Array.from({ length: QUEST_LIVES }, (_, i) => (
+              <Heart
                 key={i}
-                className="sky-star absolute block size-1 rounded-full bg-white"
-                style={{
-                  left: `${(i * 37) % 100}%`,
-                  top: `${(i * 23) % 55}%`,
-                  animationDelay: `${(i % 7) * 0.3}s`,
-                }}
+                full={i < state.lives}
+                breaking={brokenHeart === i}
               />
             ))}
           </div>
-        ) : (
-          <>
-            <div className="cloud absolute top-6 left-[-20%] h-8 w-32 rounded-full bg-white/80" />
-            <div className="cloud cloud-slow absolute top-16 left-[-40%] h-6 w-24 rounded-full bg-white/70" />
-            <div className="absolute top-10 left-[46%] size-14 rounded-full bg-yellow-200 shadow-[0_0_60px_20px_rgba(253,224,71,.6)]" />
-          </>
-        )}
-        {/* Hills and ground */}
-        <div
-          className={`absolute -bottom-16 -left-10 h-48 w-[60%] rounded-[50%] ${boss ? "bg-[#3b0764]" : "bg-emerald-400"}`}
-        />
-        <div
-          className={`absolute -right-10 -bottom-20 h-52 w-[70%] rounded-[50%] ${boss ? "bg-[#2e1065]" : "bg-emerald-500"}`}
-        />
-        <div
-          className={`absolute inset-x-0 bottom-0 h-16 ${boss ? "bg-[#1e0b3a]" : "bg-gradient-to-b from-emerald-600 to-emerald-700"}`}
-        />
-
-        {/* HUD */}
-        <div className="absolute inset-x-3 top-3 z-20 flex items-start justify-between gap-3">
-          <div className="rounded-2xl bg-black/35 px-3 py-2 backdrop-blur-sm">
-            <p className="text-[10px] font-black tracking-widest text-white/80 uppercase">
-              Momo
-            </p>
-            <div className="mt-0.5 flex gap-1">
-              {Array.from({ length: QUEST_LIVES }, (_, i) => (
-                <Heart
-                  key={i}
-                  full={i < state.lives}
-                  breaking={brokenHeart === i}
-                />
-              ))}
-            </div>
-            {state.streak >= 2 && phase !== "dead" && (
-              <p
-                className={`mt-1 text-xs font-black ${state.streak >= COMBO_FOR_SUPER ? "combo-hot text-amber-300" : "text-white"}`}
-              >
-                🔥 {state.streak} combo
-                {state.streak >= COMBO_FOR_SUPER ? " · SUPER!" : ""}
-              </p>
-            )}
+          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-black/30">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-sky-300 to-blue-500 transition-all duration-500"
+              style={{
+                width: `${(Math.min(state.streak, COMBO_FOR_SUPER) / COMBO_FOR_SUPER) * 100}%`,
+              }}
+            />
           </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <SoundToggle />
-            <div className="flex gap-1">
-              {QUEST_ENEMIES.map((e, i) => (
-                <span
-                  key={e.kind}
-                  title={e.name}
-                  className={`flex size-6 items-center justify-center rounded-full text-[11px] font-black ${
-                    i < state.enemy || state.won
-                      ? "bg-emerald-400 text-emerald-950"
-                      : i === shownEnemy
-                        ? "bg-white text-slate-900 ring-2 ring-amber-300"
-                        : "bg-black/30 text-white/70"
-                  }`}
-                >
-                  {i < state.enemy || state.won
-                    ? "✓"
-                    : e.kind === "boss"
-                      ? "👑"
-                      : i + 1}
-                </span>
-              ))}
-            </div>
+          <p
+            className={`mt-0.5 text-[10px] font-bold ${state.streak >= COMBO_FOR_SUPER ? "combo-hot text-amber-200" : "text-white/80"}`}
+          >
+            {state.streak >= COMBO_FOR_SUPER
+              ? `🔥 ${state.streak} combo · Momo Bark ready!`
+              : `Momo Bark: ${Math.min(state.streak, COMBO_FOR_SUPER)}/${COMBO_FOR_SUPER}`}
+          </p>
+        </div>
+        <div className="absolute top-3 right-3 z-30 flex flex-col items-end gap-1.5">
+          <SoundToggle />
+          <div className="flex gap-1">
+            {QUEST_ENEMIES.map((e, i) => (
+              <span
+                key={e.kind}
+                title={e.name}
+                className={`flex size-6 items-center justify-center rounded-full text-[11px] font-black shadow ${
+                  i < state.enemy || state.won
+                    ? "bg-emerald-400 text-emerald-950"
+                    : i === shownEnemy
+                      ? "bg-white text-slate-900 ring-2 ring-amber-300"
+                      : "bg-white/40 text-slate-700"
+                }`}
+              >
+                {i < state.enemy || state.won
+                  ? "✓"
+                  : e.kind === "boss"
+                    ? "👑"
+                    : i + 1}
+              </span>
+            ))}
           </div>
         </div>
 
-        {/* Momo */}
+        {/* Victory light pillar */}
+        {phase === "won" && (
+          <div className="light-pillar absolute bottom-0 left-[8%] z-0 h-full w-40" />
+        )}
+
+        {/* Momo the pet */}
         <div
-          className={`absolute bottom-6 left-[3%] z-10 w-[38%] max-w-[230px] sm:left-[6%] ${momoClass}`}
+          className={`absolute bottom-[9%] left-[2%] z-10 w-[17%] max-w-[110px] ${petClass}`}
+        >
+          <MomoPet className="w-full drop-shadow-[0_6px_6px_rgba(0,0,0,.2)]" />
+        </div>
+
+        {/* Hero */}
+        <div
+          className={`absolute bottom-[7%] left-[13%] z-20 w-[24%] max-w-[170px] ${heroClass}`}
         >
           {phase === "checking" && (
-            <div className="charge absolute inset-[10%] -z-10 rounded-full bg-amber-200/70" />
+            <div className="charge absolute inset-[5%] -z-10 rounded-full bg-sky-200/80" />
           )}
-          {(phase === "attack" || phase === "impact") && (
-            <div
-              className={`aura absolute inset-0 -z-10 rounded-full ${superBark ? "bg-cyan-300/60" : "bg-amber-300/50"}`}
-            />
-          )}
-          <MomoHero className="w-full drop-shadow-[0_8px_8px_rgba(0,0,0,.35)]" />
+          <Hero className="w-full drop-shadow-[0_6px_6px_rgba(0,0,0,.2)]" />
           {phase === "dead" && (
-            <div className="dizzy absolute -top-2 left-1/2 text-2xl">💫</div>
-          )}
-        </div>
-
-        {/* Blast */}
-        {phase === "attack" && (
-          <div
-            className={`blast absolute bottom-[38%] left-[34%] z-20 rounded-full ${superBark ? "blast-super" : ""}`}
-          />
-        )}
-        {superBark && (phase === "attack" || phase === "impact") && (
-          <div className="super-banner absolute top-[28%] left-1/2 z-30 -translate-x-1/2 text-3xl font-black whitespace-nowrap text-amber-300 sm:text-4xl">
-            SUPER BARK!
-          </div>
-        )}
-
-        {/* Enemy */}
-        <div className="absolute right-[4%] bottom-8 z-10 flex w-[34%] max-w-[210px] flex-col items-center sm:right-[8%]">
-          {phase !== "won" && (
-            <div className="mb-1 w-[85%]">
-              <p className="text-center text-xs font-black text-white drop-shadow">
-                {enemy.name}
-              </p>
-              <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-black/40 ring-1 ring-white/40">
-                <div
-                  className={`h-full rounded-full transition-[width] duration-500 ${hpPct > 50 ? "bg-emerald-400" : hpPct > 25 ? "bg-amber-400" : "bg-rose-500"}`}
-                  style={{ width: `${hpPct}%` }}
-                />
-              </div>
+            <div className="angel absolute -top-4 left-1/2 text-center">
+              <span className="block text-2xl">😇</span>
             </div>
           )}
+          {heroPops.map((p) => (
+            <span key={p.id} className="num num-hurt absolute top-0 left-1/2">
+              {p.text}
+            </span>
+          ))}
+        </div>
+
+        {/* Super Bark shockwave */}
+        {superBark && phase === "attack" && (
+          <>
+            <div className="bark-banner absolute top-[26%] left-1/2 z-40 text-3xl font-black whitespace-nowrap sm:text-5xl">
+              MOMO BARK!
+            </div>
+            <div className="bark-wave absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-[6px] border-amber-300" />
+            <div className="bark-wave bark-wave-2 absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-4 border-white" />
+          </>
+        )}
+        {phase === "impact" && superBark && (
+          <div className="flash absolute inset-0 z-30 bg-white" />
+        )}
+
+        {/* Monster */}
+        <div className="absolute right-[8%] bottom-[8%] z-20 flex w-[30%] max-w-[200px] flex-col items-center sm:right-[12%]">
           <div
             className={`relative w-full ${enemyClass}`}
             key={`${shownEnemy}-${run}`}
           >
-            <Enemy
+            <Monster
               kind={enemy.kind}
-              className={`w-full drop-shadow-[0_8px_8px_rgba(0,0,0,.35)] ${boss ? "scale-110" : ""}`}
+              className={`w-full ${boss ? "scale-125" : ""}`}
             />
+            {(phase === "impact" || phase === "miss") && (
+              <svg
+                viewBox="0 0 100 100"
+                className={`slash absolute inset-0 z-10 ${phase === "miss" ? "slash-miss" : ""}`}
+                aria-hidden="true"
+              >
+                <path
+                  d="M10 80 Q 50 -10 92 30 Q 52 10 10 80 Z"
+                  fill="#ffffff"
+                />
+                <path
+                  d="M18 70 Q 50 6 84 34"
+                  stroke="#bae6fd"
+                  strokeWidth="3"
+                  fill="none"
+                />
+              </svg>
+            )}
+            {phase === "impact" &&
+              Array.from({ length: 10 }, (_, i) => (
+                <span
+                  key={i}
+                  className="spark absolute top-1/2 left-1/2 text-amber-300"
+                  style={{ ["--a" as string]: `${i * 36}deg` }}
+                >
+                  ✦
+                </span>
+              ))}
             {phase === "enemyDown" && (
-              <div className="pointer-events-none absolute inset-0">
+              <>
                 {Array.from({ length: 16 }, (_, i) => (
                   <span
                     key={i}
-                    className="spark absolute top-1/2 left-1/2 block size-3 rounded-full"
+                    className="burst absolute top-1/2 left-1/2 text-lg"
                     style={{
                       ["--a" as string]: `${(i / 16) * 360}deg`,
-                      backgroundColor: [
-                        "#fde047",
-                        "#fb923c",
-                        "#f472b6",
-                        "#ffffff",
-                      ][i % 4],
+                      color: ["#fde047", "#f9a8d4", "#ffffff", "#a5f3fc"][
+                        i % 4
+                      ],
                     }}
-                  />
+                  >
+                    ★
+                  </span>
                 ))}
-              </div>
+                <span className="loot loot-1 absolute top-1/3 left-1/2 text-2xl">
+                  🪙
+                </span>
+                <span className="loot loot-2 absolute top-1/3 left-1/2 text-2xl">
+                  💎
+                </span>
+                <span className="loot loot-3 absolute top-1/3 left-1/2 text-2xl">
+                  🍎
+                </span>
+              </>
             )}
+            {enemyPops.map((p) => (
+              <span
+                key={p.id}
+                className={`num num-${p.kind} absolute top-[10%] left-1/2`}
+              >
+                {p.kind === "crit" && (
+                  <span className="block text-sm">CRITICAL!</span>
+                )}
+                {p.text}
+              </span>
+            ))}
           </div>
-          {damage && phase === "impact" && (
-            <span
-              key={damage.id}
-              className={`dmg absolute top-[42%] z-20 font-black drop-shadow-[0_2px_0_rgba(0,0,0,.6)] ${damage.n > 1 ? "text-4xl text-amber-300" : "text-3xl text-white"}`}
-            >
-              −{damage.n}
-              {damage.n > 1 && <span className="block text-sm">CRITICAL!</span>}
-            </span>
+          {phase !== "won" && (
+            <div className="mt-1 w-[80%]">
+              <p className="text-center text-[11px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,.6)]">
+                {enemy.name}
+              </p>
+              <div className="mt-0.5 h-2 overflow-hidden rounded-full bg-black/35 ring-1 ring-white/60">
+                <div
+                  className={`h-full rounded-full transition-[width] duration-500 ${hpPct > 50 ? "bg-gradient-to-r from-lime-300 to-green-500" : hpPct > 25 ? "bg-gradient-to-r from-yellow-300 to-amber-500" : "bg-gradient-to-r from-rose-300 to-red-500"}`}
+                  style={{ width: `${hpPct}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
 
         {/* Overlays */}
         {phase === "intro" && (
           <Overlay>
-            <p className="text-sm font-black tracking-[0.25em] text-amber-300 uppercase">
+            <p className="text-sm font-black tracking-[0.25em] text-amber-200 uppercase">
               Quest
             </p>
-            <h2 className="mt-1 text-3xl font-black text-white">
-              Help Momo save the class!
+            <h2 className="title-glow mt-1 text-3xl font-black text-white sm:text-4xl">
+              The Jelly King awaits!
             </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
-              Answer right to blast the enemies — 3 in a row unleashes a{" "}
-              <b>Super Bark</b>. Beat all 5, including King Virus. Momo has{" "}
-              {QUEST_LIVES} hearts: each wrong answer costs one.
+            <p className="mx-auto mt-2 max-w-md text-sm text-white/90">
+              Answer right to strike with your sword. 3 in a row and Momo
+              unleashes the <b>Momo Bark</b> for double damage! Defeat all 5
+              monsters. You have {QUEST_LIVES} hearts — each wrong answer costs
+              one.
             </p>
             <button
               type="button"
@@ -454,27 +575,27 @@ export function Battle({
                 unlock();
                 sfx.select();
                 setPhase("enemyIn");
-                setTimeout(() => setPhase("ask"), 700);
+                setTimeout(() => setPhase("ask"), 800);
               }}
-              className="mt-5 rounded-2xl bg-amber-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg hover:bg-amber-300"
+              className="start-btn mt-5 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
             >
-              ⚡ Start quest
+              ⚔️ Start adventure
             </button>
           </Overlay>
         )}
         {phase === "dead" && (
           <Overlay tone="dark">
-            <p className="faint-title text-4xl font-black text-white">
-              Momo fainted! 💫
+            <p className="title-pop text-4xl font-black text-white">
+              You fainted!
             </p>
             <p className="mt-2 text-sm text-white/85">
-              5 wrong answers. Read the rationales, then try the quest again —
-              Momo believes in you!
+              5 wrong answers. Read the explanations, then try again — Momo is
+              cheering for you! 🐶
             </p>
             <button
               type="button"
               onClick={restart}
-              className="mt-5 rounded-2xl bg-amber-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg hover:bg-amber-300"
+              className="start-btn mt-5 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
             >
               🔁 Try the quest again
             </button>
@@ -484,17 +605,19 @@ export function Battle({
           <>
             <Confetti />
             <Overlay>
-              <p className="win-title text-4xl font-black text-amber-300">
-                Victory! 🏆
+              <p className="level-up text-5xl font-black sm:text-6xl">
+                LEVEL UP!
               </p>
-              <p className="mt-1 text-white/90">Momo defeated King Virus!</p>
+              <p className="mt-1 font-bold text-white">
+                The Jelly King is defeated!
+              </p>
               <div className="mt-3 flex justify-center">
                 <Stars
                   count={finish.data?.stars ?? 0}
                   className="win-stars size-12"
                 />
               </div>
-              <p className="mt-2 text-sm text-white/85">
+              <p className="mt-2 text-sm text-white/90">
                 {finish.isPending
                   ? "Saving your stars…"
                   : finish.data
@@ -516,7 +639,7 @@ export function Battle({
                 </button>
                 <Link
                   href="/student/games/quest"
-                  className="rounded-2xl bg-amber-400 px-5 py-2.5 text-sm font-black text-slate-900 hover:bg-amber-300"
+                  className="rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-5 py-2.5 text-sm font-black text-slate-900"
                 >
                   Next quest →
                 </Link>
@@ -528,130 +651,186 @@ export function Battle({
 
       {/* Question */}
       {question && phase !== "intro" && phase !== "won" && phase !== "dead" && (
-        <Card className="p-4 sm:p-5">
-          <p className="text-ink text-lg leading-snug font-bold">
-            {question.prompt}
-          </p>
-          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-            {question.options.map((o, i) => {
-              const isRight = rightId === o.id;
-              const isPicked = picked === o.id;
-              const state =
-                rightId === null
-                  ? isPicked
-                    ? "ring-4 ring-white/70 scale-[.98]"
-                    : ""
-                  : isRight
-                    ? "ring-4 ring-emerald-300 answer-right"
-                    : isPicked
-                      ? "opacity-90 grayscale-[.3] answer-wrong"
-                      : "opacity-40";
-              return (
-                <button
-                  key={o.id}
-                  type="button"
-                  disabled={phase !== "ask"}
-                  onClick={() => void answer(o.id)}
-                  className={`flex items-center gap-3 rounded-2xl bg-gradient-to-br px-4 py-3 text-left text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-default disabled:hover:translate-y-0 ${OPTION_STYLES[i % 4]} ${state}`}
-                >
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/25 text-xs font-black">
-                    {isRight ? "✓" : isPicked && rightId ? "✗" : i + 1}
-                  </span>
-                  <span>{o.text}</span>
-                </button>
-              );
-            })}
+        <Card className="overflow-hidden">
+          <div className="ro-window px-4 py-2 text-xs font-black tracking-wide text-white uppercase">
+            ✦ Answer to attack
           </div>
-          {explanation &&
-            (phase === "review" ||
-              phase === "impact" ||
-              phase === "enemyDown" ||
-              phase === "attack") && (
-              <div
-                className={`mt-4 rounded-xl px-4 py-3 text-sm ${
-                  phase === "review"
-                    ? "bg-rose-50 text-rose-900"
-                    : "bg-emerald-50 text-emerald-900"
-                }`}
-              >
-                <b>{phase === "review" ? "Ouch! " : "Correct! "}</b>
-                {explanation}
+          <div className="p-4 sm:p-5">
+            <p className="text-ink text-lg leading-snug font-bold">
+              {question.prompt}
+            </p>
+            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+              {question.options.map((o, i) => {
+                const isRight = rightId === o.id;
+                const isPicked = picked === o.id;
+                const look =
+                  rightId === null
+                    ? isPicked
+                      ? "ring-4 ring-sky-200 scale-[.98]"
+                      : ""
+                    : isRight
+                      ? "ring-4 ring-emerald-300 answer-right"
+                      : isPicked
+                        ? "answer-wrong"
+                        : "opacity-40";
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    disabled={phase !== "ask"}
+                    onClick={() => void answer(o.id)}
+                    className={`flex items-center gap-3 rounded-2xl bg-gradient-to-br px-4 py-3 text-left text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-default disabled:hover:translate-y-0 ${OPTION_STYLES[i % 4]} ${look}`}
+                  >
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/30 text-xs font-black">
+                      {isRight ? "✓" : isPicked && rightId ? "✗" : i + 1}
+                    </span>
+                    <span>{o.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {explanation &&
+              (phase === "review" ||
+                phase === "impact" ||
+                phase === "enemyDown" ||
+                phase === "attack") && (
+                <div
+                  className={`mt-4 rounded-xl px-4 py-3 text-sm ${phase === "review" ? "bg-rose-50 text-rose-900" : "bg-emerald-50 text-emerald-900"}`}
+                >
+                  <b>{phase === "review" ? "Ouch! " : "Great hit! "}</b>
+                  {explanation}
+                </div>
+              )}
+            {phase === "review" && (
+              <div className="mt-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={nextQuestion}
+                  className="bg-navy hover:bg-navy-deep rounded-xl px-5 py-2 text-sm font-bold text-white"
+                >
+                  Keep fighting →
+                </button>
               </div>
             )}
-          {phase === "review" && (
-            <div className="mt-3 flex justify-end">
-              <button
-                type="button"
-                onClick={nextQuestion}
-                className="bg-navy hover:bg-navy-deep rounded-xl px-5 py-2 text-sm font-bold text-white"
-              >
-                Keep fighting →
-              </button>
-            </div>
-          )}
+          </div>
         </Card>
       )}
 
       <style>{`
-        @keyframes momo-idle { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
-        .momo-idle { animation: momo-idle 1.6s ease-in-out infinite; }
-        @keyframes momo-dash { 0% { transform: translateX(0) } 35% { transform: translateX(28%) scale(1.04) } 100% { transform: translateX(0) } }
-        .momo-dash { animation: momo-dash .5s cubic-bezier(.2,.9,.3,1); }
-        @keyframes momo-brace { 0%,100% { transform: translateX(0) } 50% { transform: translateX(-6%) } }
-        .momo-brace { animation: momo-brace .4s ease-in-out; }
-        @keyframes momo-dead { 0% { transform: rotate(0) translateY(0); filter: none } 40% { transform: rotate(-12deg) translateY(-10px) } 100% { transform: rotate(-90deg) translate(-30%, 10%); filter: grayscale(1) brightness(.8) } }
-        .momo-dead { animation: momo-dead 1.1s ease-in forwards; transform-origin: 30% 90%; }
-        @keyframes momo-win { 0%,100% { transform: translateY(0) rotate(0) } 25% { transform: translateY(-30px) rotate(-6deg) } 50% { transform: translateY(0) } 75% { transform: translateY(-18px) rotate(5deg) } }
-        .momo-win { animation: momo-win 1s ease-in-out infinite; }
-        .momo-cape { transform-origin: 128px 92px; animation: cape 0.9s ease-in-out infinite; }
-        @keyframes cape { 0%,100% { transform: skewY(0) scaleX(1) } 50% { transform: skewY(4deg) scaleX(1.06) } }
-        .momo-tail { transform-origin: 62px 116px; animation: tail .35s ease-in-out infinite alternate; }
-        @keyframes tail { from { transform: rotate(-10deg) } to { transform: rotate(14deg) } }
-        @keyframes aura { 0% { transform: scale(.6); opacity: 0 } 50% { transform: scale(1.15); opacity: 1 } 100% { transform: scale(1.3); opacity: 0 } }
-        .aura { animation: aura .6s ease-out; filter: blur(14px); }
+        .sky-day { background: linear-gradient(180deg, #5fb4ff 0%, #9fd6ff 38%, #dff1ff 62%, #fff4fb 100%); }
+        .sky-boss { background: linear-gradient(180deg, #3b1d6e 0%, #8a4fc9 40%, #f39ac7 75%, #ffd6e8 100%); }
+        .sun-rays { background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.55) 0deg 6deg, transparent 6deg 18deg); mask-image: radial-gradient(circle, #000 0 30%, transparent 70%); animation: rays 40s linear infinite; }
+        @keyframes rays { to { transform: rotate(360deg) } }
+        .twinkle { animation: twinkle 2.2s ease-in-out infinite; text-shadow: 0 0 6px #fff; }
+        @keyframes twinkle { 0%,100% { opacity: .2; transform: scale(.7) } 50% { opacity: 1; transform: scale(1.2) } }
+        .cloud-a { animation: drift 46s linear infinite; left: -30%; }
+        .cloud-b { animation: drift 70s linear infinite -20s; left: -30%; }
+        .cloud-c { animation: drift 90s linear infinite -50s; left: -30%; }
+        @keyframes drift { to { transform: translateX(170vw) } }
+        .ro-window { background: linear-gradient(180deg, rgba(86,120,196,.92), rgba(50,74,140,.92)); border: 2px solid rgba(255,255,255,.75); box-shadow: 0 4px 10px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.4); }
+
+        .hero-idle { animation: hero-idle 1.3s ease-in-out infinite; }
+        @keyframes hero-idle { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+        .hero-ready { animation: hero-ready .45s ease-in-out infinite; }
+        @keyframes hero-ready { 0%,100% { transform: translateX(0) } 50% { transform: translateX(-4px) scaleY(.97) } }
+        .hero-attack { animation: hero-attack .55s cubic-bezier(.3,.9,.3,1); }
+        @keyframes hero-attack { 0% { transform: translateX(0) } 40% { transform: translateX(150%) } 55% { transform: translateX(150%) } 100% { transform: translateX(0) } }
+        .hero-attack .hero-sword { animation: swing .55s ease-out; transform-origin: 86px 98px; }
+        @keyframes swing { 0% { transform: rotate(0) } 30% { transform: rotate(-70deg) } 55% { transform: rotate(80deg) } 100% { transform: rotate(0) } }
+        .hero-cheer .hero-sword { animation: raise .6s ease-out; transform-origin: 86px 98px; }
+        @keyframes raise { 0%,100% { transform: rotate(0) } 50% { transform: rotate(-60deg) } }
+        .hero-hurt { animation: hero-hurt .5s ease-out; }
+        @keyframes hero-hurt { 0% { transform: translateX(0); filter: none } 20% { transform: translateX(-14%) rotate(-6deg); filter: brightness(1.2) sepia(1) hue-rotate(-50deg) saturate(4) } 60% { transform: translateX(-6%) } 100% { transform: translateX(0); filter: none } }
+        .hero-dead { animation: hero-dead 1s ease-in forwards; transform-origin: 50% 95%; }
+        @keyframes hero-dead { 0% { transform: rotate(0) } 30% { transform: rotate(8deg) translateY(-8px) } 100% { transform: rotate(-88deg) translate(-20%, 10%); filter: grayscale(.8) } }
+        .hero-win { animation: hero-win .9s ease-in-out infinite; }
+        @keyframes hero-win { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-26px) } }
+        .hero-win .hero-sword { transform: rotate(-60deg); transform-origin: 86px 98px; }
+        .hero-hair { transform-origin: 66px 40px; animation: hair 2.4s ease-in-out infinite; }
+        @keyframes hair { 0%,100% { transform: rotate(0) } 50% { transform: rotate(-1.5deg) } }
+        .hero-scarf { transform-origin: 56px 96px; animation: scarf .8s ease-in-out infinite; }
+        @keyframes scarf { 0%,100% { transform: skewY(0) } 50% { transform: skewY(6deg) scaleX(1.05) } }
+        .charge { animation: charge .5s ease-in-out infinite; filter: blur(14px); }
         @keyframes charge { 0%,100% { transform: scale(.85); opacity: .5 } 50% { transform: scale(1.1); opacity: 1 } }
-        .charge { animation: charge .5s ease-in-out infinite; filter: blur(16px); }
 
-        @keyframes blast { 0% { transform: translateX(0) scale(.4); opacity: 1 } 100% { transform: translateX(min(38vw, 360px)) scale(1.2); opacity: 1 } }
-        .blast { width: 44px; height: 44px; background: radial-gradient(circle, #fff 0 25%, #fde047 45%, #f59e0b 70%, transparent 72%); box-shadow: 0 0 24px 10px rgba(253,224,71,.8), -40px 0 30px -6px rgba(253,224,71,.6), -80px 0 30px -10px rgba(253,224,71,.35); animation: blast .48s cubic-bezier(.5,0,.9,.6) forwards; }
-        .blast-super { width: 70px; height: 70px; background: radial-gradient(circle, #fff 0 25%, #67e8f9 45%, #6366f1 70%, transparent 72%); box-shadow: 0 0 40px 16px rgba(103,232,249,.9), -50px 0 40px -6px rgba(99,102,241,.6), -100px 0 40px -10px rgba(103,232,249,.4); }
-        @keyframes super-banner { 0% { transform: translate(-50%, 10px) scale(.4) rotate(-8deg); opacity: 0 } 30% { transform: translate(-50%, 0) scale(1.15) rotate(-4deg); opacity: 1 } 100% { transform: translate(-50%, -10px) scale(1) rotate(-4deg); opacity: 0 } }
-        .super-banner { animation: super-banner 1.1s ease-out forwards; text-shadow: 0 3px 0 #b45309, 0 0 20px rgba(251,191,36,.9); }
+        .pet-idle { animation: pet-hop 1s ease-in-out infinite; }
+        @keyframes pet-hop { 0%,100% { transform: translateY(0) } 45% { transform: translateY(-10px) } 55% { transform: translateY(-10px) } }
+        .pet-tail { transform-origin: 34px 68px; animation: wag .3s ease-in-out infinite alternate; }
+        @keyframes wag { from { transform: rotate(-12deg) } to { transform: rotate(16deg) } }
+        .pet-cape { transform-origin: 56px 66px; animation: scarf .7s ease-in-out infinite; }
+        .pet-super { animation: pet-super .56s cubic-bezier(.3,.9,.3,1); }
+        @keyframes pet-super { 0% { transform: translate(0,0) } 45% { transform: translate(180%, -60%) scale(1.25) } 100% { transform: translate(0,0) } }
+        .pet-sad { transform: rotate(-8deg) translateY(4px); filter: saturate(.6); }
+        .pet-win { animation: pet-hop .5s ease-in-out infinite; }
 
-        @keyframes enemy-idle { 0%,100% { transform: translateY(0) rotate(0) } 50% { transform: translateY(-8px) rotate(2deg) } }
-        .enemy-idle { animation: enemy-idle 1.4s ease-in-out infinite; }
-        @keyframes enemy-hit { 0% { transform: translateX(0); filter: brightness(1) } 15% { transform: translateX(16%) rotate(8deg); filter: brightness(3) saturate(0) } 35% { transform: translateX(6%) rotate(-4deg); filter: brightness(1.6) } 60% { transform: translateX(10%) } 100% { transform: translateX(0); filter: brightness(1) } }
-        .enemy-hit { animation: enemy-hit .55s ease-out; }
-        @keyframes enemy-down { 0% { transform: scale(1) rotate(0); opacity: 1 } 30% { transform: scale(1.2) rotate(-20deg); filter: brightness(2.5) } 100% { transform: scale(0) rotate(540deg); opacity: 0 } }
-        .enemy-down > svg { animation: enemy-down .9s ease-in forwards; }
-        @keyframes enemy-in { 0% { transform: translateX(140%) scale(.8); opacity: 0 } 70% { transform: translateX(-8%) scale(1.05); opacity: 1 } 100% { transform: translateX(0) scale(1) } }
-        .enemy-in { animation: enemy-in .7s cubic-bezier(.2,1.3,.4,1); }
-        @keyframes enemy-lunge { 0% { transform: translateX(0) } 45% { transform: translateX(-120%) scale(1.1) rotate(-10deg) } 100% { transform: translateX(0) } }
-        .enemy-lunge { animation: enemy-lunge .5s cubic-bezier(.6,0,.3,1); }
-        .enemy-wing-l { transform-origin: 60px 80px; animation: wing-l .25s ease-in-out infinite alternate; }
-        .enemy-wing-r { transform-origin: 100px 80px; animation: wing-r .25s ease-in-out infinite alternate; }
-        @keyframes wing-l { from { transform: rotate(10deg) } to { transform: rotate(-14deg) } }
-        @keyframes wing-r { from { transform: rotate(-10deg) } to { transform: rotate(14deg) } }
-        @keyframes spark { 0% { transform: rotate(var(--a)) translateX(0) scale(1); opacity: 1 } 100% { transform: rotate(var(--a)) translateX(90px) scale(.2); opacity: 0 } }
-        .spark { margin: -6px; animation: spark .8s ease-out forwards; }
-        @keyframes dmg { 0% { transform: translateY(10px) scale(.4); opacity: 0 } 25% { transform: translateY(-10px) scale(1.3); opacity: 1 } 100% { transform: translateY(-50px) scale(1); opacity: 0 } }
-        .dmg { animation: dmg .9s ease-out forwards; text-align: center; }
+        .mon-idle { animation: mon-hop 1.1s ease-in-out infinite; transform-origin: 50% 100%; }
+        @keyframes mon-hop { 0% { transform: translateY(0) scale(1.08, .9) } 30% { transform: translateY(-22px) scale(.94, 1.08) } 55% { transform: translateY(-26px) scale(1, 1) } 85% { transform: translateY(0) scale(1.1, .88) } 100% { transform: translateY(0) scale(1.08, .9) } }
+        .mon-hit { animation: mon-hit .6s ease-out; transform-origin: 50% 100%; }
+        @keyframes mon-hit { 0% { transform: translateX(0); filter: none } 12% { transform: translateX(14%) scale(1.1, .85); filter: brightness(2.6) saturate(0) } 35% { transform: translateX(8%) scale(.95, 1.05); filter: brightness(1.4) } 100% { transform: translateX(0) scale(1); filter: none } }
+        .mon-down > svg { animation: mon-down 1s ease-in forwards; transform-origin: 50% 100%; }
+        @keyframes mon-down { 0% { transform: scale(1); filter: brightness(2) } 25% { transform: scale(1.3, .5) } 45% { transform: scale(.8, 1.4) translateY(-10%) } 100% { transform: scale(0) translateY(-40%) rotate(200deg); opacity: 0 } }
+        .mon-in { animation: mon-in .8s cubic-bezier(.3,1.5,.5,1); transform-origin: 50% 100%; }
+        @keyframes mon-in { 0% { transform: translateY(-260%) scale(.8, 1.2); opacity: 0 } 55% { transform: translateY(0) scale(1.25, .7); opacity: 1 } 75% { transform: translateY(-14%) scale(.9, 1.1) } 100% { transform: translateY(0) scale(1) } }
+        .mon-lunge { animation: mon-lunge .5s cubic-bezier(.6,0,.3,1); transform-origin: 50% 100%; }
+        @keyframes mon-lunge { 0% { transform: translate(0,0) } 45% { transform: translate(-150%, -30%) scale(1.15) rotate(-12deg) } 100% { transform: translate(0,0) } }
+        .monster-wing-l { transform-origin: 44px 76px; animation: wing-l .22s ease-in-out infinite alternate; }
+        .monster-wing-r { transform-origin: 96px 76px; animation: wing-r .22s ease-in-out infinite alternate; }
+        @keyframes wing-l { from { transform: rotate(12deg) } to { transform: rotate(-16deg) } }
+        @keyframes wing-r { from { transform: rotate(-12deg) } to { transform: rotate(16deg) } }
+        .monster-leaf { transform-origin: 72px 30px; animation: hair 1s ease-in-out infinite; }
+        .monster-halo { animation: twinkle 1.6s ease-in-out infinite; }
 
-        @keyframes arena-shake { 0%,100% { transform: translate(0) } 20% { transform: translate(-10px, 4px) } 40% { transform: translate(8px, -4px) } 60% { transform: translate(-6px, 2px) } 80% { transform: translate(4px, -2px) } }
-        .arena-shake { animation: arena-shake .45s ease-in-out .3s; }
-        @keyframes cloud { from { transform: translateX(0) } to { transform: translateX(160vw) } }
-        .cloud { animation: cloud 38s linear infinite; }
-        .cloud-slow { animation-duration: 60s; }
-        @keyframes sky-star { 0%,100% { opacity: .2 } 50% { opacity: 1 } }
-        .sky-star { animation: sky-star 1.8s ease-in-out infinite; }
-        @keyframes dizzy { from { transform: translateX(-50%) rotate(0) } to { transform: translateX(-50%) rotate(360deg) } }
-        .dizzy { animation: dizzy 1s linear infinite; }
-        @keyframes combo-hot { 0%,100% { transform: scale(1) } 50% { transform: scale(1.12) } }
+        .slash { animation: slash .38s ease-out forwards; filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px #7dd3fc); }
+        .slash-miss { opacity: .5; filter: drop-shadow(0 0 6px #fff); }
+        @keyframes slash { 0% { transform: scale(.3) rotate(-30deg); opacity: 0 } 30% { opacity: 1 } 100% { transform: scale(1.3) rotate(10deg); opacity: 0 } }
+        .spark { animation: spark .6s ease-out forwards; font-size: 18px; margin: -10px; }
+        @keyframes spark { 0% { transform: rotate(var(--a)) translateX(0) scale(1.2); opacity: 1 } 100% { transform: rotate(var(--a)) translateX(70px) scale(.3); opacity: 0 } }
+        .burst { animation: burst .9s ease-out forwards; margin: -12px; }
+        @keyframes burst { 0% { transform: rotate(var(--a)) translateX(0) scale(1.4); opacity: 1 } 100% { transform: rotate(var(--a)) translateX(110px) scale(.2); opacity: 0 } }
+        .loot { margin-left: -12px; }
+        .loot-1 { animation: loot-1 1s ease-out forwards; }
+        .loot-2 { animation: loot-2 1s ease-out forwards; }
+        .loot-3 { animation: loot-3 1s ease-out forwards; }
+        @keyframes loot-1 { 0% { transform: translate(0,0) scale(.4) } 40% { transform: translate(-40px,-70px) scale(1.1) } 100% { transform: translate(-60px,40px) } }
+        @keyframes loot-2 { 0% { transform: translate(0,0) scale(.4) } 40% { transform: translate(10px,-90px) scale(1.1) } 100% { transform: translate(14px,44px) } }
+        @keyframes loot-3 { 0% { transform: translate(0,0) scale(.4) } 40% { transform: translate(50px,-60px) scale(1.1) } 100% { transform: translate(70px,42px) } }
+
+        .num { margin-left: -2ch; font-weight: 900; text-align: center; white-space: nowrap; pointer-events: none; z-index: 50; font-family: ui-rounded, system-ui, sans-serif; }
+        .num-dmg { color: #fff36b; font-size: 2.1rem; text-shadow: 0 2px 0 #7c2d12, 2px 0 0 #7c2d12, -2px 0 0 #7c2d12, 0 -2px 0 #7c2d12, 0 4px 6px rgba(0,0,0,.35); animation: num-arc 1.2s cubic-bezier(.2,.8,.4,1) forwards; }
+        .num-crit { color: #ff5a3c; font-size: 2.8rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff, 0 0 18px #fde047; animation: num-arc 1.3s cubic-bezier(.2,.8,.4,1) forwards; }
+        .num-crit span { color: #fde047; text-shadow: 0 1px 0 #7c2d12, 0 0 6px #7c2d12; }
+        .num-miss { color: #bae6fd; font-size: 1.8rem; text-shadow: 0 2px 0 #1e3a8a, 2px 0 0 #1e3a8a, -2px 0 0 #1e3a8a, 0 -2px 0 #1e3a8a; animation: num-float 1.1s ease-out forwards; }
+        .num-hurt { color: #ff4d6d; font-size: 1.9rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff; animation: num-arc-left 1.2s cubic-bezier(.2,.8,.4,1) forwards; }
+        .num-exp { color: #a7f3d0; font-size: 1.3rem; text-shadow: 0 2px 0 #065f46, 2px 0 0 #065f46, -2px 0 0 #065f46, 0 -2px 0 #065f46; animation: num-float 1.3s ease-out forwards; }
+        @keyframes num-arc { 0% { transform: translate(0, 10px) scale(.4); opacity: 0 } 15% { transform: translate(8px, -40px) scale(1.25); opacity: 1 } 45% { transform: translate(22px, -66px) scale(1) } 100% { transform: translate(46px, -10px) scale(.9); opacity: 0 } }
+        @keyframes num-arc-left { 0% { transform: translate(0, 10px) scale(.4); opacity: 0 } 15% { transform: translate(-8px, -40px) scale(1.25); opacity: 1 } 45% { transform: translate(-22px, -60px) } 100% { transform: translate(-46px, -6px); opacity: 0 } }
+        @keyframes num-float { 0% { transform: translateY(10px) scale(.5); opacity: 0 } 20% { transform: translateY(-20px) scale(1.15); opacity: 1 } 100% { transform: translateY(-70px) scale(1); opacity: 0 } }
+
+        .bark-banner { transform: translateX(-50%); color: #fde047; text-shadow: 0 3px 0 #c2410c, 0 0 18px #fff, 0 0 30px #fbbf24; animation: bark-banner 1.1s ease-out forwards; }
+        @keyframes bark-banner { 0% { transform: translateX(-50%) scale(.3) rotate(-10deg); opacity: 0 } 25% { transform: translateX(-50%) scale(1.2) rotate(-4deg); opacity: 1 } 100% { transform: translateX(-50%) scale(1) rotate(-4deg) translateY(-14px); opacity: 0 } }
+        .bark-wave { animation: bark-wave .56s ease-out forwards; }
+        .bark-wave-2 { animation-delay: .12s; }
+        @keyframes bark-wave { 0% { transform: translateX(0) scale(.4); opacity: 1 } 100% { transform: translateX(min(48vw, 520px)) scale(2.4); opacity: 0 } }
+        .flash { animation: flash .35s ease-out forwards; }
+        @keyframes flash { 0% { opacity: .85 } 100% { opacity: 0 } }
+
+        .light-pillar { background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent); box-shadow: 0 0 60px 30px rgba(253,224,71,.35); animation: pillar 1.4s ease-in-out infinite; }
+        @keyframes pillar { 0%,100% { opacity: .55; transform: scaleX(.85) } 50% { opacity: 1; transform: scaleX(1.1) } }
+        .level-up { background: linear-gradient(180deg, #fffbe6, #fde047 45%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #9a3412) drop-shadow(0 0 16px rgba(253,224,71,.8)); animation: level-up .8s cubic-bezier(.2,1.5,.4,1); }
+        @keyframes level-up { 0% { transform: scale(.2) translateY(40px); opacity: 0 } 100% { transform: scale(1) translateY(0); opacity: 1 } }
+        .angel { animation: angel 2.4s ease-out infinite; transform: translateX(-50%); }
+        @keyframes angel { 0% { transform: translate(-50%, 20px); opacity: 0 } 30% { opacity: 1 } 100% { transform: translate(-50%, -60px); opacity: 0 } }
+
+        .arena-shake { animation: arena-shake .45s ease-in-out .28s; }
+        @keyframes arena-shake { 0%,100% { transform: translate(0) } 20% { transform: translate(-9px, 4px) } 40% { transform: translate(7px, -4px) } 60% { transform: translate(-5px, 2px) } 80% { transform: translate(3px, -2px) } }
         .combo-hot { animation: combo-hot .5s ease-in-out infinite; }
+        @keyframes combo-hot { 0%,100% { transform: scale(1) } 50% { transform: scale(1.06) } }
         @keyframes pop-in { 0% { transform: scale(.6); opacity: 0 } 70% { transform: scale(1.08); opacity: 1 } 100% { transform: scale(1) } }
-        .overlay-in { animation: pop-in .45s cubic-bezier(.2,1.4,.4,1); }
-        .win-title, .faint-title { animation: pop-in .6s cubic-bezier(.2,1.4,.4,1); }
-        .win-stars { animation: pop-in .8s .3s cubic-bezier(.2,1.4,.4,1) both; }
+        .overlay-in, .title-pop { animation: pop-in .5s cubic-bezier(.2,1.4,.4,1); }
+        .title-glow { text-shadow: 0 3px 0 #1e3a8a, 0 0 18px rgba(255,255,255,.6); }
+        .win-stars { animation: pop-in .8s .35s cubic-bezier(.2,1.4,.4,1) both; }
+        .start-btn { animation: start-pulse 1.4s ease-in-out infinite; }
+        @keyframes start-pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.06) } }
         @keyframes heart-break { 0% { transform: scale(1) } 30% { transform: scale(1.6) rotate(-12deg) } 60% { transform: scale(.8) rotate(10deg) } 100% { transform: scale(1) } }
         .heart-break { animation: heart-break .6s ease-out; }
         @keyframes answer-right { 0%,100% { transform: scale(1) } 40% { transform: scale(1.04) } }
@@ -659,9 +838,19 @@ export function Battle({
         @keyframes answer-wrong { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
         .answer-wrong { animation: answer-wrong .3s ease-in-out 2; }
         @media (prefers-reduced-motion: reduce) {
-          .momo-idle, .momo-cape, .momo-tail, .enemy-idle, .cloud, .sky-star, .combo-hot, .enemy-wing-l, .enemy-wing-r { animation: none; }
+          .sun-rays, .twinkle, .cloud-a, .cloud-b, .cloud-c, .hero-idle, .hero-hair, .hero-scarf, .pet-idle, .pet-tail, .pet-cape, .mon-idle, .monster-wing-l, .monster-wing-r, .monster-leaf, .start-btn, .combo-hot { animation: none; }
         }
       `}</style>
+    </div>
+  );
+}
+
+function Cloud({ className = "" }: { className?: string }) {
+  return (
+    <div className={`absolute h-16 w-48 ${className}`} aria-hidden="true">
+      <span className="absolute bottom-0 left-0 h-10 w-48 rounded-full bg-white" />
+      <span className="absolute bottom-3 left-8 size-16 rounded-full bg-white" />
+      <span className="absolute bottom-2 left-24 size-12 rounded-full bg-white" />
     </div>
   );
 }
@@ -670,23 +859,15 @@ function Heart({ full, breaking }: { full: boolean; breaking: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={`size-6 ${breaking ? "heart-break" : ""}`}
+      className={`size-5 ${breaking ? "heart-break" : ""}`}
       aria-hidden="true"
     >
       <path
         d="M12 21s-7.5-4.6-9.7-9.3C.6 8.1 2.6 4 6.4 4c2.2 0 3.6 1.2 4.4 2.5h2.4C14 5.2 15.4 4 17.6 4c3.8 0 5.8 4.1 4.1 7.7C19.5 16.4 12 21 12 21z"
-        fill={full ? "#ef4444" : "#475569"}
+        fill={full ? "#ff4d6d" : "#64748b"}
         stroke="#fff"
         strokeWidth="1.5"
       />
-      {!full && (
-        <path
-          d="M12 7l-1.5 4 3 2-2 5"
-          stroke="#1e293b"
-          strokeWidth="1.6"
-          fill="none"
-        />
-      )}
     </svg>
   );
 }
@@ -700,7 +881,7 @@ function Overlay({
 }) {
   return (
     <div
-      className={`absolute inset-0 z-40 flex items-center justify-center p-4 ${tone === "dark" ? "bg-slate-950/70" : "bg-slate-950/45"} backdrop-blur-[2px]`}
+      className={`absolute inset-0 z-40 flex items-center justify-center p-4 ${tone === "dark" ? "bg-slate-900/65" : "bg-indigo-950/40"} backdrop-blur-[2px]`}
     >
       <div className="overlay-in text-center">{children}</div>
     </div>
