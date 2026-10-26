@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { sfx } from "~/app/_components/sfx";
+import type { EnemyKind } from "~/lib/games/quest";
 import { Hero, MomoPet, Monster, type Mood } from "./art";
 
 /**
@@ -13,10 +14,18 @@ import { Hero, MomoPet, Monster, type Mood } from "./art";
  * underneath.
  */
 
-export type Scene = "start" | "boss" | "win" | "faint";
+export type Scene =
+  | "start"
+  | "boss"
+  | "win"
+  | "faint"
+  | "dragon"
+  | "phase2"
+  | "phase3"
+  | "legend";
 
 type Cast = {
-  main: { who: "hero"; mood: Mood } | { who: "boss" };
+  main: { who: "hero"; mood: Mood } | { who: "monster"; kind: EnemyKind };
   line: string;
   inset: { who: "pet" } | { who: "hero"; mood: Mood };
   insetLine: string;
@@ -25,6 +34,38 @@ type Cast = {
 };
 
 const SCENES: Record<Scene, Cast> = {
+  dragon: {
+    main: { who: "monster", kind: "dragon" },
+    line: "So, little hero… you dare challenge the Shadow Dragon?",
+    inset: { who: "hero", mood: "determined" },
+    insetLine: "Momo — all four elements. Let's go!",
+    sfx: "GOGOGO…",
+    mood: "menace",
+  },
+  phase2: {
+    main: { who: "monster", kind: "dragon2" },
+    line: "RAAAGH! Now you've made me ANGRY! Answer FAST!",
+    inset: { who: "hero", mood: "shock" },
+    insetLine: "He's on fire?! The clock is ticking, Momo!",
+    sfx: "GOOOO!!",
+    mood: "menace",
+  },
+  phase3: {
+    main: { who: "monster", kind: "dragon3" },
+    line: "Behold… my TRUE FORM. This ends now!",
+    inset: { who: "pet" },
+    insetLine: "Arf!! (Don't give up — use your skills!)",
+    sfx: "ZZZZN…",
+    mood: "menace",
+  },
+  legend: {
+    main: { who: "hero", mood: "laugh" },
+    line: "We beat the Shadow Dragon! We're LEGENDS, Momo!",
+    inset: { who: "pet" },
+    insetLine: "ARF ARF!! ♥",
+    sfx: "LEGEND!!",
+    mood: "sparkle",
+  },
   start: {
     main: { who: "hero", mood: "determined" },
     line: "Let's go, Momo! The Jelly King won't know what hit him!",
@@ -34,7 +75,7 @@ const SCENES: Record<Scene, Cast> = {
     mood: "focus",
   },
   boss: {
-    main: { who: "boss" },
+    main: { who: "monster", kind: "boss" },
     line: "Who dares enter my Jelly Kingdom?! I'll squish you flat!",
     inset: { who: "hero", mood: "shock" },
     insetLine: "W-woah… he's HUGE!",
@@ -94,7 +135,7 @@ export function MangaCutIn({
   useEffect(() => {
     const t = setTimeout(() => {
       if (scene === "faint") sfx.faint();
-      else if (scene === "win") sfx.fanfare();
+      else if (scene === "win" || scene === "legend") sfx.fanfare();
       else sfx.hit();
     }, 120);
     return () => clearTimeout(t);
@@ -132,13 +173,13 @@ export function MangaCutIn({
           {/* Close-up */}
           <div
             className={`manga-face ink absolute ${
-              cast.main.who === "boss"
+              cast.main.who === "monster"
                 ? "top-[2%] left-[4%] w-[52%]"
                 : "top-[-22%] left-[-4%] w-[66%]"
             }`}
           >
-            {cast.main.who === "boss" ? (
-              <Monster kind="boss" className="w-full" />
+            {cast.main.who === "monster" ? (
+              <Monster kind={cast.main.kind} className="w-full" />
             ) : (
               <Hero mood={cast.main.mood} className="w-full" />
             )}

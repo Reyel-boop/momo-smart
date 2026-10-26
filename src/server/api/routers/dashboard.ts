@@ -22,6 +22,7 @@ const GAME_LABELS: Record<string, { title: string; course: string }> = {
   code: { title: "Code Quest", course: "Computer Programming" },
   call: { title: "Call Simulator", course: "Telecommunications" },
   quest: { title: "Momo's Quest", course: "Unit quests" },
+  boss: { title: "Boss Level", course: "Shadow Dragon" },
 };
 
 export const dashboardRouter = createTRPCRouter({
@@ -479,12 +480,13 @@ export const dashboardRouter = createTRPCRouter({
       ...gameLedger.map((entry) => {
         const game = GAME_LABELS[entry.game] ?? GAME_LABELS.quest!;
         // Quest levels are the units played so far; the others are fixed.
+        // Boss Levels give up to 5 stars each, the others up to 3.
         const max =
           (entry.game === "code"
             ? CODE_LEVELS.length
             : entry.game === "call"
               ? CALL_LEVELS.length
-              : entry.levels) * 3;
+              : entry.levels) * (entry.game === "boss" ? 5 : 3);
         return {
           id: `game-${entry.game}`,
           title: game.title,

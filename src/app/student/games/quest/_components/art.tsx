@@ -266,7 +266,7 @@ export function Monster({
       <ellipse
         cx="70"
         cy="132"
-        rx={kind === "boss" ? 46 : 34}
+        rx={kind === "boss" || kind.startsWith("dragon") ? 50 : 34}
         ry="5"
         fill="#000"
         opacity=".18"
@@ -278,6 +278,9 @@ export function Monster({
       {kind === "bat" && <BubbleBat />}
       {kind === "ghost" && <Ghosty />}
       {kind === "boss" && <JellyKing />}
+      {kind === "dragon" && <Dragon form={1} />}
+      {kind === "dragon2" && <Dragon form={2} />}
+      {kind === "dragon3" && <Dragon form={3} />}
     </svg>
   );
 }
@@ -689,4 +692,185 @@ function HeroFace({ mood }: { mood: Mood }) {
         </g>
       );
   }
+}
+
+/**
+ * The Shadow Dragon, the Boss Level's foe, in its three phases: purple,
+ * enraged red with flames, and a black-and-gold True Form with glowing eyes.
+ */
+function Dragon({ form }: { form: 1 | 2 | 3 }) {
+  const look = {
+    1: {
+      body: "#8b5cf6",
+      shade: "#5b21b6",
+      belly: "#ede9fe",
+      wing: "#6d28d9",
+      horn: "#f5f3ff",
+      eye: "#fde047",
+    },
+    2: {
+      body: "#ef4444",
+      shade: "#991b1b",
+      belly: "#fee2e2",
+      wing: "#b91c1c",
+      horn: "#fde68a",
+      eye: "#fef08a",
+    },
+    3: {
+      body: "#27213a",
+      shade: "#0b0814",
+      belly: "#facc15",
+      wing: "#1a1528",
+      horn: "#facc15",
+      eye: "#f43f5e",
+    },
+  }[form];
+  const id = `dragon-${form}`;
+  return (
+    <g>
+      <defs>
+        <radialGradient id={id} cx=".4" cy=".3" r=".8">
+          <stop offset="0" stopColor="#ffffff" stopOpacity=".55" />
+          <stop offset=".25" stopColor={look.body} />
+          <stop offset="1" stopColor={look.shade} />
+        </radialGradient>
+      </defs>
+      {form === 3 && (
+        <circle
+          cx="70"
+          cy="76"
+          r="62"
+          fill="#a855f7"
+          opacity=".25"
+          className="monster-halo"
+        />
+      )}
+      {form === 2 &&
+        [24, 52, 88, 116].map((x, i) => (
+          <path
+            key={x}
+            className="dragon-flame"
+            style={{ animationDelay: `${i * 0.15}s` }}
+            d={`M${x} 60 C ${x - 10} 44, ${x - 2} 30, ${x + 4} 18 C ${x + 6} 32, ${x + 14} 40, ${x + 8} 60 Z`}
+            fill="#fb923c"
+            opacity=".85"
+          />
+        ))}
+      {/* Wings */}
+      <g className="monster-wing-l">
+        <path
+          d="M40 66 C 16 40, 0 46, 2 58 C 10 58, 10 66, 4 74 C 14 72, 16 80, 12 88 C 24 84, 32 84, 42 86 Z"
+          fill={look.wing}
+          stroke={look.shade}
+          strokeWidth="2"
+        />
+      </g>
+      <g className="monster-wing-r">
+        <path
+          d="M100 66 C 124 40, 140 46, 138 58 C 130 58, 130 66, 136 74 C 126 72, 124 80, 128 88 C 116 84, 108 84, 98 86 Z"
+          fill={look.wing}
+          stroke={look.shade}
+          strokeWidth="2"
+        />
+      </g>
+      {/* Tail */}
+      <path
+        d="M100 116 C 124 118, 132 104, 128 92 L 136 90 L 130 84 C 138 106, 124 128, 98 124 Z"
+        fill={look.shade}
+      />
+      {/* Body and head */}
+      <ellipse cx="70" cy="100" rx="36" ry="30" fill={`url(#${id})`} />
+      <ellipse
+        cx="70"
+        cy="108"
+        rx="20"
+        ry="18"
+        fill={look.belly}
+        opacity=".9"
+      />
+      {[100, 108, 116].map((y) => (
+        <path
+          key={y}
+          d={`M56 ${y} Q 70 ${y + 4} 84 ${y}`}
+          stroke={look.shade}
+          strokeWidth="1.4"
+          fill="none"
+          opacity=".5"
+        />
+      ))}
+      <ellipse cx="70" cy="58" rx="34" ry="28" fill={`url(#${id})`} />
+      {/* Horns */}
+      <path
+        d="M46 40 C 40 26, 42 16, 50 10 C 50 22, 54 30, 56 36 Z"
+        fill={look.horn}
+      />
+      <path
+        d="M94 40 C 100 26, 98 16, 90 10 C 90 22, 86 30, 84 36 Z"
+        fill={look.horn}
+      />
+      {form === 3 && (
+        <path
+          d="M58 34 L 62 22 L 70 30 L 78 22 L 82 34 Z"
+          fill="#facc15"
+          stroke="#a16207"
+          strokeWidth="1.5"
+        />
+      )}
+      {/* Snout and nostrils */}
+      <ellipse
+        cx="70"
+        cy="70"
+        rx="18"
+        ry="11"
+        fill={look.belly}
+        opacity=".85"
+      />
+      <circle cx="64" cy="68" r="1.8" fill={look.shade} />
+      <circle cx="76" cy="68" r="1.8" fill={look.shade} />
+      {/* Eyes */}
+      <ellipse
+        cx="56"
+        cy="52"
+        rx="6"
+        ry={form === 1 ? 7 : 5.5}
+        fill={look.eye}
+      />
+      <ellipse
+        cx="84"
+        cy="52"
+        rx="6"
+        ry={form === 1 ? 7 : 5.5}
+        fill={look.eye}
+      />
+      <ellipse cx="57" cy="53" rx="2" ry="4.5" fill="#111" />
+      <ellipse cx="85" cy="53" rx="2" ry="4.5" fill="#111" />
+      {form === 3 && (
+        <g>
+          <circle cx="56" cy="52" r="9" fill="#f43f5e" opacity=".35" />
+          <circle cx="84" cy="52" r="9" fill="#f43f5e" opacity=".35" />
+        </g>
+      )}
+      <path
+        d="M46 42 L 62 47 M94 42 L 78 47"
+        stroke="#111"
+        strokeWidth={form === 1 ? 3 : 4}
+        strokeLinecap="round"
+      />
+      {/* Grin with fangs */}
+      <path
+        d="M58 76 Q 70 84 82 76"
+        stroke="#111"
+        strokeWidth="2.2"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path d="M62 77 l2 5 l2 -4 z M78 77 l-2 5 l-2 -4 z" fill="#fff" />
+      {form >= 2 && (
+        <g fill="#cbd5e1" opacity=".8">
+          <circle cx="38" cy="66" r="3" />
+          <circle cx="104" cy="64" r="2.5" />
+        </g>
+      )}
+    </g>
+  );
 }

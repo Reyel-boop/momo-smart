@@ -7,15 +7,15 @@ import { Battle } from "./battle";
 export const metadata: Metadata = { title: "Momo's Quest · Momo Smart" };
 export const dynamic = "force-dynamic";
 
+/** One unit's quest. */
 export default async function QuestBattlePage({
   params,
 }: {
   params: Promise<{ assessmentId: string }>;
 }) {
   const { assessmentId } = await params;
-  const data = await api.game
-    .questQuestions({ assessmentId })
-    .catch(() => null);
+  const arena = { kind: "unit" as const, id: assessmentId };
+  const data = await api.game.questQuestions({ arena }).catch(() => null);
   if (!data || data.questions.length === 0) {
     return (
       <Card className="mx-auto max-w-lg">
@@ -25,5 +25,5 @@ export default async function QuestBattlePage({
       </Card>
     );
   }
-  return <Battle key={assessmentId} assessmentId={assessmentId} data={data} />;
+  return <Battle key={assessmentId} arena={arena} data={data} />;
 }

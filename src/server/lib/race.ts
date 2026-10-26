@@ -182,6 +182,7 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
       OR: [
         ...(game ? [{ game }] : []),
         { game: "quest", levelId: { in: units.map((u) => u.id) } },
+        { game: "boss", levelId: `boss-${sectionId}` },
       ],
     },
     select: { studentId: true, stars: true, updatedAt: true },

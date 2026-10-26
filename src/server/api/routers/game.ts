@@ -3,7 +3,13 @@ import { z } from "zod";
 
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
 import { CODE_LEVELS, codeStars } from "~/lib/games/code-quest";
-import { questStars, replay } from "~/lib/games/quest";
+import {
+  BOSS,
+  BOSS_UNLOCK_WINS,
+  QUEST,
+  questStars,
+  replay,
+} from "~/lib/games/quest";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
@@ -15,7 +21,7 @@ import type { PrismaClient } from "../../../../generated/prisma";
  */
 type Game = "code" | "call";
 /** Progress rows also use "quest" (Momo's Quest, one level per unit quiz). */
-type SavedGame = Game | "quest";
+type SavedGame = Game | "quest" | "boss";
 
 const GAMES = {
   code: {
@@ -118,6 +124,16 @@ async function saveBest(
     newStars: Math.max(0, stars - (before?.stars ?? 0)),
   };
 }
+
+const elementInput = z.enum(["water", "fire", "air", "earth"]);
+
+/** Where a battle happens: one unit's quest, or a class's Boss Level. */
+const arenaInput = z.object({
+  kind: z.enum(["unit", "boss"]),
+  id: z.string(),
+});
+
+export const bossLevelId = (sectionId: string) => `boss-${sectionId}`;
 
 export const gameRouter = createTRPCRouter({
   /** The student's games, each with its levels, stars and locks. */
@@ -222,7 +238,10 @@ export const gameRouter = createTRPCRouter({
       return { ...result, ...saved };
     }),
 
-  /** Momo's Quest: the unit quizzes of the student's classes, with best stars. */
+  /**
+   * Momo's Quest: the unit quests of the student's classes with best
+   * stars, and each class's Boss Level with how close it is to unlocking.
+   */
   questUnits: studentProcedure.query(async ({ ctx }) => {
     const quizzes = await ctx.db.assessment.findMany({
       where: {
@@ -240,41 +259,56 @@ export const gameRouter = createTRPCRouter({
       ],
       select: {
         id: true,
+        sectionId: true,
         section: { select: { code: true, course: { select: { name: true } } } },
         unit: { select: { order: true, title: true } },
         _count: { select: { questions: true } },
       },
     });
     const best = await ctx.db.gameProgress.findMany({
-      where: { studentId: ctx.studentId, game: "quest" },
+      where: { studentId: ctx.studentId, game: { in: ["quest", "boss"] } },
       select: { levelId: true, stars: true },
     });
     const stars = new Map(best.map((b) => [b.levelId, b.stars]));
-    return quizzes
+    const units = quizzes
       .filter((q) => q._count.questions > 0)
       .map((q) => ({
         assessmentId: q.id,
+        sectionId: q.sectionId,
         className: `${q.section.course.name} — ${q.section.code}`,
         unit: q.unit!.order,
         unitTitle: q.unit!.title,
         questions: q._count.questions,
         stars: stars.get(q.id) ?? 0,
       }));
+    const sections = [...new Set(units.map((u) => u.sectionId))];
+    const bosses = sections.map((sectionId) => {
+      const mine = units.filter((u) => u.sectionId === sectionId);
+      const needed = Math.min(BOSS_UNLOCK_WINS, mine.length);
+      const wins = mine.filter((u) => u.stars > 0).length;
+      return {
+        sectionId,
+        className: mine[0]!.className,
+        questions: mine.reduce((sum, u) => sum + u.questions, 0),
+        wins,
+        needed,
+        unlocked: wins >= needed,
+        stars: stars.get(bossLevelId(sectionId)) ?? 0,
+      };
+    });
+    return { units, bosses };
   }),
 
-  /** Momo's Quest: a unit's questions, shuffled, without the answers. */
+  /** Momo's Quest: a battle's questions, shuffled, without the answers. */
   questQuestions: studentProcedure
-    .input(z.object({ assessmentId: z.string() }))
+    .input(z.object({ arena: arenaInput }))
     .query(async ({ ctx, input }) => {
-      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
+      const arena = await arenaOf(ctx.db, ctx.studentId, input.arena);
       const questions = await ctx.db.question.findMany({
         where: {
           type: "MULTIPLE_CHOICE",
           options: { some: { isCorrect: true } },
-          assessment: {
-            sectionId: quiz.sectionId,
-            OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
-          },
+          assessment: arena.questionsIn,
         },
         select: {
           id: true,
@@ -290,12 +324,10 @@ export const gameRouter = createTRPCRouter({
         [questions[i], questions[j]] = [questions[j]!, questions[i]!];
       }
       return {
-        // Unit titles may already start with "Unit 3: …".
-        title: /^unit\s+\d/i.test(quiz.unitTitle)
-          ? quiz.unitTitle
-          : `Unit ${quiz.unitOrder}: ${quiz.unitTitle}`,
-        className: quiz.className,
-        best: quiz.best,
+        mode: input.arena.kind,
+        title: arena.title,
+        className: arena.className,
+        best: arena.best,
         questions,
       };
     }),
@@ -304,16 +336,29 @@ export const gameRouter = createTRPCRouter({
   questAnswer: studentProcedure
     .input(
       z.object({
-        assessmentId: z.string(),
+        arena: arenaInput,
         questionId: z.string(),
+        // Empty when the timer ran out.
         optionId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
-      const question = await questionOf(ctx.db, quiz, input.questionId);
+      const arena = await arenaOf(ctx.db, ctx.studentId, input.arena);
+      const question = await ctx.db.question.findFirst({
+        where: { id: input.questionId, assessment: arena.questionsIn },
+        select: {
+          explanation: true,
+          options: { select: { id: true, isCorrect: true } },
+        },
+      });
+      if (!question) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Question not found.",
+        });
+      }
       const right = question.options.find((o) => o.isCorrect);
-      const correct = right?.id === input.optionId;
+      const correct = !!input.optionId && right?.id === input.optionId;
       // One star per question, once — shared with Unit Questions and Live Quiz.
       let newStar = false;
       if (correct) {
@@ -352,27 +397,39 @@ export const gameRouter = createTRPCRouter({
       };
     }),
 
-  /** Momo's Quest: replays the answers, and saves the stars of a win. */
+  /** Momo's Quest: replays the battle, and saves the stars of a win. */
   questFinish: studentProcedure
     .input(
       z.object({
-        assessmentId: z.string(),
+        arena: arenaInput,
+        // Every turn in order: answers, skill casts and heals.
         answers: z
-          .array(z.object({ questionId: z.string(), optionId: z.string() }))
-          .max(200),
+          .array(
+            z.discriminatedUnion("kind", [
+              z.object({
+                kind: z.literal("answer"),
+                questionId: z.string(),
+                optionId: z.string(),
+                element: elementInput,
+              }),
+              z.object({ kind: z.literal("cast"), element: elementInput }),
+              z.object({ kind: z.literal("heal") }),
+            ]),
+          )
+          .max(400),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const quiz = await questQuiz(ctx.db, ctx.studentId, input.assessmentId);
-      const ids = [...new Set(input.answers.map((a) => a.questionId))];
+      const arena = await arenaOf(ctx.db, ctx.studentId, input.arena);
+      const ids = [
+        ...new Set(
+          input.answers.flatMap((a) =>
+            a.kind === "answer" ? [a.questionId] : [],
+          ),
+        ),
+      ];
       const questions = await ctx.db.question.findMany({
-        where: {
-          id: { in: ids },
-          assessment: {
-            sectionId: quiz.sectionId,
-            OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
-          },
-        },
+        where: { id: { in: ids }, assessment: arena.questionsIn },
         select: {
           id: true,
           options: { where: { isCorrect: true }, select: { id: true } },
@@ -380,20 +437,30 @@ export const gameRouter = createTRPCRouter({
       });
       const correctOf = new Map(questions.map((q) => [q.id, q.options[0]?.id]));
       const state = replay(
-        input.answers.map((a) => correctOf.get(a.questionId) === a.optionId),
+        input.answers.map((a) =>
+          a.kind === "answer"
+            ? {
+                kind: "answer" as const,
+                correct:
+                  !!a.optionId && correctOf.get(a.questionId) === a.optionId,
+                element: a.element,
+              }
+            : a,
+        ),
+        arena.rules,
       );
-      const stars = questStars(state);
+      const stars = questStars(state, arena.rules);
       const saved =
         stars > 0
           ? await saveBest(
               ctx.db,
               ctx.studentId,
-              "quest",
-              quiz.id,
+              input.arena.kind === "boss" ? "boss" : "quest",
+              arena.levelId,
               stars,
               state.lives,
             )
-          : { best: quiz.best, newStars: 0 };
+          : { best: arena.best, newStars: 0 };
       return {
         won: state.won,
         dead: state.dead,
@@ -404,69 +471,121 @@ export const gameRouter = createTRPCRouter({
     }),
 });
 
-/** A unit quiz the student can quest on (enrolled, published). */
-async function questQuiz(
+/**
+ * The battle's rules, title, progress key and question pool, checking the
+ * student is in the class (and, for a Boss Level, has unlocked it).
+ */
+async function arenaOf(
   db: PrismaClient,
   studentId: string,
-  assessmentId: string,
+  arena: z.infer<typeof arenaInput>,
 ) {
-  const quiz = await db.assessment.findFirst({
-    where: {
-      id: assessmentId,
-      assignmentId: null,
-      unitId: { not: null },
-      publishedAt: { not: null },
-      section: { enrollments: { some: { studentId, status: "ACTIVE" } } },
-    },
-    select: {
-      id: true,
-      sectionId: true,
-      unitId: true,
-      unit: { select: { order: true, title: true } },
-      section: { select: { code: true, course: { select: { name: true } } } },
-    },
-  });
-  if (!quiz?.unitId || !quiz.unit) {
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "That quest is not in your classes.",
+  if (arena.kind === "unit") {
+    const quiz = await db.assessment.findFirst({
+      where: {
+        id: arena.id,
+        assignmentId: null,
+        unitId: { not: null },
+        publishedAt: { not: null },
+        section: { enrollments: { some: { studentId, status: "ACTIVE" } } },
+      },
+      select: {
+        id: true,
+        sectionId: true,
+        unitId: true,
+        unit: { select: { order: true, title: true } },
+        section: { select: { code: true, course: { select: { name: true } } } },
+      },
     });
-  }
-  const best = await db.gameProgress.findUnique({
-    where: { studentId_levelId: { studentId, levelId: quiz.id } },
-    select: { stars: true },
-  });
-  return {
-    id: quiz.id,
-    sectionId: quiz.sectionId,
-    unitId: quiz.unitId,
-    unitOrder: quiz.unit.order,
-    unitTitle: quiz.unit.title,
-    className: `${quiz.section.course.name} — ${quiz.section.code}`,
-    best: best?.stars ?? 0,
-  };
-}
-
-async function questionOf(
-  db: PrismaClient,
-  quiz: { id: string; sectionId: string; unitId: string },
-  questionId: string,
-) {
-  const question = await db.question.findFirst({
-    where: {
-      id: questionId,
-      assessment: {
+    if (!quiz?.unitId || !quiz.unit) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "That quest is not in your classes.",
+      });
+    }
+    const best = await db.gameProgress.findUnique({
+      where: { studentId_levelId: { studentId, levelId: quiz.id } },
+      select: { stars: true },
+    });
+    return {
+      rules: QUEST,
+      levelId: quiz.id,
+      // Unit titles may already start with "Unit 3: …".
+      title: /^unit\s+\d/i.test(quiz.unit.title)
+        ? quiz.unit.title
+        : `Unit ${quiz.unit.order}: ${quiz.unit.title}`,
+      className: `${quiz.section.course.name} — ${quiz.section.code}`,
+      best: best?.stars ?? 0,
+      questionsIn: {
         sectionId: quiz.sectionId,
         OR: [{ id: quiz.id }, { bankForUnitId: quiz.unitId }],
       },
+    };
+  }
+
+  const section = await db.section.findFirst({
+    where: {
+      id: arena.id,
+      enrollments: { some: { studentId, status: "ACTIVE" } },
     },
     select: {
-      explanation: true,
-      options: { select: { id: true, isCorrect: true } },
+      id: true,
+      code: true,
+      course: { select: { name: true } },
+      assessments: {
+        where: {
+          assignmentId: null,
+          unitId: { not: null },
+          publishedAt: { not: null },
+        },
+        select: { id: true },
+      },
     },
   });
-  if (!question) {
-    throw new TRPCError({ code: "NOT_FOUND", message: "Question not found." });
+  if (!section || section.assessments.length === 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "That Boss Level is not in your classes.",
+    });
   }
-  return question;
+  const unitIds = section.assessments.map((a) => a.id);
+  const [wins, best] = await Promise.all([
+    db.gameProgress.count({
+      where: {
+        studentId,
+        game: "quest",
+        levelId: { in: unitIds },
+        stars: { gt: 0 },
+      },
+    }),
+    db.gameProgress.findUnique({
+      where: {
+        studentId_levelId: { studentId, levelId: bossLevelId(section.id) },
+      },
+      select: { stars: true },
+    }),
+  ]);
+  const needed = Math.min(BOSS_UNLOCK_WINS, unitIds.length);
+  if (wins < needed) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: `Win ${needed} unit quests in this class to unlock the Boss Level (${wins}/${needed}).`,
+    });
+  }
+  return {
+    rules: BOSS,
+    levelId: bossLevelId(section.id),
+    title: "Boss Level: The Shadow Dragon",
+    className: `${section.course.name} — ${section.code}`,
+    best: best?.stars ?? 0,
+    // Every unit's questions, and the Live Quiz banks.
+    questionsIn: {
+      sectionId: section.id,
+      assignmentId: null,
+      OR: [
+        { unitId: { not: null }, publishedAt: { not: null } },
+        { bankForUnitId: { not: null } },
+      ],
+    },
+  };
 }

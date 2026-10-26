@@ -8,32 +8,46 @@ import { Confetti, SoundToggle } from "~/app/_components/race/race-view";
 import { sfx, unlock } from "~/app/_components/sfx";
 import { Card } from "~/app/_components/ui";
 import {
+  BOSS,
+  canCast,
+  canHeal,
+  CAST_COST,
   COMBO_FOR_SUPER,
-  QUEST_ENEMIES,
-  QUEST_LIVES,
+  ELEMENT_INFO,
+  ELEMENTS,
+  HEAL_COST,
+  QUEST,
+  SP_MAX,
   startState,
   step,
+  type Element,
   type QuestState,
 } from "~/lib/games/quest";
 import { api, type RouterOutputs } from "~/trpc/react";
 import { Stars } from "../../_components/stars";
 import { Hero, MomoPet, Monster } from "../_components/art";
-import { MangaCutIn } from "../_components/manga";
+import {
+  EffectStyles,
+  ElementCast,
+  ElementImpact,
+} from "../_components/effects";
+import { MangaCutIn, type Scene } from "../_components/manga";
 
 type Data = RouterOutputs["game"]["questQuestions"];
 type Question = Data["questions"][number];
+export type Arena = { kind: "unit" | "boss"; id: string };
 
 type Phase =
   | "intro"
   | "ask"
   | "checking"
-  | "attack" // hero dashes and swings
-  | "impact" // the hit lands
+  | "attack" // the skill flies
+  | "impact" // the skill lands
   | "enemyDown"
   | "enemyIn"
-  | "burst" // 3 in a row: the Elemental Burst cut-in
-  | "bossIntro" // manga cut-in before the Jelly King
-  | "miss" // wrong answer: the swing misses
+  | "burst" // 3 in a row: Momo's elemental Bark cut-in
+  | "bossIntro" // manga cut-in before the boss or a new dragon phase
+  | "miss" // wrong answer: the attack misses
   | "lunge" // the monster strikes back
   | "review"
   | "won"
@@ -42,8 +56,14 @@ type Phase =
 type Pop = {
   id: number;
   text: string;
-  kind: "dmg" | "crit" | "miss" | "hurt" | "exp" | "star";
+  kind: "dmg" | "crit" | "miss" | "hurt" | "exp" | "star" | "weak" | "heal";
+  color?: string;
 };
+
+type Turn =
+  | { kind: "answer"; questionId: string; optionId: string; element: Element }
+  | { kind: "cast"; element: Element }
+  | { kind: "heal" };
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const shuffle = <T,>(a: T[]) => {
@@ -63,21 +83,18 @@ const OPTION_STYLES = [
 ];
 
 /**
- * A Momo's Quest battle in a bright chibi-anime world. A correct answer is a
- * sword strike (three in a row: Momo's Super Bark, double damage); a wrong
- * answer misses, the monster strikes back, and a heart is lost. Defeat all
- * five monsters to level up; lose five hearts and the hero faints. The
- * server checks every answer and replays the quest to award stars.
+ * A Momo's Quest battle — a unit quest or a class's Boss Level. Answering
+ * correctly casts the selected element skill (and charges mana); a monster
+ * hit with its weak element takes extra damage. Three right in a row add
+ * Momo's elemental Bark. Students who don't know an answer can spend mana to
+ * cast a skill anyway, or have Momo heal a heart. Wrong answers (and, in the
+ * Boss Level's later phases, running out of time) cost a heart. The server
+ * checks every answer and replays every turn to award stars.
  */
-export function Battle({
-  assessmentId,
-  data,
-}: {
-  assessmentId: string;
-  data: Data;
-}) {
+export function Battle({ arena, data }: { arena: Arena; data: Data }) {
   const router = useRouter();
   const utils = api.useUtils();
+  const rules = arena.kind === "boss" ? BOSS : QUEST;
   const check = api.game.questAnswer.useMutation();
   const finish = api.game.questFinish.useMutation({
     onSuccess: () => {
@@ -89,43 +106,76 @@ export function Battle({
   const [run, setRun] = useState(0);
   const [deck, setDeck] = useState<Question[]>(data.questions);
   const [cursor, setCursor] = useState(0);
-  const [state, setState] = useState<QuestState>(startState);
+  const [state, setState] = useState<QuestState>(() => startState(rules));
   const [shownEnemy, setShownEnemy] = useState(0);
-  const [shownHp, setShownHp] = useState(QUEST_ENEMIES[0]!.hp);
+  const [shownHp, setShownHp] = useState(rules.enemies[0]!.hp);
   const [phase, setPhase] = useState<Phase>("intro");
   const [picked, setPicked] = useState<string | null>(null);
   const [rightId, setRightId] = useState<string | null>(null);
   const [explanation, setExplanation] = useState<string | null>(null);
-  const [superBark, setSuperBark] = useState(false);
+  const [element, setElement] = useState<Element>("fire");
+  const [castElement, setCastElement] = useState<Element>("fire");
+  const [bark, setBark] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const [healing, setHealing] = useState(false);
+  const [revealed, setRevealed] = useState<boolean[]>(() =>
+    rules.enemies.map(() => false),
+  );
   const [brokenHeart, setBrokenHeart] = useState<number | null>(null);
   const [enemyPops, setEnemyPops] = useState<Pop[]>([]);
   const [heroPops, setHeroPops] = useState<Pop[]>([]);
-  // Stars earned this visit: one per new correct answer.
   const [earned, setEarned] = useState(0);
-  const answers = useRef<Array<{ questionId: string; optionId: string }>>([]);
+  const [deadline, setDeadline] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const turns = useRef<Turn[]>([]);
 
   const question = deck[cursor % Math.max(1, deck.length)];
-  const enemy = QUEST_ENEMIES[Math.min(shownEnemy, QUEST_ENEMIES.length - 1)]!;
-  const boss = enemy.kind === "boss";
+  const enemy = rules.enemies[Math.min(shownEnemy, rules.enemies.length - 1)]!;
+  const lastEnemy = shownEnemy === rules.enemies.length - 1;
+  const info = ELEMENT_INFO[element];
 
-  const pop = (side: "enemy" | "hero", text: string, kind: Pop["kind"]) => {
-    const p = { id: Math.random(), text, kind };
+  const pop = (
+    side: "enemy" | "hero",
+    text: string,
+    kind: Pop["kind"],
+    color?: string,
+  ) => {
+    const p = { id: Math.random(), text, kind, color };
     const set = side === "enemy" ? setEnemyPops : setHeroPops;
     set((all) => [...all, p]);
-    setTimeout(() => set((all) => all.filter((x) => x.id !== p.id)), 1400);
+    setTimeout(() => set((all) => all.filter((x) => x.id !== p.id)), 1500);
   };
 
+  // The answer timer, on enemies that have one.
+  useEffect(() => {
+    if (phase === "ask" && enemy.seconds) {
+      setDeadline(Date.now() + enemy.seconds * 1000);
+    } else if (phase !== "checking") {
+      setDeadline(null);
+    }
+  }, [phase, enemy.seconds, cursor]);
+  useEffect(() => {
+    if (!deadline) return;
+    const t = setInterval(() => setNow(Date.now()), 200);
+    return () => clearInterval(t);
+  }, [deadline]);
+  const secondsLeft = deadline
+    ? Math.max(0, Math.ceil((deadline - now) / 1000))
+    : null;
+
   const restart = () => {
-    answers.current = [];
+    turns.current = [];
     setDeck(shuffle(data.questions));
     setCursor(0);
-    setState(startState());
+    setState(startState(rules));
     setShownEnemy(0);
-    setShownHp(QUEST_ENEMIES[0]!.hp);
+    setShownHp(rules.enemies[0]!.hp);
     setPicked(null);
     setRightId(null);
     setExplanation(null);
     setBrokenHeart(null);
+    setRevealed(rules.enemies.map(() => false));
+    setEarned(0);
     setRun((r) => r + 1);
     finish.reset();
     setPhase("enemyIn");
@@ -141,19 +191,80 @@ export function Battle({
     setPicked(null);
     setRightId(null);
     setExplanation(null);
+    setTimedOut(false);
     setPhase("ask");
   }, [deck.length]);
 
+  /** The skill (and maybe Momo's Bark) lands; on to the next enemy if it falls. */
+  const strike = async (next: ReturnType<typeof step>, used: Element) => {
+    setCastElement(used);
+    setBark(next.bark);
+    if (next.bark) {
+      setPhase("burst");
+      sfx.burst();
+      await wait(1500);
+    }
+    setPhase("attack");
+    sfx.zap();
+    await wait(next.bark ? 520 : 440);
+    setPhase("impact");
+    if (next.bark || next.weak) sfx.superHit();
+    else sfx.hit();
+    const base = 90 + Math.floor(Math.random() * 60);
+    pop(
+      "enemy",
+      String(base * next.damage),
+      next.bark ? "crit" : "dmg",
+      ELEMENT_INFO[used].color,
+    );
+    if (next.weak) {
+      setTimeout(
+        () =>
+          pop("enemy", "SUPER EFFECTIVE!", "weak", ELEMENT_INFO[used].color),
+        180,
+      );
+      setRevealed((r) => r.map((v, i) => (i === state.enemy ? true : v)));
+    }
+    setShownHp((hp) => Math.max(0, hp - next.damage));
+    setState(next.state);
+    await wait(760);
+    if (next.defeated) {
+      setPhase("enemyDown");
+      sfx.boom();
+      pop("enemy", `+${next.state.enemy * 25} EXP`, "exp");
+      await wait(1100);
+      if (next.state.won) {
+        setPhase("won");
+        finish.mutate({ arena, answers: turns.current });
+        return;
+      }
+      setShownEnemy(next.state.enemy);
+      setShownHp(rules.enemies[next.state.enemy]!.hp);
+      // The boss (or a new dragon phase) gets a manga entrance.
+      if (
+        rules.mode === "boss" ||
+        next.state.enemy === rules.enemies.length - 1
+      ) {
+        setPhase("bossIntro");
+        return;
+      }
+      setPhase("enemyIn");
+      await wait(800);
+    }
+    nextQuestion();
+  };
+
+  /** Answer the question; an empty option means the timer ran out. */
   const answer = async (optionId: string) => {
     if (phase !== "ask" || !question) return;
     unlock();
     sfx.select();
-    setPicked(optionId);
+    setPicked(optionId || null);
     setPhase("checking");
     let result: Awaited<ReturnType<typeof check.mutateAsync>>;
     try {
       result = await check.mutateAsync({
-        assessmentId,
+        arena,
         questionId: question.id,
         optionId,
       });
@@ -162,10 +273,19 @@ export function Battle({
       setPhase("ask");
       return;
     }
-    answers.current.push({ questionId: question.id, optionId });
+    turns.current.push({
+      kind: "answer",
+      questionId: question.id,
+      optionId,
+      element,
+    });
     setRightId(result.correctOptionId);
     setExplanation(result.explanation);
-    const next = step(state, result.correct);
+    const next = step(
+      state,
+      { kind: "answer", correct: result.correct, element },
+      rules,
+    );
     if (result.newStar) {
       setEarned((n) => n + 1);
       setTimeout(() => {
@@ -175,77 +295,78 @@ export function Battle({
     }
 
     if (result.correct) {
-      const isSuper = next.state.streak >= COMBO_FOR_SUPER;
-      setSuperBark(isSuper);
-      if (isSuper) {
-        // Elemental Burst: dim, cut-in with the hero's close-up, then strike.
-        setPhase("burst");
-        sfx.burst();
-        await wait(1500);
-      }
-      setPhase("attack");
-      sfx.zap();
-      await wait(isSuper ? 560 : 420);
-      setPhase("impact");
-      if (isSuper) sfx.superHit();
-      else sfx.hit();
-      const base = 90 + Math.floor(Math.random() * 60);
-      pop(
-        "enemy",
-        String(base * next.damage * (isSuper ? 2 : 1)),
-        isSuper ? "crit" : "dmg",
-      );
-      setShownHp((hp) => Math.max(0, hp - next.damage));
-      setState(next.state);
-      await wait(700);
-      if (next.defeated) {
-        setPhase("enemyDown");
-        sfx.boom();
-        pop("enemy", `+${next.state.enemy * 25} EXP`, "exp");
-        await wait(1100);
-        if (next.state.won) {
-          setPhase("won");
-          finish.mutate({ assessmentId, answers: answers.current });
-          return;
-        }
-        setShownEnemy(next.state.enemy);
-        setShownHp(QUEST_ENEMIES[next.state.enemy]!.hp);
-        if (next.state.enemy === QUEST_ENEMIES.length - 1) {
-          setPhase("bossIntro");
-          return;
-        }
-        setPhase("enemyIn");
-        await wait(800);
-      }
-      nextQuestion();
+      await strike(next, element);
+      return;
+    }
+    if (!optionId) {
+      setTimedOut(true);
+      pop("enemy", "TIME UP!", "miss");
     } else {
       setPhase("miss");
       sfx.zap();
       await wait(250);
       pop("enemy", "MISS", "miss");
       await wait(300);
-      setPhase("lunge");
-      await wait(330);
-      sfx.hurt();
-      pop("hero", String(40 + Math.floor(Math.random() * 40)), "hurt");
-      setBrokenHeart(next.state.lives);
-      setState(next.state);
-      await wait(700);
-      if (next.state.dead) {
-        setPhase("dead");
-        finish.mutate({ assessmentId, answers: answers.current });
-        return;
-      }
-      setPhase("review");
     }
+    setPhase("lunge");
+    await wait(330);
+    sfx.hurt();
+    pop("hero", String(40 + Math.floor(Math.random() * 40)), "hurt");
+    setBrokenHeart(next.state.lives);
+    setState(next.state);
+    await wait(700);
+    if (next.state.dead) {
+      setPhase("dead");
+      finish.mutate({ arena, answers: turns.current });
+      return;
+    }
+    setPhase("review");
   };
 
-  // Keys 1–4 answer; Enter continues.
+  /** Don't know it? Spend mana to cast the selected skill and skip. */
+  const castSkill = async () => {
+    if (phase !== "ask" || !canCast(state)) return;
+    unlock();
+    turns.current.push({ kind: "cast", element });
+    const next = step(state, { kind: "cast", element }, rules);
+    setPicked(null);
+    setRightId(null);
+    setExplanation(null);
+    pop("hero", `−${CAST_COST} 💎`, "heal", "#a5b4fc");
+    await strike(next, element);
+  };
+
+  /** Momo's Healing Paw: a heart back for mana. */
+  const healPaw = () => {
+    if (phase !== "ask" || !canHeal(state, rules)) return;
+    unlock();
+    turns.current.push({ kind: "heal" });
+    const next = step(state, { kind: "heal" }, rules);
+    setState(next.state);
+    setHealing(true);
+    sfx.coin();
+    pop("hero", "+1 ❤️", "heal", "#fb7185");
+    setTimeout(() => setHealing(false), 1100);
+  };
+
+  // The timer running out counts as a wrong answer.
+  useEffect(() => {
+    if (phase === "ask" && deadline && now >= deadline) void answer("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [now, deadline, phase]);
+
+  // Keys: 1–4 answer, Q W E R pick an element, Space casts, H heals.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (phase === "ask" && question && /^[1-4]$/.test(e.key)) {
         const option = question.options[Number(e.key) - 1];
         if (option) void answer(option.id);
+      } else if (
+        phase === "ask" &&
+        "qwer".includes(e.key.toLowerCase()) &&
+        e.key.length === 1
+      ) {
+        setElement(ELEMENTS["qwer".indexOf(e.key.toLowerCase())]!);
       } else if (phase === "review" && e.key === "Enter") {
         nextQuestion();
       }
@@ -255,29 +376,31 @@ export function Battle({
   });
 
   const hpPct = (shownHp / enemy.hp) * 100;
-  const level = state.enemy + 1;
+  const castColor = ELEMENT_INFO[castElement].color;
   const heroClass =
     phase === "dead"
       ? "hero-dead"
       : phase === "won"
         ? "hero-win"
-        : phase === "attack" || phase === "miss"
-          ? superBark && phase === "attack"
+        : phase === "miss"
+          ? "hero-attack"
+          : phase === "attack"
             ? "hero-cheer"
-            : "hero-attack"
-          : phase === "lunge"
-            ? "hero-hurt"
-            : phase === "checking"
-              ? "hero-ready"
-              : "hero-idle";
+            : phase === "lunge"
+              ? "hero-hurt"
+              : phase === "checking"
+                ? "hero-ready"
+                : "hero-idle";
   const petClass =
-    phase === "attack" && superBark
+    phase === "attack" && bark
       ? "pet-super"
-      : phase === "dead"
-        ? "pet-sad"
-        : phase === "won"
-          ? "pet-win"
-          : "pet-idle";
+      : healing
+        ? "pet-heal"
+        : phase === "dead"
+          ? "pet-sad"
+          : phase === "won"
+            ? "pet-win"
+            : "pet-idle";
   const enemyClass =
     phase === "impact"
       ? "mon-hit"
@@ -290,6 +413,17 @@ export function Battle({
             : phase === "won"
               ? "hidden"
               : "mon-idle";
+  const sky =
+    rules.mode === "boss"
+      ? `sky-final sky-final-${shownEnemy + 1}`
+      : lastEnemy
+        ? "sky-boss"
+        : "sky-day";
+  const introScene: Scene = rules.mode === "boss" ? "dragon" : "start";
+  const bossScene: Scene =
+    rules.mode === "boss" ? (shownEnemy === 1 ? "phase2" : "phase3") : "boss";
+  const winScene: Scene = rules.mode === "boss" ? "legend" : "win";
+  const busy = phase !== "ask";
 
   return (
     <div className="mx-auto max-w-5xl space-y-4" key={run}>
@@ -311,9 +445,14 @@ export function Battle({
         <div className="text-right">
           <p className="text-muted text-[11px] font-semibold">Your best</p>
           <Stars
-            count={Math.max(data.best, finish.data?.best ?? 0)}
+            count={Math.min(3, Math.max(data.best, finish.data?.best ?? 0))}
             className="size-6"
           />
+          {rules.mode === "boss" && (
+            <p className="text-muted text-[11px] font-semibold">
+              {Math.max(data.best, finish.data?.best ?? 0)} / 5 stars
+            </p>
+          )}
         </div>
       </div>
 
@@ -321,11 +460,20 @@ export function Battle({
       <div
         className={`relative h-[320px] overflow-hidden rounded-3xl shadow-xl ring-4 ring-white sm:h-[400px] ${
           phase === "lunge" ? "arena-shake" : ""
-        } ${boss ? "sky-boss" : "sky-day"}`}
+        } ${sky}`}
       >
-        {/* Sun rays and sparkles */}
-        <div className="sun-rays absolute -top-40 -left-40 size-[520px] rounded-full opacity-60" />
-        <div className="absolute top-6 left-10 size-16 rounded-full bg-white/90 shadow-[0_0_80px_40px_rgba(255,255,255,.75)]" />
+        {rules.mode !== "boss" && (
+          <>
+            <div className="sun-rays absolute -top-40 -left-40 size-[520px] rounded-full opacity-60" />
+            <div className="absolute top-6 left-10 size-16 rounded-full bg-white/90 shadow-[0_0_80px_40px_rgba(255,255,255,.75)]" />
+            <Cloud className="cloud-a top-[12%]" />
+            <Cloud className="cloud-b top-[30%] scale-75 opacity-80" />
+            <Cloud className="cloud-c top-[4%] scale-50 opacity-70" />
+          </>
+        )}
+        {rules.mode === "boss" && (
+          <div className="lightning absolute inset-0" />
+        )}
         {Array.from({ length: 14 }, (_, i) => (
           <span
             key={i}
@@ -340,11 +488,7 @@ export function Battle({
             ✦
           </span>
         ))}
-        {/* Clouds */}
-        <Cloud className="cloud-a top-[12%]" />
-        <Cloud className="cloud-b top-[30%] scale-75 opacity-80" />
-        <Cloud className="cloud-c top-[4%] scale-50 opacity-70" />
-        {boss && (
+        {(lastEnemy || rules.mode === "boss") && (
           <svg
             viewBox="0 0 200 80"
             className="absolute right-[18%] bottom-[30%] w-56 opacity-50"
@@ -352,49 +496,28 @@ export function Battle({
           >
             <path
               d="M10 80 V40 h10 v-8 h8 v8 h10 V20 h8 v-8 h8 v8 h8 v20 h10 v-8 h8 v8 h10 V30 h8 v-10 h8 v10 h8 v50 Z"
-              fill="#5b2a86"
+              fill={rules.mode === "boss" ? "#1c1917" : "#5b2a86"}
             />
           </svg>
         )}
-        {/* Hills, field and path */}
-        <div
-          className={`absolute -bottom-24 -left-16 h-56 w-[70%] rounded-[50%] ${boss ? "bg-[#9b6fd1]" : "bg-[#a6e3a1]"}`}
-        />
-        <div
-          className={`absolute -right-20 -bottom-28 h-60 w-[75%] rounded-[50%] ${boss ? "bg-[#8256be]" : "bg-[#8fd88a]"}`}
-        />
-        <div
-          className={`absolute inset-x-0 bottom-0 h-20 ${boss ? "bg-gradient-to-b from-[#7a4bb3] to-[#5b2a86]" : "bg-gradient-to-b from-[#7cce6c] to-[#5bb350]"}`}
-        />
-        <div className="absolute bottom-3 left-1/2 h-10 w-[85%] -translate-x-1/2 rounded-[50%] bg-[#e9d6a8]/70" />
-        {Array.from({ length: 10 }, (_, i) => (
-          <span
-            key={i}
-            className="absolute size-2 rounded-full"
-            style={{
-              left: `${(i * 11 + 3) % 98}%`,
-              bottom: `${4 + (i % 3) * 5}%`,
-              backgroundColor: ["#fff", "#fde047", "#f9a8d4"][i % 3],
-            }}
-          />
-        ))}
+        <div className="hill-a absolute -bottom-24 -left-16 h-56 w-[70%] rounded-[50%]" />
+        <div className="hill-b absolute -right-20 -bottom-28 h-60 w-[75%] rounded-[50%]" />
+        <div className="ground absolute inset-x-0 bottom-0 h-20" />
+        <div className="absolute bottom-3 left-1/2 h-10 w-[85%] -translate-x-1/2 rounded-[50%] bg-[#e9d6a8]/60" />
 
         {/* HUD: status window */}
-        <div className="ro-window absolute top-3 left-3 z-30 w-[46%] max-w-[250px] rounded-xl px-3 py-2">
+        <div className="ro-window absolute top-3 left-3 z-30 w-[48%] max-w-[260px] rounded-xl px-3 py-2">
           <div className="flex items-center justify-between text-[11px] font-black text-white">
             <span>Adventurer &amp; Momo</span>
-            <span className="flex items-center gap-2">
-              <span
-                className="rounded-full bg-amber-300/90 px-1.5 text-[10px] text-amber-950"
-                title="Stars earned this quest"
-              >
-                ⭐ {earned}
-              </span>
-              <span className="text-amber-200">Lv. {level}</span>
+            <span
+              className="rounded-full bg-amber-300/90 px-1.5 text-[10px] text-amber-950"
+              title="Stars earned this battle"
+            >
+              ⭐ {earned}
             </span>
           </div>
           <div className="mt-1 flex gap-1">
-            {Array.from({ length: QUEST_LIVES }, (_, i) => (
+            {Array.from({ length: rules.lives }, (_, i) => (
               <Heart
                 key={i}
                 full={i < state.lives}
@@ -402,26 +525,36 @@ export function Battle({
               />
             ))}
           </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-black/30">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-300 to-blue-500 transition-all duration-500"
-              style={{
-                width: `${(Math.min(state.streak, COMBO_FOR_SUPER) / COMBO_FOR_SUPER) * 100}%`,
-              }}
-            />
+          <div
+            className="mt-1 flex items-center gap-1"
+            title="Mana: earned by correct answers, spent on skills"
+          >
+            {Array.from({ length: SP_MAX }, (_, i) => (
+              <span
+                key={i}
+                className={`size-3 rotate-45 rounded-[3px] border border-white/70 transition ${
+                  i < state.sp
+                    ? "bg-gradient-to-br from-indigo-300 to-violet-500 shadow-[0_0_6px_#a5b4fc]"
+                    : "bg-black/30"
+                }`}
+              />
+            ))}
+            <span className="ml-1 text-[10px] font-bold text-indigo-100">
+              {state.sp} mana
+            </span>
           </div>
           <p
             className={`mt-0.5 text-[10px] font-bold ${state.streak >= COMBO_FOR_SUPER ? "combo-hot text-amber-200" : "text-white/80"}`}
           >
             {state.streak >= COMBO_FOR_SUPER
-              ? `🔥 ${state.streak} combo · Momo Bark ready!`
+              ? `🔥 ${state.streak} combo · ${info.bark}!`
               : `Momo Bark: ${Math.min(state.streak, COMBO_FOR_SUPER)}/${COMBO_FOR_SUPER}`}
           </p>
         </div>
         <div className="absolute top-3 right-3 z-30 flex flex-col items-end gap-1.5">
           <SoundToggle />
           <div className="flex gap-1">
-            {QUEST_ENEMIES.map((e, i) => (
+            {rules.enemies.map((e, i) => (
               <span
                 key={e.kind}
                 title={e.name}
@@ -435,15 +568,23 @@ export function Battle({
               >
                 {i < state.enemy || state.won
                   ? "✓"
-                  : e.kind === "boss"
-                    ? "👑"
-                    : i + 1}
+                  : rules.mode === "boss"
+                    ? "🐉"
+                    : i === rules.enemies.length - 1
+                      ? "👑"
+                      : i + 1}
               </span>
             ))}
           </div>
+          {secondsLeft !== null && phase === "ask" && (
+            <span
+              className={`rounded-xl px-2.5 py-1 font-mono text-lg font-black text-white tabular-nums ${secondsLeft <= 5 ? "timer-hot bg-rose-600" : "bg-black/40"}`}
+            >
+              ⏱ {secondsLeft}s
+            </span>
+          )}
         </div>
 
-        {/* Victory light pillar */}
         {phase === "won" && (
           <div className="light-pillar absolute bottom-0 left-[8%] z-0 h-full w-40" />
         )}
@@ -452,6 +593,9 @@ export function Battle({
         <div
           className={`absolute bottom-[9%] left-[2%] z-10 w-[17%] max-w-[110px] ${petClass}`}
         >
+          {healing && (
+            <div className="heal-glow absolute inset-[-20%] -z-10 rounded-full" />
+          )}
           <MomoPet className="w-full drop-shadow-[0_6px_6px_rgba(0,0,0,.2)]" />
         </div>
 
@@ -461,6 +605,12 @@ export function Battle({
         >
           {phase === "checking" && (
             <div className="charge absolute inset-[5%] -z-10 rounded-full bg-sky-200/80" />
+          )}
+          {(phase === "attack" || phase === "impact") && (
+            <div
+              className="aura absolute inset-0 -z-10 rounded-full"
+              style={{ backgroundColor: castColor }}
+            />
           )}
           <Hero className="w-full drop-shadow-[0_6px_6px_rgba(0,0,0,.2)]" />
           {phase === "dead" && (
@@ -472,53 +622,68 @@ export function Battle({
             <span
               key={p.id}
               className={`num num-${p.kind} absolute top-0 left-1/2`}
+              style={p.color ? { color: p.color } : undefined}
             >
               {p.text}
             </span>
           ))}
         </div>
 
-        {/* Super Bark shockwave */}
-        {superBark && phase === "attack" && (
+        {/* The skill in flight, and Momo's Bark wave */}
+        {phase === "attack" && (
+          <ElementCast key={`cast-${cursor}`} element={castElement} />
+        )}
+        {phase === "attack" && bark && (
           <>
-            <div className="bark-wave absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-[6px] border-amber-300" />
+            <div
+              className="bark-wave absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-[6px]"
+              style={{ borderColor: castColor }}
+            />
             <div className="bark-wave bark-wave-2 absolute bottom-[22%] left-[14%] z-30 size-24 rounded-full border-4 border-white" />
           </>
         )}
-        {phase === "impact" && superBark && (
+        {phase === "impact" && bark && (
           <>
-            <div className="flash absolute inset-0 z-30 bg-violet-200" />
+            <div
+              className="flash absolute inset-0 z-30"
+              style={{ backgroundColor: castColor, opacity: 0.4 }}
+            />
             <p className="sfx-stamp absolute top-[14%] left-[30%] z-40 text-5xl font-black italic sm:text-7xl">
-              ZUBAAAN!!
+              {castElement === "fire"
+                ? "GOOOO!!"
+                : castElement === "water"
+                  ? "SPLAAASH!!"
+                  : castElement === "air"
+                    ? "WHOOOSH!!"
+                    : "DOGOOON!!"}
             </p>
           </>
         )}
 
-        {/* Elemental Burst cut-in */}
+        {/* Momo's Bark cut-in */}
         {phase === "burst" && (
           <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden">
             <div className="burst-dim absolute inset-0" />
-            <div className="burst-band absolute top-1/2 left-[-20%] h-[58%] w-[140%]">
+            <div
+              className="burst-band absolute top-1/2 left-[-20%] h-[58%] w-[140%]"
+              style={{
+                background: `linear-gradient(100deg, #1e1b4b 0%, ${castColor} 40%, #fef3c7 62%, ${castColor} 82%, #1e1b4b 100%)`,
+              }}
+            >
               <div className="burst-lines absolute inset-0" />
               <div className="burst-portrait absolute top-[-30%] left-[12%] w-[58%] max-w-[420px]">
-                <Hero className="w-full" />
-                <span className="burst-eye-glow absolute top-[30%] left-[38%] text-2xl text-amber-100">
-                  ✦
-                </span>
-                <span className="burst-eye-glow absolute top-[30%] left-[55%] text-xl text-amber-100">
-                  ✦
-                </span>
+                <Hero mood="determined" className="w-full" />
               </div>
               <div className="burst-pet absolute right-[22%] bottom-[2%] w-[16%] max-w-[110px]">
                 <MomoPet className="w-full" />
               </div>
             </div>
             <div className="burst-name absolute right-[6%] bottom-[12%] text-right">
-              <p className="text-xs font-black tracking-[0.35em] text-violet-200 uppercase">
-                Elemental Burst
+              <p className="text-xs font-black tracking-[0.35em] text-white/80 uppercase">
+                {ELEMENT_INFO[castElement].icon} Momo&apos;s Bark
               </p>
               <p className="text-3xl font-black text-white italic sm:text-5xl">
-                Thunder Star Bark
+                {ELEMENT_INFO[castElement].bark}
               </p>
             </div>
           </div>
@@ -532,59 +697,21 @@ export function Battle({
           >
             <Monster
               kind={enemy.kind}
-              className={`w-full ${boss ? "scale-125" : ""}`}
+              className={`w-full ${lastEnemy || rules.mode === "boss" ? "scale-125" : ""}`}
             />
-            {(phase === "impact" || phase === "miss") && (
+            {phase === "miss" && (
               <svg
                 viewBox="0 0 100 100"
-                className={`slash absolute inset-0 z-10 ${phase === "miss" ? "slash-miss" : ""}`}
+                className="slash slash-miss absolute inset-0 z-10"
                 aria-hidden="true"
               >
                 <path
                   d="M10 80 Q 50 -10 92 30 Q 52 10 10 80 Z"
                   fill="#ffffff"
                 />
-                <path
-                  d="M18 70 Q 50 6 84 34"
-                  stroke="#bae6fd"
-                  strokeWidth="3"
-                  fill="none"
-                />
               </svg>
             )}
-            {phase === "impact" &&
-              Array.from({ length: 10 }, (_, i) => (
-                <span
-                  key={i}
-                  className="spark absolute top-1/2 left-1/2 text-amber-300"
-                  style={{ ["--a" as string]: `${i * 36}deg` }}
-                >
-                  ✦
-                </span>
-              ))}
-            {phase === "impact" && superBark && (
-              <div className="pointer-events-none absolute inset-0 z-20">
-                <div className="boom-core absolute top-1/2 left-1/2 size-40 rounded-full" />
-                <div className="boom-ring absolute top-1/2 left-1/2 size-40 rounded-full border-[6px] border-violet-300" />
-                <div className="boom-ring boom-ring-2 absolute top-1/2 left-1/2 size-40 rounded-full border-4 border-amber-200" />
-                {Array.from({ length: 6 }, (_, i) => (
-                  <svg
-                    key={i}
-                    viewBox="0 0 20 60"
-                    className="bolt absolute top-1/2 left-1/2 h-24 w-8"
-                    style={{ ["--a" as string]: `${i * 60 + 15}deg` }}
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M12 0 L4 28 L11 28 L6 60 L18 22 L10 22 Z"
-                      fill="#f5d0fe"
-                      stroke="#a855f7"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
-                ))}
-              </div>
-            )}
+            {phase === "impact" && <ElementImpact element={castElement} />}
             {phase === "enemyDown" && (
               <>
                 {Array.from({ length: 16 }, (_, i) => (
@@ -616,6 +743,7 @@ export function Battle({
               <span
                 key={p.id}
                 className={`num num-${p.kind} absolute top-[10%] left-1/2`}
+                style={p.color ? { color: p.color } : undefined}
               >
                 {p.kind === "crit" && (
                   <span className="block text-sm">CRITICAL!</span>
@@ -625,7 +753,7 @@ export function Battle({
             ))}
           </div>
           {phase !== "won" && (
-            <div className="mt-1 w-[80%]">
+            <div className="mt-1 w-[86%]">
               <p className="text-center text-[11px] font-black text-white drop-shadow-[0_1px_1px_rgba(0,0,0,.6)]">
                 {enemy.name}
               </p>
@@ -635,18 +763,97 @@ export function Battle({
                   style={{ width: `${hpPct}%` }}
                 />
               </div>
+              <p className="mt-0.5 text-center text-[10px] font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,.6)]">
+                Weak to:{" "}
+                {revealed[shownEnemy]
+                  ? `${ELEMENT_INFO[enemy.weak].icon} ${ELEMENT_INFO[enemy.weak].name}`
+                  : "❓ find out!"}
+              </p>
             </div>
           )}
         </div>
-
-        {/* Overlays */}
       </div>
+
+      {/* Skills */}
+      {phase !== "intro" && phase !== "won" && phase !== "dead" && (
+        <Card className="overflow-hidden">
+          <div className="ro-window flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs font-black tracking-wide text-white uppercase">
+            <span>✦ Skills — pick an element, then answer</span>
+            <span className="normal-case">Keys: Q W E R · 1–4</span>
+          </div>
+          <div className="flex flex-wrap items-stretch gap-2 p-3">
+            {ELEMENTS.map((el, i) => {
+              const e = ELEMENT_INFO[el];
+              const on = element === el;
+              return (
+                <button
+                  key={el}
+                  type="button"
+                  onClick={() => {
+                    setElement(el);
+                    sfx.select();
+                  }}
+                  aria-pressed={on}
+                  className={`flex min-w-[96px] flex-1 items-center gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${
+                    on
+                      ? "skill-on -translate-y-0.5 bg-white shadow-md"
+                      : "border-transparent bg-slate-100 hover:bg-slate-50"
+                  }`}
+                  style={
+                    on
+                      ? {
+                          borderColor: e.color,
+                          boxShadow: `0 0 0 3px ${e.color}33`,
+                        }
+                      : undefined
+                  }
+                >
+                  <span className="text-2xl">{e.icon}</span>
+                  <span className="min-w-0 leading-tight">
+                    <span className="text-ink block text-sm font-black">
+                      {e.skill}
+                    </span>
+                    <span className="text-muted block text-[10px] font-bold">
+                      {e.name} · {"QWER"[i]}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => void castSkill()}
+              disabled={busy || !canCast(state)}
+              className="flex min-w-[150px] flex-1 flex-col items-start justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+              title="Don't know the answer? Spend mana to attack anyway (the question comes back later)."
+            >
+              <span className="text-sm font-black">✨ Cast {info.skill}</span>
+              <span className="text-[10px] font-bold text-indigo-100">
+                Skip &amp; attack · {CAST_COST} 💎
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={healPaw}
+              disabled={busy || !canHeal(state, rules)}
+              className="flex min-w-[130px] flex-1 flex-col items-start justify-center rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+              title="Momo heals one heart."
+            >
+              <span className="text-sm font-black">🐾 Healing Paw</span>
+              <span className="text-[10px] font-bold text-rose-100">
+                Momo · +1 ❤️ · {HEAL_COST} 💎
+              </span>
+            </button>
+          </div>
+        </Card>
+      )}
 
       {/* Question */}
       {question && phase !== "intro" && phase !== "won" && phase !== "dead" && (
         <Card className="overflow-hidden">
           <div className="ro-window px-4 py-2 text-xs font-black tracking-wide text-white uppercase">
-            ✦ Answer to attack
+            {ELEMENT_INFO[element].icon} Answer to cast{" "}
+            {ELEMENT_INFO[element].skill}
           </div>
           <div className="p-4 sm:p-5">
             <p className="text-ink text-lg leading-snug font-bold">
@@ -690,7 +897,13 @@ export function Battle({
                 <div
                   className={`mt-4 rounded-xl px-4 py-3 text-sm ${phase === "review" ? "bg-rose-50 text-rose-900" : "bg-emerald-50 text-emerald-900"}`}
                 >
-                  <b>{phase === "review" ? "Ouch! " : "Great hit! "}</b>
+                  <b>
+                    {phase === "review"
+                      ? timedOut
+                        ? "Time's up! "
+                        : "Ouch! "
+                      : "Great hit! "}
+                  </b>
                   {explanation}
                 </div>
               )}
@@ -710,11 +923,15 @@ export function Battle({
       )}
 
       {phase === "intro" && (
-        <MangaCutIn scene="start">
+        <MangaCutIn scene={introScene}>
           <p className="text-sm text-white/85">
-            Answer right to strike. 3 in a row unleashes the <b>Momo Bark</b>.
-            Every new correct answer earns ⭐ 1 star, and winning adds up to 3
-            more. You have {QUEST_LIVES} hearts.
+            Pick an element skill — 💧 Water, 🔥 Fire, 🌪️ Air or 🪨 Earth — and
+            answer right to cast it. Each monster has a hidden weakness. Correct
+            answers charge 💎 mana: don&apos;t know an answer? Spend it to cast
+            anyway, or have Momo heal a heart. Every new correct answer earns ⭐
+            1 star; winning adds up to {rules.mode === "boss" ? 5 : 3} more.
+            {rules.mode === "boss" &&
+              " The dragon's later phases put a timer on every question!"}
           </p>
           <button
             type="button"
@@ -727,12 +944,17 @@ export function Battle({
             }}
             className="start-btn mt-4 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
           >
-            ⚔️ Start adventure
+            ⚔️ {rules.mode === "boss" ? "Face the dragon" : "Start adventure"}
           </button>
         </MangaCutIn>
       )}
       {phase === "bossIntro" && (
-        <MangaCutIn scene="boss">
+        <MangaCutIn scene={bossScene}>
+          {enemy.seconds && (
+            <p className="text-sm font-bold text-rose-200">
+              ⏱ {enemy.seconds} seconds per question from now on!
+            </p>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -740,7 +962,7 @@ export function Battle({
               setPhase("enemyIn");
               setTimeout(nextQuestion, 800);
             }}
-            className="start-btn rounded-2xl bg-gradient-to-b from-rose-400 to-red-600 px-10 py-3 text-xl font-black text-white shadow-lg ring-4 ring-white/70"
+            className="start-btn mt-3 rounded-2xl bg-gradient-to-b from-rose-400 to-red-600 px-10 py-3 text-xl font-black text-white shadow-lg ring-4 ring-white/70"
           >
             ⚔️ FIGHT!
           </button>
@@ -749,27 +971,28 @@ export function Battle({
       {phase === "dead" && (
         <MangaCutIn scene="faint">
           <p className="text-sm text-white/85">
-            5 wrong answers — read the explanations, then try again.
+            Read the explanations, then try again. Tip: save mana for the
+            questions you don&apos;t know.
           </p>
           <button
             type="button"
             onClick={restart}
             className="start-btn mt-4 rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg ring-4 ring-white/70"
           >
-            🔁 Try the quest again
+            🔁 Try again
           </button>
         </MangaCutIn>
       )}
       {phase === "won" && (
         <>
           <Confetti />
-          <MangaCutIn scene="win">
+          <MangaCutIn scene={winScene}>
             <p className="level-up text-4xl font-black sm:text-5xl">
-              LEVEL UP!
+              {rules.mode === "boss" ? "LEGEND!" : "LEVEL UP!"}
             </p>
             <div className="mt-2 flex justify-center">
               <Stars
-                count={finish.data?.stars ?? 0}
+                count={Math.min(3, finish.data?.stars ?? 0)}
                 className="win-stars size-11"
               />
             </div>
@@ -778,7 +1001,7 @@ export function Battle({
                 ? "Saving your stars…"
                 : finish.data
                   ? finish.data.newStars > 0
-                    ? `+${finish.data.newStars} bonus Star${finish.data.newStars === 1 ? "" : "s"} for winning · ${earned} for new correct answers`
+                    ? `+${finish.data.newStars} bonus Star${finish.data.newStars === 1 ? "" : "s"} for winning (${finish.data.stars}/${rules.mode === "boss" ? 5 : 3}) · ${earned} for new correct answers`
                     : `${earned} star${earned === 1 ? "" : "s"} for new correct answers · your win bonus is still ${finish.data.best}`
                   : (finish.error?.message ?? "")}
             </p>
@@ -794,14 +1017,16 @@ export function Battle({
                 href="/student/games/quest"
                 className="rounded-2xl bg-gradient-to-b from-amber-300 to-orange-400 px-5 py-2.5 text-sm font-black text-slate-900"
               >
-                Next quest →
+                {rules.mode === "boss" ? "Back to quests →" : "Next quest →"}
               </Link>
             </div>
           </MangaCutIn>
         </>
       )}
 
+      <EffectStyles />
       <style>{`
+
         .sky-day { background: linear-gradient(180deg, #5fb4ff 0%, #9fd6ff 38%, #dff1ff 62%, #fff4fb 100%); }
         .sky-boss { background: linear-gradient(180deg, #3b1d6e 0%, #8a4fc9 40%, #f39ac7 75%, #ffd6e8 100%); }
         .sun-rays { background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.55) 0deg 6deg, transparent 6deg 18deg); mask-image: radial-gradient(circle, #000 0 30%, transparent 70%); animation: rays 40s linear infinite; }
@@ -949,6 +1174,28 @@ export function Battle({
         @media (prefers-reduced-motion: reduce) {
           .sun-rays, .twinkle, .cloud-a, .cloud-b, .cloud-c, .hero-idle, .hero-hair, .hero-scarf, .pet-idle, .pet-tail, .pet-cape, .mon-idle, .monster-wing-l, .monster-wing-r, .monster-leaf, .start-btn, .combo-hot { animation: none; }
         }
+      
+        .sky-final-1 { background: linear-gradient(180deg, #0f0a1f 0%, #3b1d6e 45%, #7c3aed 80%, #c4b5fd 100%); }
+        .sky-final-2 { background: linear-gradient(180deg, #1c0707 0%, #7f1d1d 40%, #ea580c 78%, #fdba74 100%); }
+        .sky-final-3 { background: linear-gradient(180deg, #030008 0%, #1e1b2e 45%, #4c1d95 75%, #facc15 100%); }
+        .sky-day .hill-a { background: #a6e3a1 } .sky-day .hill-b { background: #8fd88a } .sky-day .ground { background: linear-gradient(180deg, #7cce6c, #5bb350) }
+        .sky-boss .hill-a { background: #9b6fd1 } .sky-boss .hill-b { background: #8256be } .sky-boss .ground { background: linear-gradient(180deg, #7a4bb3, #5b2a86) }
+        .sky-final .hill-a { background: #292524 } .sky-final .hill-b { background: #1c1917 } .sky-final .ground { background: linear-gradient(180deg, #44403c, #1c1917) }
+        .sky-final-2 .hill-a { background: #7c2d12 } .sky-final-2 .hill-b { background: #431407 }
+        .lightning { animation: lightning 5s linear infinite; background: rgba(255,255,255,.0); }
+        @keyframes lightning { 0%, 93%, 100% { background: rgba(255,255,255,0) } 94% { background: rgba(233,213,255,.55) } 95% { background: rgba(255,255,255,0) } 96% { background: rgba(233,213,255,.35) } }
+        .dragon-flame { transform-origin: 50% 100%; animation: dragon-flame .5s ease-in-out infinite alternate; }
+        @keyframes dragon-flame { from { transform: scaleY(.8) } to { transform: scaleY(1.15) translateY(-3px) } }
+        .num-weak { font-size: 1.1rem; text-shadow: 0 2px 0 #1e293b, 2px 0 0 #1e293b, -2px 0 0 #1e293b, 0 -2px 0 #1e293b; animation: num-float 1.4s ease-out forwards; margin-top: -26px; }
+        .num-heal { font-size: 1.5rem; text-shadow: 0 2px 0 #fff, 2px 0 0 #fff, -2px 0 0 #fff, 0 -2px 0 #fff; animation: num-float 1.3s ease-out forwards; }
+        .aura { animation: aura .6s ease-out; filter: blur(16px); opacity: .7; }
+        @keyframes aura { 0% { transform: scale(.6); opacity: 0 } 50% { transform: scale(1.2); opacity: .8 } 100% { transform: scale(1.3); opacity: 0 } }
+        .pet-heal { animation: pet-heal 1s ease-in-out; }
+        @keyframes pet-heal { 0%,100% { transform: translate(0,0) } 40% { transform: translate(40%, -30%) scale(1.15) } }
+        .heal-glow { background: radial-gradient(circle, rgba(251,113,133,.7), transparent 65%); animation: aura 1s ease-out; }
+        .timer-hot { animation: combo-hot .5s ease-in-out infinite; }
+        .skill-on { animation: skill-on .3s cubic-bezier(.2,1.6,.4,1); }
+        @keyframes skill-on { 0% { transform: scale(.94) } 100% { transform: scale(1) translateY(-2px) } }
       `}</style>
     </div>
   );
