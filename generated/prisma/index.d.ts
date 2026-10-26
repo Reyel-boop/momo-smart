@@ -324,6 +324,17 @@ export type LiveAnswer = $Result.DefaultSelection<Prisma.$LiveAnswerPayload>
  * (1–3) count toward the leaderboard.
  */
 export type GameProgress = $Result.DefaultSelection<Prisma.$GameProgressPayload>
+/**
+ * Model RaceTeam
+ * One of a class's five Group Race teams. Members' stars earned in the
+ * class add up to the team's score on the race track.
+ */
+export type RaceTeam = $Result.DefaultSelection<Prisma.$RaceTeamPayload>
+/**
+ * Model RaceMember
+ * A student's team in a class's Group Race (one team per class).
+ */
+export type RaceMember = $Result.DefaultSelection<Prisma.$RaceMemberPayload>
 
 /**
  * Enums
@@ -1529,6 +1540,26 @@ export class PrismaClient<
     * ```
     */
   get gameProgress(): Prisma.GameProgressDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.raceTeam`: Exposes CRUD operations for the **RaceTeam** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RaceTeams
+    * const raceTeams = await prisma.raceTeam.findMany()
+    * ```
+    */
+  get raceTeam(): Prisma.RaceTeamDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.raceMember`: Exposes CRUD operations for the **RaceMember** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RaceMembers
+    * const raceMembers = await prisma.raceMember.findMany()
+    * ```
+    */
+  get raceMember(): Prisma.RaceMemberDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -2030,7 +2061,9 @@ export namespace Prisma {
     LiveGame: 'LiveGame',
     LivePlayer: 'LivePlayer',
     LiveAnswer: 'LiveAnswer',
-    GameProgress: 'GameProgress'
+    GameProgress: 'GameProgress',
+    RaceTeam: 'RaceTeam',
+    RaceMember: 'RaceMember'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2049,7 +2082,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer" | "gameProgress"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "studentProfile" | "homeroom" | "teacherProfile" | "guardian" | "guardianLink" | "accommodation" | "department" | "term" | "course" | "section" | "sectionMeeting" | "enrollment" | "gradeSnapshot" | "unit" | "lesson" | "lessonSection" | "lessonMarker" | "lessonResource" | "sectionPacing" | "lessonProgress" | "lessonNote" | "fileObject" | "gradeCategory" | "assignment" | "rubric" | "rubricCriterion" | "rubricLevel" | "submission" | "submissionAttachment" | "grade" | "rubricScore" | "assessment" | "question" | "questionOption" | "assessmentAttempt" | "questionResponse" | "responseAttachment" | "proctorEvent" | "attendanceSession" | "attendanceRecord" | "alert" | "interventionAction" | "peerTutorAssignment" | "announcement" | "announcementRead" | "conversation" | "conversationParticipant" | "message" | "notification" | "calendarEvent" | "officeHour" | "officeHourBooking" | "waitlistEntry" | "liveGame" | "livePlayer" | "liveAnswer" | "gameProgress" | "raceTeam" | "raceMember"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6567,6 +6600,154 @@ export namespace Prisma {
           }
         }
       }
+      RaceTeam: {
+        payload: Prisma.$RaceTeamPayload<ExtArgs>
+        fields: Prisma.RaceTeamFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RaceTeamFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RaceTeamFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          findFirst: {
+            args: Prisma.RaceTeamFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RaceTeamFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          findMany: {
+            args: Prisma.RaceTeamFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>[]
+          }
+          create: {
+            args: Prisma.RaceTeamCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          createMany: {
+            args: Prisma.RaceTeamCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RaceTeamCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>[]
+          }
+          delete: {
+            args: Prisma.RaceTeamDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          update: {
+            args: Prisma.RaceTeamUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          deleteMany: {
+            args: Prisma.RaceTeamDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RaceTeamUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RaceTeamUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>[]
+          }
+          upsert: {
+            args: Prisma.RaceTeamUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceTeamPayload>
+          }
+          aggregate: {
+            args: Prisma.RaceTeamAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRaceTeam>
+          }
+          groupBy: {
+            args: Prisma.RaceTeamGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RaceTeamGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RaceTeamCountArgs<ExtArgs>
+            result: $Utils.Optional<RaceTeamCountAggregateOutputType> | number
+          }
+        }
+      }
+      RaceMember: {
+        payload: Prisma.$RaceMemberPayload<ExtArgs>
+        fields: Prisma.RaceMemberFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RaceMemberFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RaceMemberFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          findFirst: {
+            args: Prisma.RaceMemberFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RaceMemberFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          findMany: {
+            args: Prisma.RaceMemberFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>[]
+          }
+          create: {
+            args: Prisma.RaceMemberCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          createMany: {
+            args: Prisma.RaceMemberCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RaceMemberCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>[]
+          }
+          delete: {
+            args: Prisma.RaceMemberDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          update: {
+            args: Prisma.RaceMemberUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          deleteMany: {
+            args: Prisma.RaceMemberDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RaceMemberUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RaceMemberUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>[]
+          }
+          upsert: {
+            args: Prisma.RaceMemberUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RaceMemberPayload>
+          }
+          aggregate: {
+            args: Prisma.RaceMemberAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRaceMember>
+          }
+          groupBy: {
+            args: Prisma.RaceMemberGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RaceMemberGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RaceMemberCountArgs<ExtArgs>
+            result: $Utils.Optional<RaceMemberCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6724,6 +6905,8 @@ export namespace Prisma {
     livePlayer?: LivePlayerOmit
     liveAnswer?: LiveAnswerOmit
     gameProgress?: GameProgressOmit
+    raceTeam?: RaceTeamOmit
+    raceMember?: RaceMemberOmit
   }
 
   /* Types for Logging */
@@ -6957,6 +7140,7 @@ export namespace Prisma {
     tutoringGiven: number
     livePlayers: number
     gameProgress: number
+    raceMembers: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6974,6 +7158,7 @@ export namespace Prisma {
     tutoringGiven?: boolean | StudentProfileCountOutputTypeCountTutoringGivenArgs
     livePlayers?: boolean | StudentProfileCountOutputTypeCountLivePlayersArgs
     gameProgress?: boolean | StudentProfileCountOutputTypeCountGameProgressArgs
+    raceMembers?: boolean | StudentProfileCountOutputTypeCountRaceMembersArgs
   }
 
   // Custom InputTypes
@@ -7083,6 +7268,13 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountGameProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GameProgressWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountRaceMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RaceMemberWhereInput
   }
 
 
@@ -7325,6 +7517,7 @@ export namespace Prisma {
     alerts: number
     tutorAssignments: number
     liveGames: number
+    raceTeams: number
   }
 
   export type SectionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7340,6 +7533,7 @@ export namespace Prisma {
     alerts?: boolean | SectionCountOutputTypeCountAlertsArgs
     tutorAssignments?: boolean | SectionCountOutputTypeCountTutorAssignmentsArgs
     liveGames?: boolean | SectionCountOutputTypeCountLiveGamesArgs
+    raceTeams?: boolean | SectionCountOutputTypeCountRaceTeamsArgs
   }
 
   // Custom InputTypes
@@ -7435,6 +7629,13 @@ export namespace Prisma {
    */
   export type SectionCountOutputTypeCountLiveGamesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LiveGameWhereInput
+  }
+
+  /**
+   * SectionCountOutputType without action
+   */
+  export type SectionCountOutputTypeCountRaceTeamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RaceTeamWhereInput
   }
 
 
@@ -8288,6 +8489,37 @@ export namespace Prisma {
    */
   export type LivePlayerCountOutputTypeCountAnswersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LiveAnswerWhereInput
+  }
+
+
+  /**
+   * Count Type RaceTeamCountOutputType
+   */
+
+  export type RaceTeamCountOutputType = {
+    members: number
+  }
+
+  export type RaceTeamCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    members?: boolean | RaceTeamCountOutputTypeCountMembersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * RaceTeamCountOutputType without action
+   */
+  export type RaceTeamCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeamCountOutputType
+     */
+    select?: RaceTeamCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * RaceTeamCountOutputType without action
+   */
+  export type RaceTeamCountOutputTypeCountMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RaceMemberWhereInput
   }
 
 
@@ -13341,6 +13573,7 @@ export namespace Prisma {
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
+    raceMembers?: boolean | StudentProfile$raceMembersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
@@ -13405,6 +13638,7 @@ export namespace Prisma {
     tutoringGiven?: boolean | StudentProfile$tutoringGivenArgs<ExtArgs>
     livePlayers?: boolean | StudentProfile$livePlayersArgs<ExtArgs>
     gameProgress?: boolean | StudentProfile$gameProgressArgs<ExtArgs>
+    raceMembers?: boolean | StudentProfile$raceMembersArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13435,6 +13669,7 @@ export namespace Prisma {
       tutoringGiven: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
       livePlayers: Prisma.$LivePlayerPayload<ExtArgs>[]
       gameProgress: Prisma.$GameProgressPayload<ExtArgs>[]
+      raceMembers: Prisma.$RaceMemberPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13869,6 +14104,7 @@ export namespace Prisma {
     tutoringGiven<T extends StudentProfile$tutoringGivenArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$tutoringGivenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     livePlayers<T extends StudentProfile$livePlayersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$livePlayersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LivePlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     gameProgress<T extends StudentProfile$gameProgressArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$gameProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GameProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    raceMembers<T extends StudentProfile$raceMembersArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$raceMembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14656,6 +14892,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: GameProgressScalarFieldEnum | GameProgressScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.raceMembers
+   */
+  export type StudentProfile$raceMembersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    where?: RaceMemberWhereInput
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    cursor?: RaceMemberWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
   }
 
   /**
@@ -23808,6 +24068,7 @@ export namespace Prisma {
     alerts?: boolean | Section$alertsArgs<ExtArgs>
     tutorAssignments?: boolean | Section$tutorAssignmentsArgs<ExtArgs>
     liveGames?: boolean | Section$liveGamesArgs<ExtArgs>
+    raceTeams?: boolean | Section$raceTeamsArgs<ExtArgs>
     _count?: boolean | SectionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["section"]>
 
@@ -23870,6 +24131,7 @@ export namespace Prisma {
     alerts?: boolean | Section$alertsArgs<ExtArgs>
     tutorAssignments?: boolean | Section$tutorAssignmentsArgs<ExtArgs>
     liveGames?: boolean | Section$liveGamesArgs<ExtArgs>
+    raceTeams?: boolean | Section$raceTeamsArgs<ExtArgs>
     _count?: boolean | SectionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SectionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -23901,6 +24163,7 @@ export namespace Prisma {
       alerts: Prisma.$AlertPayload<ExtArgs>[]
       tutorAssignments: Prisma.$PeerTutorAssignmentPayload<ExtArgs>[]
       liveGames: Prisma.$LiveGamePayload<ExtArgs>[]
+      raceTeams: Prisma.$RaceTeamPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -24330,6 +24593,7 @@ export namespace Prisma {
     alerts<T extends Section$alertsArgs<ExtArgs> = {}>(args?: Subset<T, Section$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tutorAssignments<T extends Section$tutorAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Section$tutorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PeerTutorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     liveGames<T extends Section$liveGamesArgs<ExtArgs> = {}>(args?: Subset<T, Section$liveGamesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LiveGamePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    raceTeams<T extends Section$raceTeamsArgs<ExtArgs> = {}>(args?: Subset<T, Section$raceTeamsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -25049,6 +25313,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LiveGameScalarFieldEnum | LiveGameScalarFieldEnum[]
+  }
+
+  /**
+   * Section.raceTeams
+   */
+  export type Section$raceTeamsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    where?: RaceTeamWhereInput
+    orderBy?: RaceTeamOrderByWithRelationInput | RaceTeamOrderByWithRelationInput[]
+    cursor?: RaceTeamWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RaceTeamScalarFieldEnum | RaceTeamScalarFieldEnum[]
   }
 
   /**
@@ -79654,6 +79942,2184 @@ export namespace Prisma {
 
 
   /**
+   * Model RaceTeam
+   */
+
+  export type AggregateRaceTeam = {
+    _count: RaceTeamCountAggregateOutputType | null
+    _avg: RaceTeamAvgAggregateOutputType | null
+    _sum: RaceTeamSumAggregateOutputType | null
+    _min: RaceTeamMinAggregateOutputType | null
+    _max: RaceTeamMaxAggregateOutputType | null
+  }
+
+  export type RaceTeamAvgAggregateOutputType = {
+    number: number | null
+  }
+
+  export type RaceTeamSumAggregateOutputType = {
+    number: number | null
+  }
+
+  export type RaceTeamMinAggregateOutputType = {
+    id: string | null
+    sectionId: string | null
+    number: number | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type RaceTeamMaxAggregateOutputType = {
+    id: string | null
+    sectionId: string | null
+    number: number | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type RaceTeamCountAggregateOutputType = {
+    id: number
+    sectionId: number
+    number: number
+    name: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type RaceTeamAvgAggregateInputType = {
+    number?: true
+  }
+
+  export type RaceTeamSumAggregateInputType = {
+    number?: true
+  }
+
+  export type RaceTeamMinAggregateInputType = {
+    id?: true
+    sectionId?: true
+    number?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type RaceTeamMaxAggregateInputType = {
+    id?: true
+    sectionId?: true
+    number?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type RaceTeamCountAggregateInputType = {
+    id?: true
+    sectionId?: true
+    number?: true
+    name?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type RaceTeamAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RaceTeam to aggregate.
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceTeams to fetch.
+     */
+    orderBy?: RaceTeamOrderByWithRelationInput | RaceTeamOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RaceTeamWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceTeams from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceTeams.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RaceTeams
+    **/
+    _count?: true | RaceTeamCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RaceTeamAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RaceTeamSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RaceTeamMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RaceTeamMaxAggregateInputType
+  }
+
+  export type GetRaceTeamAggregateType<T extends RaceTeamAggregateArgs> = {
+        [P in keyof T & keyof AggregateRaceTeam]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRaceTeam[P]>
+      : GetScalarType<T[P], AggregateRaceTeam[P]>
+  }
+
+
+
+
+  export type RaceTeamGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RaceTeamWhereInput
+    orderBy?: RaceTeamOrderByWithAggregationInput | RaceTeamOrderByWithAggregationInput[]
+    by: RaceTeamScalarFieldEnum[] | RaceTeamScalarFieldEnum
+    having?: RaceTeamScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RaceTeamCountAggregateInputType | true
+    _avg?: RaceTeamAvgAggregateInputType
+    _sum?: RaceTeamSumAggregateInputType
+    _min?: RaceTeamMinAggregateInputType
+    _max?: RaceTeamMaxAggregateInputType
+  }
+
+  export type RaceTeamGroupByOutputType = {
+    id: string
+    sectionId: string
+    number: number
+    name: string
+    createdAt: Date
+    _count: RaceTeamCountAggregateOutputType | null
+    _avg: RaceTeamAvgAggregateOutputType | null
+    _sum: RaceTeamSumAggregateOutputType | null
+    _min: RaceTeamMinAggregateOutputType | null
+    _max: RaceTeamMaxAggregateOutputType | null
+  }
+
+  type GetRaceTeamGroupByPayload<T extends RaceTeamGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RaceTeamGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RaceTeamGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RaceTeamGroupByOutputType[P]>
+            : GetScalarType<T[P], RaceTeamGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RaceTeamSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    number?: boolean
+    name?: boolean
+    createdAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    members?: boolean | RaceTeam$membersArgs<ExtArgs>
+    _count?: boolean | RaceTeamCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceTeam"]>
+
+  export type RaceTeamSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    number?: boolean
+    name?: boolean
+    createdAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceTeam"]>
+
+  export type RaceTeamSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sectionId?: boolean
+    number?: boolean
+    name?: boolean
+    createdAt?: boolean
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceTeam"]>
+
+  export type RaceTeamSelectScalar = {
+    id?: boolean
+    sectionId?: boolean
+    number?: boolean
+    name?: boolean
+    createdAt?: boolean
+  }
+
+  export type RaceTeamOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sectionId" | "number" | "name" | "createdAt", ExtArgs["result"]["raceTeam"]>
+  export type RaceTeamInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+    members?: boolean | RaceTeam$membersArgs<ExtArgs>
+    _count?: boolean | RaceTeamCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type RaceTeamIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+  }
+  export type RaceTeamIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    section?: boolean | SectionDefaultArgs<ExtArgs>
+  }
+
+  export type $RaceTeamPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RaceTeam"
+    objects: {
+      section: Prisma.$SectionPayload<ExtArgs>
+      members: Prisma.$RaceMemberPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sectionId: string
+      /**
+       * 0–4: the lane and color.
+       */
+      number: number
+      name: string
+      createdAt: Date
+    }, ExtArgs["result"]["raceTeam"]>
+    composites: {}
+  }
+
+  type RaceTeamGetPayload<S extends boolean | null | undefined | RaceTeamDefaultArgs> = $Result.GetResult<Prisma.$RaceTeamPayload, S>
+
+  type RaceTeamCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RaceTeamFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RaceTeamCountAggregateInputType | true
+    }
+
+  export interface RaceTeamDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RaceTeam'], meta: { name: 'RaceTeam' } }
+    /**
+     * Find zero or one RaceTeam that matches the filter.
+     * @param {RaceTeamFindUniqueArgs} args - Arguments to find a RaceTeam
+     * @example
+     * // Get one RaceTeam
+     * const raceTeam = await prisma.raceTeam.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RaceTeamFindUniqueArgs>(args: SelectSubset<T, RaceTeamFindUniqueArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RaceTeam that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RaceTeamFindUniqueOrThrowArgs} args - Arguments to find a RaceTeam
+     * @example
+     * // Get one RaceTeam
+     * const raceTeam = await prisma.raceTeam.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RaceTeamFindUniqueOrThrowArgs>(args: SelectSubset<T, RaceTeamFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RaceTeam that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamFindFirstArgs} args - Arguments to find a RaceTeam
+     * @example
+     * // Get one RaceTeam
+     * const raceTeam = await prisma.raceTeam.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RaceTeamFindFirstArgs>(args?: SelectSubset<T, RaceTeamFindFirstArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RaceTeam that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamFindFirstOrThrowArgs} args - Arguments to find a RaceTeam
+     * @example
+     * // Get one RaceTeam
+     * const raceTeam = await prisma.raceTeam.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RaceTeamFindFirstOrThrowArgs>(args?: SelectSubset<T, RaceTeamFindFirstOrThrowArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RaceTeams that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RaceTeams
+     * const raceTeams = await prisma.raceTeam.findMany()
+     * 
+     * // Get first 10 RaceTeams
+     * const raceTeams = await prisma.raceTeam.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const raceTeamWithIdOnly = await prisma.raceTeam.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RaceTeamFindManyArgs>(args?: SelectSubset<T, RaceTeamFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RaceTeam.
+     * @param {RaceTeamCreateArgs} args - Arguments to create a RaceTeam.
+     * @example
+     * // Create one RaceTeam
+     * const RaceTeam = await prisma.raceTeam.create({
+     *   data: {
+     *     // ... data to create a RaceTeam
+     *   }
+     * })
+     * 
+     */
+    create<T extends RaceTeamCreateArgs>(args: SelectSubset<T, RaceTeamCreateArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RaceTeams.
+     * @param {RaceTeamCreateManyArgs} args - Arguments to create many RaceTeams.
+     * @example
+     * // Create many RaceTeams
+     * const raceTeam = await prisma.raceTeam.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RaceTeamCreateManyArgs>(args?: SelectSubset<T, RaceTeamCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RaceTeams and returns the data saved in the database.
+     * @param {RaceTeamCreateManyAndReturnArgs} args - Arguments to create many RaceTeams.
+     * @example
+     * // Create many RaceTeams
+     * const raceTeam = await prisma.raceTeam.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RaceTeams and only return the `id`
+     * const raceTeamWithIdOnly = await prisma.raceTeam.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RaceTeamCreateManyAndReturnArgs>(args?: SelectSubset<T, RaceTeamCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RaceTeam.
+     * @param {RaceTeamDeleteArgs} args - Arguments to delete one RaceTeam.
+     * @example
+     * // Delete one RaceTeam
+     * const RaceTeam = await prisma.raceTeam.delete({
+     *   where: {
+     *     // ... filter to delete one RaceTeam
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RaceTeamDeleteArgs>(args: SelectSubset<T, RaceTeamDeleteArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RaceTeam.
+     * @param {RaceTeamUpdateArgs} args - Arguments to update one RaceTeam.
+     * @example
+     * // Update one RaceTeam
+     * const raceTeam = await prisma.raceTeam.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RaceTeamUpdateArgs>(args: SelectSubset<T, RaceTeamUpdateArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RaceTeams.
+     * @param {RaceTeamDeleteManyArgs} args - Arguments to filter RaceTeams to delete.
+     * @example
+     * // Delete a few RaceTeams
+     * const { count } = await prisma.raceTeam.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RaceTeamDeleteManyArgs>(args?: SelectSubset<T, RaceTeamDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RaceTeams.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RaceTeams
+     * const raceTeam = await prisma.raceTeam.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RaceTeamUpdateManyArgs>(args: SelectSubset<T, RaceTeamUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RaceTeams and returns the data updated in the database.
+     * @param {RaceTeamUpdateManyAndReturnArgs} args - Arguments to update many RaceTeams.
+     * @example
+     * // Update many RaceTeams
+     * const raceTeam = await prisma.raceTeam.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RaceTeams and only return the `id`
+     * const raceTeamWithIdOnly = await prisma.raceTeam.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RaceTeamUpdateManyAndReturnArgs>(args: SelectSubset<T, RaceTeamUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RaceTeam.
+     * @param {RaceTeamUpsertArgs} args - Arguments to update or create a RaceTeam.
+     * @example
+     * // Update or create a RaceTeam
+     * const raceTeam = await prisma.raceTeam.upsert({
+     *   create: {
+     *     // ... data to create a RaceTeam
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RaceTeam we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RaceTeamUpsertArgs>(args: SelectSubset<T, RaceTeamUpsertArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RaceTeams.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamCountArgs} args - Arguments to filter RaceTeams to count.
+     * @example
+     * // Count the number of RaceTeams
+     * const count = await prisma.raceTeam.count({
+     *   where: {
+     *     // ... the filter for the RaceTeams we want to count
+     *   }
+     * })
+    **/
+    count<T extends RaceTeamCountArgs>(
+      args?: Subset<T, RaceTeamCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RaceTeamCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RaceTeam.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RaceTeamAggregateArgs>(args: Subset<T, RaceTeamAggregateArgs>): Prisma.PrismaPromise<GetRaceTeamAggregateType<T>>
+
+    /**
+     * Group by RaceTeam.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceTeamGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RaceTeamGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RaceTeamGroupByArgs['orderBy'] }
+        : { orderBy?: RaceTeamGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RaceTeamGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRaceTeamGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RaceTeam model
+   */
+  readonly fields: RaceTeamFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RaceTeam.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RaceTeamClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    section<T extends SectionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SectionDefaultArgs<ExtArgs>>): Prisma__SectionClient<$Result.GetResult<Prisma.$SectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    members<T extends RaceTeam$membersArgs<ExtArgs> = {}>(args?: Subset<T, RaceTeam$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RaceTeam model
+   */
+  interface RaceTeamFieldRefs {
+    readonly id: FieldRef<"RaceTeam", 'String'>
+    readonly sectionId: FieldRef<"RaceTeam", 'String'>
+    readonly number: FieldRef<"RaceTeam", 'Int'>
+    readonly name: FieldRef<"RaceTeam", 'String'>
+    readonly createdAt: FieldRef<"RaceTeam", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RaceTeam findUnique
+   */
+  export type RaceTeamFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceTeam to fetch.
+     */
+    where: RaceTeamWhereUniqueInput
+  }
+
+  /**
+   * RaceTeam findUniqueOrThrow
+   */
+  export type RaceTeamFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceTeam to fetch.
+     */
+    where: RaceTeamWhereUniqueInput
+  }
+
+  /**
+   * RaceTeam findFirst
+   */
+  export type RaceTeamFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceTeam to fetch.
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceTeams to fetch.
+     */
+    orderBy?: RaceTeamOrderByWithRelationInput | RaceTeamOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RaceTeams.
+     */
+    cursor?: RaceTeamWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceTeams from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceTeams.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RaceTeams.
+     */
+    distinct?: RaceTeamScalarFieldEnum | RaceTeamScalarFieldEnum[]
+  }
+
+  /**
+   * RaceTeam findFirstOrThrow
+   */
+  export type RaceTeamFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceTeam to fetch.
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceTeams to fetch.
+     */
+    orderBy?: RaceTeamOrderByWithRelationInput | RaceTeamOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RaceTeams.
+     */
+    cursor?: RaceTeamWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceTeams from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceTeams.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RaceTeams.
+     */
+    distinct?: RaceTeamScalarFieldEnum | RaceTeamScalarFieldEnum[]
+  }
+
+  /**
+   * RaceTeam findMany
+   */
+  export type RaceTeamFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceTeams to fetch.
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceTeams to fetch.
+     */
+    orderBy?: RaceTeamOrderByWithRelationInput | RaceTeamOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RaceTeams.
+     */
+    cursor?: RaceTeamWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceTeams from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceTeams.
+     */
+    skip?: number
+    distinct?: RaceTeamScalarFieldEnum | RaceTeamScalarFieldEnum[]
+  }
+
+  /**
+   * RaceTeam create
+   */
+  export type RaceTeamCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RaceTeam.
+     */
+    data: XOR<RaceTeamCreateInput, RaceTeamUncheckedCreateInput>
+  }
+
+  /**
+   * RaceTeam createMany
+   */
+  export type RaceTeamCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RaceTeams.
+     */
+    data: RaceTeamCreateManyInput | RaceTeamCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RaceTeam createManyAndReturn
+   */
+  export type RaceTeamCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * The data used to create many RaceTeams.
+     */
+    data: RaceTeamCreateManyInput | RaceTeamCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RaceTeam update
+   */
+  export type RaceTeamUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RaceTeam.
+     */
+    data: XOR<RaceTeamUpdateInput, RaceTeamUncheckedUpdateInput>
+    /**
+     * Choose, which RaceTeam to update.
+     */
+    where: RaceTeamWhereUniqueInput
+  }
+
+  /**
+   * RaceTeam updateMany
+   */
+  export type RaceTeamUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RaceTeams.
+     */
+    data: XOR<RaceTeamUpdateManyMutationInput, RaceTeamUncheckedUpdateManyInput>
+    /**
+     * Filter which RaceTeams to update
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * Limit how many RaceTeams to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RaceTeam updateManyAndReturn
+   */
+  export type RaceTeamUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * The data used to update RaceTeams.
+     */
+    data: XOR<RaceTeamUpdateManyMutationInput, RaceTeamUncheckedUpdateManyInput>
+    /**
+     * Filter which RaceTeams to update
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * Limit how many RaceTeams to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RaceTeam upsert
+   */
+  export type RaceTeamUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RaceTeam to update in case it exists.
+     */
+    where: RaceTeamWhereUniqueInput
+    /**
+     * In case the RaceTeam found by the `where` argument doesn't exist, create a new RaceTeam with this data.
+     */
+    create: XOR<RaceTeamCreateInput, RaceTeamUncheckedCreateInput>
+    /**
+     * In case the RaceTeam was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RaceTeamUpdateInput, RaceTeamUncheckedUpdateInput>
+  }
+
+  /**
+   * RaceTeam delete
+   */
+  export type RaceTeamDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+    /**
+     * Filter which RaceTeam to delete.
+     */
+    where: RaceTeamWhereUniqueInput
+  }
+
+  /**
+   * RaceTeam deleteMany
+   */
+  export type RaceTeamDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RaceTeams to delete
+     */
+    where?: RaceTeamWhereInput
+    /**
+     * Limit how many RaceTeams to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RaceTeam.members
+   */
+  export type RaceTeam$membersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    where?: RaceMemberWhereInput
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    cursor?: RaceMemberWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
+  }
+
+  /**
+   * RaceTeam without action
+   */
+  export type RaceTeamDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceTeam
+     */
+    select?: RaceTeamSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceTeam
+     */
+    omit?: RaceTeamOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceTeamInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RaceMember
+   */
+
+  export type AggregateRaceMember = {
+    _count: RaceMemberCountAggregateOutputType | null
+    _min: RaceMemberMinAggregateOutputType | null
+    _max: RaceMemberMaxAggregateOutputType | null
+  }
+
+  export type RaceMemberMinAggregateOutputType = {
+    id: string | null
+    teamId: string | null
+    sectionId: string | null
+    studentId: string | null
+  }
+
+  export type RaceMemberMaxAggregateOutputType = {
+    id: string | null
+    teamId: string | null
+    sectionId: string | null
+    studentId: string | null
+  }
+
+  export type RaceMemberCountAggregateOutputType = {
+    id: number
+    teamId: number
+    sectionId: number
+    studentId: number
+    _all: number
+  }
+
+
+  export type RaceMemberMinAggregateInputType = {
+    id?: true
+    teamId?: true
+    sectionId?: true
+    studentId?: true
+  }
+
+  export type RaceMemberMaxAggregateInputType = {
+    id?: true
+    teamId?: true
+    sectionId?: true
+    studentId?: true
+  }
+
+  export type RaceMemberCountAggregateInputType = {
+    id?: true
+    teamId?: true
+    sectionId?: true
+    studentId?: true
+    _all?: true
+  }
+
+  export type RaceMemberAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RaceMember to aggregate.
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceMembers to fetch.
+     */
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RaceMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RaceMembers
+    **/
+    _count?: true | RaceMemberCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RaceMemberMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RaceMemberMaxAggregateInputType
+  }
+
+  export type GetRaceMemberAggregateType<T extends RaceMemberAggregateArgs> = {
+        [P in keyof T & keyof AggregateRaceMember]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRaceMember[P]>
+      : GetScalarType<T[P], AggregateRaceMember[P]>
+  }
+
+
+
+
+  export type RaceMemberGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RaceMemberWhereInput
+    orderBy?: RaceMemberOrderByWithAggregationInput | RaceMemberOrderByWithAggregationInput[]
+    by: RaceMemberScalarFieldEnum[] | RaceMemberScalarFieldEnum
+    having?: RaceMemberScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RaceMemberCountAggregateInputType | true
+    _min?: RaceMemberMinAggregateInputType
+    _max?: RaceMemberMaxAggregateInputType
+  }
+
+  export type RaceMemberGroupByOutputType = {
+    id: string
+    teamId: string
+    sectionId: string
+    studentId: string
+    _count: RaceMemberCountAggregateOutputType | null
+    _min: RaceMemberMinAggregateOutputType | null
+    _max: RaceMemberMaxAggregateOutputType | null
+  }
+
+  type GetRaceMemberGroupByPayload<T extends RaceMemberGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RaceMemberGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RaceMemberGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RaceMemberGroupByOutputType[P]>
+            : GetScalarType<T[P], RaceMemberGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RaceMemberSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    teamId?: boolean
+    sectionId?: boolean
+    studentId?: boolean
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceMember"]>
+
+  export type RaceMemberSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    teamId?: boolean
+    sectionId?: boolean
+    studentId?: boolean
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceMember"]>
+
+  export type RaceMemberSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    teamId?: boolean
+    sectionId?: boolean
+    studentId?: boolean
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["raceMember"]>
+
+  export type RaceMemberSelectScalar = {
+    id?: boolean
+    teamId?: boolean
+    sectionId?: boolean
+    studentId?: boolean
+  }
+
+  export type RaceMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "teamId" | "sectionId" | "studentId", ExtArgs["result"]["raceMember"]>
+  export type RaceMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+  export type RaceMemberIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+  export type RaceMemberIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    team?: boolean | RaceTeamDefaultArgs<ExtArgs>
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+
+  export type $RaceMemberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RaceMember"
+    objects: {
+      team: Prisma.$RaceTeamPayload<ExtArgs>
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      teamId: string
+      sectionId: string
+      studentId: string
+    }, ExtArgs["result"]["raceMember"]>
+    composites: {}
+  }
+
+  type RaceMemberGetPayload<S extends boolean | null | undefined | RaceMemberDefaultArgs> = $Result.GetResult<Prisma.$RaceMemberPayload, S>
+
+  type RaceMemberCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RaceMemberFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RaceMemberCountAggregateInputType | true
+    }
+
+  export interface RaceMemberDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RaceMember'], meta: { name: 'RaceMember' } }
+    /**
+     * Find zero or one RaceMember that matches the filter.
+     * @param {RaceMemberFindUniqueArgs} args - Arguments to find a RaceMember
+     * @example
+     * // Get one RaceMember
+     * const raceMember = await prisma.raceMember.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RaceMemberFindUniqueArgs>(args: SelectSubset<T, RaceMemberFindUniqueArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RaceMember that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RaceMemberFindUniqueOrThrowArgs} args - Arguments to find a RaceMember
+     * @example
+     * // Get one RaceMember
+     * const raceMember = await prisma.raceMember.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RaceMemberFindUniqueOrThrowArgs>(args: SelectSubset<T, RaceMemberFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RaceMember that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberFindFirstArgs} args - Arguments to find a RaceMember
+     * @example
+     * // Get one RaceMember
+     * const raceMember = await prisma.raceMember.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RaceMemberFindFirstArgs>(args?: SelectSubset<T, RaceMemberFindFirstArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RaceMember that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberFindFirstOrThrowArgs} args - Arguments to find a RaceMember
+     * @example
+     * // Get one RaceMember
+     * const raceMember = await prisma.raceMember.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RaceMemberFindFirstOrThrowArgs>(args?: SelectSubset<T, RaceMemberFindFirstOrThrowArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RaceMembers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RaceMembers
+     * const raceMembers = await prisma.raceMember.findMany()
+     * 
+     * // Get first 10 RaceMembers
+     * const raceMembers = await prisma.raceMember.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const raceMemberWithIdOnly = await prisma.raceMember.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RaceMemberFindManyArgs>(args?: SelectSubset<T, RaceMemberFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RaceMember.
+     * @param {RaceMemberCreateArgs} args - Arguments to create a RaceMember.
+     * @example
+     * // Create one RaceMember
+     * const RaceMember = await prisma.raceMember.create({
+     *   data: {
+     *     // ... data to create a RaceMember
+     *   }
+     * })
+     * 
+     */
+    create<T extends RaceMemberCreateArgs>(args: SelectSubset<T, RaceMemberCreateArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RaceMembers.
+     * @param {RaceMemberCreateManyArgs} args - Arguments to create many RaceMembers.
+     * @example
+     * // Create many RaceMembers
+     * const raceMember = await prisma.raceMember.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RaceMemberCreateManyArgs>(args?: SelectSubset<T, RaceMemberCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RaceMembers and returns the data saved in the database.
+     * @param {RaceMemberCreateManyAndReturnArgs} args - Arguments to create many RaceMembers.
+     * @example
+     * // Create many RaceMembers
+     * const raceMember = await prisma.raceMember.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RaceMembers and only return the `id`
+     * const raceMemberWithIdOnly = await prisma.raceMember.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RaceMemberCreateManyAndReturnArgs>(args?: SelectSubset<T, RaceMemberCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RaceMember.
+     * @param {RaceMemberDeleteArgs} args - Arguments to delete one RaceMember.
+     * @example
+     * // Delete one RaceMember
+     * const RaceMember = await prisma.raceMember.delete({
+     *   where: {
+     *     // ... filter to delete one RaceMember
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RaceMemberDeleteArgs>(args: SelectSubset<T, RaceMemberDeleteArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RaceMember.
+     * @param {RaceMemberUpdateArgs} args - Arguments to update one RaceMember.
+     * @example
+     * // Update one RaceMember
+     * const raceMember = await prisma.raceMember.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RaceMemberUpdateArgs>(args: SelectSubset<T, RaceMemberUpdateArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RaceMembers.
+     * @param {RaceMemberDeleteManyArgs} args - Arguments to filter RaceMembers to delete.
+     * @example
+     * // Delete a few RaceMembers
+     * const { count } = await prisma.raceMember.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RaceMemberDeleteManyArgs>(args?: SelectSubset<T, RaceMemberDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RaceMembers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RaceMembers
+     * const raceMember = await prisma.raceMember.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RaceMemberUpdateManyArgs>(args: SelectSubset<T, RaceMemberUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RaceMembers and returns the data updated in the database.
+     * @param {RaceMemberUpdateManyAndReturnArgs} args - Arguments to update many RaceMembers.
+     * @example
+     * // Update many RaceMembers
+     * const raceMember = await prisma.raceMember.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RaceMembers and only return the `id`
+     * const raceMemberWithIdOnly = await prisma.raceMember.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RaceMemberUpdateManyAndReturnArgs>(args: SelectSubset<T, RaceMemberUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RaceMember.
+     * @param {RaceMemberUpsertArgs} args - Arguments to update or create a RaceMember.
+     * @example
+     * // Update or create a RaceMember
+     * const raceMember = await prisma.raceMember.upsert({
+     *   create: {
+     *     // ... data to create a RaceMember
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RaceMember we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RaceMemberUpsertArgs>(args: SelectSubset<T, RaceMemberUpsertArgs<ExtArgs>>): Prisma__RaceMemberClient<$Result.GetResult<Prisma.$RaceMemberPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RaceMembers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberCountArgs} args - Arguments to filter RaceMembers to count.
+     * @example
+     * // Count the number of RaceMembers
+     * const count = await prisma.raceMember.count({
+     *   where: {
+     *     // ... the filter for the RaceMembers we want to count
+     *   }
+     * })
+    **/
+    count<T extends RaceMemberCountArgs>(
+      args?: Subset<T, RaceMemberCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RaceMemberCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RaceMember.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RaceMemberAggregateArgs>(args: Subset<T, RaceMemberAggregateArgs>): Prisma.PrismaPromise<GetRaceMemberAggregateType<T>>
+
+    /**
+     * Group by RaceMember.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RaceMemberGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RaceMemberGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RaceMemberGroupByArgs['orderBy'] }
+        : { orderBy?: RaceMemberGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RaceMemberGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRaceMemberGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RaceMember model
+   */
+  readonly fields: RaceMemberFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RaceMember.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RaceMemberClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    team<T extends RaceTeamDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RaceTeamDefaultArgs<ExtArgs>>): Prisma__RaceTeamClient<$Result.GetResult<Prisma.$RaceTeamPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RaceMember model
+   */
+  interface RaceMemberFieldRefs {
+    readonly id: FieldRef<"RaceMember", 'String'>
+    readonly teamId: FieldRef<"RaceMember", 'String'>
+    readonly sectionId: FieldRef<"RaceMember", 'String'>
+    readonly studentId: FieldRef<"RaceMember", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RaceMember findUnique
+   */
+  export type RaceMemberFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceMember to fetch.
+     */
+    where: RaceMemberWhereUniqueInput
+  }
+
+  /**
+   * RaceMember findUniqueOrThrow
+   */
+  export type RaceMemberFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceMember to fetch.
+     */
+    where: RaceMemberWhereUniqueInput
+  }
+
+  /**
+   * RaceMember findFirst
+   */
+  export type RaceMemberFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceMember to fetch.
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceMembers to fetch.
+     */
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RaceMembers.
+     */
+    cursor?: RaceMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RaceMembers.
+     */
+    distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
+  }
+
+  /**
+   * RaceMember findFirstOrThrow
+   */
+  export type RaceMemberFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceMember to fetch.
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceMembers to fetch.
+     */
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RaceMembers.
+     */
+    cursor?: RaceMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceMembers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RaceMembers.
+     */
+    distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
+  }
+
+  /**
+   * RaceMember findMany
+   */
+  export type RaceMemberFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter, which RaceMembers to fetch.
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RaceMembers to fetch.
+     */
+    orderBy?: RaceMemberOrderByWithRelationInput | RaceMemberOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RaceMembers.
+     */
+    cursor?: RaceMemberWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RaceMembers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RaceMembers.
+     */
+    skip?: number
+    distinct?: RaceMemberScalarFieldEnum | RaceMemberScalarFieldEnum[]
+  }
+
+  /**
+   * RaceMember create
+   */
+  export type RaceMemberCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RaceMember.
+     */
+    data: XOR<RaceMemberCreateInput, RaceMemberUncheckedCreateInput>
+  }
+
+  /**
+   * RaceMember createMany
+   */
+  export type RaceMemberCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RaceMembers.
+     */
+    data: RaceMemberCreateManyInput | RaceMemberCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RaceMember createManyAndReturn
+   */
+  export type RaceMemberCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * The data used to create many RaceMembers.
+     */
+    data: RaceMemberCreateManyInput | RaceMemberCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RaceMember update
+   */
+  export type RaceMemberUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RaceMember.
+     */
+    data: XOR<RaceMemberUpdateInput, RaceMemberUncheckedUpdateInput>
+    /**
+     * Choose, which RaceMember to update.
+     */
+    where: RaceMemberWhereUniqueInput
+  }
+
+  /**
+   * RaceMember updateMany
+   */
+  export type RaceMemberUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RaceMembers.
+     */
+    data: XOR<RaceMemberUpdateManyMutationInput, RaceMemberUncheckedUpdateManyInput>
+    /**
+     * Filter which RaceMembers to update
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * Limit how many RaceMembers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RaceMember updateManyAndReturn
+   */
+  export type RaceMemberUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * The data used to update RaceMembers.
+     */
+    data: XOR<RaceMemberUpdateManyMutationInput, RaceMemberUncheckedUpdateManyInput>
+    /**
+     * Filter which RaceMembers to update
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * Limit how many RaceMembers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RaceMember upsert
+   */
+  export type RaceMemberUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RaceMember to update in case it exists.
+     */
+    where: RaceMemberWhereUniqueInput
+    /**
+     * In case the RaceMember found by the `where` argument doesn't exist, create a new RaceMember with this data.
+     */
+    create: XOR<RaceMemberCreateInput, RaceMemberUncheckedCreateInput>
+    /**
+     * In case the RaceMember was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RaceMemberUpdateInput, RaceMemberUncheckedUpdateInput>
+  }
+
+  /**
+   * RaceMember delete
+   */
+  export type RaceMemberDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+    /**
+     * Filter which RaceMember to delete.
+     */
+    where: RaceMemberWhereUniqueInput
+  }
+
+  /**
+   * RaceMember deleteMany
+   */
+  export type RaceMemberDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RaceMembers to delete
+     */
+    where?: RaceMemberWhereInput
+    /**
+     * Limit how many RaceMembers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RaceMember without action
+   */
+  export type RaceMemberDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RaceMember
+     */
+    select?: RaceMemberSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RaceMember
+     */
+    omit?: RaceMemberOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RaceMemberInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -80503,6 +82969,27 @@ export namespace Prisma {
   };
 
   export type GameProgressScalarFieldEnum = (typeof GameProgressScalarFieldEnum)[keyof typeof GameProgressScalarFieldEnum]
+
+
+  export const RaceTeamScalarFieldEnum: {
+    id: 'id',
+    sectionId: 'sectionId',
+    number: 'number',
+    name: 'name',
+    createdAt: 'createdAt'
+  };
+
+  export type RaceTeamScalarFieldEnum = (typeof RaceTeamScalarFieldEnum)[keyof typeof RaceTeamScalarFieldEnum]
+
+
+  export const RaceMemberScalarFieldEnum: {
+    id: 'id',
+    teamId: 'teamId',
+    sectionId: 'sectionId',
+    studentId: 'studentId'
+  };
+
+  export type RaceMemberScalarFieldEnum = (typeof RaceMemberScalarFieldEnum)[keyof typeof RaceMemberScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -81437,6 +83924,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
     livePlayers?: LivePlayerListRelationFilter
     gameProgress?: GameProgressListRelationFilter
+    raceMembers?: RaceMemberListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
@@ -81466,6 +83954,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentOrderByRelationAggregateInput
     livePlayers?: LivePlayerOrderByRelationAggregateInput
     gameProgress?: GameProgressOrderByRelationAggregateInput
+    raceMembers?: RaceMemberOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -81498,6 +83987,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentListRelationFilter
     livePlayers?: LivePlayerListRelationFilter
     gameProgress?: GameProgressListRelationFilter
+    raceMembers?: RaceMemberListRelationFilter
   }, "id" | "userId" | "studentNumber">
 
   export type StudentProfileOrderByWithAggregationInput = {
@@ -82055,6 +84545,7 @@ export namespace Prisma {
     alerts?: AlertListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     liveGames?: LiveGameListRelationFilter
+    raceTeams?: RaceTeamListRelationFilter
   }
 
   export type SectionOrderByWithRelationInput = {
@@ -82082,6 +84573,7 @@ export namespace Prisma {
     alerts?: AlertOrderByRelationAggregateInput
     tutorAssignments?: PeerTutorAssignmentOrderByRelationAggregateInput
     liveGames?: LiveGameOrderByRelationAggregateInput
+    raceTeams?: RaceTeamOrderByRelationAggregateInput
   }
 
   export type SectionWhereUniqueInput = Prisma.AtLeast<{
@@ -82113,6 +84605,7 @@ export namespace Prisma {
     alerts?: AlertListRelationFilter
     tutorAssignments?: PeerTutorAssignmentListRelationFilter
     liveGames?: LiveGameListRelationFilter
+    raceTeams?: RaceTeamListRelationFilter
   }, "id" | "joinCode" | "termId_courseId_code">
 
   export type SectionOrderByWithAggregationInput = {
@@ -85756,6 +88249,121 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"GameProgress"> | Date | string
   }
 
+  export type RaceTeamWhereInput = {
+    AND?: RaceTeamWhereInput | RaceTeamWhereInput[]
+    OR?: RaceTeamWhereInput[]
+    NOT?: RaceTeamWhereInput | RaceTeamWhereInput[]
+    id?: StringFilter<"RaceTeam"> | string
+    sectionId?: StringFilter<"RaceTeam"> | string
+    number?: IntFilter<"RaceTeam"> | number
+    name?: StringFilter<"RaceTeam"> | string
+    createdAt?: DateTimeFilter<"RaceTeam"> | Date | string
+    section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
+    members?: RaceMemberListRelationFilter
+  }
+
+  export type RaceTeamOrderByWithRelationInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    number?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    section?: SectionOrderByWithRelationInput
+    members?: RaceMemberOrderByRelationAggregateInput
+  }
+
+  export type RaceTeamWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sectionId_number?: RaceTeamSectionIdNumberCompoundUniqueInput
+    AND?: RaceTeamWhereInput | RaceTeamWhereInput[]
+    OR?: RaceTeamWhereInput[]
+    NOT?: RaceTeamWhereInput | RaceTeamWhereInput[]
+    sectionId?: StringFilter<"RaceTeam"> | string
+    number?: IntFilter<"RaceTeam"> | number
+    name?: StringFilter<"RaceTeam"> | string
+    createdAt?: DateTimeFilter<"RaceTeam"> | Date | string
+    section?: XOR<SectionScalarRelationFilter, SectionWhereInput>
+    members?: RaceMemberListRelationFilter
+  }, "id" | "sectionId_number">
+
+  export type RaceTeamOrderByWithAggregationInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    number?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    _count?: RaceTeamCountOrderByAggregateInput
+    _avg?: RaceTeamAvgOrderByAggregateInput
+    _max?: RaceTeamMaxOrderByAggregateInput
+    _min?: RaceTeamMinOrderByAggregateInput
+    _sum?: RaceTeamSumOrderByAggregateInput
+  }
+
+  export type RaceTeamScalarWhereWithAggregatesInput = {
+    AND?: RaceTeamScalarWhereWithAggregatesInput | RaceTeamScalarWhereWithAggregatesInput[]
+    OR?: RaceTeamScalarWhereWithAggregatesInput[]
+    NOT?: RaceTeamScalarWhereWithAggregatesInput | RaceTeamScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RaceTeam"> | string
+    sectionId?: StringWithAggregatesFilter<"RaceTeam"> | string
+    number?: IntWithAggregatesFilter<"RaceTeam"> | number
+    name?: StringWithAggregatesFilter<"RaceTeam"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"RaceTeam"> | Date | string
+  }
+
+  export type RaceMemberWhereInput = {
+    AND?: RaceMemberWhereInput | RaceMemberWhereInput[]
+    OR?: RaceMemberWhereInput[]
+    NOT?: RaceMemberWhereInput | RaceMemberWhereInput[]
+    id?: StringFilter<"RaceMember"> | string
+    teamId?: StringFilter<"RaceMember"> | string
+    sectionId?: StringFilter<"RaceMember"> | string
+    studentId?: StringFilter<"RaceMember"> | string
+    team?: XOR<RaceTeamScalarRelationFilter, RaceTeamWhereInput>
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+  }
+
+  export type RaceMemberOrderByWithRelationInput = {
+    id?: SortOrder
+    teamId?: SortOrder
+    sectionId?: SortOrder
+    studentId?: SortOrder
+    team?: RaceTeamOrderByWithRelationInput
+    student?: StudentProfileOrderByWithRelationInput
+  }
+
+  export type RaceMemberWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sectionId_studentId?: RaceMemberSectionIdStudentIdCompoundUniqueInput
+    AND?: RaceMemberWhereInput | RaceMemberWhereInput[]
+    OR?: RaceMemberWhereInput[]
+    NOT?: RaceMemberWhereInput | RaceMemberWhereInput[]
+    teamId?: StringFilter<"RaceMember"> | string
+    sectionId?: StringFilter<"RaceMember"> | string
+    studentId?: StringFilter<"RaceMember"> | string
+    team?: XOR<RaceTeamScalarRelationFilter, RaceTeamWhereInput>
+    student?: XOR<StudentProfileScalarRelationFilter, StudentProfileWhereInput>
+  }, "id" | "sectionId_studentId">
+
+  export type RaceMemberOrderByWithAggregationInput = {
+    id?: SortOrder
+    teamId?: SortOrder
+    sectionId?: SortOrder
+    studentId?: SortOrder
+    _count?: RaceMemberCountOrderByAggregateInput
+    _max?: RaceMemberMaxOrderByAggregateInput
+    _min?: RaceMemberMinOrderByAggregateInput
+  }
+
+  export type RaceMemberScalarWhereWithAggregatesInput = {
+    AND?: RaceMemberScalarWhereWithAggregatesInput | RaceMemberScalarWhereWithAggregatesInput[]
+    OR?: RaceMemberScalarWhereWithAggregatesInput[]
+    NOT?: RaceMemberScalarWhereWithAggregatesInput | RaceMemberScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RaceMember"> | string
+    teamId?: StringWithAggregatesFilter<"RaceMember"> | string
+    sectionId?: StringWithAggregatesFilter<"RaceMember"> | string
+    studentId?: StringWithAggregatesFilter<"RaceMember"> | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -86154,6 +88762,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
@@ -86181,6 +88790,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
@@ -86208,6 +88818,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
@@ -86235,6 +88846,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
@@ -86806,6 +89418,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateInput = {
@@ -86830,6 +89443,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUpdateInput = {
@@ -86854,6 +89468,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateInput = {
@@ -86878,6 +89493,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionCreateManyInput = {
@@ -90626,6 +93242,112 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type RaceTeamCreateInput = {
+    id?: string
+    number: number
+    name: string
+    createdAt?: Date | string
+    section: SectionCreateNestedOneWithoutRaceTeamsInput
+    members?: RaceMemberCreateNestedManyWithoutTeamInput
+  }
+
+  export type RaceTeamUncheckedCreateInput = {
+    id?: string
+    sectionId: string
+    number: number
+    name: string
+    createdAt?: Date | string
+    members?: RaceMemberUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type RaceTeamUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    section?: SectionUpdateOneRequiredWithoutRaceTeamsNestedInput
+    members?: RaceMemberUpdateManyWithoutTeamNestedInput
+  }
+
+  export type RaceTeamUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: RaceMemberUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type RaceTeamCreateManyInput = {
+    id?: string
+    sectionId: string
+    number: number
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type RaceTeamUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RaceTeamUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RaceMemberCreateInput = {
+    id?: string
+    sectionId: string
+    team: RaceTeamCreateNestedOneWithoutMembersInput
+    student: StudentProfileCreateNestedOneWithoutRaceMembersInput
+  }
+
+  export type RaceMemberUncheckedCreateInput = {
+    id?: string
+    teamId: string
+    sectionId: string
+    studentId: string
+  }
+
+  export type RaceMemberUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    team?: RaceTeamUpdateOneRequiredWithoutMembersNestedInput
+    student?: StudentProfileUpdateOneRequiredWithoutRaceMembersNestedInput
+  }
+
+  export type RaceMemberUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RaceMemberCreateManyInput = {
+    id?: string
+    teamId: string
+    sectionId: string
+    studentId: string
+  }
+
+  export type RaceMemberUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RaceMemberUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -91203,6 +93925,12 @@ export namespace Prisma {
     none?: GameProgressWhereInput
   }
 
+  export type RaceMemberListRelationFilter = {
+    every?: RaceMemberWhereInput
+    some?: RaceMemberWhereInput
+    none?: RaceMemberWhereInput
+  }
+
   export type EnrollmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -91248,6 +93976,10 @@ export namespace Prisma {
   }
 
   export type GameProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RaceMemberOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -91792,6 +94524,12 @@ export namespace Prisma {
     none?: SectionPacingWhereInput
   }
 
+  export type RaceTeamListRelationFilter = {
+    every?: RaceTeamWhereInput
+    some?: RaceTeamWhereInput
+    none?: RaceTeamWhereInput
+  }
+
   export type SectionMeetingOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -91809,6 +94547,10 @@ export namespace Prisma {
   }
 
   export type SectionPacingOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RaceTeamOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -94661,6 +97403,74 @@ export namespace Prisma {
     score?: SortOrder
   }
 
+  export type RaceTeamSectionIdNumberCompoundUniqueInput = {
+    sectionId: string
+    number: number
+  }
+
+  export type RaceTeamCountOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    number?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RaceTeamAvgOrderByAggregateInput = {
+    number?: SortOrder
+  }
+
+  export type RaceTeamMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    number?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RaceTeamMinOrderByAggregateInput = {
+    id?: SortOrder
+    sectionId?: SortOrder
+    number?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type RaceTeamSumOrderByAggregateInput = {
+    number?: SortOrder
+  }
+
+  export type RaceTeamScalarRelationFilter = {
+    is?: RaceTeamWhereInput
+    isNot?: RaceTeamWhereInput
+  }
+
+  export type RaceMemberSectionIdStudentIdCompoundUniqueInput = {
+    sectionId: string
+    studentId: string
+  }
+
+  export type RaceMemberCountOrderByAggregateInput = {
+    id?: SortOrder
+    teamId?: SortOrder
+    sectionId?: SortOrder
+    studentId?: SortOrder
+  }
+
+  export type RaceMemberMaxOrderByAggregateInput = {
+    id?: SortOrder
+    teamId?: SortOrder
+    sectionId?: SortOrder
+    studentId?: SortOrder
+  }
+
+  export type RaceMemberMinOrderByAggregateInput = {
+    id?: SortOrder
+    teamId?: SortOrder
+    sectionId?: SortOrder
+    studentId?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -95441,6 +98251,13 @@ export namespace Prisma {
     connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
   }
 
+  export type RaceMemberCreateNestedManyWithoutStudentInput = {
+    create?: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput> | RaceMemberCreateWithoutStudentInput[] | RaceMemberUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutStudentInput | RaceMemberCreateOrConnectWithoutStudentInput[]
+    createMany?: RaceMemberCreateManyStudentInputEnvelope
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+  }
+
   export type EnrollmentUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -95537,6 +98354,13 @@ export namespace Prisma {
     connectOrCreate?: GameProgressCreateOrConnectWithoutStudentInput | GameProgressCreateOrConnectWithoutStudentInput[]
     createMany?: GameProgressCreateManyStudentInputEnvelope
     connect?: GameProgressWhereUniqueInput | GameProgressWhereUniqueInput[]
+  }
+
+  export type RaceMemberUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput> | RaceMemberCreateWithoutStudentInput[] | RaceMemberUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutStudentInput | RaceMemberCreateOrConnectWithoutStudentInput[]
+    createMany?: RaceMemberCreateManyStudentInputEnvelope
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -95769,6 +98593,20 @@ export namespace Prisma {
     deleteMany?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
   }
 
+  export type RaceMemberUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput> | RaceMemberCreateWithoutStudentInput[] | RaceMemberUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutStudentInput | RaceMemberCreateOrConnectWithoutStudentInput[]
+    upsert?: RaceMemberUpsertWithWhereUniqueWithoutStudentInput | RaceMemberUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: RaceMemberCreateManyStudentInputEnvelope
+    set?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    disconnect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    delete?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    update?: RaceMemberUpdateWithWhereUniqueWithoutStudentInput | RaceMemberUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: RaceMemberUpdateManyWithWhereWithoutStudentInput | RaceMemberUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+  }
+
   export type EnrollmentUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<EnrollmentCreateWithoutStudentInput, EnrollmentUncheckedCreateWithoutStudentInput> | EnrollmentCreateWithoutStudentInput[] | EnrollmentUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: EnrollmentCreateOrConnectWithoutStudentInput | EnrollmentCreateOrConnectWithoutStudentInput[]
@@ -95963,6 +98801,20 @@ export namespace Prisma {
     update?: GameProgressUpdateWithWhereUniqueWithoutStudentInput | GameProgressUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: GameProgressUpdateManyWithWhereWithoutStudentInput | GameProgressUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: GameProgressScalarWhereInput | GameProgressScalarWhereInput[]
+  }
+
+  export type RaceMemberUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput> | RaceMemberCreateWithoutStudentInput[] | RaceMemberUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutStudentInput | RaceMemberCreateOrConnectWithoutStudentInput[]
+    upsert?: RaceMemberUpsertWithWhereUniqueWithoutStudentInput | RaceMemberUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: RaceMemberCreateManyStudentInputEnvelope
+    set?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    disconnect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    delete?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    update?: RaceMemberUpdateWithWhereUniqueWithoutStudentInput | RaceMemberUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: RaceMemberUpdateManyWithWhereWithoutStudentInput | RaceMemberUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
   }
 
   export type StudentProfileCreateNestedManyWithoutSectionInput = {
@@ -96593,6 +99445,13 @@ export namespace Prisma {
     connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
   }
 
+  export type RaceTeamCreateNestedManyWithoutSectionInput = {
+    create?: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput> | RaceTeamCreateWithoutSectionInput[] | RaceTeamUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutSectionInput | RaceTeamCreateOrConnectWithoutSectionInput[]
+    createMany?: RaceTeamCreateManySectionInputEnvelope
+    connect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+  }
+
   export type SectionMeetingUncheckedCreateNestedManyWithoutSectionInput = {
     create?: XOR<SectionMeetingCreateWithoutSectionInput, SectionMeetingUncheckedCreateWithoutSectionInput> | SectionMeetingCreateWithoutSectionInput[] | SectionMeetingUncheckedCreateWithoutSectionInput[]
     connectOrCreate?: SectionMeetingCreateOrConnectWithoutSectionInput | SectionMeetingCreateOrConnectWithoutSectionInput[]
@@ -96675,6 +99534,13 @@ export namespace Prisma {
     connectOrCreate?: LiveGameCreateOrConnectWithoutSectionInput | LiveGameCreateOrConnectWithoutSectionInput[]
     createMany?: LiveGameCreateManySectionInputEnvelope
     connect?: LiveGameWhereUniqueInput | LiveGameWhereUniqueInput[]
+  }
+
+  export type RaceTeamUncheckedCreateNestedManyWithoutSectionInput = {
+    create?: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput> | RaceTeamCreateWithoutSectionInput[] | RaceTeamUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutSectionInput | RaceTeamCreateOrConnectWithoutSectionInput[]
+    createMany?: RaceTeamCreateManySectionInputEnvelope
+    connect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
   }
 
   export type CourseUpdateOneRequiredWithoutSectionsNestedInput = {
@@ -96869,6 +99735,20 @@ export namespace Prisma {
     deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
   }
 
+  export type RaceTeamUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput> | RaceTeamCreateWithoutSectionInput[] | RaceTeamUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutSectionInput | RaceTeamCreateOrConnectWithoutSectionInput[]
+    upsert?: RaceTeamUpsertWithWhereUniqueWithoutSectionInput | RaceTeamUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: RaceTeamCreateManySectionInputEnvelope
+    set?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    disconnect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    delete?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    connect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    update?: RaceTeamUpdateWithWhereUniqueWithoutSectionInput | RaceTeamUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: RaceTeamUpdateManyWithWhereWithoutSectionInput | RaceTeamUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: RaceTeamScalarWhereInput | RaceTeamScalarWhereInput[]
+  }
+
   export type SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput = {
     create?: XOR<SectionMeetingCreateWithoutSectionInput, SectionMeetingUncheckedCreateWithoutSectionInput> | SectionMeetingCreateWithoutSectionInput[] | SectionMeetingUncheckedCreateWithoutSectionInput[]
     connectOrCreate?: SectionMeetingCreateOrConnectWithoutSectionInput | SectionMeetingCreateOrConnectWithoutSectionInput[]
@@ -97035,6 +99915,20 @@ export namespace Prisma {
     update?: LiveGameUpdateWithWhereUniqueWithoutSectionInput | LiveGameUpdateWithWhereUniqueWithoutSectionInput[]
     updateMany?: LiveGameUpdateManyWithWhereWithoutSectionInput | LiveGameUpdateManyWithWhereWithoutSectionInput[]
     deleteMany?: LiveGameScalarWhereInput | LiveGameScalarWhereInput[]
+  }
+
+  export type RaceTeamUncheckedUpdateManyWithoutSectionNestedInput = {
+    create?: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput> | RaceTeamCreateWithoutSectionInput[] | RaceTeamUncheckedCreateWithoutSectionInput[]
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutSectionInput | RaceTeamCreateOrConnectWithoutSectionInput[]
+    upsert?: RaceTeamUpsertWithWhereUniqueWithoutSectionInput | RaceTeamUpsertWithWhereUniqueWithoutSectionInput[]
+    createMany?: RaceTeamCreateManySectionInputEnvelope
+    set?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    disconnect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    delete?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    connect?: RaceTeamWhereUniqueInput | RaceTeamWhereUniqueInput[]
+    update?: RaceTeamUpdateWithWhereUniqueWithoutSectionInput | RaceTeamUpdateWithWhereUniqueWithoutSectionInput[]
+    updateMany?: RaceTeamUpdateManyWithWhereWithoutSectionInput | RaceTeamUpdateManyWithWhereWithoutSectionInput[]
+    deleteMany?: RaceTeamScalarWhereInput | RaceTeamScalarWhereInput[]
   }
 
   export type SectionCreateNestedOneWithoutMeetingsInput = {
@@ -100173,6 +103067,90 @@ export namespace Prisma {
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutGameProgressInput, StudentProfileUpdateWithoutGameProgressInput>, StudentProfileUncheckedUpdateWithoutGameProgressInput>
   }
 
+  export type SectionCreateNestedOneWithoutRaceTeamsInput = {
+    create?: XOR<SectionCreateWithoutRaceTeamsInput, SectionUncheckedCreateWithoutRaceTeamsInput>
+    connectOrCreate?: SectionCreateOrConnectWithoutRaceTeamsInput
+    connect?: SectionWhereUniqueInput
+  }
+
+  export type RaceMemberCreateNestedManyWithoutTeamInput = {
+    create?: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput> | RaceMemberCreateWithoutTeamInput[] | RaceMemberUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutTeamInput | RaceMemberCreateOrConnectWithoutTeamInput[]
+    createMany?: RaceMemberCreateManyTeamInputEnvelope
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+  }
+
+  export type RaceMemberUncheckedCreateNestedManyWithoutTeamInput = {
+    create?: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput> | RaceMemberCreateWithoutTeamInput[] | RaceMemberUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutTeamInput | RaceMemberCreateOrConnectWithoutTeamInput[]
+    createMany?: RaceMemberCreateManyTeamInputEnvelope
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+  }
+
+  export type SectionUpdateOneRequiredWithoutRaceTeamsNestedInput = {
+    create?: XOR<SectionCreateWithoutRaceTeamsInput, SectionUncheckedCreateWithoutRaceTeamsInput>
+    connectOrCreate?: SectionCreateOrConnectWithoutRaceTeamsInput
+    upsert?: SectionUpsertWithoutRaceTeamsInput
+    connect?: SectionWhereUniqueInput
+    update?: XOR<XOR<SectionUpdateToOneWithWhereWithoutRaceTeamsInput, SectionUpdateWithoutRaceTeamsInput>, SectionUncheckedUpdateWithoutRaceTeamsInput>
+  }
+
+  export type RaceMemberUpdateManyWithoutTeamNestedInput = {
+    create?: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput> | RaceMemberCreateWithoutTeamInput[] | RaceMemberUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutTeamInput | RaceMemberCreateOrConnectWithoutTeamInput[]
+    upsert?: RaceMemberUpsertWithWhereUniqueWithoutTeamInput | RaceMemberUpsertWithWhereUniqueWithoutTeamInput[]
+    createMany?: RaceMemberCreateManyTeamInputEnvelope
+    set?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    disconnect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    delete?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    update?: RaceMemberUpdateWithWhereUniqueWithoutTeamInput | RaceMemberUpdateWithWhereUniqueWithoutTeamInput[]
+    updateMany?: RaceMemberUpdateManyWithWhereWithoutTeamInput | RaceMemberUpdateManyWithWhereWithoutTeamInput[]
+    deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+  }
+
+  export type RaceMemberUncheckedUpdateManyWithoutTeamNestedInput = {
+    create?: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput> | RaceMemberCreateWithoutTeamInput[] | RaceMemberUncheckedCreateWithoutTeamInput[]
+    connectOrCreate?: RaceMemberCreateOrConnectWithoutTeamInput | RaceMemberCreateOrConnectWithoutTeamInput[]
+    upsert?: RaceMemberUpsertWithWhereUniqueWithoutTeamInput | RaceMemberUpsertWithWhereUniqueWithoutTeamInput[]
+    createMany?: RaceMemberCreateManyTeamInputEnvelope
+    set?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    disconnect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    delete?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    connect?: RaceMemberWhereUniqueInput | RaceMemberWhereUniqueInput[]
+    update?: RaceMemberUpdateWithWhereUniqueWithoutTeamInput | RaceMemberUpdateWithWhereUniqueWithoutTeamInput[]
+    updateMany?: RaceMemberUpdateManyWithWhereWithoutTeamInput | RaceMemberUpdateManyWithWhereWithoutTeamInput[]
+    deleteMany?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+  }
+
+  export type RaceTeamCreateNestedOneWithoutMembersInput = {
+    create?: XOR<RaceTeamCreateWithoutMembersInput, RaceTeamUncheckedCreateWithoutMembersInput>
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutMembersInput
+    connect?: RaceTeamWhereUniqueInput
+  }
+
+  export type StudentProfileCreateNestedOneWithoutRaceMembersInput = {
+    create?: XOR<StudentProfileCreateWithoutRaceMembersInput, StudentProfileUncheckedCreateWithoutRaceMembersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutRaceMembersInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type RaceTeamUpdateOneRequiredWithoutMembersNestedInput = {
+    create?: XOR<RaceTeamCreateWithoutMembersInput, RaceTeamUncheckedCreateWithoutMembersInput>
+    connectOrCreate?: RaceTeamCreateOrConnectWithoutMembersInput
+    upsert?: RaceTeamUpsertWithoutMembersInput
+    connect?: RaceTeamWhereUniqueInput
+    update?: XOR<XOR<RaceTeamUpdateToOneWithWhereWithoutMembersInput, RaceTeamUpdateWithoutMembersInput>, RaceTeamUncheckedUpdateWithoutMembersInput>
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutRaceMembersNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutRaceMembersInput, StudentProfileUncheckedCreateWithoutRaceMembersInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutRaceMembersInput
+    upsert?: StudentProfileUpsertWithoutRaceMembersInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutRaceMembersInput, StudentProfileUpdateWithoutRaceMembersInput>, StudentProfileUncheckedUpdateWithoutRaceMembersInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -101072,6 +104050,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
@@ -101098,6 +104077,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUserInput = {
@@ -101568,6 +104548,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
@@ -101594,6 +104575,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type TeacherProfileUpsertWithoutUserInput = {
@@ -102755,6 +105737,28 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RaceMemberCreateWithoutStudentInput = {
+    id?: string
+    sectionId: string
+    team: RaceTeamCreateNestedOneWithoutMembersInput
+  }
+
+  export type RaceMemberUncheckedCreateWithoutStudentInput = {
+    id?: string
+    teamId: string
+    sectionId: string
+  }
+
+  export type RaceMemberCreateOrConnectWithoutStudentInput = {
+    where: RaceMemberWhereUniqueInput
+    create: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput>
+  }
+
+  export type RaceMemberCreateManyStudentInputEnvelope = {
+    data: RaceMemberCreateManyStudentInput | RaceMemberCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutStudentProfileInput = {
     update: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
@@ -103243,6 +106247,32 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"GameProgress"> | Date | string
   }
 
+  export type RaceMemberUpsertWithWhereUniqueWithoutStudentInput = {
+    where: RaceMemberWhereUniqueInput
+    update: XOR<RaceMemberUpdateWithoutStudentInput, RaceMemberUncheckedUpdateWithoutStudentInput>
+    create: XOR<RaceMemberCreateWithoutStudentInput, RaceMemberUncheckedCreateWithoutStudentInput>
+  }
+
+  export type RaceMemberUpdateWithWhereUniqueWithoutStudentInput = {
+    where: RaceMemberWhereUniqueInput
+    data: XOR<RaceMemberUpdateWithoutStudentInput, RaceMemberUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type RaceMemberUpdateManyWithWhereWithoutStudentInput = {
+    where: RaceMemberScalarWhereInput
+    data: XOR<RaceMemberUpdateManyMutationInput, RaceMemberUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type RaceMemberScalarWhereInput = {
+    AND?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+    OR?: RaceMemberScalarWhereInput[]
+    NOT?: RaceMemberScalarWhereInput | RaceMemberScalarWhereInput[]
+    id?: StringFilter<"RaceMember"> | string
+    teamId?: StringFilter<"RaceMember"> | string
+    sectionId?: StringFilter<"RaceMember"> | string
+    studentId?: StringFilter<"RaceMember"> | string
+  }
+
   export type StudentProfileCreateWithoutSectionInput = {
     id?: string
     studentNumber: string
@@ -103267,6 +106297,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSectionInput = {
@@ -103293,6 +106324,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSectionInput = {
@@ -103442,6 +106474,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTeacherInput = {
@@ -103465,6 +106498,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTeacherInput = {
@@ -103833,6 +106867,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
@@ -103859,6 +106894,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -103930,6 +106966,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
@@ -103956,6 +106993,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAccommodationsInput = {
@@ -103982,6 +107020,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAccommodationsInput = {
@@ -104008,6 +107047,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAccommodationsInput = {
@@ -104050,6 +107090,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAccommodationsInput = {
@@ -104076,6 +107117,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type CourseCreateWithoutDepartmentInput = {
@@ -104223,6 +107265,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTermInput = {
@@ -104246,6 +107289,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTermInput = {
@@ -104314,6 +107358,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutCourseInput = {
@@ -104337,6 +107382,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutCourseInput = {
@@ -104975,6 +108021,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RaceTeamCreateWithoutSectionInput = {
+    id?: string
+    number: number
+    name: string
+    createdAt?: Date | string
+    members?: RaceMemberCreateNestedManyWithoutTeamInput
+  }
+
+  export type RaceTeamUncheckedCreateWithoutSectionInput = {
+    id?: string
+    number: number
+    name: string
+    createdAt?: Date | string
+    members?: RaceMemberUncheckedCreateNestedManyWithoutTeamInput
+  }
+
+  export type RaceTeamCreateOrConnectWithoutSectionInput = {
+    where: RaceTeamWhereUniqueInput
+    create: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput>
+  }
+
+  export type RaceTeamCreateManySectionInputEnvelope = {
+    data: RaceTeamCreateManySectionInput | RaceTeamCreateManySectionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CourseUpsertWithoutSectionsInput = {
     update: XOR<CourseUpdateWithoutSectionsInput, CourseUncheckedUpdateWithoutSectionsInput>
     create: XOR<CourseCreateWithoutSectionsInput, CourseUncheckedCreateWithoutSectionsInput>
@@ -105350,6 +108422,33 @@ export namespace Prisma {
     data: XOR<LiveGameUpdateManyMutationInput, LiveGameUncheckedUpdateManyWithoutSectionInput>
   }
 
+  export type RaceTeamUpsertWithWhereUniqueWithoutSectionInput = {
+    where: RaceTeamWhereUniqueInput
+    update: XOR<RaceTeamUpdateWithoutSectionInput, RaceTeamUncheckedUpdateWithoutSectionInput>
+    create: XOR<RaceTeamCreateWithoutSectionInput, RaceTeamUncheckedCreateWithoutSectionInput>
+  }
+
+  export type RaceTeamUpdateWithWhereUniqueWithoutSectionInput = {
+    where: RaceTeamWhereUniqueInput
+    data: XOR<RaceTeamUpdateWithoutSectionInput, RaceTeamUncheckedUpdateWithoutSectionInput>
+  }
+
+  export type RaceTeamUpdateManyWithWhereWithoutSectionInput = {
+    where: RaceTeamScalarWhereInput
+    data: XOR<RaceTeamUpdateManyMutationInput, RaceTeamUncheckedUpdateManyWithoutSectionInput>
+  }
+
+  export type RaceTeamScalarWhereInput = {
+    AND?: RaceTeamScalarWhereInput | RaceTeamScalarWhereInput[]
+    OR?: RaceTeamScalarWhereInput[]
+    NOT?: RaceTeamScalarWhereInput | RaceTeamScalarWhereInput[]
+    id?: StringFilter<"RaceTeam"> | string
+    sectionId?: StringFilter<"RaceTeam"> | string
+    number?: IntFilter<"RaceTeam"> | number
+    name?: StringFilter<"RaceTeam"> | string
+    createdAt?: DateTimeFilter<"RaceTeam"> | Date | string
+  }
+
   export type SectionCreateWithoutMeetingsInput = {
     id?: string
     code: string
@@ -105371,6 +108470,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutMeetingsInput = {
@@ -105394,6 +108494,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutMeetingsInput = {
@@ -105433,6 +108534,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutMeetingsInput = {
@@ -105456,6 +108558,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionCreateWithoutEnrollmentsInput = {
@@ -105479,6 +108582,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutEnrollmentsInput = {
@@ -105502,6 +108606,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutEnrollmentsInput = {
@@ -105533,6 +108638,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutEnrollmentsInput = {
@@ -105559,6 +108665,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutEnrollmentsInput = {
@@ -105624,6 +108731,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutEnrollmentsInput = {
@@ -105647,6 +108755,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type StudentProfileUpsertWithoutEnrollmentsInput = {
@@ -105684,6 +108793,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutEnrollmentsInput = {
@@ -105710,6 +108820,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GradeSnapshotUpsertWithWhereUniqueWithoutEnrollmentInput = {
@@ -107152,6 +110263,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutPacingInput = {
@@ -107175,6 +110287,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutPacingInput = {
@@ -107245,6 +110358,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutPacingInput = {
@@ -107268,6 +110382,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutPacingInput = {
@@ -107376,6 +110491,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonProgressInput = {
@@ -107402,6 +110518,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonProgressInput = {
@@ -107495,6 +110612,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonProgressInput = {
@@ -107521,6 +110639,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LessonCreateWithoutNotesInput = {
@@ -107592,6 +110711,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLessonNotesInput = {
@@ -107618,6 +110738,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLessonNotesInput = {
@@ -107711,6 +110832,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLessonNotesInput = {
@@ -107737,6 +110859,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserCreateWithoutUploadedFilesInput = {
@@ -108032,6 +111155,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutGradeCategoriesInput = {
@@ -108055,6 +111179,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutGradeCategoriesInput = {
@@ -108150,6 +111275,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutGradeCategoriesInput = {
@@ -108173,6 +111299,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type AssignmentUpsertWithWhereUniqueWithoutCategoryInput = {
@@ -108212,6 +111339,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAssignmentsInput = {
@@ -108235,6 +111363,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAssignmentsInput = {
@@ -108489,6 +111618,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAssignmentsInput = {
@@ -108512,6 +111642,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutAssignmentsInput = {
@@ -109234,6 +112365,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSubmissionsInput = {
@@ -109260,6 +112392,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSubmissionsInput = {
@@ -109410,6 +112543,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSubmissionsInput = {
@@ -109436,6 +112570,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SubmissionAttachmentUpsertWithWhereUniqueWithoutSubmissionInput = {
@@ -110094,6 +113229,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAssessmentsInput = {
@@ -110117,6 +113253,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAssessmentsInput = {
@@ -110393,6 +113530,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAssessmentsInput = {
@@ -110416,6 +113554,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UnitUpsertWithoutAssessmentsInput = {
@@ -111017,6 +114156,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttemptsInput = {
@@ -111043,6 +114183,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttemptsInput = {
@@ -111214,6 +114355,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttemptsInput = {
@@ -111240,6 +114382,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type QuestionResponseUpsertWithWhereUniqueWithoutAttemptInput = {
@@ -111734,6 +114877,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAttendanceSessionsInput = {
@@ -111757,6 +114901,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAttendanceSessionsInput = {
@@ -111889,6 +115034,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAttendanceSessionsInput = {
@@ -111912,6 +115058,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutAttendanceTakenInput = {
@@ -112052,6 +115199,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendanceInput = {
@@ -112078,6 +115226,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendanceInput = {
@@ -112153,6 +115302,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendanceInput = {
@@ -112179,6 +115329,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutAlertsInput = {
@@ -112205,6 +115356,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAlertsInput = {
@@ -112231,6 +115383,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAlertsInput = {
@@ -112259,6 +115412,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAlertsInput = {
@@ -112282,6 +115436,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAlertsInput = {
@@ -112417,6 +115572,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAlertsInput = {
@@ -112443,6 +115599,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutAlertsInput = {
@@ -112477,6 +115634,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAlertsInput = {
@@ -112500,6 +115658,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutAlertsResolvedInput = {
@@ -112829,6 +115988,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -112855,6 +116015,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -112886,6 +116047,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutTutoringGivenInput = {
@@ -112912,6 +116074,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutTutoringGivenInput = {
@@ -112940,6 +116103,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutTutorAssignmentsInput = {
@@ -112963,6 +116127,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutTutorAssignmentsInput = {
@@ -113005,6 +116170,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -113031,6 +116197,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUpsertWithoutTutoringGivenInput = {
@@ -113068,6 +116235,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutTutoringGivenInput = {
@@ -113094,6 +116262,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionUpsertWithoutTutorAssignmentsInput = {
@@ -113128,6 +116297,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTutorAssignmentsInput = {
@@ -113151,6 +116321,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserCreateWithoutAnnouncementsInput = {
@@ -113239,6 +116410,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutAnnouncementsInput = {
@@ -113262,6 +116434,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutAnnouncementsInput = {
@@ -113394,6 +116567,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutAnnouncementsInput = {
@@ -113417,6 +116591,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type AnnouncementReadUpsertWithWhereUniqueWithoutAnnouncementInput = {
@@ -114238,6 +117413,7 @@ export namespace Prisma {
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutCalendarEventsInput = {
@@ -114261,6 +117437,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
     liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutCalendarEventsInput = {
@@ -114365,6 +117542,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutCalendarEventsInput = {
@@ -114388,6 +117566,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type UserUpsertWithoutCalendarEventsInput = {
@@ -114620,6 +117799,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutOfficeHourSlotsInput = {
@@ -114646,6 +117826,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutOfficeHourSlotsInput = {
@@ -114725,6 +117906,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutOfficeHourSlotsInput = {
@@ -114751,6 +117933,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type SectionCreateWithoutLiveGamesInput = {
@@ -114774,6 +117957,7 @@ export namespace Prisma {
     pacing?: SectionPacingCreateNestedManyWithoutSectionInput
     alerts?: AlertCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamCreateNestedManyWithoutSectionInput
   }
 
   export type SectionUncheckedCreateWithoutLiveGamesInput = {
@@ -114797,6 +117981,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
     alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    raceTeams?: RaceTeamUncheckedCreateNestedManyWithoutSectionInput
   }
 
   export type SectionCreateOrConnectWithoutLiveGamesInput = {
@@ -114976,6 +118161,7 @@ export namespace Prisma {
     pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutLiveGamesInput = {
@@ -114999,6 +118185,7 @@ export namespace Prisma {
     pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type TeacherProfileUpsertWithoutLiveGamesInput = {
@@ -115202,6 +118389,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLivePlayersInput = {
@@ -115228,6 +118416,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLivePlayersInput = {
@@ -115343,6 +118532,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLivePlayersInput = {
@@ -115369,6 +118559,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type LiveAnswerUpsertWithWhereUniqueWithoutPlayerInput = {
@@ -115543,6 +118734,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGameProgressInput = {
@@ -115569,6 +118761,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
     tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
     livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    raceMembers?: RaceMemberUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGameProgressInput = {
@@ -115611,6 +118804,7 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGameProgressInput = {
@@ -115637,6 +118831,329 @@ export namespace Prisma {
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type SectionCreateWithoutRaceTeamsInput = {
+    id?: string
+    code: string
+    period: number
+    room?: string | null
+    capacity?: number
+    joinCode?: string
+    course: CourseCreateNestedOneWithoutSectionsInput
+    term: TermCreateNestedOneWithoutSectionsInput
+    teacher: TeacherProfileCreateNestedOneWithoutSectionsInput
+    meetings?: SectionMeetingCreateNestedManyWithoutSectionInput
+    enrollments?: EnrollmentCreateNestedManyWithoutSectionInput
+    gradeCategories?: GradeCategoryCreateNestedManyWithoutSectionInput
+    assignments?: AssignmentCreateNestedManyWithoutSectionInput
+    assessments?: AssessmentCreateNestedManyWithoutSectionInput
+    attendanceSessions?: AttendanceSessionCreateNestedManyWithoutSectionInput
+    announcements?: AnnouncementCreateNestedManyWithoutSectionInput
+    calendarEvents?: CalendarEventCreateNestedManyWithoutSectionInput
+    pacing?: SectionPacingCreateNestedManyWithoutSectionInput
+    alerts?: AlertCreateNestedManyWithoutSectionInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameCreateNestedManyWithoutSectionInput
+  }
+
+  export type SectionUncheckedCreateWithoutRaceTeamsInput = {
+    id?: string
+    courseId: string
+    termId: string
+    teacherId: string
+    code: string
+    period: number
+    room?: string | null
+    capacity?: number
+    joinCode?: string
+    meetings?: SectionMeetingUncheckedCreateNestedManyWithoutSectionInput
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutSectionInput
+    gradeCategories?: GradeCategoryUncheckedCreateNestedManyWithoutSectionInput
+    assignments?: AssignmentUncheckedCreateNestedManyWithoutSectionInput
+    assessments?: AssessmentUncheckedCreateNestedManyWithoutSectionInput
+    attendanceSessions?: AttendanceSessionUncheckedCreateNestedManyWithoutSectionInput
+    announcements?: AnnouncementUncheckedCreateNestedManyWithoutSectionInput
+    calendarEvents?: CalendarEventUncheckedCreateNestedManyWithoutSectionInput
+    pacing?: SectionPacingUncheckedCreateNestedManyWithoutSectionInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutSectionInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutSectionInput
+    liveGames?: LiveGameUncheckedCreateNestedManyWithoutSectionInput
+  }
+
+  export type SectionCreateOrConnectWithoutRaceTeamsInput = {
+    where: SectionWhereUniqueInput
+    create: XOR<SectionCreateWithoutRaceTeamsInput, SectionUncheckedCreateWithoutRaceTeamsInput>
+  }
+
+  export type RaceMemberCreateWithoutTeamInput = {
+    id?: string
+    sectionId: string
+    student: StudentProfileCreateNestedOneWithoutRaceMembersInput
+  }
+
+  export type RaceMemberUncheckedCreateWithoutTeamInput = {
+    id?: string
+    sectionId: string
+    studentId: string
+  }
+
+  export type RaceMemberCreateOrConnectWithoutTeamInput = {
+    where: RaceMemberWhereUniqueInput
+    create: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput>
+  }
+
+  export type RaceMemberCreateManyTeamInputEnvelope = {
+    data: RaceMemberCreateManyTeamInput | RaceMemberCreateManyTeamInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SectionUpsertWithoutRaceTeamsInput = {
+    update: XOR<SectionUpdateWithoutRaceTeamsInput, SectionUncheckedUpdateWithoutRaceTeamsInput>
+    create: XOR<SectionCreateWithoutRaceTeamsInput, SectionUncheckedCreateWithoutRaceTeamsInput>
+    where?: SectionWhereInput
+  }
+
+  export type SectionUpdateToOneWithWhereWithoutRaceTeamsInput = {
+    where?: SectionWhereInput
+    data: XOR<SectionUpdateWithoutRaceTeamsInput, SectionUncheckedUpdateWithoutRaceTeamsInput>
+  }
+
+  export type SectionUpdateWithoutRaceTeamsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    period?: IntFieldUpdateOperationsInput | number
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
+    course?: CourseUpdateOneRequiredWithoutSectionsNestedInput
+    term?: TermUpdateOneRequiredWithoutSectionsNestedInput
+    teacher?: TeacherProfileUpdateOneRequiredWithoutSectionsNestedInput
+    meetings?: SectionMeetingUpdateManyWithoutSectionNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutSectionNestedInput
+    gradeCategories?: GradeCategoryUpdateManyWithoutSectionNestedInput
+    assignments?: AssignmentUpdateManyWithoutSectionNestedInput
+    assessments?: AssessmentUpdateManyWithoutSectionNestedInput
+    attendanceSessions?: AttendanceSessionUpdateManyWithoutSectionNestedInput
+    announcements?: AnnouncementUpdateManyWithoutSectionNestedInput
+    calendarEvents?: CalendarEventUpdateManyWithoutSectionNestedInput
+    pacing?: SectionPacingUpdateManyWithoutSectionNestedInput
+    alerts?: AlertUpdateManyWithoutSectionNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+  }
+
+  export type SectionUncheckedUpdateWithoutRaceTeamsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    courseId?: StringFieldUpdateOperationsInput | string
+    termId?: StringFieldUpdateOperationsInput | string
+    teacherId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    period?: IntFieldUpdateOperationsInput | number
+    room?: NullableStringFieldUpdateOperationsInput | string | null
+    capacity?: IntFieldUpdateOperationsInput | number
+    joinCode?: StringFieldUpdateOperationsInput | string
+    meetings?: SectionMeetingUncheckedUpdateManyWithoutSectionNestedInput
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutSectionNestedInput
+    gradeCategories?: GradeCategoryUncheckedUpdateManyWithoutSectionNestedInput
+    assignments?: AssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    assessments?: AssessmentUncheckedUpdateManyWithoutSectionNestedInput
+    attendanceSessions?: AttendanceSessionUncheckedUpdateManyWithoutSectionNestedInput
+    announcements?: AnnouncementUncheckedUpdateManyWithoutSectionNestedInput
+    calendarEvents?: CalendarEventUncheckedUpdateManyWithoutSectionNestedInput
+    pacing?: SectionPacingUncheckedUpdateManyWithoutSectionNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
+    liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+  }
+
+  export type RaceMemberUpsertWithWhereUniqueWithoutTeamInput = {
+    where: RaceMemberWhereUniqueInput
+    update: XOR<RaceMemberUpdateWithoutTeamInput, RaceMemberUncheckedUpdateWithoutTeamInput>
+    create: XOR<RaceMemberCreateWithoutTeamInput, RaceMemberUncheckedCreateWithoutTeamInput>
+  }
+
+  export type RaceMemberUpdateWithWhereUniqueWithoutTeamInput = {
+    where: RaceMemberWhereUniqueInput
+    data: XOR<RaceMemberUpdateWithoutTeamInput, RaceMemberUncheckedUpdateWithoutTeamInput>
+  }
+
+  export type RaceMemberUpdateManyWithWhereWithoutTeamInput = {
+    where: RaceMemberScalarWhereInput
+    data: XOR<RaceMemberUpdateManyMutationInput, RaceMemberUncheckedUpdateManyWithoutTeamInput>
+  }
+
+  export type RaceTeamCreateWithoutMembersInput = {
+    id?: string
+    number: number
+    name: string
+    createdAt?: Date | string
+    section: SectionCreateNestedOneWithoutRaceTeamsInput
+  }
+
+  export type RaceTeamUncheckedCreateWithoutMembersInput = {
+    id?: string
+    sectionId: string
+    number: number
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type RaceTeamCreateOrConnectWithoutMembersInput = {
+    where: RaceTeamWhereUniqueInput
+    create: XOR<RaceTeamCreateWithoutMembersInput, RaceTeamUncheckedCreateWithoutMembersInput>
+  }
+
+  export type StudentProfileCreateWithoutRaceMembersInput = {
+    id?: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    section?: HomeroomCreateNestedOneWithoutStudentsInput
+    enrollments?: EnrollmentCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordCreateNestedManyWithoutStudentInput
+    alerts?: AlertCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutRaceMembersInput = {
+    id?: string
+    userId: string
+    studentNumber: string
+    gradeLevel: number
+    graduationYear?: number | null
+    homeroom?: string | null
+    sectionId?: string | null
+    cumulativeGpa?: number | null
+    gpaPercentile?: number | null
+    photoUrl?: string | null
+    enrollments?: EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutStudentInput
+    lessonProgress?: LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+    lessonNotes?: LessonNoteUncheckedCreateNestedManyWithoutStudentInput
+    attempts?: AssessmentAttemptUncheckedCreateNestedManyWithoutStudentInput
+    attendance?: AttendanceRecordUncheckedCreateNestedManyWithoutStudentInput
+    alerts?: AlertUncheckedCreateNestedManyWithoutStudentInput
+    accommodations?: AccommodationUncheckedCreateNestedManyWithoutStudentInput
+    guardians?: GuardianLinkUncheckedCreateNestedManyWithoutStudentInput
+    officeHourSlots?: OfficeHourBookingUncheckedCreateNestedManyWithoutStudentInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedCreateNestedManyWithoutTutorInput
+    livePlayers?: LivePlayerUncheckedCreateNestedManyWithoutStudentInput
+    gameProgress?: GameProgressUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutRaceMembersInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutRaceMembersInput, StudentProfileUncheckedCreateWithoutRaceMembersInput>
+  }
+
+  export type RaceTeamUpsertWithoutMembersInput = {
+    update: XOR<RaceTeamUpdateWithoutMembersInput, RaceTeamUncheckedUpdateWithoutMembersInput>
+    create: XOR<RaceTeamCreateWithoutMembersInput, RaceTeamUncheckedCreateWithoutMembersInput>
+    where?: RaceTeamWhereInput
+  }
+
+  export type RaceTeamUpdateToOneWithWhereWithoutMembersInput = {
+    where?: RaceTeamWhereInput
+    data: XOR<RaceTeamUpdateWithoutMembersInput, RaceTeamUncheckedUpdateWithoutMembersInput>
+  }
+
+  export type RaceTeamUpdateWithoutMembersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    section?: SectionUpdateOneRequiredWithoutRaceTeamsNestedInput
+  }
+
+  export type RaceTeamUncheckedUpdateWithoutMembersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentProfileUpsertWithoutRaceMembersInput = {
+    update: XOR<StudentProfileUpdateWithoutRaceMembersInput, StudentProfileUncheckedUpdateWithoutRaceMembersInput>
+    create: XOR<StudentProfileCreateWithoutRaceMembersInput, StudentProfileUncheckedCreateWithoutRaceMembersInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutRaceMembersInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutRaceMembersInput, StudentProfileUncheckedUpdateWithoutRaceMembersInput>
+  }
+
+  export type StudentProfileUpdateWithoutRaceMembersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    section?: HomeroomUpdateOneWithoutStudentsNestedInput
+    enrollments?: EnrollmentUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutRaceMembersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    studentNumber?: StringFieldUpdateOperationsInput | string
+    gradeLevel?: IntFieldUpdateOperationsInput | number
+    graduationYear?: NullableIntFieldUpdateOperationsInput | number | null
+    homeroom?: NullableStringFieldUpdateOperationsInput | string | null
+    sectionId?: NullableStringFieldUpdateOperationsInput | string | null
+    cumulativeGpa?: NullableFloatFieldUpdateOperationsInput | number | null
+    gpaPercentile?: NullableFloatFieldUpdateOperationsInput | number | null
+    photoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollments?: EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutStudentNestedInput
+    lessonProgress?: LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+    lessonNotes?: LessonNoteUncheckedUpdateManyWithoutStudentNestedInput
+    attempts?: AssessmentAttemptUncheckedUpdateManyWithoutStudentNestedInput
+    attendance?: AttendanceRecordUncheckedUpdateManyWithoutStudentNestedInput
+    alerts?: AlertUncheckedUpdateManyWithoutStudentNestedInput
+    accommodations?: AccommodationUncheckedUpdateManyWithoutStudentNestedInput
+    guardians?: GuardianLinkUncheckedUpdateManyWithoutStudentNestedInput
+    officeHourSlots?: OfficeHourBookingUncheckedUpdateManyWithoutStudentNestedInput
+    tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+    tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
+    livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
+    gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -116313,6 +119830,12 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type RaceMemberCreateManyStudentInput = {
+    id?: string
+    teamId: string
+    sectionId: string
+  }
+
   export type EnrollmentUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumEnrollmentStatusFieldUpdateOperationsInput | $Enums.EnrollmentStatus
@@ -116759,6 +120282,24 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type RaceMemberUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    team?: RaceTeamUpdateOneRequiredWithoutMembersNestedInput
+  }
+
+  export type RaceMemberUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RaceMemberUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    teamId?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type StudentProfileCreateManySectionInput = {
     id?: string
     userId: string
@@ -116795,6 +120336,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSectionInput = {
@@ -116821,6 +120363,7 @@ export namespace Prisma {
     tutoringGiven?: PeerTutorAssignmentUncheckedUpdateManyWithoutTutorNestedInput
     livePlayers?: LivePlayerUncheckedUpdateManyWithoutStudentNestedInput
     gameProgress?: GameProgressUncheckedUpdateManyWithoutStudentNestedInput
+    raceMembers?: RaceMemberUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateManyWithoutSectionInput = {
@@ -116893,6 +120436,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTeacherInput = {
@@ -116916,6 +120460,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutTeacherInput = {
@@ -117151,6 +120696,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutTermInput = {
@@ -117174,6 +120720,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutTermInput = {
@@ -117227,6 +120774,7 @@ export namespace Prisma {
     alerts?: AlertUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateWithoutCourseInput = {
@@ -117250,6 +120798,7 @@ export namespace Prisma {
     alerts?: AlertUncheckedUpdateManyWithoutSectionNestedInput
     tutorAssignments?: PeerTutorAssignmentUncheckedUpdateManyWithoutSectionNestedInput
     liveGames?: LiveGameUncheckedUpdateManyWithoutSectionNestedInput
+    raceTeams?: RaceTeamUncheckedUpdateManyWithoutSectionNestedInput
   }
 
   export type SectionUncheckedUpdateManyWithoutCourseInput = {
@@ -117444,6 +120993,13 @@ export namespace Prisma {
     teamMode?: boolean
     createdAt?: Date | string
     finishedAt?: Date | string | null
+  }
+
+  export type RaceTeamCreateManySectionInput = {
+    id?: string
+    number: number
+    name: string
+    createdAt?: Date | string
   }
 
   export type SectionMeetingUpdateWithoutSectionInput = {
@@ -117915,6 +121471,29 @@ export namespace Prisma {
     teamMode?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     finishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type RaceTeamUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: RaceMemberUpdateManyWithoutTeamNestedInput
+  }
+
+  export type RaceTeamUncheckedUpdateWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: RaceMemberUncheckedUpdateManyWithoutTeamNestedInput
+  }
+
+  export type RaceTeamUncheckedUpdateManyWithoutSectionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    number?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GradeSnapshotCreateManyEnrollmentInput = {
@@ -119751,6 +123330,30 @@ export namespace Prisma {
     isCorrect?: BoolFieldUpdateOperationsInput | boolean
     points?: IntFieldUpdateOperationsInput | number
     answeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RaceMemberCreateManyTeamInput = {
+    id?: string
+    sectionId: string
+    studentId: string
+  }
+
+  export type RaceMemberUpdateWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    student?: StudentProfileUpdateOneRequiredWithoutRaceMembersNestedInput
+  }
+
+  export type RaceMemberUncheckedUpdateWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RaceMemberUncheckedUpdateManyWithoutTeamInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sectionId?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
   }
 
 

@@ -11,6 +11,7 @@ import {
   PlayIcon,
   SettingsIcon,
   StarIcon,
+  TrophyIcon,
   UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
@@ -39,6 +40,7 @@ export function Sidebar({
     },
     { label: "Roster", href: "/teacher/roster" },
     { label: "Live Quiz", href: "/teacher/live" },
+    { label: "Group Race", href: "/teacher/race" },
     { label: "Grades", href: "/teacher/grades" },
     { label: "Calendar", href: "/teacher/calendar" },
     { label: "Messages", href: "/teacher/messages", dot: unreadMessages > 0 },
@@ -50,6 +52,7 @@ export function Sidebar({
     Assignments: <ClipboardIcon className="size-[18px]" />,
     Roster: <UsersIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
+    "Group Race": <TrophyIcon className="size-[18px]" />,
     Grades: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,

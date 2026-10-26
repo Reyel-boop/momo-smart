@@ -13,6 +13,7 @@ import {
   SettingsIcon,
   StarIcon,
   TrophyIcon,
+  UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
 
@@ -31,6 +32,7 @@ export function Sidebar({
     { label: "Assignments", href: "/student/assignments", badge: dueCount },
     { label: "Live Quiz", href: "/student/live" },
     { label: "Games", href: "/student/games" },
+    { label: "Group Race", href: "/student/race" },
     { label: "Scores", href: "/student/scores" },
     { label: "Calendar", href: "/student/calendar" },
     { label: "Messages", href: "/student/messages", dot: unreadMessages > 0 },
@@ -42,6 +44,7 @@ export function Sidebar({
     Assignments: <ClipboardIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
     Games: <TrophyIcon className="size-[18px]" />,
+    "Group Race": <UsersIcon className="size-[18px]" />,
     Scores: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,

@@ -776,6 +776,21 @@ exports.Prisma.GameProgressScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.RaceTeamScalarFieldEnum = {
+  id: 'id',
+  sectionId: 'sectionId',
+  number: 'number',
+  name: 'name',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.RaceMemberScalarFieldEnum = {
+  id: 'id',
+  teamId: 'teamId',
+  sectionId: 'sectionId',
+  studentId: 'studentId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1110,7 +1125,9 @@ exports.Prisma.ModelName = {
   LiveGame: 'LiveGame',
   LivePlayer: 'LivePlayer',
   LiveAnswer: 'LiveAnswer',
-  GameProgress: 'GameProgress'
+  GameProgress: 'GameProgress',
+  RaceTeam: 'RaceTeam',
+  RaceMember: 'RaceMember'
 };
 
 /**

@@ -144,6 +144,7 @@ model StudentProfile {
   tutoringGiven    PeerTutorAssignment[] @relation("TutorAssignmentTutor")
   livePlayers      LivePlayer[]
   gameProgress     GameProgress[]
+  raceMembers      RaceMember[]
 
   @@index([gradeLevel])
   @@index([sectionId])
@@ -319,6 +320,7 @@ model Section {
   alerts             Alert[]
   tutorAssignments   PeerTutorAssignment[]
   liveGames          LiveGame[]
+  raceTeams          RaceTeam[]
 
   @@unique([termId, courseId, code])
   @@index([teacherId, termId])
@@ -1464,4 +1466,34 @@ model GameProgress {
 
   @@unique([studentId, levelId])
   @@index([studentId, game])
+}
+
+/// One of a class's five Group Race teams. Members' stars earned in the
+/// class add up to the team's score on the race track.
+model RaceTeam {
+  id        String   @id @default(cuid())
+  sectionId String
+  /// 0–4: the lane and color.
+  number    Int
+  name      String
+  createdAt DateTime @default(now())
+
+  section Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  members RaceMember[]
+
+  @@unique([sectionId, number])
+}
+
+/// A student's team in a class's Group Race (one team per class).
+model RaceMember {
+  id        String @id @default(cuid())
+  teamId    String
+  sectionId String
+  studentId String
+
+  team    RaceTeam       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  student StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, studentId])
+  @@index([teamId])
 }
