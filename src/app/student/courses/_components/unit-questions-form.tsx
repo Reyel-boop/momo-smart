@@ -482,6 +482,15 @@ function Review({
                 : "Review the discussion and try again."}
           </span>
         </p>
+        <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-bold text-amber-800">
+          <span aria-hidden="true">⭐</span>
+          {latest.newStars > 0
+            ? `+${latest.newStars} Star${latest.newStars === 1 ? "" : "s"} earned this try`
+            : "No new stars this try"}
+          <span className="font-semibold text-amber-700">
+            · {latest.totalStars} of {quiz.totalPoints} stars from this unit
+          </span>
+        </p>
         {latest.focusLosses > 0 && (
           <p className="mt-1 text-xs font-semibold text-amber-700">
             You left the quiz screen {latest.focusLosses} time

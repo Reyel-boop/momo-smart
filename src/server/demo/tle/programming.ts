@@ -3,13 +3,14 @@
  * Three-Term Budget of Work (updated April 7, 2026): one unit per week,
  * one lesson per learning competency. Lessons carry a lecture video, a
  * written lecture, a reading built from the suggested activities, and a
- * self-check; every unit has five Unit Questions.
+ * self-check; every unit has 30 Unit Questions.
  *
  * Code samples use ~~~ fences so they don't clash with template literals.
  */
 import type { DemoLesson, DemoSubject, DemoUnit } from "../grade10";
 import { q, TLE_DEPARTMENT } from "./common";
 import { PROGRAMMING_BANK } from "./programming-bank";
+import { PROGRAMMING_EXTRA } from "./programming-extra";
 
 /** `inline code` inside a lecture. */
 const c = (text: string) => `\`${text}\``;
@@ -1405,5 +1406,14 @@ export const computerProgramming = (grade: 9 | 10): DemoSubject => ({
   description:
     "Developing websites with HTML and CSS in a safe and responsible manner (DepEd Budget of Work, Grade 9 or 10).",
   colorToken: "blue",
-  units: UNITS.map((unit, i) => ({ ...unit, bank: PROGRAMMING_BANK[i] })),
+  // Each unit quiz has 30 items: the 5 Unit Questions, the 15 written for
+  // Live Quiz, and 10 more. Live Quiz plays from these same questions.
+  units: UNITS.map((unit, i) => ({
+    ...unit,
+    quiz: [
+      ...(unit.quiz ?? []),
+      ...(PROGRAMMING_BANK[i] ?? []),
+      ...(PROGRAMMING_EXTRA[i] ?? []),
+    ],
+  })),
 });

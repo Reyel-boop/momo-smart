@@ -1,0 +1,776 @@
+/** Computer Programming: ten more Unit Questions per unit, for 30 in all with the five Unit Questions and the fifteen of the Live Quiz bank. */
+import type { QuizItem } from "../grade10-quiz";
+import { q } from "./common";
+
+export const PROGRAMMING_EXTRA: QuizItem[][] = [
+  // 1 Careers and Computer Ergonomics
+  [
+    q(
+      "A person who tests software to find bugs before release is a…",
+      [
+        "software tester / QA",
+        "graphic designer",
+        "network cabler",
+        "data encoder",
+      ],
+      0,
+      "Testers (Quality Assurance) find bugs before users do.",
+    ),
+    q(
+      "Which career designs how an app looks and feels to use?",
+      ["UI/UX designer", "database administrator", "technician", "cashier"],
+      0,
+      "UI/UX designers plan screens and the user's experience.",
+    ),
+    q(
+      "Which career keeps a company's databases organized and backed up?",
+      ["Database administrator", "Web designer", "Game tester", "Typist"],
+      0,
+      "DBAs manage, secure and back up databases.",
+    ),
+    q(
+      "Building apps for phones is called…",
+      ["mobile development", "desktop publishing", "cabling", "printing"],
+      0,
+      "Mobile developers build Android and iOS apps.",
+    ),
+    q(
+      "Which is a SOFT skill every programmer needs?",
+      ["Communication", "Typing HTML", "Using CSS", "Installing a printer"],
+      0,
+      "Programmers explain ideas to teammates and clients.",
+    ),
+    q(
+      "The chair's height is right when your…",
+      [
+        "thighs are level and feet are flat",
+        "knees are above your hips",
+        "feet dangle",
+        "chin touches the desk",
+      ],
+      0,
+      "Level thighs and flat feet support your back.",
+    ),
+    q(
+      "Your elbows while typing should be about…",
+      [
+        "90 degrees, close to the body",
+        "straight out in front",
+        "above your shoulders",
+        "on the monitor",
+      ],
+      0,
+      "Relaxed shoulders and 90° elbows prevent strain.",
+    ),
+    q(
+      "Pain from repeating the same hand movement for a long time is a…",
+      ["repetitive strain injury", "virus", "power surge", "syntax error"],
+      0,
+      "RSI comes from repeated motions like typing and clicking.",
+    ),
+    q(
+      "A good light for the computer room…",
+      [
+        "does not shine directly on the screen",
+        "points straight at the screen",
+        "is very dim",
+        "flickers",
+      ],
+      0,
+      "Avoid glare by placing lights to the side.",
+    ),
+    q(
+      "Which TESDA qualification matches web and app programming?",
+      [
+        "Programming NC III / ICT courses",
+        "Cookery NC II",
+        "Carpentry NC II",
+        "Driving NC II",
+      ],
+      0,
+      "TESDA offers ICT and programming qualifications.",
+    ),
+  ],
+  // 2 HTML Structure and HTML Editors
+  [
+    q(
+      "HTML elements written inside other elements are…",
+      ["nested", "deleted", "hidden", "compiled"],
+      0,
+      "Nesting puts elements inside each other.",
+    ),
+    q(
+      "Which tag gives the browser the page's character set?",
+      ['<meta charset="UTF-8">', "<char>", "<title>", "<body charset>"],
+      0,
+      "UTF-8 lets the page show ñ and other characters.",
+    ),
+    q(
+      "Text between <!-- and --> is…",
+      [
+        "a comment the browser does not show",
+        "a heading",
+        "bold text",
+        "a link",
+      ],
+      0,
+      "Comments are notes for programmers.",
+    ),
+    q(
+      "Which is the correct order of the main parts?",
+      [
+        "<html>, <head>, <body>",
+        "<body>, <head>, <html>",
+        "<head>, <html>, <body>",
+        "<title>, <html>, <body>",
+      ],
+      0,
+      "html wraps head first, then body.",
+    ),
+    q(
+      "Which tag usually goes inside <head>?",
+      ["<title>", "<h1>", "<p>", "<img>"],
+      0,
+      "Head holds information about the page.",
+    ),
+    q(
+      "HTML tags are best written in…",
+      ["lowercase", "random case", "Bold", "numbers"],
+      0,
+      "Lowercase tags are the standard style.",
+    ),
+    q(
+      "Which file extension is used for HTML files?",
+      [".html", ".exe", ".docx", ".mp3"],
+      0,
+      ".html (or .htm) tells the browser it's a web page.",
+    ),
+    q(
+      "A free code editor made by Microsoft is…",
+      ["Visual Studio Code", "Paint", "Excel", "Media Player"],
+      0,
+      "VS Code is popular for HTML and CSS.",
+    ),
+    q(
+      "What does a web browser do with HTML?",
+      [
+        "Reads it and shows the page",
+        "Prints it only",
+        "Deletes it",
+        "Converts it to a video",
+      ],
+      0,
+      "Browsers render HTML into what you see.",
+    ),
+    q(
+      "<br> and <img> are called…",
+      ["empty (void) elements", "container elements", "comments", "attributes"],
+      0,
+      "They have no closing tag.",
+    ),
+  ],
+  // 3 Headings, Paragraphs, Styles and Formatting
+  [
+    q(
+      "Which tag makes a paragraph?",
+      ["<p>", "<para>", "<pg>", "<text>"],
+      0,
+      "<p> holds a paragraph.",
+    ),
+    q(
+      "Which tag is the smallest heading?",
+      ["<h6>", "<h1>", "<h0>", "<head>"],
+      0,
+      "h1 is biggest, h6 smallest.",
+    ),
+    q(
+      "Chemical formula CO₂ uses which tag for the 2?",
+      ["<sub>", "<sup>", "<small>", "<b>"],
+      0,
+      "Subscript lowers the 2.",
+    ),
+    q(
+      "Which style makes the page background light blue?",
+      [
+        "background-color: lightblue;",
+        "color: lightblue;",
+        "bg: lightblue;",
+        "font: lightblue;",
+      ],
+      0,
+      "background-color colors the area behind content.",
+    ),
+    q(
+      "Which style makes text bold using CSS?",
+      [
+        "font-weight: bold;",
+        "text-bold: yes;",
+        "font-style: bold;",
+        "bold: true;",
+      ],
+      0,
+      "font-weight controls thickness.",
+    ),
+    q(
+      "Which tag shows code in a monospace font?",
+      ["<code>", "<pre-code>", "<mono>", "<script>"],
+      0,
+      "<code> marks computer code.",
+    ),
+    q(
+      "Which tag keeps spaces and line breaks exactly as typed?",
+      ["<pre>", "<p>", "<span>", "<em>"],
+      0,
+      "<pre> is preformatted text.",
+    ),
+    q(
+      "Which tag marks a long quotation?",
+      ["<blockquote>", "<quote-block>", "<q-long>", "<cite-all>"],
+      0,
+      "<blockquote> indents a long quote.",
+    ),
+    q(
+      'What does style="font-style: italic;" do?',
+      ["Makes text italic", "Makes text bold", "Underlines text", "Hides text"],
+      0,
+      "font-style sets italic.",
+    ),
+    q(
+      "Which tag marks an abbreviation like DepEd with a tooltip?",
+      [
+        '<abbr title="Department of Education">',
+        "<short>",
+        "<tip>",
+        "<acronym-tip>",
+      ],
+      0,
+      "<abbr> with title shows the full name on hover.",
+    ),
+  ],
+  // 4 Multimedia, Lists and Tables
+  [
+    q(
+      "Which attribute sets the width of an image?",
+      ["width", "size", "length", "big"],
+      0,
+      'width="300" makes it 300 pixels wide.',
+    ),
+    q(
+      "Which tag plays sound?",
+      ["<audio>", "<sound>", "<mp3>", "<music>"],
+      0,
+      '<audio controls src="song.mp3">.',
+    ),
+    q(
+      "Which video format works in almost every browser?",
+      ["MP4", "DOCX", "PSD", "EXE"],
+      0,
+      "MP4 (H.264) is widely supported.",
+    ),
+    q(
+      "A list inside another list is a…",
+      ["nested list", "table", "form", "frame"],
+      0,
+      "Put a <ul> inside an <li>.",
+    ),
+    q(
+      'type="A" on an <ol> numbers items with…',
+      ["capital letters", "Roman numerals", "bullets", "squares"],
+      0,
+      "A, B, C…",
+    ),
+    q(
+      "Which tag is one cell of data in a table?",
+      ["<td>", "<tr>", "<table-cell>", "<th-data>"],
+      0,
+      "td = table data.",
+    ),
+    q(
+      "Which attribute merges cells across columns?",
+      ["colspan", "rowspan", "merge", "span-col"],
+      0,
+      'colspan="2" covers two columns.',
+    ),
+    q(
+      "Which tag groups the bottom summary rows of a table?",
+      ["<tfoot>", "<footer>", "<tbottom>", "<tend>"],
+      0,
+      "<tfoot> holds totals.",
+    ),
+    q(
+      "Images used on a website should be…",
+      [
+        "compressed so pages load fast",
+        "as large as possible",
+        "only BMP files",
+        "never resized",
+      ],
+      0,
+      "Smaller files load faster.",
+    ),
+    q(
+      "The <figcaption> element gives…",
+      [
+        "a caption for a figure or image",
+        "a heading for a table",
+        "a link",
+        "a list title",
+      ],
+      0,
+      "Use it inside <figure>.",
+    ),
+  ],
+  // 5 Forms and Links
+  [
+    q(
+      "Which input type shows a calendar to pick a date?",
+      ["date", "calendar", "day", "time-date"],
+      0,
+      'type="date" opens a date picker.',
+    ),
+    q(
+      "Which input type accepts only numbers?",
+      ["number", "digits", "int", "math"],
+      0,
+      'type="number" shows up/down arrows.',
+    ),
+    q(
+      "The attribute that makes a field mandatory is…",
+      ["required", "must", "important", "needed"],
+      0,
+      "The form won't submit if it's empty.",
+    ),
+    q(
+      "Which attribute in <form> tells where to send the data?",
+      ["action", "send", "to", "target-url"],
+      0,
+      'action="save.php" names the receiver.',
+    ),
+    q(
+      "Each item of a drop-down list uses…",
+      ["<option>", "<item>", "<li>", "<choice>"],
+      0,
+      "<select> contains <option> elements.",
+    ),
+    q(
+      "A button that clears the form uses type=…",
+      ["reset", "clear", "delete", "erase"],
+      0,
+      'type="reset" restores default values.',
+    ),
+    q(
+      "Which links to a file in the same folder?",
+      [
+        'href="about.html"',
+        'href="C:/about"',
+        'href="@about"',
+        'href="about" target',
+      ],
+      0,
+      "A relative link uses just the file name.",
+    ),
+    q(
+      "Which tag groups related form fields with a border?",
+      ["<fieldset>", "<group>", "<box>", "<frameset>"],
+      0,
+      "<fieldset> with <legend> groups fields.",
+    ),
+    q(
+      "Which input type lets the user choose a file to upload?",
+      ["file", "upload", "attach", "doc"],
+      0,
+      'type="file" opens a file picker.',
+    ),
+    q(
+      "A link that downloads a file uses which attribute?",
+      ["download", "save", "get", "fetch"],
+      0,
+      '<a href="form.pdf" download>.',
+    ),
+  ],
+  // 6 Developing a Website
+  [
+    q(
+      "The first step in building a website is…",
+      ["planning", "uploading", "testing", "advertising"],
+      0,
+      "Plan the purpose, audience and pages first.",
+    ),
+    q(
+      "Putting a website on the internet is called…",
+      ["publishing / hosting", "deleting", "compiling", "formatting"],
+      0,
+      "A web host stores the site online.",
+    ),
+    q(
+      "A website's name, like deped.gov.ph, is its…",
+      ["domain name", "IP cable", "title tag", "browser"],
+      0,
+      "Domain names point to web servers.",
+    ),
+    q(
+      "A free way to publish a student site is…",
+      ["GitHub Pages", "a USB drive", "a printer", "an email draft"],
+      0,
+      "GitHub Pages hosts static HTML sites free.",
+    ),
+    q(
+      "Showing your site to users and asking for comments is…",
+      ["getting feedback", "hacking", "compressing", "debugging only"],
+      0,
+      "Feedback helps improve the site.",
+    ),
+    q(
+      "Which page tells visitors how to reach you?",
+      ["Contact page", "404 page", "Login page", "Cart page"],
+      0,
+      "The contact page lists email, phone or a form.",
+    ),
+    q(
+      "A broken link points to…",
+      [
+        "a page or file that doesn't exist",
+        "the home page",
+        "an image",
+        "a working site",
+      ],
+      0,
+      "Fix broken links before publishing.",
+    ),
+    q(
+      "Keeping colors and fonts the same on all pages is…",
+      ["consistency", "randomness", "nesting", "hosting"],
+      0,
+      "Consistency makes a site look professional.",
+    ),
+    q(
+      "Which helps people find your site on Google?",
+      [
+        "Clear titles and headings (SEO)",
+        "No text at all",
+        "Tiny images only",
+        "Hidden pages",
+      ],
+      0,
+      "Search engine optimization uses good titles and content.",
+    ),
+    q(
+      "Updating content regularly keeps a website…",
+      ["useful and trusted", "slower", "broken", "hidden"],
+      0,
+      "Old information makes users leave.",
+    ),
+  ],
+  // 7 Introduction to CSS
+  [
+    q(
+      "A CSS rule is made of a selector and a…",
+      ["declaration block", "tag", "comment", "attribute"],
+      0,
+      "selector { property: value; }",
+    ),
+    q(
+      "Which ends each CSS declaration?",
+      ["; (semicolon)", ", (comma)", ". (period)", ": (colon)"],
+      0,
+      "Semicolons separate declarations.",
+    ),
+    q(
+      "A CSS comment is written as…",
+      ["/* comment */", "<!-- comment -->", "// only", "# comment"],
+      0,
+      "CSS uses /* */.",
+    ),
+    q(
+      "The * selector selects…",
+      ["every element", "no element", "only images", "only links"],
+      0,
+      "* is the universal selector.",
+    ),
+    q(
+      "Which property sets the font size?",
+      ["font-size", "text-size", "size", "font-height"],
+      0,
+      "font-size: 18px;",
+    ),
+    q(
+      "Which unit is relative to the parent's font size?",
+      ["em", "px", "cm", "pt"],
+      0,
+      "1em equals the parent's font size.",
+    ),
+    q(
+      "Which property aligns text to the right?",
+      [
+        "text-align: right;",
+        "align: right;",
+        "float-text: right;",
+        "justify: right;",
+      ],
+      0,
+      "text-align controls horizontal alignment.",
+    ),
+    q(
+      "Which external CSS file name is common?",
+      ["style.css", "style.html", "style.doc", "style.exe"],
+      0,
+      "CSS files end in .css.",
+    ),
+    q(
+      "Which property adds a background image?",
+      ["background-image", "image", "bg-picture", "src"],
+      0,
+      'background-image: url("bg.jpg");',
+    ),
+    q(
+      "Inline CSS uses which attribute?",
+      ["style", "css", "class", "design"],
+      0,
+      '<p style="…"> is inline CSS.',
+    ),
+  ],
+  // 8 CSS Spacing, Links, Lists, Tables and Animation
+  [
+    q(
+      "Which property puts space OUTSIDE an element's border?",
+      ["margin", "padding", "border", "gap-in"],
+      0,
+      "Margin is outer space.",
+    ),
+    q(
+      "border-collapse: collapse; is used on…",
+      ["tables, to merge cell borders", "images", "links", "lists"],
+      0,
+      "It removes double borders.",
+    ),
+    q(
+      "Which pseudo-class styles a link not yet visited?",
+      [":link", ":visited", ":hover", ":done"],
+      0,
+      ":link is the unvisited state.",
+    ),
+    q(
+      "list-style-image sets…",
+      [
+        "a picture as the bullet",
+        "a background",
+        "a heading",
+        "a table border",
+      ],
+      0,
+      "Use an image instead of a dot.",
+    ),
+    q(
+      "Which property sets how long an animation runs?",
+      ["animation-duration", "animation-time", "length", "duration-css"],
+      0,
+      "animation-duration: 2s;",
+    ),
+    q(
+      "Which property delays the start of a transition?",
+      ["transition-delay", "wait", "pause", "delay-start"],
+      0,
+      "transition-delay: 0.5s;",
+    ),
+    q(
+      "padding: 10px; adds 10px of padding on…",
+      ["all four sides", "top only", "left only", "no side"],
+      0,
+      "One value applies to every side.",
+    ),
+    q(
+      "Which property makes table cells' text start at the top?",
+      [
+        "vertical-align: top;",
+        "text-align: top;",
+        "align-top: yes;",
+        "top: 0;",
+      ],
+      0,
+      "vertical-align controls cell content position.",
+    ),
+    q(
+      "In @keyframes, 'from' means…",
+      ["0%", "50%", "100%", "the end"],
+      0,
+      "from = 0%, to = 100%.",
+    ),
+    q(
+      "Which property changes the mouse to a hand on hover?",
+      ["cursor: pointer;", "mouse: hand;", "pointer: yes;", "hand: on;"],
+      0,
+      "cursor: pointer shows it's clickable.",
+    ),
+  ],
+  // 9 CSS Box Model, Box Shadow and Transform
+  [
+    q(
+      "The content area's size is set by…",
+      ["width and height", "margin", "border-color", "font"],
+      0,
+      "width and height size the content box.",
+    ),
+    q(
+      "Two vertical margins touching each other may…",
+      ["collapse into one", "double", "disappear the box", "turn red"],
+      0,
+      "Vertical margin collapsing keeps the larger margin.",
+    ),
+    q(
+      "Which shows a box's border style as dots?",
+      [
+        "border-style: dotted;",
+        "border: dots;",
+        "dotted: yes;",
+        "border-line: dot;",
+      ],
+      0,
+      "Other styles: solid, dashed, double.",
+    ),
+    q(
+      "transform: scale(2); makes the element…",
+      ["twice as big", "half as big", "rotate twice", "move 2px"],
+      0,
+      "scale multiplies the size.",
+    ),
+    q(
+      "transform-origin changes…",
+      [
+        "the point the element turns or scales around",
+        "the color",
+        "the font",
+        "the margin",
+      ],
+      0,
+      "Default origin is the center.",
+    ),
+    q(
+      "overflow: hidden; does what to extra content?",
+      [
+        "Hides what goes outside the box",
+        "Makes the box bigger",
+        "Prints it",
+        "Adds a scrollbar always",
+      ],
+      0,
+      "Overflowing content is clipped.",
+    ),
+    q(
+      "overflow: auto; adds…",
+      ["a scrollbar only when needed", "nothing", "a border", "a shadow"],
+      0,
+      "Scrollbars appear if content is too big.",
+    ),
+    q(
+      "A negative shadow offset like -5px moves the shadow…",
+      ["left or up", "right or down", "nowhere", "inside always"],
+      0,
+      "Negative x goes left; negative y goes up.",
+    ),
+    q(
+      "Which makes a circle from a square box?",
+      ["border-radius: 50%;", "shape: circle;", "round: 100;", "circle: yes;"],
+      0,
+      "50% radius rounds into a circle.",
+    ),
+    q(
+      "display: none; does what?",
+      [
+        "Hides the element and its space",
+        "Makes it transparent but keeps space",
+        "Deletes the file",
+        "Centers it",
+      ],
+      0,
+      "visibility: hidden keeps the space; display: none removes it.",
+    ),
+  ],
+  // 10 Creating an Interactive Website
+  [
+    q(
+      "A design that changes layout for phones uses…",
+      ["media queries", "tables", "frames", "marquee"],
+      0,
+      "@media (max-width: 600px) { … }",
+    ),
+    q(
+      "The viewport meta tag helps pages…",
+      ["fit phone screens", "load images", "play videos", "print"],
+      0,
+      '<meta name="viewport" content="width=device-width">.',
+    ),
+    q(
+      "A good color contrast means…",
+      [
+        "text is easy to read on its background",
+        "same color text and background",
+        "no colors",
+        "only red",
+      ],
+      0,
+      "High contrast helps everyone read.",
+    ),
+    q(
+      "Which is an example of interactive feedback?",
+      [
+        "A button changes color when clicked",
+        "A static paragraph",
+        "A footer",
+        "A title tag",
+      ],
+      0,
+      "Feedback shows the action worked.",
+    ),
+    q(
+      "Tooltips that appear on hover can be made with the…",
+      ["title attribute", "alt only", "href", "src"],
+      0,
+      "title shows text when the mouse rests on an element.",
+    ),
+    q(
+      "A form that checks input before sending does…",
+      ["validation", "styling", "hosting", "printing"],
+      0,
+      "Validation catches mistakes early.",
+    ),
+    q(
+      'In JavaScript, alert("Hi") does what?',
+      [
+        "Shows a pop-up message",
+        "Changes the font",
+        "Adds a table",
+        "Saves a file",
+      ],
+      0,
+      "alert opens a message box.",
+    ),
+    q(
+      "Which HTML attribute runs code when a button is clicked?",
+      ["onclick", "onhover", "click", "run"],
+      0,
+      "onclick runs JavaScript on click.",
+    ),
+    q(
+      "Why test a website on different browsers?",
+      [
+        "They may show pages differently",
+        "It is required by law",
+        "To make it slower",
+        "To delete bugs automatically",
+      ],
+      0,
+      "Chrome, Firefox and Safari can differ.",
+    ),
+    q(
+      "A loading animation helps users by…",
+      [
+        "showing that something is happening",
+        "hiding the page forever",
+        "deleting data",
+        "stopping clicks always",
+      ],
+      0,
+      "It tells users to wait.",
+    ),
+  ],
+];

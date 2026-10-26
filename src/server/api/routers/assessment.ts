@@ -942,6 +942,25 @@ export const assessmentRouter = createTRPCRouter({
               totalScore: graded[0].totalScore,
               focusLosses: graded[0]._count.proctorEvents,
               responses: graded[0].responses,
+              // Stars: one per question answered correctly, each once.
+              newStars: (() => {
+                const before = new Set(
+                  graded
+                    .slice(1)
+                    .flatMap((a) => a.responses)
+                    .filter((r) => r.isCorrect)
+                    .map((r) => r.questionId),
+                );
+                return graded[0].responses.filter(
+                  (r) => r.isCorrect && !before.has(r.questionId),
+                ).length;
+              })(),
+              totalStars: new Set(
+                graded
+                  .flatMap((a) => a.responses)
+                  .filter((r) => r.isCorrect)
+                  .map((r) => r.questionId),
+              ).size,
             }
           : null,
         questions: graded.length > 0 ? questions : [],
