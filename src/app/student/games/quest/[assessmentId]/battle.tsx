@@ -426,23 +426,26 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
   const busy = phase !== "ask";
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4" key={run}>
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div
+      className="mx-auto max-w-5xl space-y-4 max-sm:-mt-3 max-sm:space-y-2"
+      key={run}
+    >
+      <div className="flex flex-wrap items-end justify-between gap-3 max-sm:flex-nowrap max-sm:items-center">
         <div className="min-w-0">
           <Link
             href="/student/games/quest"
-            className="text-brand text-sm font-semibold hover:underline"
+            className="text-brand text-sm font-semibold hover:underline max-sm:text-xs"
           >
             ← All quests
           </Link>
-          <p className="text-muted mt-1 text-xs font-bold tracking-wide uppercase">
+          <p className="text-muted mt-1 text-xs font-bold tracking-wide uppercase max-sm:hidden">
             Momo&apos;s Quest · {data.className}
           </p>
-          <h1 className="text-ink text-2xl font-extrabold tracking-tight">
+          <h1 className="text-ink text-2xl font-extrabold tracking-tight max-sm:truncate max-sm:text-sm">
             {data.title}
           </h1>
         </div>
-        <div className="text-right">
+        <div className="text-right max-sm:hidden">
           <p className="text-muted text-[11px] font-semibold">Your best</p>
           <Stars
             count={Math.min(3, Math.max(data.best, finish.data?.best ?? 0))}
@@ -458,7 +461,7 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
 
       {/* Arena */}
       <div
-        className={`relative h-[320px] overflow-hidden rounded-3xl shadow-xl ring-4 ring-white sm:h-[400px] ${
+        className={`relative h-[226px] overflow-hidden rounded-3xl shadow-xl ring-4 ring-white max-sm:rounded-2xl max-sm:ring-2 sm:h-[400px] ${
           phase === "lunge" ? "arena-shake" : ""
         } ${sky}`}
       >
@@ -506,8 +509,8 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
         <div className="absolute bottom-3 left-1/2 h-10 w-[85%] -translate-x-1/2 rounded-[50%] bg-[#e9d6a8]/60" />
 
         {/* HUD: status window */}
-        <div className="ro-window absolute top-3 left-3 z-30 w-[48%] max-w-[260px] rounded-xl px-3 py-2">
-          <div className="flex items-center justify-between text-[11px] font-black text-white">
+        <div className="ro-window absolute top-3 left-3 z-30 w-[48%] max-w-[260px] rounded-xl px-3 py-2 max-sm:top-2 max-sm:left-2 max-sm:w-[46%] max-sm:px-2 max-sm:py-1">
+          <div className="flex items-center justify-between text-[11px] font-black text-white max-sm:hidden">
             <span>Adventurer &amp; Momo</span>
             <span
               className="rounded-full bg-amber-300/90 px-1.5 text-[10px] text-amber-950"
@@ -552,13 +555,13 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
           </p>
         </div>
         <div className="absolute top-3 right-3 z-30 flex flex-col items-end gap-1.5">
-          <SoundToggle />
+          <SoundToggle className="max-sm:px-2 max-sm:py-1 max-sm:text-[10px]" />
           <div className="flex gap-1">
             {rules.enemies.map((e, i) => (
               <span
                 key={e.kind}
                 title={e.name}
-                className={`flex size-6 items-center justify-center rounded-full text-[11px] font-black shadow ${
+                className={`flex size-6 items-center justify-center rounded-full text-[11px] font-black shadow max-sm:size-5 max-sm:text-[10px] ${
                   i < state.enemy || state.won
                     ? "bg-emerald-400 text-emerald-950"
                     : i === shownEnemy
@@ -690,7 +693,7 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
         )}
 
         {/* Monster */}
-        <div className="absolute right-[8%] bottom-[8%] z-20 flex w-[30%] max-w-[200px] flex-col items-center sm:right-[12%]">
+        <div className="absolute right-[8%] bottom-[8%] z-20 flex w-[30%] max-w-[200px] flex-col items-center max-sm:right-[4%] max-sm:bottom-[4%] max-sm:w-[26%] sm:right-[12%]">
           <div
             className={`relative w-full ${enemyClass}`}
             key={`${shownEnemy}-${run}`}
@@ -764,10 +767,13 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
                 />
               </div>
               <p className="mt-0.5 text-center text-[10px] font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,.6)]">
-                Weak to:{" "}
+                Weak<span className="max-sm:hidden"> to</span>:{" "}
                 {revealed[shownEnemy]
                   ? `${ELEMENT_INFO[enemy.weak].icon} ${ELEMENT_INFO[enemy.weak].name}`
-                  : "❓ find out!"}
+                  : "❓"}
+                {!revealed[shownEnemy] && (
+                  <span className="max-sm:hidden"> find out!</span>
+                )}
               </p>
             </div>
           )}
@@ -777,11 +783,11 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
       {/* Skills */}
       {phase !== "intro" && phase !== "won" && phase !== "dead" && (
         <Card className="overflow-hidden">
-          <div className="ro-window flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs font-black tracking-wide text-white uppercase">
+          <div className="ro-window flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs font-black tracking-wide text-white uppercase max-sm:hidden">
             <span>✦ Skills — pick an element, then answer</span>
             <span className="normal-case">Keys: Q W E R · 1–4</span>
           </div>
-          <div className="flex flex-wrap items-stretch gap-2 p-3">
+          <div className="flex items-stretch gap-1.5 p-1.5 sm:flex-wrap sm:gap-2 sm:p-3">
             {ELEMENTS.map((el, i) => {
               const e = ELEMENT_INFO[el];
               const on = element === el;
@@ -794,7 +800,7 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
                     sfx.select();
                   }}
                   aria-pressed={on}
-                  className={`flex min-w-[96px] flex-1 items-center gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border-2 px-1 py-1 text-left transition sm:min-w-[96px] sm:justify-start sm:px-3 sm:py-2 ${
                     on
                       ? "skill-on -translate-y-0.5 bg-white shadow-md"
                       : "border-transparent bg-slate-100 hover:bg-slate-50"
@@ -808,8 +814,10 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
                       : undefined
                   }
                 >
-                  <span className="text-2xl">{e.icon}</span>
-                  <span className="min-w-0 leading-tight">
+                  <span className="text-2xl max-sm:text-xl" title={e.skill}>
+                    {e.icon}
+                  </span>
+                  <span className="min-w-0 leading-tight max-sm:hidden">
                     <span className="text-ink block text-sm font-black">
                       {e.skill}
                     </span>
@@ -824,24 +832,31 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
               type="button"
               onClick={() => void castSkill()}
               disabled={busy || !canCast(state)}
-              className="flex min-w-[150px] flex-1 flex-col items-start justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+              className="flex flex-[1.4] flex-col items-start justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 max-sm:items-center max-sm:px-1 max-sm:py-1 sm:min-w-[150px]"
               title="Don't know the answer? Spend mana to attack anyway (the question comes back later)."
             >
-              <span className="text-sm font-black">✨ Cast {info.skill}</span>
+              <span className="text-sm font-black max-sm:text-[11px]">
+                ✨ Cast<span className="max-sm:hidden"> {info.skill}</span>
+              </span>
               <span className="text-[10px] font-bold text-indigo-100">
-                Skip &amp; attack · {CAST_COST} 💎
+                <span className="max-sm:hidden">Skip &amp; attack · </span>
+                {CAST_COST} 💎
               </span>
             </button>
             <button
               type="button"
               onClick={healPaw}
               disabled={busy || !canHeal(state, rules)}
-              className="flex min-w-[130px] flex-1 flex-col items-start justify-center rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+              className="flex flex-[1.4] flex-col items-start justify-center rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 px-3 py-2 text-left text-white shadow-md transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 max-sm:items-center max-sm:px-1 max-sm:py-1 sm:min-w-[130px]"
               title="Momo heals one heart."
             >
-              <span className="text-sm font-black">🐾 Healing Paw</span>
+              <span className="text-sm font-black max-sm:text-[11px]">
+                🐾 <span className="max-sm:hidden">Healing Paw</span>
+                <span className="sm:hidden">Heal</span>
+              </span>
               <span className="text-[10px] font-bold text-rose-100">
-                Momo · +1 ❤️ · {HEAL_COST} 💎
+                <span className="max-sm:hidden">Momo · +1 ❤️ · </span>
+                {HEAL_COST} 💎
               </span>
             </button>
           </div>
@@ -851,15 +866,15 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
       {/* Question */}
       {question && phase !== "intro" && phase !== "won" && phase !== "dead" && (
         <Card className="overflow-hidden">
-          <div className="ro-window px-4 py-2 text-xs font-black tracking-wide text-white uppercase">
+          <div className="ro-window px-4 py-2 text-xs font-black tracking-wide text-white uppercase max-sm:hidden">
             {ELEMENT_INFO[element].icon} Answer to cast{" "}
             {ELEMENT_INFO[element].skill}
           </div>
-          <div className="p-4 sm:p-5">
-            <p className="text-ink text-lg leading-snug font-bold">
+          <div className="p-4 max-sm:p-2.5 sm:p-5">
+            <p className="text-ink text-lg leading-snug font-bold max-sm:text-sm">
               {question.prompt}
             </p>
-            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-2 gap-2.5 max-sm:mt-2 max-sm:gap-1.5">
               {question.options.map((o, i) => {
                 const isRight = rightId === o.id;
                 const isPicked = picked === o.id;
@@ -879,9 +894,9 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
                     type="button"
                     disabled={phase !== "ask"}
                     onClick={() => void answer(o.id)}
-                    className={`flex items-center gap-3 rounded-2xl bg-gradient-to-br px-4 py-3 text-left text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-default disabled:hover:translate-y-0 ${OPTION_STYLES[i % 4]} ${look}`}
+                    className={`flex items-center gap-3 rounded-2xl bg-gradient-to-br px-4 py-3 text-left text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-default disabled:hover:translate-y-0 max-sm:min-h-[52px] max-sm:gap-1.5 max-sm:rounded-xl max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-tight ${OPTION_STYLES[i % 4]} ${look}`}
                   >
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/30 text-xs font-black">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/30 text-xs font-black max-sm:size-5 max-sm:text-[10px]">
                       {isRight ? "✓" : isPicked && rightId ? "✗" : i + 1}
                     </span>
                     <span>{o.text}</span>
@@ -895,7 +910,7 @@ export function Battle({ arena, data }: { arena: Arena; data: Data }) {
                 phase === "enemyDown" ||
                 phase === "attack") && (
                 <div
-                  className={`mt-4 rounded-xl px-4 py-3 text-sm ${phase === "review" ? "bg-rose-50 text-rose-900" : "bg-emerald-50 text-emerald-900"}`}
+                  className={`mt-4 rounded-xl px-4 py-3 text-sm max-sm:mt-2 max-sm:line-clamp-3 max-sm:px-2.5 max-sm:py-1.5 max-sm:text-xs ${phase === "review" ? "bg-rose-50 text-rose-900" : "bg-emerald-50 text-emerald-900"}`}
                 >
                   <b>
                     {phase === "review"
@@ -1215,7 +1230,7 @@ function Heart({ full, breaking }: { full: boolean; breaking: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={`size-5 ${breaking ? "heart-break" : ""}`}
+      className={`size-4 sm:size-5 ${breaking ? "heart-break" : ""}`}
       aria-hidden="true"
     >
       <path
