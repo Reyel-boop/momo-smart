@@ -14,6 +14,7 @@ import {
   TrophyIcon,
   UsersIcon,
 } from "~/app/_components/icons";
+import { MobileMenu } from "~/app/_components/mobile-menu";
 import { Nav, type NavItem } from "~/app/_components/nav";
 import { Avatar } from "~/app/_components/ui";
 
@@ -58,8 +59,8 @@ export function Sidebar({
     Messages: <ChatIcon className="size-[18px]" />,
   };
 
-  return (
-    <aside className="border-line bg-surface hidden w-[248px] shrink-0 flex-col border-r lg:flex">
+  const content = (
+    <>
       <div className="flex flex-1 flex-col overflow-y-auto px-4 py-5">
         {/* Brand */}
         <div className="flex items-start gap-3 px-1">
@@ -119,6 +120,15 @@ export function Sidebar({
           Momo Smart LMS · Fall Term
         </p>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      <aside className="border-line bg-surface hidden w-[248px] shrink-0 flex-col border-r lg:flex">
+        {content}
+      </aside>
+      <MobileMenu>{content}</MobileMenu>
+    </>
   );
 }
