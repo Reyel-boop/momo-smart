@@ -6,20 +6,62 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SoundToggle } from "~/app/_components/race/race-view";
 import { sfx, unlock } from "~/app/_components/sfx";
 import { Card } from "~/app/_components/ui";
+import { SALITA_LEVELS } from "~/lib/games/salita-sprint";
 import {
-  SPRINT_LEVELS,
-  SPRINT_SECONDS,
-  SPRINT_STARS,
-  type SprintItem,
-  type SprintLevel,
-} from "~/lib/games/tag-sprint";
+  SPEED_SECONDS,
+  SPEED_STARS,
+  type SpeedItem,
+  type SpeedLevel,
+} from "~/lib/games/speed";
+import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
 import { api } from "~/trpc/react";
-import {
-  LevelHeader,
-  LevelResult,
-  LockedLevel,
-  shuffled,
-} from "../../_components/shared";
+import { LevelHeader, LevelResult, LockedLevel, shuffled } from "./shared";
+
+export type SpeedGame = "sprint" | "salita";
+
+/** Each speed game's levels and its look and words. */
+const SPEED_GAMES: Record<
+  SpeedGame,
+  {
+    levels: SpeedLevel[];
+    name: string;
+    emoji: string;
+    gradient: string;
+    rules: string;
+    /** Code answers (tags, properties) show in a code font. */
+    code: boolean;
+    headings: { top: string; pass: string; fail: string };
+  }
+> = {
+  sprint: {
+    levels: SPRINT_LEVELS,
+    name: "Tag Sprint",
+    emoji: "⚡",
+    gradient: "from-fuchsia-600 via-violet-600 to-indigo-700",
+    rules:
+      "A description appears. Tap the tag, attribute or property that matches, as fast as you can. 5 in a row doubles your points, 10 triples them. A wrong tap costs a point and a short pause.",
+    code: true,
+    headings: {
+      top: "⚡ Lightning fast!",
+      pass: "⏱ Time's up!",
+      fail: "⏱ Time's up — try again",
+    },
+  },
+  salita: {
+    levels: SALITA_LEVELS,
+    name: "Salita Sprint",
+    emoji: "📜",
+    gradient: "from-rose-600 via-red-600 to-amber-500",
+    rules:
+      "May lalabas na paglalarawan. Piliin agad ang tamang sagot! 5 sunod-sunod na tama, doble ang puntos; 10, triple. Ang mali ay bawas na isang puntos at maikling hinto.",
+    code: false,
+    headings: {
+      top: "📜 Ang galing mo!",
+      pass: "⏱ Tapos na ang oras!",
+      fail: "⏱ Tapos na ang oras — subukan muli",
+    },
+  },
+};
 
 /** Seconds of lockout after a wrong tap, so guessing doesn't pay. */
 const WRONG_PAUSE = 700;
@@ -31,16 +73,19 @@ const CHOICE_COLORS = [
 ];
 
 /**
- * One Tag Sprint round: 60 seconds of "which tag does this?". The combo
- * multiplier only changes the points on screen; the server scores the
- * answers (right minus wrong) for stars.
+ * One speed round (Tag Sprint, Salita Sprint): 60 seconds of "which one is
+ * this?". The combo multiplier only changes the points on screen; the
+ * server scores the answers (right minus wrong) for stars.
  */
-export function SprintScreen({ levelId }: { levelId: string }) {
-  const level = SPRINT_LEVELS.find((l) => l.id === levelId)!;
-  const access = api.game.level.useQuery(
-    { game: "sprint", levelId },
-    { retry: false },
-  );
+export function SpeedScreen({
+  game,
+  levelId,
+}: {
+  game: SpeedGame;
+  levelId: string;
+}) {
+  const level = SPEED_GAMES[game].levels.find((l) => l.id === levelId)!;
+  const access = api.game.level.useQuery({ game, levelId }, { retry: false });
   const [attempt, setAttempt] = useState(0);
 
   if (access.error) {
@@ -49,6 +94,7 @@ export function SprintScreen({ levelId }: { levelId: string }) {
   return (
     <Sprint
       key={attempt}
+      game={game}
       level={level}
       best={access.data?.best ?? 0}
       number={access.data?.number}
@@ -60,9 +106,10 @@ export function SprintScreen({ levelId }: { levelId: string }) {
   );
 }
 
-type Deal = { item: SprintItem; choices: string[] };
+type Deal = { item: SpeedItem; choices: string[] };
 
 function Sprint({
+  game,
   level,
   best,
   number,
@@ -71,7 +118,8 @@ function Sprint({
   ready,
   onRetry,
 }: {
-  level: SprintLevel;
+  game: SpeedGame;
+  level: SpeedLevel;
   best: number;
   number?: number;
   count?: number;
@@ -79,10 +127,11 @@ function Sprint({
   ready: boolean;
   onRetry: () => void;
 }) {
+  const theme = SPEED_GAMES[game];
   const router = useRouter();
   const utils = api.useUtils();
   const [phase, setPhase] = useState<"intro" | "play" | "done">("intro");
-  const [left, setLeft] = useState(SPRINT_SECONDS);
+  const [left, setLeft] = useState(SPEED_SECONDS);
   const [card, setCard] = useState<Deal | null>(null);
   const [answers, setAnswers] = useState<{ id: string; choice: string }[]>([]);
   const [combo, setCombo] = useState(0);
@@ -91,9 +140,9 @@ function Sprint({
     null,
   );
   const [pop, setPop] = useState<{ text: string; at: number } | null>(null);
-  const queue = useRef<SprintItem[]>([]);
+  const queue = useRef<SpeedItem[]>([]);
   const locked = useRef(false);
-  const finish = api.game.finishSprint.useMutation({
+  const finish = api.game.finishSpeed.useMutation({
     onSuccess: () => {
       void utils.game.hub.invalidate();
       router.refresh();
@@ -143,9 +192,9 @@ function Sprint({
       !finish.isPending &&
       !finish.error
     ) {
-      finish.mutate({ levelId: level.id, answers });
+      finish.mutate({ game, levelId: level.id, answers });
     }
-  }, [phase, ready, finish, level.id, answers]);
+  }, [phase, ready, finish, game, level.id, answers]);
 
   useEffect(() => {
     if (finish.data && finish.data.stars > 0) sfx.fanfare();
@@ -195,7 +244,7 @@ function Sprint({
   return (
     <div className="mx-auto max-w-3xl space-y-4 max-sm:space-y-3">
       <LevelHeader
-        game="Tag Sprint"
+        game={theme.name}
         unit={level.unit}
         unitTitle={level.unitTitle}
         title={level.title}
@@ -208,21 +257,21 @@ function Sprint({
 
       {phase === "intro" && (
         <Card className="overflow-hidden">
-          <div className="bg-gradient-to-br from-fuchsia-600 via-violet-600 to-indigo-700 px-6 py-8 text-center text-white">
-            <p className="text-5xl">⚡</p>
+          <div
+            className={`bg-gradient-to-br ${theme.gradient} px-6 py-8 text-center text-white`}
+          >
+            <p className="text-5xl">{theme.emoji}</p>
             <p className="mt-2 text-xs font-black tracking-[0.25em] text-amber-300 uppercase">
-              {SPRINT_SECONDS}-second round
+              {SPEED_SECONDS}-second round
             </p>
             <h2 className="text-3xl font-black">{level.topic}</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
-              A description appears. Tap the tag, attribute or property that
-              matches, as fast as you can. 5 in a row doubles your points, 10
-              triples them. A wrong tap costs a point and a short pause.
+              {theme.rules}
             </p>
             <div className="mt-4 flex justify-center gap-4 text-xs font-bold text-white/85">
-              <span>⭐ {SPRINT_STARS[0]} right</span>
-              <span>⭐⭐ {SPRINT_STARS[1]}</span>
-              <span>⭐⭐⭐ {SPRINT_STARS[2]}</span>
+              <span>⭐ {SPEED_STARS[0]} right</span>
+              <span>⭐⭐ {SPEED_STARS[1]}</span>
+              <span>⭐⭐⭐ {SPEED_STARS[2]}</span>
             </div>
             <button
               type="button"
@@ -241,7 +290,7 @@ function Sprint({
           <div className="h-2 bg-slate-100">
             <div
               className={`h-full transition-all duration-1000 ease-linear ${left <= 10 ? "bg-rose-500" : "bg-violet-500"}`}
-              style={{ width: `${(left / SPRINT_SECONDS) * 100}%` }}
+              style={{ width: `${(left / SPEED_SECONDS) * 100}%` }}
             />
           </div>
           <div className="flex items-center justify-between px-5 pt-3 text-sm font-black">
@@ -288,7 +337,7 @@ function Sprint({
                     key={choice}
                     type="button"
                     onClick={() => answer(choice)}
-                    className={`min-h-[64px] rounded-2xl bg-gradient-to-br px-3 py-3 font-mono text-base font-bold break-words text-white shadow-md transition active:scale-95 sm:text-lg ${CHOICE_COLORS[k]} ${
+                    className={`choice-btn min-h-[64px] rounded-2xl bg-gradient-to-br px-3 py-3 text-base font-bold break-words text-white shadow-md transition active:scale-95 sm:text-lg ${theme.code ? "font-mono" : ""} ${CHOICE_COLORS[k]} ${
                       isPicked
                         ? flash.right
                           ? "scale-105 ring-4 ring-emerald-300"
@@ -326,22 +375,22 @@ function Sprint({
             <LevelResult
               heading={
                 finish.data.stars === 3
-                  ? "⚡ Lightning fast!"
+                  ? theme.headings.top
                   : finish.data.stars > 0
-                    ? "⏱ Time's up!"
-                    : "⏱ Time's up — try again"
+                    ? theme.headings.pass
+                    : theme.headings.fail
               }
               stars={finish.data.stars}
               newStars={finish.data.newStars}
               best={finish.data.best}
-              failNote={`Get a score of ${SPRINT_STARS[0]} or more (right minus wrong) for a star.`}
+              failNote={`Get a score of ${SPEED_STARS[0]} or more (right minus wrong) for a star.`}
               stats={[
                 { label: "Right", value: String(finish.data.right) },
                 { label: "Wrong", value: String(finish.data.wrong) },
                 { label: "Score", value: String(finish.data.net) },
                 { label: "Points", value: String(points) },
               ]}
-              nextHref={nextId ? `/student/games/sprint/${nextId}` : null}
+              nextHref={nextId ? `/student/games/${game}/${nextId}` : null}
               onRetry={onRetry}
             >
               {missed.length > 0 && (
@@ -356,7 +405,9 @@ function Sprint({
                         className="border-line bg-surface flex justify-between gap-3 rounded-xl border px-3 py-2 text-sm"
                       >
                         <span className="text-ink">{item.prompt}</span>
-                        <span className="font-mono font-bold text-emerald-700">
+                        <span
+                          className={`font-bold text-emerald-700 ${theme.code ? "font-mono" : ""}`}
+                        >
                           {item.answer}
                         </span>
                       </p>

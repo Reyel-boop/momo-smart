@@ -1,8 +1,4 @@
-import { BUG_LEVELS } from "~/lib/games/bug-hunt";
-import { CALL_LEVELS } from "~/lib/games/call-sim";
-import { CODE_LEVELS } from "~/lib/games/code-quest";
-import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
-import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
+import { GAME_IDS, GAMES } from "~/lib/games/catalog";
 import { z } from "zod";
 
 import {
@@ -22,23 +18,20 @@ import {
 } from "~/server/lib/stars";
 
 const GAME_LABELS: Record<string, { title: string; course: string }> = {
-  code: { title: "Code Quest", course: "Computer Programming" },
-  bug: { title: "Bug Hunt", course: "Computer Programming" },
-  sprint: { title: "Tag Sprint", course: "Computer Programming" },
-  call: { title: "Call Simulator", course: "Telecommunications" },
-  ticket: { title: "Ticket Rush", course: "Telecommunications" },
+  ...Object.fromEntries(
+    GAME_IDS.map((g) => [
+      g,
+      { title: GAMES[g].title, course: GAMES[g].course },
+    ]),
+  ),
   quest: { title: "Momo's Quest", course: "Unit quests" },
   boss: { title: "Boss Level", course: "Shadow Dragon" },
 };
 
 /** Level counts of the games with a fixed set of levels. */
-const GAME_LEVELS: Record<string, number> = {
-  code: CODE_LEVELS.length,
-  bug: BUG_LEVELS.length,
-  sprint: SPRINT_LEVELS.length,
-  call: CALL_LEVELS.length,
-  ticket: TICKET_LEVELS.length,
-};
+const GAME_LEVELS: Record<string, number> = Object.fromEntries(
+  GAME_IDS.map((g) => [g, GAMES[g].levels.length]),
+);
 
 export const dashboardRouter = createTRPCRouter({
   /**

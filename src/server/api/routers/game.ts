@@ -3,7 +3,16 @@ import { z } from "zod";
 
 import { BUG_LEVELS, scoreBugs } from "~/lib/games/bug-hunt";
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
-import { CODE_LEVELS, codeStars } from "~/lib/games/code-quest";
+import {
+  GAME_IDS,
+  GAMES,
+  gamesForCourse,
+  type GameId,
+} from "~/lib/games/catalog";
+import { codeStars } from "~/lib/games/code-quest";
+import { GRAMMAR_LEVELS, scoreGrammar } from "~/lib/games/grammar-hunt";
+import { LAB_LEVELS } from "~/lib/games/lab-sorter";
+import { MATH_LEVELS, MATH_PROBLEMS, scoreMath } from "~/lib/games/number-rush";
 import {
   BOSS,
   BOSS_UNLOCK_WINS,
@@ -11,55 +20,34 @@ import {
   questStars,
   replay,
 } from "~/lib/games/quest";
-import { SPRINT_LEVELS, scoreSprint } from "~/lib/games/tag-sprint";
-import { TICKET_LEVELS, scoreTickets } from "~/lib/games/ticket-rush";
+import { SALITA_LEVELS } from "~/lib/games/salita-sprint";
+import { scoreSort } from "~/lib/games/sort";
+import { scoreSpeed } from "~/lib/games/speed";
+import { scoreTama, TAMA_LEVELS } from "~/lib/games/tama-o-mali";
+import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
+import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
+import { TOOL_LEVELS } from "~/lib/games/tool-shed";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 /**
- * Course games. Code Quest, Bug Hunt and Tag Sprint belong to Computer
- * Programming; Call Simulator and Ticket Rush to Telecommunications. Each
- * is open only to students enrolled in a class of that course. Levels unlock one after another, and the best
- * stars on each level count toward the leaderboard.
+ * Course games, one or more for every subject (see ~/lib/games/catalog).
+ * Each is open only to students enrolled in a class of its course. Levels
+ * unlock one after another, and the best stars on each level count toward
+ * the leaderboard.
  */
-type Game = keyof typeof GAMES;
+type Game = GameId;
 /** Progress rows also use "quest" (Momo's Quest, one level per unit quiz). */
 type SavedGame = Game | "quest" | "boss";
 
-const GAMES = {
-  code: {
-    title: "Code Quest",
-    course: "Computer Programming",
-    codeSuffix: "-CP",
-    levels: CODE_LEVELS,
-  },
-  bug: {
-    title: "Bug Hunt",
-    course: "Computer Programming",
-    codeSuffix: "-CP",
-    levels: BUG_LEVELS,
-  },
-  sprint: {
-    title: "Tag Sprint",
-    course: "Computer Programming",
-    codeSuffix: "-CP",
-    levels: SPRINT_LEVELS,
-  },
-  call: {
-    title: "Call Simulator",
-    course: "Telecommunications",
-    codeSuffix: "-TEL",
-    levels: CALL_LEVELS,
-  },
-  ticket: {
-    title: "Ticket Rush",
-    course: "Telecommunications",
-    codeSuffix: "-TEL",
-    levels: TICKET_LEVELS,
-  },
-} as const;
-
-const gameInput = z.enum(["code", "bug", "sprint", "call", "ticket"]);
+const gameInput = z.enum(GAME_IDS);
+/** The games on each shared engine, and where their levels live. */
+const SORT_GAMES = {
+  ticket: TICKET_LEVELS,
+  lab: LAB_LEVELS,
+  tools: TOOL_LEVELS,
+};
+const SPEED_GAMES = { sprint: SPRINT_LEVELS, salita: SALITA_LEVELS };
 
 /** The games this student can play, from the courses they're enrolled in. */
 async function gamesFor(db: PrismaClient, studentId: string) {
@@ -67,10 +55,10 @@ async function gamesFor(db: PrismaClient, studentId: string) {
     where: { studentId, status: "ACTIVE" },
     select: { section: { select: { course: { select: { code: true } } } } },
   });
-  const codes = enrollments.map((e) => e.section.course.code);
-  return (Object.keys(GAMES) as Game[]).filter((game) =>
-    codes.some((code) => code.endsWith(GAMES[game].codeSuffix)),
+  const games = new Set(
+    enrollments.flatMap((e) => gamesForCourse(e.section.course.code)),
   );
+  return GAME_IDS.filter((game) => games.has(game));
 }
 
 /** Best stars per level of one game. */
@@ -291,10 +279,11 @@ export const gameRouter = createTRPCRouter({
       return { ...result, ...saved };
     }),
 
-  /** Tag Sprint: every answer tapped in the round. */
-  finishSprint: studentProcedure
+  /** Speed rounds (Tag Sprint, Salita Sprint): every answer tapped. */
+  finishSpeed: studentProcedure
     .input(
       z.object({
+        game: z.enum(["sprint", "salita"]),
         levelId: z.string(),
         answers: z
           .array(z.object({ id: z.string(), choice: z.string() }))
@@ -302,15 +291,17 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertPlayable(ctx.db, ctx.studentId, "sprint", input.levelId);
-      const level = SPRINT_LEVELS.find((l) => l.id === input.levelId)!;
-      const result = scoreSprint(level, input.answers);
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = SPEED_GAMES[input.game].find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreSpeed(level, input.answers);
       const saved =
         result.stars > 0
           ? await saveBest(
               ctx.db,
               ctx.studentId,
-              "sprint",
+              input.game,
               input.levelId,
               result.stars,
               result.net,
@@ -319,10 +310,14 @@ export const gameRouter = createTRPCRouter({
       return { ...result, ...saved };
     }),
 
-  /** Ticket Rush: the bin picked for every ticket (-1 when it ran out). */
-  finishTicket: studentProcedure
+  /**
+   * Sorting rounds (Ticket Rush, Lab Sorter, Tool Shed): the bin picked
+   * for every card (-1 when it ran out).
+   */
+  finishSort: studentProcedure
     .input(
       z.object({
+        game: z.enum(["ticket", "lab", "tools"]),
         levelId: z.string(),
         answers: z
           .array(z.object({ id: z.string(), bin: z.number().int().min(-1) }))
@@ -330,13 +325,13 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertPlayable(ctx.db, ctx.studentId, "ticket", input.levelId);
-      const level = TICKET_LEVELS.find((l) => l.id === input.levelId)!;
-      const result = scoreTickets(level, input.answers);
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = SORT_GAMES[input.game].find((l) => l.id === input.levelId)!;
+      const result = scoreSort(level, input.answers);
       if (!result) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Finish the whole shift first.",
+          message: "Finish the whole round first.",
         });
       }
       const saved =
@@ -344,12 +339,115 @@ export const gameRouter = createTRPCRouter({
           ? await saveBest(
               ctx.db,
               ctx.studentId,
-              "ticket",
+              input.game,
               input.levelId,
               result.stars,
               result.percent,
             )
           : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Number Rush: the balloon popped for each problem's seed. */
+  finishMath: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        answers: z
+          .array(
+            z.object({
+              seed: z.number().int().min(0).max(2_000_000_000),
+              choice: z.string().max(60),
+            }),
+          )
+          .length(MATH_PROBLEMS),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "math", input.levelId);
+      const level = MATH_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreMath(level, input.answers);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Answer all the problems first.",
+        });
+      }
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "math",
+              input.levelId,
+              result.stars,
+              result.right,
+            )
+          : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Tama o Mali: Tama or Mali for every card. */
+  finishTama: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        answers: z
+          .array(z.object({ id: z.string(), tama: z.boolean() }))
+          .max(20),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "tama", input.levelId);
+      const level = TAMA_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreTama(level, input.answers);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Answer every card first.",
+        });
+      }
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "tama",
+              input.levelId,
+              result.stars,
+              result.right,
+            )
+          : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Grammar Hunt: per sentence, every word tapped and the fixes picked. */
+  finishGrammar: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        taps: z.array(z.array(z.number().int().min(0)).max(30)).max(10),
+        picks: z.array(z.array(z.number().int().min(0).max(2)).max(3)).max(10),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "grammar", input.levelId);
+      const level = GRAMMAR_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreGrammar(level, input.taps, input.picks);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Fix every sentence first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        "grammar",
+        input.levelId,
+        result.stars,
+        Math.max(0, 10 - result.mistakes),
+      );
       return { ...result, ...saved };
     }),
 

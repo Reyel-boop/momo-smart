@@ -6,46 +6,147 @@ import { useEffect, useRef, useState } from "react";
 import { SoundToggle } from "~/app/_components/race/race-view";
 import { sfx, unlock } from "~/app/_components/sfx";
 import { Card } from "~/app/_components/ui";
-import {
-  TICKET_LEVELS,
-  TICKET_STARS,
-  type Ticket,
-  type TicketLevel,
-} from "~/lib/games/ticket-rush";
+import { LAB_LEVELS } from "~/lib/games/lab-sorter";
+import { SORT_STARS, type SortCard, type SortLevel } from "~/lib/games/sort";
+import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
+import { TOOL_LEVELS } from "~/lib/games/tool-shed";
 import { api } from "~/trpc/react";
-import {
-  LevelHeader,
-  LevelResult,
-  LockedLevel,
-  shuffled,
-} from "../../_components/shared";
+import { LevelHeader, LevelResult, LockedLevel, shuffled } from "./shared";
+
+export type SortGame = "ticket" | "lab" | "tools";
+
+/** Each sorting game's levels and its look and words. */
+const SORT_GAMES: Record<
+  SortGame,
+  {
+    levels: SortLevel[];
+    name: string;
+    round: string;
+    emoji: string;
+    gradient: string;
+    kicker: string;
+    start: string;
+    /** What one card is called, with its icon. */
+    noun: string;
+    nounIcon: string;
+    /** Cards are quotes from someone (Ticket Rush) or plain samples. */
+    quoted: boolean;
+    intro: (level: SortLevel) => string;
+    timeout: string;
+    headings: { top: string; pass: string; fail: string };
+    pending: string;
+  }
+> = {
+  ticket: {
+    levels: TICKET_LEVELS,
+    name: "Ticket Rush",
+    round: "Shift",
+    emoji: "🎧",
+    gradient: "from-teal-600 via-emerald-600 to-cyan-700",
+    kicker: "Shift briefing",
+    start: "🎧 Start shift",
+    noun: "Ticket",
+    nounIcon: "🎫",
+    quoted: true,
+    intro: (l) =>
+      `${l.cards.length} tickets. Each customer waits ${l.patience} seconds before hanging up.`,
+    timeout: "📵 The customer hung up!",
+    headings: {
+      top: "🏆 Top agent of the shift!",
+      pass: "🎧 Shift complete!",
+      fail: "Shift failed — try again",
+    },
+    pending: "Shift over! Checking the queue…",
+  },
+  lab: {
+    levels: LAB_LEVELS,
+    name: "Lab Sorter",
+    round: "Round",
+    emoji: "🧪",
+    gradient: "from-sky-600 via-indigo-600 to-violet-700",
+    kicker: "Lab briefing",
+    start: "🧪 Start sorting",
+    noun: "Sample",
+    nounIcon: "🧪",
+    quoted: false,
+    intro: (l) =>
+      `${l.cards.length} samples, ${l.patience} seconds each before they spoil.`,
+    timeout: "⏱ Too slow, the sample spoiled!",
+    headings: {
+      top: "🏆 Lab genius!",
+      pass: "🧪 Lab work done!",
+      fail: "Lab failed — try again",
+    },
+    pending: "Checking your lab work…",
+  },
+  tools: {
+    levels: TOOL_LEVELS,
+    name: "Tool Shed",
+    round: "Round",
+    emoji: "🧰",
+    gradient: "from-amber-600 via-orange-600 to-red-600",
+    kicker: "Shop briefing",
+    start: "🧰 Open the shed",
+    noun: "Item",
+    nounIcon: "🔧",
+    quoted: false,
+    intro: (l) =>
+      `${l.cards.length} items, ${l.patience} seconds each to put away.`,
+    timeout: "⏱ Too slow!",
+    headings: {
+      top: "🏆 Master of the shop!",
+      pass: "🧰 Shed sorted!",
+      fail: "Not yet — try again",
+    },
+    pending: "Checking the shelves…",
+  },
+};
 
 const BIN_COLORS = [
   "from-sky-500 to-blue-600",
   "from-emerald-500 to-teal-600",
   "from-amber-400 to-orange-500",
   "from-pink-500 to-rose-600",
+  "from-violet-500 to-purple-600",
+  "from-slate-500 to-slate-700",
 ];
 
+/** Grid columns for a number of bins, phone first. */
+function binColumns(count: number) {
+  if (count === 2) return "grid-cols-2";
+  if (count === 4) return "grid-cols-2 sm:grid-cols-4";
+  return "grid-cols-3";
+}
+
 /**
- * One Ticket Rush shift: tickets come one at a time, each with a patience
- * bar, and the student sorts each into a bin. Wrong or missed tickets show
- * why before the next one; the server scores the shift.
+ * One round of a sorting game (Ticket Rush, Lab Sorter, Tool Shed): cards
+ * come one at a time, each with a timer bar, and the student sorts each
+ * into a bin. Wrong or missed cards show why before the next one; the
+ * server scores the round.
  */
-export function TicketScreen({ levelId }: { levelId: string }) {
-  const level = TICKET_LEVELS.find((l) => l.id === levelId)!;
-  const access = api.game.level.useQuery(
-    { game: "ticket", levelId },
-    { retry: false },
-  );
+export function SortScreen({
+  game,
+  levelId,
+}: {
+  game: SortGame;
+  levelId: string;
+}) {
+  const level = SORT_GAMES[game].levels.find((l) => l.id === levelId)!;
+  const access = api.game.level.useQuery({ game, levelId }, { retry: false });
   const [attempt, setAttempt] = useState(0);
 
   if (access.error) {
-    return <LockedLevel what="Shift" message={access.error.message} />;
+    return (
+      <LockedLevel
+        what={SORT_GAMES[game].round}
+        message={access.error.message}
+      />
+    );
   }
   return (
-    <Shift
+    <Round
       key={attempt}
+      game={game}
       level={level}
       best={access.data?.best ?? 0}
       number={access.data?.number}
@@ -57,9 +158,10 @@ export function TicketScreen({ levelId }: { levelId: string }) {
   );
 }
 
-type Feedback = { ticket: Ticket; bin: number; right: boolean };
+type Feedback = { card: SortCard; bin: number; right: boolean };
 
-function Shift({
+function Round({
+  game,
   level,
   best,
   number,
@@ -68,7 +170,8 @@ function Shift({
   ready,
   onRetry,
 }: {
-  level: TicketLevel;
+  game: SortGame;
+  level: SortLevel;
   best: number;
   number?: number;
   count?: number;
@@ -76,27 +179,28 @@ function Shift({
   ready: boolean;
   onRetry: () => void;
 }) {
+  const theme = SORT_GAMES[game];
   const router = useRouter();
   const utils = api.useUtils();
-  const [queue] = useState(() => shuffled(level.tickets));
+  const [queue] = useState(() => shuffled(level.cards));
   const [phase, setPhase] = useState<"intro" | "play" | "done">("intro");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<{ id: string; bin: number }[]>([]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const resolved = useRef(-1);
-  const finish = api.game.finishTicket.useMutation({
+  const finish = api.game.finishSort.useMutation({
     onSuccess: () => {
       void utils.game.hub.invalidate();
       router.refresh();
     },
   });
 
-  const ticket = queue[index];
+  const card = queue[index];
   const right = answers.filter(
-    (a) => level.tickets.find((t) => t.id === a.id)?.bin === a.bin,
+    (a) => level.cards.find((c) => c.id === a.id)?.bin === a.bin,
   ).length;
   const handled = answers.length;
-  // Customer mood: the share sorted right so far.
+  // Mood: the share sorted right so far.
   const mood = handled === 0 ? 1 : right / handled;
   const face =
     mood >= 0.9 ? "😄" : mood >= 0.7 ? "🙂" : mood >= 0.5 ? "😐" : "😠";
@@ -108,17 +212,17 @@ function Shift({
   };
 
   const resolve = (bin: number) => {
-    if (!ticket || resolved.current === index || feedback) return;
+    if (!card || resolved.current === index || feedback) return;
     resolved.current = index;
-    const ok = bin === ticket.bin;
-    setAnswers((a) => [...a, { id: ticket.id, bin }]);
-    setFeedback({ ticket, bin, right: ok });
+    const ok = bin === card.bin;
+    setAnswers((a) => [...a, { id: card.id, bin }]);
+    setFeedback({ card, bin, right: ok });
     if (ok) sfx.coin();
-    else if (bin < 0) sfx.hangup();
+    else if (bin < 0 && game === "ticket") sfx.hangup();
     else sfx.hurt();
   };
 
-  // The customer gives up when the patience bar runs out.
+  // The card runs out when its timer bar empties.
   useEffect(() => {
     if (phase !== "play" || feedback) return;
     const t = setTimeout(() => resolve(-1), level.patience * 1000);
@@ -142,9 +246,9 @@ function Shift({
       !finish.isPending &&
       !finish.error
     ) {
-      finish.mutate({ levelId: level.id, answers });
+      finish.mutate({ game, levelId: level.id, answers });
     }
-  }, [phase, ready, finish, level.id, answers]);
+  }, [phase, ready, finish, game, level.id, answers]);
 
   useEffect(() => {
     if (finish.data && finish.data.stars > 0) sfx.fanfare();
@@ -152,15 +256,16 @@ function Shift({
 
   const mistakes = answers
     .map((a) => ({
-      ticket: level.tickets.find((t) => t.id === a.id)!,
+      card: level.cards.find((c) => c.id === a.id)!,
       bin: a.bin,
     }))
-    .filter((m) => m.ticket.bin !== m.bin);
+    .filter((m) => m.card.bin !== m.bin);
+  const quote = (text: string) => (theme.quoted ? `“${text}”` : text);
 
   return (
     <div className="mx-auto max-w-4xl space-y-4 max-sm:space-y-3">
       <LevelHeader
-        game="Ticket Rush"
+        game={theme.name}
         unit={level.unit}
         unitTitle={level.unitTitle}
         title={level.title}
@@ -173,10 +278,12 @@ function Shift({
 
       {phase === "intro" && (
         <Card className="overflow-hidden">
-          <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700 px-6 py-8 text-center text-white">
-            <p className="text-5xl">🎧</p>
+          <div
+            className={`bg-gradient-to-br ${theme.gradient} px-6 py-8 text-center text-white`}
+          >
+            <p className="text-5xl">{theme.emoji}</p>
             <p className="mt-2 text-xs font-black tracking-[0.25em] text-amber-300 uppercase">
-              Shift briefing
+              {theme.kicker}
             </p>
             <h2 className="mx-auto max-w-lg text-2xl font-black">
               {level.task}
@@ -192,44 +299,43 @@ function Shift({
               ))}
             </div>
             <p className="mx-auto mt-4 max-w-md text-sm text-white/85">
-              {level.tickets.length} tickets. Each customer waits{" "}
-              {level.patience} seconds before hanging up. Sort {TICKET_STARS[2]}
-              % right for 3 stars.
+              {theme.intro(level)} Sort {SORT_STARS[2]}% right for 3 stars.
             </p>
             <button
               type="button"
               onPointerDown={unlock}
               onClick={() => {
                 unlock();
-                sfx.pickup();
+                if (game === "ticket") sfx.pickup();
+                else sfx.select();
                 setPhase("play");
               }}
               className="go-btn mt-6 rounded-2xl bg-amber-400 px-8 py-3 text-lg font-black text-slate-900 shadow-lg hover:bg-amber-300"
             >
-              🎧 Start shift
+              {theme.start}
             </button>
           </div>
         </Card>
       )}
 
-      {phase === "play" && ticket && (
+      {phase === "play" && card && (
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between bg-slate-800 px-5 py-2.5 text-sm font-black text-white">
             <span>
-              🎫 Ticket {index + 1}
+              {theme.nounIcon} {theme.noun} {index + 1}
               <span className="text-slate-400">/{queue.length}</span>
             </span>
             <span className="text-emerald-300">✓ {right}</span>
-            <span title="Customer mood" className="text-xl">
+            <span title="Mood" className="text-xl">
               {face}
             </span>
           </div>
 
           <div className="relative px-5 pt-6 pb-4 max-sm:px-3 max-sm:pt-4">
-            {/* The queue behind the current ticket */}
-            {queue.slice(index + 1, index + 3).map((t, k) => (
+            {/* The queue behind the current card */}
+            {queue.slice(index + 1, index + 3).map((c, k) => (
               <div
-                key={t.id}
+                key={c.id}
                 className="border-line bg-surface absolute inset-x-5 h-24 rounded-2xl border shadow-sm max-sm:inset-x-3"
                 style={{
                   top: `${12 - k * 6}px`,
@@ -239,7 +345,7 @@ function Shift({
               />
             ))}
             <div
-              key={ticket.id}
+              key={card.id}
               className={`ticket-in border-line bg-surface relative rounded-2xl border-2 px-5 py-4 shadow-lg ${
                 feedback
                   ? feedback.right
@@ -248,23 +354,21 @@ function Shift({
                   : ""
               }`}
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex min-h-4 items-center justify-between gap-3">
                 <p className="text-muted text-xs font-black tracking-wide uppercase">
-                  {ticket.from}
+                  {card.from}
                 </p>
                 {!feedback && (
-                  <span className="text-muted text-[11px] font-bold">
-                    ⏳ waiting
-                  </span>
+                  <span className="text-muted text-[11px] font-bold">⏳</span>
                 )}
               </div>
               <p className="text-ink mt-1 text-lg leading-snug font-bold sm:text-xl">
-                “{ticket.text}”
+                {quote(card.text)}
               </p>
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
                 {!feedback && (
                   <div
-                    key={ticket.id}
+                    key={card.id}
                     className="patience h-full rounded-full"
                     style={{ animationDuration: `${level.patience}s` }}
                   />
@@ -284,12 +388,12 @@ function Shift({
                   {feedback.right
                     ? "✓ Sorted right!"
                     : feedback.bin < 0
-                      ? `📵 The customer hung up! It was ${level.bins[feedback.ticket.bin]!.label}.`
-                      : `✗ That goes to ${level.bins[feedback.ticket.bin]!.label}.`}
+                      ? `${theme.timeout} It was ${level.bins[feedback.card.bin]!.label}.`
+                      : `✗ That goes to ${level.bins[feedback.card.bin]!.label}.`}
                 </p>
                 {!feedback.right && (
                   <div className="mt-0.5 flex flex-wrap items-end justify-between gap-2">
-                    <p>{feedback.ticket.why}</p>
+                    <p>{feedback.card.why}</p>
                     <button
                       type="button"
                       onClick={next}
@@ -304,12 +408,10 @@ function Shift({
           </div>
 
           <div
-            className={`grid gap-2.5 px-5 pb-5 max-sm:gap-2 max-sm:px-3 ${
-              level.bins.length === 3 ? "grid-cols-3" : "grid-cols-2"
-            } ${level.bins.length === 4 ? "sm:grid-cols-4" : ""}`}
+            className={`grid gap-2.5 px-5 pb-5 max-sm:gap-2 max-sm:px-3 ${binColumns(level.bins.length)}`}
           >
             {level.bins.map((b, k) => {
-              const isAnswer = feedback?.ticket.bin === k;
+              const isAnswer = feedback?.card.bin === k;
               const isPicked = feedback?.bin === k;
               return (
                 <button
@@ -342,23 +444,21 @@ function Shift({
         <Card className="px-4 py-4">
           {!finish.data ? (
             <p className="text-muted text-center text-sm">
-              {finish.error
-                ? finish.error.message
-                : "Shift over! Checking the queue…"}
+              {finish.error ? finish.error.message : theme.pending}
             </p>
           ) : (
             <LevelResult
               heading={
                 finish.data.stars === 3
-                  ? "🏆 Top agent of the shift!"
+                  ? theme.headings.top
                   : finish.data.stars > 0
-                    ? "🎧 Shift complete!"
-                    : "Shift failed — try again"
+                    ? theme.headings.pass
+                    : theme.headings.fail
               }
               stars={finish.data.stars}
               newStars={finish.data.newStars}
               best={finish.data.best}
-              failNote={`Sort at least ${TICKET_STARS[0]}% of the tickets right for a star.`}
+              failNote={`Sort at least ${SORT_STARS[0]}% right for a star.`}
               stats={[
                 {
                   label: "Sorted right",
@@ -366,7 +466,7 @@ function Shift({
                 },
                 { label: "Accuracy", value: `${finish.data.percent}%` },
               ]}
-              nextHref={nextId ? `/student/games/ticket/${nextId}` : null}
+              nextHref={nextId ? `/student/games/${game}/${nextId}` : null}
               onRetry={onRetry}
             >
               {mistakes.length > 0 && (
@@ -376,14 +476,14 @@ function Shift({
                   </p>
                   {mistakes.map((m) => (
                     <div
-                      key={m.ticket.id}
+                      key={m.card.id}
                       className="border-line bg-surface rounded-xl border px-3 py-2 text-xs"
                     >
-                      <p className="text-ink font-bold">“{m.ticket.text}”</p>
+                      <p className="text-ink font-bold">{quote(m.card.text)}</p>
                       <p className="mt-0.5 text-emerald-700">
-                        → {level.bins[m.ticket.bin]!.icon}{" "}
-                        {level.bins[m.ticket.bin]!.label}:{" "}
-                        <span className="text-muted">{m.ticket.why}</span>
+                        → {level.bins[m.card.bin]!.icon}{" "}
+                        {level.bins[m.card.bin]!.label}:{" "}
+                        <span className="text-muted">{m.card.why}</span>
                       </p>
                     </div>
                   ))}

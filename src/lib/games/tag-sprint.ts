@@ -4,30 +4,12 @@
  * matching tag, attribute or CSS property among four. Right answers in a
  * row build a combo; wrong ones cost a point. Five rounds, one per topic.
  *
- * The wrong choices are other answers from the same round, so each item is
- * just a prompt and its answer. Scoring lives here for the server.
+ * Runs on the speed-round engine in ./speed.
  */
 
-export type SprintItem = { id: string; prompt: string; answer: string };
+import { pool, type SpeedLevel } from "./speed";
 
-export type SprintLevel = {
-  id: string;
-  unit: number;
-  unitTitle: string;
-  title: string;
-  /** What the round covers, shown before it starts. */
-  topic: string;
-  items: SprintItem[];
-};
-
-export const SPRINT_SECONDS = 60;
-/** Net score (right minus wrong) for 1, 2 and 3 stars. */
-export const SPRINT_STARS = [6, 12, 18] as const;
-
-const pool = (id: string, pairs: [string, string][]): SprintItem[] =>
-  pairs.map(([prompt, answer], i) => ({ id: `${id}.${i}`, prompt, answer }));
-
-export const SPRINT_LEVELS: SprintLevel[] = [
+export const SPRINT_LEVELS: SpeedLevel[] = [
   {
     id: "sprint-1",
     unit: 3,
@@ -174,24 +156,3 @@ export const SPRINT_LEVELS: SprintLevel[] = [
     ]),
   },
 ];
-
-/** Stars for a round's net score. */
-export function sprintStars(net: number) {
-  return SPRINT_STARS.filter((needed) => net >= needed).length;
-}
-
-/** Scores a round from every answer tapped. */
-export function scoreSprint(
-  level: SprintLevel,
-  answers: { id: string; choice: string }[],
-) {
-  const byId = new Map(level.items.map((i) => [i.id, i.answer]));
-  let right = 0;
-  let wrong = 0;
-  for (const a of answers) {
-    if (byId.get(a.id) === a.choice) right++;
-    else wrong++;
-  }
-  const net = Math.max(0, right - wrong);
-  return { right, wrong, net, stars: sprintStars(net) };
-}

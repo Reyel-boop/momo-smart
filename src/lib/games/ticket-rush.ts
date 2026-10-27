@@ -5,49 +5,12 @@
  * call-flow step…) before the customer's patience runs out. Six shifts,
  * each on one unit of the course.
  *
- * Scoring lives here so the server can score a shift from the answers.
+ * Runs on the sorting engine in ./sort.
  */
 
-export type Ticket = {
-  id: string;
-  /** Who it's from, e.g. "Mr. Santos" or "Agent". */
-  from: string;
-  text: string;
-  /** The right bin's index. */
-  bin: number;
-  /** Shown when it's sorted wrong or runs out. */
-  why: string;
-};
+import { sortCards, type SortLevel } from "./sort";
 
-export type TicketLevel = {
-  id: string;
-  unit: number;
-  unitTitle: string;
-  title: string;
-  /** What the student does this shift. */
-  task: string;
-  bins: { label: string; icon: string }[];
-  /** Seconds before an unsorted ticket's customer gives up. */
-  patience: number;
-  tickets: Ticket[];
-};
-
-/** Accuracy (percent) for 1, 2 and 3 stars. */
-export const TICKET_STARS = [50, 70, 90] as const;
-
-const tickets = (
-  id: string,
-  rows: [from: string, text: string, bin: number, why: string][],
-): Ticket[] =>
-  rows.map(([from, text, bin, why], i) => ({
-    id: `${id}.${i}`,
-    from,
-    text,
-    bin,
-    why,
-  }));
-
-export const TICKET_LEVELS: TicketLevel[] = [
+export const TICKET_LEVELS: SortLevel[] = [
   {
     id: "ticket-1",
     unit: 2,
@@ -59,7 +22,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Outbound", icon: "📤" },
     ],
     patience: 12,
-    tickets: tickets("ticket-1", [
+    cards: sortCards("ticket-1", [
       [
         "Mrs. Cruz",
         "I'm calling because my bill is higher this month.",
@@ -135,7 +98,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Customer Care", icon: "💬" },
     ],
     patience: 11,
-    tickets: tickets("ticket-2", [
+    cards: sortCards("ticket-2", [
       [
         "Mr. Garcia",
         "I was charged twice for the same month.",
@@ -209,7 +172,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Unprofessional", icon: "❌" },
     ],
     patience: 10,
-    tickets: tickets("ticket-3", [
+    cards: sortCards("ticket-3", [
       [
         "Agent",
         "Thank you for calling Momo Telecom, this is Ana. How may I help you?",
@@ -285,7 +248,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Abandon Rate", icon: "📵" },
     ],
     patience: 12,
-    tickets: tickets("ticket-4", [
+    cards: sortCards("ticket-4", [
       [
         "Report",
         "Your calls average 6 minutes 40 seconds each.",
@@ -360,7 +323,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Transfer to department", icon: "🔀" },
     ],
     patience: 12,
-    tickets: tickets("ticket-5", [
+    cards: sortCards("ticket-5", [
       [
         "Ms. Aquino",
         "What time does your store close?",
@@ -436,7 +399,7 @@ export const TICKET_LEVELS: TicketLevel[] = [
       { label: "Closing", icon: "🏁" },
     ],
     patience: 10,
-    tickets: tickets("ticket-6", [
+    cards: sortCards("ticket-6", [
       [
         "Agent",
         "Good morning, thank you for calling Momo Telecom. This is Mia.",
@@ -500,27 +463,3 @@ export const TICKET_LEVELS: TicketLevel[] = [
     ]),
   },
 ];
-
-export function ticketStars(percent: number) {
-  return TICKET_STARS.filter((needed) => percent >= needed).length;
-}
-
-/**
- * Scores a shift: one answer per ticket, the bin picked (-1 when the
- * customer ran out of patience). Null when tickets are missing.
- */
-export function scoreTickets(
-  level: TicketLevel,
-  answers: { id: string; bin: number }[],
-) {
-  const picked = new Map(answers.map((a) => [a.id, a.bin]));
-  if (level.tickets.some((t) => !picked.has(t.id))) return null;
-  const right = level.tickets.filter((t) => picked.get(t.id) === t.bin).length;
-  const percent = Math.round((right / level.tickets.length) * 100);
-  return {
-    right,
-    total: level.tickets.length,
-    percent,
-    stars: ticketStars(percent),
-  };
-}

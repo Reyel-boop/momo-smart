@@ -1,11 +1,13 @@
+import { gamesForCourse } from "~/lib/games/catalog";
+
 import type { Prisma, PrismaClient } from "../../../generated/prisma";
 import { STAR_ASSIGNMENT_TYPES, starsFor } from "./stars";
 
 /**
  * Group Race: each class is split into five teams, and a team's score is the
  * stars its members have earned in that class — Unit Questions and Live
- * Quiz answers (each question once), released graded work, and, in
- * Computer Programming or Telecommunications, the course game.
+ * Quiz answers (each question once), released graded work, and the games
+ * of the class's course.
  */
 type Db = PrismaClient | Prisma.TransactionClient;
 
@@ -167,11 +169,7 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
     }
   }
   // Course games, and Momo's Quest on this class's units (best result).
-  const courseGames = courseCode.endsWith("-CP")
-    ? ["code", "bug", "sprint"]
-    : courseCode.endsWith("-TEL")
-      ? ["call", "ticket"]
-      : [];
+  const courseGames: string[] = gamesForCourse(courseCode);
   const units = await db.assessment.findMany({
     where: { sectionId, unitId: { not: null }, assignmentId: null },
     select: { id: true },

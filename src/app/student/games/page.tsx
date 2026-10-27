@@ -4,6 +4,7 @@ import Link from "next/link";
 import { LockIcon, PlayIcon, StarIcon } from "~/app/_components/icons";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
+import { type GameId } from "~/lib/games/catalog";
 import { api } from "~/trpc/server";
 import { Stars } from "./_components/stars";
 import { Hero, MomoPet, Monster } from "./quest/_components/art";
@@ -47,13 +48,58 @@ const LOOK = {
     banner: "from-cyan-600 to-emerald-700",
     emoji: "🎧",
   },
-} as const;
+  math: {
+    href: "/student/games/math",
+    blurb:
+      "Answers float up in balloons: solve the problem and pop the right one before it drifts away.",
+    banner: "from-sky-600 to-indigo-700",
+    emoji: "🎈",
+  },
+  lab: {
+    href: "/student/games/lab",
+    blurb:
+      "Sort samples on the lab bench: plate boundaries, waves, lenses, biomolecules, gas laws and more.",
+    banner: "from-indigo-600 to-violet-700",
+    emoji: "🧪",
+  },
+  tama: {
+    href: "/student/games/tama",
+    blurb:
+      "I-swipe pakanan kung TAMA, pakaliwa kung MALI — bawat pahayag ay may paliwanag.",
+    banner: "from-amber-500 to-rose-600",
+    emoji: "🇵🇭",
+  },
+  grammar: {
+    href: "/student/games/grammar",
+    blurb:
+      "Every sentence hides one wrong word. Tap it, fix it, and learn the rule behind it.",
+    banner: "from-blue-600 to-sky-600",
+    emoji: "🔎",
+  },
+  salita: {
+    href: "/student/games/salita",
+    blurb:
+      "60 segundo: itugma ang paglalarawan sa tamang diyos, tayutay, epiko o tauhan ng El Fili.",
+    banner: "from-rose-600 to-amber-500",
+    emoji: "📜",
+  },
+  tools: {
+    href: "/student/games/tools",
+    blurb:
+      "Put every tool and habit where it belongs: computer parts, kitchen, food safety, farm and wiring.",
+    banner: "from-amber-600 to-red-600",
+    emoji: "🧰",
+  },
+} as const satisfies Record<
+  GameId,
+  { href: string; blurb: string; banner: string; emoji: string }
+>;
 
 /**
- * The student's course games: Code Quest, Bug Hunt and Tag Sprint for
- * Computer Programming, Call Simulator and Ticket Rush for
- * Telecommunications, each listed only for students in that course. Every level shows its stars, and locked levels wait for the one
- * before.
+ * The student's course games: at least one for every subject they're
+ * enrolled in (see ~/lib/games/catalog), each listed only for students in
+ * that course. Every level shows its stars, and locked levels wait for the
+ * one before.
  */
 export default async function GamesPage() {
   const games = await api.game.hub();
@@ -94,8 +140,7 @@ export default async function GamesPage() {
       {games.length === 0 && (
         <Card>
           <EmptyState>
-            The course games appear here when you join Computer Programming or
-            Telecommunications.
+            Your subject games appear here when you join a class.
           </EmptyState>
         </Card>
       )}
