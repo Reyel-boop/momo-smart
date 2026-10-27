@@ -251,7 +251,7 @@ export const userRouter = createTRPCRouter({
               sectionId: input.sectionId,
               section:
                 ctx.session.user.role === "ADMIN"
-                  ? undefined
+                  ? { schoolId: ctx.session.user.schoolId ?? "" }
                   : { teacherId: ctx.teacherId ?? "" },
             },
           },
@@ -288,6 +288,7 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      await assertStudentAccess(ctx.db, ctx.session.user, input.studentId);
       return ctx.db.accommodation.create({ data: input });
     }),
 });

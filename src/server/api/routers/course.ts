@@ -2,9 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import {
-  adminProcedure,
   createTRPCRouter,
+  ownerProcedure,
   protectedProcedure,
+  schoolOf,
   studentProcedure,
   teacherProcedure,
 } from "~/server/api/trpc";
@@ -26,7 +27,13 @@ export const courseRouter = createTRPCRouter({
   importRoster: teacherProcedure
     .input(z.object({ rows: z.array(rosterRow).min(1).max(200), homeroom }))
     .mutation(({ ctx, input }) =>
-      importRoster(ctx.db, input.rows, [], input.homeroom),
+      importRoster(
+        ctx.db,
+        input.rows,
+        [],
+        input.homeroom,
+        schoolOf(ctx.session.user),
+      ),
     ),
 
   /** The teacher’s department (subject area), if the registrar set one. */
@@ -41,6 +48,7 @@ export const courseRouter = createTRPCRouter({
   /** The sections (homerooms) a teacher can start a class for. */
   homerooms: teacherProcedure.query(({ ctx }) =>
     ctx.db.homeroom.findMany({
+      where: { schoolId: schoolOf(ctx.session.user) },
       orderBy: [{ gradeLevel: "asc" }, { name: "asc" }],
       select: { id: true, name: true, gradeLevel: true },
     }),
@@ -54,13 +62,14 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ courseId: z.string(), homeroomId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const teacherId = ctx.session.user.teacherId;
+      const schoolId = schoolOf(ctx.session.user);
       const [term, room, course, teacher] = await Promise.all([
         ctx.db.term.findFirst({
           where: { isCurrent: true },
           select: { id: true },
         }),
-        ctx.db.homeroom.findUnique({
-          where: { id: input.homeroomId },
+        ctx.db.homeroom.findFirst({
+          where: { id: input.homeroomId, schoolId },
           select: { name: true },
         }),
         ctx.db.course.findUnique({
@@ -91,7 +100,8 @@ export const courseRouter = createTRPCRouter({
       const code = room.name.slice(0, 20);
       const existing = await ctx.db.section.findUnique({
         where: {
-          termId_courseId_code: {
+          schoolId_termId_courseId_code: {
+            schoolId,
             termId: term.id,
             courseId: input.courseId,
             code,
@@ -115,6 +125,7 @@ export const courseRouter = createTRPCRouter({
       }
       const section = await ctx.db.section.create({
         data: {
+          schoolId,
           termId: term.id,
           courseId: input.courseId,
           teacherId,
@@ -163,7 +174,7 @@ export const courseRouter = createTRPCRouter({
                     some: { studentId: user.studentId ?? "", status: "ACTIVE" },
                   },
                 }
-              : {}),
+              : { schoolId: user.schoolId ?? "" }),
         },
         orderBy: { period: "asc" },
         select: {
@@ -631,7 +642,8 @@ export const courseRouter = createTRPCRouter({
 
   // --- School configuration -------------------------------------------------
 
-  createCourse: adminProcedure
+  /** Adds a course to the curriculum every school shares. */
+  createCourse: ownerProcedure
     .input(
       z.object({
         code: z.string().min(2).max(20),
@@ -646,98 +658,4 @@ export const courseRouter = createTRPCRouter({
       }),
     )
     .mutation(({ ctx, input }) => ctx.db.course.create({ data: input })),
-
-  createSection: adminProcedure
-    .input(
-      z.object({
-        courseId: z.string(),
-        termId: z.string(),
-        teacherId: z.string(),
-        code: z.string().min(1).max(20),
-        period: z.number().int().min(0).max(12),
-        room: z.string().max(40).optional(),
-        capacity: z.number().int().min(1).max(200).default(30),
-        meetings: z
-          .array(
-            z.object({
-              dayOfWeek: z.enum([
-                "MONDAY",
-                "TUESDAY",
-                "WEDNESDAY",
-                "THURSDAY",
-                "FRIDAY",
-                "SATURDAY",
-                "SUNDAY",
-              ]),
-              rotation: z.enum(["ALL", "ODD", "EVEN"]).default("ALL"),
-              startTime: z.string().regex(/^\d{2}:\d{2}$/),
-              endTime: z.string().regex(/^\d{2}:\d{2}$/),
-              room: z.string().max(40).optional(),
-            }),
-          )
-          .default([]),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { meetings, ...section } = input;
-      return ctx.db.section.create({
-        data: { ...section, meetings: { create: meetings } },
-        include: { meetings: true },
-      });
-    }),
-
-  enrollStudent: adminProcedure
-    .input(
-      z.object({
-        sectionId: z.string(),
-        studentId: z.string(),
-        seatNo: z.number().int().positive().optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const section = await ctx.db.section.findUnique({
-        where: { id: input.sectionId },
-        select: {
-          capacity: true,
-          _count: { select: { enrollments: { where: { status: "ACTIVE" } } } },
-        },
-      });
-      if (!section) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Section not found.",
-        });
-      }
-      if (section._count.enrollments >= section.capacity) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "This section is at capacity.",
-        });
-      }
-
-      return ctx.db.enrollment.upsert({
-        where: {
-          sectionId_studentId: {
-            sectionId: input.sectionId,
-            studentId: input.studentId,
-          },
-        },
-        create: input,
-        update: { status: "ACTIVE", droppedAt: null, seatNo: input.seatNo },
-      });
-    }),
-
-  dropStudent: adminProcedure
-    .input(z.object({ sectionId: z.string(), studentId: z.string() }))
-    .mutation(({ ctx, input }) =>
-      ctx.db.enrollment.update({
-        where: {
-          sectionId_studentId: {
-            sectionId: input.sectionId,
-            studentId: input.studentId,
-          },
-        },
-        data: { status: "DROPPED", droppedAt: new Date() },
-      }),
-    ),
 });

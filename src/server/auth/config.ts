@@ -26,6 +26,10 @@ declare module "next-auth" {
       teacherId: string | null;
       /** Signed in with a temporary password that must be changed first. */
       mustChangePassword: boolean;
+      /** The person's school (for the owner, the school they're working in). */
+      schoolId: string | null;
+      /** The Momo owner, who creates schools and can switch between them. */
+      isOwner: boolean;
     } & DefaultSession["user"];
   }
 
@@ -50,6 +54,8 @@ type SessionClaims = {
   studentId: string | null;
   teacherId: string | null;
   mustChangePassword: boolean;
+  schoolId: string | null;
+  isOwner: boolean;
 };
 
 const ROLES: UserRole[] = ["STUDENT", "TEACHER", "ADMIN"];
@@ -65,6 +71,8 @@ function readClaims(token: Record<string, unknown>): SessionClaims {
     studentId: asString(token.studentId),
     teacherId: asString(token.teacherId),
     mustChangePassword: token.mustChangePassword === true,
+    schoolId: asString(token.schoolId),
+    isOwner: token.isOwner === true,
   };
 }
 
@@ -155,6 +163,8 @@ export const authConfig = {
           teacherId: user.teacherId ?? null,
           // Read on the next request, from the account row below.
           mustChangePassword: false,
+          schoolId: null,
+          isOwner: false,
         };
         return { ...token, ...claims };
       }
@@ -173,6 +183,8 @@ export const authConfig = {
           isActive: true,
           role: true,
           mustChangePassword: true,
+          schoolId: true,
+          isOwner: true,
           studentProfile: { select: { id: true } },
           teacherProfile: { select: { id: true } },
         },
@@ -188,6 +200,8 @@ export const authConfig = {
         studentId: account.studentProfile?.id ?? null,
         teacherId: account.teacherProfile?.id ?? null,
         mustChangePassword: account.mustChangePassword,
+        schoolId: account.schoolId,
+        isOwner: account.isOwner,
       };
     },
     session: ({ session, token }) => {

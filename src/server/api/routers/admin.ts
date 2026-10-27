@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { adminProcedure, createTRPCRouter, schoolOf } from "~/server/api/trpc";
 import { createUnitQuizzesForSection } from "~/server/curriculum";
 import { homeroom, importRoster, rosterRow } from "~/server/lib/import-roster";
 import type { PrismaClient } from "../../../../generated/prisma";
@@ -39,7 +39,7 @@ const orNull = (value: string | undefined) =>
 const ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
 
 /** A temporary password like "kq7m-x4tp-9wer", shown to the registrar once. */
-function temporaryPassword() {
+export function temporaryPassword() {
   const group = () =>
     Array.from({ length: 4 }, () => ALPHABET[randomInt(ALPHABET.length)]).join(
       "",
@@ -74,8 +74,12 @@ function graduationYear(gradeLevel: number, now = new Date()) {
   return schoolYearEnd + (12 - gradeLevel);
 }
 
-/** Creates one account with a temporary password; returns the password. */
-async function createPerson(db: PrismaClient, input: PersonInput) {
+/** Creates one account in a school with a temporary password; returns the password. */
+export async function createPerson(
+  db: PrismaClient,
+  input: PersonInput,
+  schoolId: string,
+) {
   const password = temporaryPassword();
   const passwordHash = await hash(password, 10);
   try {
@@ -84,6 +88,7 @@ async function createPerson(db: PrismaClient, input: PersonInput) {
         name: input.name,
         email: input.email,
         role: input.role,
+        schoolId,
         passwordHash,
         mustChangePassword: true,
         ...(input.role === "TEACHER"
@@ -130,21 +135,95 @@ async function createPerson(db: PrismaClient, input: PersonInput) {
   }
 }
 
+const notInSchool = (what: string) =>
+  new TRPCError({
+    code: "NOT_FOUND",
+    message: `${what} isn't in this school.`,
+  });
+
+/** A person of this school (never the owner, unless it's the owner asking). */
+async function personOf(
+  db: PrismaClient,
+  schoolId: string,
+  userId: string,
+  actor: { isOwner: boolean },
+) {
+  const person = await db.user.findFirst({
+    where: { id: userId, schoolId },
+    select: { id: true, isOwner: true },
+  });
+  if (!person || (person.isOwner && !actor.isOwner)) {
+    throw notInSchool("That person");
+  }
+  return person;
+}
+
+async function classOf(db: PrismaClient, schoolId: string, sectionId: string) {
+  const section = await db.section.findFirst({
+    where: { id: sectionId, schoolId },
+    select: { id: true },
+  });
+  if (!section) throw notInSchool("That class");
+  return section;
+}
+
+async function homeroomOf(db: PrismaClient, schoolId: string, id: string) {
+  const room = await db.homeroom.findFirst({
+    where: { id, schoolId },
+    select: { id: true, name: true },
+  });
+  if (!room) throw notInSchool("That section");
+  return room;
+}
+
+/** Students' profile ids that all belong to this school. */
+async function assertStudentsOf(
+  db: PrismaClient,
+  schoolId: string,
+  studentIds: string[],
+) {
+  const count = await db.studentProfile.count({
+    where: { id: { in: studentIds }, user: { schoolId } },
+  });
+  if (count !== new Set(studentIds).size) throw notInSchool("A student");
+}
+
 export const adminRouter = createTRPCRouter({
+  /** The admin's school: name, DepEd ID and the sign-up code. */
+  school: adminProcedure.query(({ ctx }) =>
+    ctx.db.school.findUniqueOrThrow({
+      where: { id: schoolOf(ctx.session.user) },
+      select: {
+        id: true,
+        name: true,
+        depedId: true,
+        address: true,
+        joinCode: true,
+      },
+    }),
+  ),
+
   /** Counts for the admin home page. */
   overview: adminProcedure.query(async ({ ctx }) => {
+    const schoolId = schoolOf(ctx.session.user);
     const [teachers, students, classes, courses, term, pendingFirstLogin] =
       await Promise.all([
-        ctx.db.user.count({ where: { role: "TEACHER", isActive: true } }),
-        ctx.db.user.count({ where: { role: "STUDENT", isActive: true } }),
-        ctx.db.section.count({ where: { term: { isCurrent: true } } }),
+        ctx.db.user.count({
+          where: { schoolId, role: "TEACHER", isActive: true },
+        }),
+        ctx.db.user.count({
+          where: { schoolId, role: "STUDENT", isActive: true },
+        }),
+        ctx.db.section.count({
+          where: { schoolId, term: { isCurrent: true } },
+        }),
         ctx.db.course.count(),
         ctx.db.term.findFirst({
           where: { isCurrent: true },
           select: { id: true, name: true, startDate: true, endDate: true },
         }),
         ctx.db.user.count({
-          where: { mustChangePassword: true, isActive: true },
+          where: { schoolId, mustChangePassword: true, isActive: true },
         }),
       ]);
     return { teachers, students, classes, courses, term, pendingFirstLogin };
@@ -164,6 +243,7 @@ export const adminRouter = createTRPCRouter({
       const q = input.query;
       return ctx.db.user.findMany({
         where: {
+          schoolId: schoolOf(ctx.session.user),
           role: input.role,
           ...(input.role === "STUDENT" && input.section
             ? {
@@ -227,7 +307,9 @@ export const adminRouter = createTRPCRouter({
   /** Adds one teacher or student; the result carries the temporary password. */
   addPerson: adminProcedure
     .input(personInput)
-    .mutation(({ ctx, input }) => createPerson(ctx.db, input)),
+    .mutation(({ ctx, input }) =>
+      createPerson(ctx.db, input, schoolOf(ctx.session.user)),
+    ),
 
   /**
    * Adds many students at once (from a CSV). Each row succeeds or fails on
@@ -252,6 +334,7 @@ export const adminRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const schoolId = schoolOf(ctx.session.user);
       const results: Array<
         | {
             line: number;
@@ -276,7 +359,8 @@ export const adminRouter = createTRPCRouter({
           continue;
         }
         try {
-          const created = await createPerson(ctx.db, parsed.data);
+          if (row.sectionId) await classOf(ctx.db, schoolId, row.sectionId);
+          const created = await createPerson(ctx.db, parsed.data, schoolId);
           if (row.sectionId) {
             const profile = await ctx.db.studentProfile.findUniqueOrThrow({
               where: { userId: created.userId },
@@ -313,7 +397,13 @@ export const adminRouter = createTRPCRouter({
   importRoster: adminProcedure
     .input(z.object({ rows: z.array(rosterRow).min(1).max(200), homeroom }))
     .mutation(({ ctx, input }) =>
-      importRoster(ctx.db, input.rows, [], input.homeroom),
+      importRoster(
+        ctx.db,
+        input.rows,
+        [],
+        input.homeroom,
+        schoolOf(ctx.session.user),
+      ),
     ),
 
   /** Every course in the curriculum, with its units and this term's classes. */
@@ -336,7 +426,10 @@ export const adminRouter = createTRPCRouter({
           },
         },
         sections: {
-          where: { term: { isCurrent: true } },
+          where: {
+            schoolId: schoolOf(ctx.session.user),
+            term: { isCurrent: true },
+          },
           orderBy: { code: "asc" },
           select: { id: true, code: true },
         },
@@ -347,6 +440,7 @@ export const adminRouter = createTRPCRouter({
   /** Sections (homerooms) with how many students are in each. */
   sections: adminProcedure.query(({ ctx }) =>
     ctx.db.homeroom.findMany({
+      where: { schoolId: schoolOf(ctx.session.user) },
       orderBy: [{ gradeLevel: "asc" }, { name: "asc" }],
       select: {
         id: true,
@@ -362,7 +456,7 @@ export const adminRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         return await ctx.db.homeroom.create({
-          data: input,
+          data: { ...input, schoolId: schoolOf(ctx.session.user) },
           select: { id: true },
         });
       } catch (error) {
@@ -376,6 +470,7 @@ export const adminRouter = createTRPCRouter({
     .input(sectionInput.extend({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
+      await homeroomOf(ctx.db, schoolOf(ctx.session.user), id);
       try {
         await ctx.db.$transaction([
           ctx.db.homeroom.update({ where: { id }, data }),
@@ -395,6 +490,7 @@ export const adminRouter = createTRPCRouter({
   deleteSection: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      await homeroomOf(ctx.db, schoolOf(ctx.session.user), input.id);
       await ctx.db.$transaction([
         ctx.db.studentProfile.updateMany({
           where: { sectionId: input.id },
@@ -411,6 +507,12 @@ export const adminRouter = createTRPCRouter({
       z.object({ userId: z.string(), departmentId: z.string().nullable() }),
     )
     .mutation(async ({ ctx, input }) => {
+      await personOf(
+        ctx.db,
+        schoolOf(ctx.session.user),
+        input.userId,
+        ctx.session.user,
+      );
       if (input.departmentId) {
         const exists = await ctx.db.department.findUnique({
           where: { id: input.departmentId },
@@ -434,18 +536,11 @@ export const adminRouter = createTRPCRouter({
   setStudentSection: adminProcedure
     .input(z.object({ userId: z.string(), sectionId: z.string().nullable() }))
     .mutation(async ({ ctx, input }) => {
+      const schoolId = schoolOf(ctx.session.user);
+      await personOf(ctx.db, schoolId, input.userId, ctx.session.user);
       const room = input.sectionId
-        ? await ctx.db.homeroom.findUnique({
-            where: { id: input.sectionId },
-            select: { id: true, name: true },
-          })
+        ? await homeroomOf(ctx.db, schoolId, input.sectionId)
         : null;
-      if (input.sectionId && !room) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "That section no longer exists.",
-        });
-      }
       await ctx.db.studentProfile.update({
         where: { userId: input.userId },
         data: { sectionId: room?.id ?? null, homeroom: room?.name ?? null },
@@ -463,6 +558,12 @@ export const adminRouter = createTRPCRouter({
           message: "Change your own password in Settings.",
         });
       }
+      await personOf(
+        ctx.db,
+        schoolOf(ctx.session.user),
+        input.userId,
+        ctx.session.user,
+      );
       const password = temporaryPassword();
       await ctx.db.user.update({
         where: { id: input.userId },
@@ -484,6 +585,12 @@ export const adminRouter = createTRPCRouter({
           message: "You can't turn off your own account.",
         });
       }
+      await personOf(
+        ctx.db,
+        schoolOf(ctx.session.user),
+        input.userId,
+        ctx.session.user,
+      );
       await ctx.db.user.update({
         where: { id: input.userId },
         data: { isActive: input.active },
@@ -503,7 +610,9 @@ export const adminRouter = createTRPCRouter({
         select: { id: true, code: true, name: true },
       }),
       ctx.db.teacherProfile.findMany({
-        where: { user: { isActive: true } },
+        where: {
+          user: { isActive: true, schoolId: schoolOf(ctx.session.user) },
+        },
         orderBy: { user: { name: "asc" } },
         select: { id: true, user: { select: { name: true, title: true } } },
       }),
@@ -518,7 +627,10 @@ export const adminRouter = createTRPCRouter({
   /** This term's classes with their teacher and enrollment. */
   classes: adminProcedure.query(({ ctx }) =>
     ctx.db.section.findMany({
-      where: { term: { isCurrent: true } },
+      where: {
+        schoolId: schoolOf(ctx.session.user),
+        term: { isCurrent: true },
+      },
       orderBy: [{ course: { code: "asc" } }, { code: "asc" }],
       select: {
         id: true,
@@ -540,8 +652,9 @@ export const adminRouter = createTRPCRouter({
   classDetail: adminProcedure
     .input(z.object({ sectionId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const section = await ctx.db.section.findUnique({
-        where: { id: input.sectionId },
+      const schoolId = schoolOf(ctx.session.user);
+      const section = await ctx.db.section.findFirst({
+        where: { id: input.sectionId, schoolId },
         select: {
           id: true,
           code: true,
@@ -574,7 +687,7 @@ export const adminRouter = createTRPCRouter({
       }
       const enrolled = new Set(section.enrollments.map((e) => e.student.id));
       const available = await ctx.db.studentProfile.findMany({
-        where: { user: { isActive: true } },
+        where: { user: { isActive: true, schoolId } },
         orderBy: [{ gradeLevel: "asc" }, { user: { name: "asc" } }],
         select: {
           id: true,
@@ -602,6 +715,12 @@ export const adminRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const schoolId = schoolOf(ctx.session.user);
+      const teacher = await ctx.db.teacherProfile.findFirst({
+        where: { id: input.teacherId, user: { schoolId } },
+        select: { id: true },
+      });
+      if (!teacher) throw notInSchool("That teacher");
       const term = await ctx.db.term.findFirst({
         where: { isCurrent: true },
         select: { id: true },
@@ -613,7 +732,12 @@ export const adminRouter = createTRPCRouter({
         });
       }
       const section = await ctx.db.section.create({
-        data: { ...input, room: orNull(input.room), termId: term.id },
+        data: {
+          ...input,
+          room: orNull(input.room),
+          termId: term.id,
+          schoolId,
+        },
         select: { id: true },
       });
       const quizzes = await createUnitQuizzesForSection(ctx.db, section.id);
@@ -629,6 +753,9 @@ export const adminRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const schoolId = schoolOf(ctx.session.user);
+      await classOf(ctx.db, schoolId, input.sectionId);
+      await assertStudentsOf(ctx.db, schoolId, input.studentIds);
       for (const studentId of input.studentIds) {
         await ctx.db.enrollment.upsert({
           where: {
@@ -645,6 +772,7 @@ export const adminRouter = createTRPCRouter({
   unenroll: adminProcedure
     .input(z.object({ sectionId: z.string(), studentId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      await classOf(ctx.db, schoolOf(ctx.session.user), input.sectionId);
       await ctx.db.enrollment.update({
         where: {
           sectionId_studentId: {

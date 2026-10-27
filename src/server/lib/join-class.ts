@@ -20,8 +20,28 @@ type JoinableSection = Prisma.SectionGetPayload<{
 }>;
 
 /**
- * The class a code points to: a class code ("7F3A2C"), or a course code
- * ("MATH 10") meaning that course's class for the student's own section.
+ * The school a sign-up code belongs to: a class code (the class's school) or
+ * a school's own code. Null when the code matches neither.
+ */
+export async function schoolForCode(db: Db, rawCode: string) {
+  const code = normaliseJoinCode(rawCode);
+  if (!code) return null;
+  const byClass = await db.section.findFirst({
+    where: { joinCode: code, term: { isCurrent: true } },
+    select: { schoolId: true },
+  });
+  if (byClass) return { schoolId: byClass.schoolId, isClassCode: true };
+  const school = await db.school.findUnique({
+    where: { joinCode: code },
+    select: { id: true },
+  });
+  return school ? { schoolId: school.id, isClassCode: false } : null;
+}
+
+/**
+ * The class a code points to, in the student's own school: a class code
+ * ("7F3A2C"), or a course code ("MATH 10") meaning that course's class for
+ * the student's own section.
  */
 async function findClass(
   db: Db,
@@ -29,11 +49,25 @@ async function findClass(
   rawCode: string,
 ): Promise<JoinableSection> {
   const code = normaliseJoinCode(rawCode);
+  const me = await db.studentProfile.findUnique({
+    where: { id: studentId },
+    select: { user: { select: { schoolId: true } } },
+  });
+  const schoolId = me?.user.schoolId ?? "";
   const byClassCode = await db.section.findFirst({
     where: { joinCode: code, term: { isCurrent: true } },
-    select: sectionSelect,
+    select: { ...sectionSelect, schoolId: true },
   });
-  if (byClassCode) return byClassCode;
+  if (byClassCode) {
+    if (byClassCode.schoolId !== schoolId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message:
+          "That class belongs to another school. Check the code with your teacher.",
+      });
+    }
+    return byClassCode;
+  }
 
   const courses = await db.course.findMany({
     select: { id: true, code: true, name: true },
@@ -52,7 +86,7 @@ async function findClass(
       select: { section: { select: { name: true } } },
     }),
     db.section.findMany({
-      where: { courseId: course.id, term: { isCurrent: true } },
+      where: { courseId: course.id, schoolId, term: { isCurrent: true } },
       select: sectionSelect,
     }),
   ]);

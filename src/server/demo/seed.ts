@@ -161,10 +161,18 @@ async function reset() {
     db.session.deleteMany(),
     db.account.deleteMany(),
     db.user.deleteMany(),
+    db.school.deleteMany(),
   ]);
 }
 
+/** The demo database's one school. */
+const DEMO_SCHOOL_ID = "sch-demo";
+
 async function build() {
+  await db.school.create({
+    data: { id: DEMO_SCHOOL_ID, name: "Momo Smart Demo School" },
+  });
+
   // --- Departments and term -------------------------------------------------
   const departments = new Map<DemoSubject["key"], string>();
   const departmentByName = new Map<string, string>();
@@ -197,6 +205,7 @@ async function build() {
   // --- Staff ----------------------------------------------------------------
   const chenUser = await db.user.create({
     data: {
+      schoolId: DEMO_SCHOOL_ID,
       name: "Aris Chen",
       title: "Dr.",
       email: "aris.chen@momosmart.edu",
@@ -217,6 +226,7 @@ async function build() {
 
   await db.user.create({
     data: {
+      schoolId: DEMO_SCHOOL_ID,
       name: "Momo Registrar",
       email: "registrar@momosmart.edu",
       role: "ADMIN",
@@ -254,6 +264,7 @@ async function build() {
 
   const bioSec1 = await db.section.create({
     data: {
+      schoolId: DEMO_SCHOOL_ID,
       courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
@@ -269,6 +280,7 @@ async function build() {
 
   const bioSec2 = await db.section.create({
     data: {
+      schoolId: DEMO_SCHOOL_ID,
       courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
@@ -286,6 +298,7 @@ async function build() {
 
   const anatSec = await db.section.create({
     data: {
+      schoolId: DEMO_SCHOOL_ID,
       courseId: courses.get("SCI")!,
       termId: term.id,
       teacherId: chen.id,
@@ -318,6 +331,7 @@ async function build() {
   ) =>
     db.section.create({
       data: {
+        schoolId: DEMO_SCHOOL_ID,
         courseId: courses.get(key)!,
         termId: term.id,
         teacherId: chen.id,
@@ -349,6 +363,7 @@ async function build() {
   const tleSection = (key: DemoSubject["key"], code: string, period: number) =>
     db.section.create({
       data: {
+        schoolId: DEMO_SCHOOL_ID,
         courseId: courses.get(key)!,
         termId: term.id,
         teacherId: chen.id,
@@ -417,6 +432,7 @@ async function build() {
   for (const seed of studentSeeds) {
     const user = await db.user.create({
       data: {
+        schoolId: DEMO_SCHOOL_ID,
         name: seed.name,
         email: `${seed.number.toLowerCase()}@student.momosmart.edu`,
         role: "STUDENT",
@@ -1842,6 +1858,7 @@ async function build() {
       {
         authorId: registrar.id,
         scope: "SCHOOL",
+        schoolId: DEMO_SCHOOL_ID,
         title: "Intramurals schedule updated",
         body: "Opening program begins at 1:45 PM on Thursday at the covered court. Modified class schedules posted.",
         publishedAt: new Date(NOW.getTime() - 2 * 60 * 60 * 1000),
@@ -1849,6 +1866,7 @@ async function build() {
       {
         authorId: registrar.id,
         scope: "SCHOOL",
+        schoolId: DEMO_SCHOOL_ID,
         title: "Quarterly exam schedule posted",
         body: "Grade 10 quarterly assessments start next week. Check the schedule on the bulletin board near the Guidance Office.",
         publishedAt: new Date(NOW.getTime() - 5 * 60 * 60 * 1000),
@@ -1870,6 +1888,7 @@ async function build() {
   await db.calendarEvent.createMany({
     data: [
       {
+        schoolId: DEMO_SCHOOL_ID,
         title: "Mid-Term Progress Reports Due",
         description: "District Submission",
         type: "ADMIN_DEADLINE",
@@ -1877,6 +1896,7 @@ async function build() {
         createdById: registrar.id,
       },
       {
+        schoolId: DEMO_SCHOOL_ID,
         title: "Unit 4 Exam — Biomolecules and Cellular Energy",
         type: "EXAM",
         startAt: at(9, 10, 0),

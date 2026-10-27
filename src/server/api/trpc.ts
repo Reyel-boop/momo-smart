@@ -181,6 +181,35 @@ export const adminProcedure = t.procedure
   .use(timingMiddleware)
   .use(enforceRoles(["ADMIN"]));
 
+/** The Momo owner: creates schools and switches between them. */
+export const ownerProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    const user = ctx.session?.user;
+    if (!user) throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (!user.isOwner) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only the Momo owner can manage schools.",
+      });
+    }
+    return next({ ctx: { session: { ...ctx.session, user } } });
+  });
+
+/**
+ * The school a staff member works in. Every admin and teacher belongs to
+ * one; without it there is nothing they may see.
+ */
+export function schoolOf(user: { schoolId: string | null }) {
+  if (!user.schoolId) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "This account isn't linked to a school yet.",
+    });
+  }
+  return user.schoolId;
+}
+
 /** Either side of the classroom — used by shared reads such as announcements. */
 export const staffOrStudentProcedure = t.procedure
   .use(timingMiddleware)

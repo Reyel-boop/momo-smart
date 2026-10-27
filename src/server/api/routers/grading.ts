@@ -6,12 +6,14 @@ import { letterFor, refreshEnrollmentGrade, round } from "~/server/lib/grading";
 import { assertTeachesSection } from "~/server/lib/permissions";
 import type { Prisma } from "../../../../generated/prisma";
 
-/** Scopes a query to the sections the caller may grade. */
+/** Scopes a query to the sections the caller may grade (an admin: their school's). */
 const gradableSections = (
-  role: string,
+  user: { role: string; schoolId: string | null },
   teacherId: string | null,
 ): Prisma.SectionWhereInput =>
-  role === "ADMIN" ? {} : { teacherId: teacherId ?? "" };
+  user.role === "ADMIN"
+    ? { schoolId: user.schoolId ?? "" }
+    : { teacherId: teacherId ?? "" };
 
 export const gradingRouter = createTRPCRouter({
   /**
@@ -48,7 +50,7 @@ export const gradingRouter = createTRPCRouter({
           ],
           assignment: {
             sectionId: input.sectionId,
-            section: gradableSections(ctx.session.user.role, ctx.teacherId),
+            section: gradableSections(ctx.session.user, ctx.teacherId),
           },
         },
         orderBy,
@@ -120,7 +122,7 @@ export const gradingRouter = createTRPCRouter({
 
   /** Headline counts for the "Ungraded Queue" stat card. */
   queueSummary: teacherProcedure.query(async ({ ctx }) => {
-    const sectionScope = gradableSections(ctx.session.user.role, ctx.teacherId);
+    const sectionScope = gradableSections(ctx.session.user, ctx.teacherId);
     const soon = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const [total, dueWithin24h, sections] = await Promise.all([

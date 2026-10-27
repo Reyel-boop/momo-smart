@@ -12,6 +12,7 @@ import { lessonRouter } from "~/server/api/routers/lesson";
 import { gameRouter } from "~/server/api/routers/game";
 import { liveRouter } from "~/server/api/routers/live";
 import { raceRouter } from "~/server/api/routers/race";
+import { schoolRouter } from "~/server/api/routers/school";
 import { messageRouter } from "~/server/api/routers/message";
 import { notificationRouter } from "~/server/api/routers/notification";
 import { submissionRouter } from "~/server/api/routers/submission";
@@ -39,9 +40,11 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  *   notification  in-app notification feed
  *   calendar      agenda, timetable and office hours
  *   admin         registrar: accounts, classes and enrollment
+ *   school        owner: schools, their admins, switching schools
  */
 export const appRouter = createTRPCRouter({
   admin: adminRouter,
+  school: schoolRouter,
   user: userRouter,
   course: courseRouter,
   lesson: lessonRouter,

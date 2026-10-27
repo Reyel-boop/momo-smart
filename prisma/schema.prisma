@@ -48,6 +48,11 @@ model User {
   /// Set for accounts created or reset by the registrar with a temporary
   /// password; the user must choose their own before using the app.
   mustChangePassword Boolean   @default(false)
+  /// The school this person belongs to.
+  schoolId           String?
+  school             School?   @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  /// The Momo owner: creates schools and can open any school's admin pages.
+  isOwner            Boolean   @default(false)
   lastLoginAt        DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
@@ -71,6 +76,7 @@ model User {
   interventionActions InterventionAction[]
 
   @@index([role])
+  @@index([schoolId, role])
 }
 
 model Account {
@@ -151,17 +157,39 @@ model StudentProfile {
   @@index([sectionId])
 }
 
+/// A school using Momo. Its people, sections (homerooms), classes and
+/// school-wide announcements and events belong to it; the curriculum
+/// (courses, lessons, quizzes and games) is shared by every school.
+model School {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  /// DepEd School ID, e.g. "301234".
+  depedId   String?
+  address   String?
+  /// Teachers (and students without a class code) sign up with this code.
+  joinCode  String   @unique @default(dbgenerated("('S'::text || upper(substr(md5(((random())::text || (clock_timestamp())::text)), 1, 7)))"))
+  createdAt DateTime @default(now())
+
+  users          User[]
+  homerooms      Homeroom[]
+  sections       Section[]
+  announcements  Announcement[]
+  calendarEvents CalendarEvent[]
+}
+
 /// A section (homeroom) students belong to, as on School Form 1 — e.g.
 /// Grade 10 "Rizal". Not to be confused with `Section`, which is a class.
 model Homeroom {
   id         String   @id @default(cuid())
+  schoolId   String
+  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   name       String
   gradeLevel Int
   createdAt  DateTime @default(now())
 
   students StudentProfile[]
 
-  @@unique([gradeLevel, name])
+  @@unique([schoolId, gradeLevel, name])
 }
 
 model TeacherProfile {
@@ -292,6 +320,7 @@ model Course {
 
 model Section {
   id        String @id @default(cuid())
+  schoolId  String
   courseId  String
   termId    String
   teacherId String
@@ -305,6 +334,7 @@ model Section {
   /// Code students enter to join the class ("Join a class" / sign-up).
   joinCode String  @unique @default(dbgenerated("upper(substr(md5((random())::text || (clock_timestamp())::text), 1, 6))"))
 
+  school  School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   course  Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   term    Term           @relation(fields: [termId], references: [id], onDelete: Cascade)
   teacher TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Restrict)
@@ -324,7 +354,8 @@ model Section {
   raceTeams          RaceTeam[]
   raceSessions       RaceSession[]
 
-  @@unique([termId, courseId, code])
+  @@unique([schoolId, termId, courseId, code])
+  @@index([schoolId, termId])
   @@index([teacherId, termId])
   @@index([termId, period])
 }
@@ -1186,6 +1217,8 @@ model Announcement {
   scope       AnnouncementScope
   /// Set when scope is SECTION.
   sectionId   String?
+  /// The school, for announcements not tied to one class.
+  schoolId    String?
   title       String
   body        String
   isPinned    Boolean           @default(false)
@@ -1194,9 +1227,11 @@ model Announcement {
 
   author  User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
   section Section?           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  school  School?            @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   reads   AnnouncementRead[]
 
   @@index([scope, publishedAt])
+  @@index([schoolId, publishedAt])
   @@index([sectionId, publishedAt])
 }
 
@@ -1300,12 +1335,16 @@ model CalendarEvent {
   allDay      Boolean           @default(false)
   location    String?
   sectionId   String?
+  /// The school, for events not tied to one class.
+  schoolId    String?
   createdById String?
 
   section   Section? @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  school    School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   createdBy User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([startAt])
+  @@index([schoolId, startAt])
   @@index([sectionId, startAt])
 }
 
