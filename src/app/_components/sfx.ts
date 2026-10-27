@@ -155,6 +155,23 @@ export const sfx = {
     );
     noise(0.75, 0.5, 4000, 0.25);
   },
+  /** A phone ringing: two short double-tone bursts. */
+  ring() {
+    for (const at of [0, 0.5]) {
+      tone(at, 440, 440, 0.38, "sine", 0.09);
+      tone(at, 480, 480, 0.38, "sine", 0.09);
+    }
+  },
+  /** Picking up the line. */
+  pickup() {
+    noise(0, 0.05, 2500, 0.2);
+    tone(0.05, 1200, 1200, 0.06, "sine", 0.05);
+  },
+  /** The call ends: three short beeps. */
+  hangup() {
+    noise(0, 0.05, 2000, 0.18);
+    [0.15, 0.4, 0.65].forEach((t) => tone(t, 480, 480, 0.16, "sine", 0.08));
+  },
   /** A countdown tick. */
   tick() {
     tone(0, 1800, 1800, 0.04, "square", 0.05);
