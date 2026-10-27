@@ -34,28 +34,31 @@ enum UserRole {
 }
 
 model User {
-  id                 String    @id @default(cuid())
-  name               String?
-  email              String?   @unique
-  emailVerified      DateTime?
-  image              String?
-  role               UserRole  @default(STUDENT)
+  id                  String    @id @default(cuid())
+  name                String?
+  email               String?   @unique
+  emailVerified       DateTime?
+  image               String?
+  role                UserRole  @default(STUDENT)
   /// bcrypt hash for email + password sign-in; null for SSO-only accounts.
-  passwordHash       String?
+  passwordHash        String?
   /// Honorific shown in the UI ("Dr.", "Ms.", "Mr.").
-  title              String?
-  isActive           Boolean   @default(true)
+  title               String?
+  isActive            Boolean   @default(true)
   /// Set for accounts created or reset by the registrar with a temporary
   /// password; the user must choose their own before using the app.
-  mustChangePassword Boolean   @default(false)
+  mustChangePassword  Boolean   @default(false)
   /// The school this person belongs to.
-  schoolId           String?
-  school             School?   @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  schoolId            String?
+  school              School?   @relation(fields: [schoolId], references: [id], onDelete: Restrict)
   /// The Momo owner: creates schools and can open any school's admin pages.
-  isOwner            Boolean   @default(false)
-  lastLoginAt        DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  isOwner             Boolean   @default(false)
+  /// The person asked for their account and data to be deleted (from the
+  /// app or the website); their school admin completes it.
+  deletionRequestedAt DateTime?
+  lastLoginAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   accounts Account[]
   sessions Session[]

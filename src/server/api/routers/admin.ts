@@ -206,27 +206,45 @@ export const adminRouter = createTRPCRouter({
   /** Counts for the admin home page. */
   overview: adminProcedure.query(async ({ ctx }) => {
     const schoolId = schoolOf(ctx.session.user);
-    const [teachers, students, classes, courses, term, pendingFirstLogin] =
-      await Promise.all([
-        ctx.db.user.count({
-          where: { schoolId, role: "TEACHER", isActive: true },
-        }),
-        ctx.db.user.count({
-          where: { schoolId, role: "STUDENT", isActive: true },
-        }),
-        ctx.db.section.count({
-          where: { schoolId, term: { isCurrent: true } },
-        }),
-        ctx.db.course.count(),
-        ctx.db.term.findFirst({
-          where: { isCurrent: true },
-          select: { id: true, name: true, startDate: true, endDate: true },
-        }),
-        ctx.db.user.count({
-          where: { schoolId, mustChangePassword: true, isActive: true },
-        }),
-      ]);
-    return { teachers, students, classes, courses, term, pendingFirstLogin };
+    const [
+      teachers,
+      students,
+      classes,
+      courses,
+      term,
+      pendingFirstLogin,
+      deletionRequests,
+    ] = await Promise.all([
+      ctx.db.user.count({
+        where: { schoolId, role: "TEACHER", isActive: true },
+      }),
+      ctx.db.user.count({
+        where: { schoolId, role: "STUDENT", isActive: true },
+      }),
+      ctx.db.section.count({
+        where: { schoolId, term: { isCurrent: true } },
+      }),
+      ctx.db.course.count(),
+      ctx.db.term.findFirst({
+        where: { isCurrent: true },
+        select: { id: true, name: true, startDate: true, endDate: true },
+      }),
+      ctx.db.user.count({
+        where: { schoolId, mustChangePassword: true, isActive: true },
+      }),
+      ctx.db.user.count({
+        where: { schoolId, deletionRequestedAt: { not: null } },
+      }),
+    ]);
+    return {
+      teachers,
+      students,
+      classes,
+      courses,
+      term,
+      pendingFirstLogin,
+      deletionRequests,
+    };
   }),
 
   /** Teachers or students, optionally filtered by name, email or number. */
@@ -280,6 +298,7 @@ export const adminRouter = createTRPCRouter({
           email: true,
           isActive: true,
           mustChangePassword: true,
+          deletionRequestedAt: true,
           lastLoginAt: true,
           studentProfile: {
             select: {
@@ -595,6 +614,49 @@ export const adminRouter = createTRPCRouter({
         where: { id: input.userId },
         data: { isActive: input.active },
       });
+      return { ok: true };
+    }),
+
+  /**
+   * Deletes an account that asked to be deleted, with all its data. A
+   * teacher's classes must go to another teacher first.
+   */
+  deleteAccount: adminProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const schoolId = schoolOf(ctx.session.user);
+      await personOf(ctx.db, schoolId, input.userId, ctx.session.user);
+      const person = await ctx.db.user.findUniqueOrThrow({
+        where: { id: input.userId },
+        select: {
+          isOwner: true,
+          deletionRequestedAt: true,
+          teacherProfile: {
+            select: { _count: { select: { sections: true } } },
+          },
+        },
+      });
+      if (person.isOwner || input.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "This account can't be deleted here.",
+        });
+      }
+      if (!person.deletionRequestedAt) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Only accounts that asked to be deleted can be deleted. Turn the account off instead.",
+        });
+      }
+      if (person.teacherProfile?._count.sections) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            "This teacher still has classes. Give them to another teacher first.",
+        });
+      }
+      await ctx.db.user.delete({ where: { id: input.userId } });
       return { ok: true };
     }),
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { env } from "~/env";
 import { humanise } from "~/app/_components/format";
 import { LockIcon, SettingsIcon, UsersIcon } from "~/app/_components/icons";
@@ -83,14 +85,28 @@ export async function SettingsView() {
         <PasswordForm locked={env.DEMO_MODE} />
       </Card>
 
-      <form action={logout} className="flex justify-end">
-        <button
-          type="submit"
-          className="border-line text-ink hover:bg-canvas rounded-xl border px-4 py-2.5 text-sm font-semibold transition"
-        >
-          Sign out
-        </button>
-      </form>
+      <div className="text-muted flex flex-wrap items-center justify-between gap-3 text-sm">
+        <span>
+          <Link href="/privacy" className="hover:text-ink font-semibold">
+            Privacy Policy
+          </Link>
+          {" · "}
+          <Link
+            href="/account/delete"
+            className="font-semibold text-rose-600 hover:text-rose-700"
+          >
+            Delete my account
+          </Link>
+        </span>
+        <form action={logout} className="flex justify-end">
+          <button
+            type="submit"
+            className="border-line text-ink hover:bg-canvas rounded-xl border px-4 py-2.5 text-sm font-semibold transition"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

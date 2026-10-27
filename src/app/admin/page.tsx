@@ -87,6 +87,17 @@ export default async function AdminHome() {
         </p>
       </Card>
 
+      {o.deletionRequests > 0 && (
+        <Link
+          href="/admin/people"
+          className="block rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800 hover:bg-rose-100"
+        >
+          {o.deletionRequests} account{o.deletionRequests === 1 ? "" : "s"}{" "}
+          asked to be deleted. Open People to review and delete{" "}
+          {o.deletionRequests === 1 ? "it" : "them"} →
+        </Link>
+      )}
+
       {o.pendingFirstLogin > 0 && (
         <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
           {o.pendingFirstLogin} account{o.pendingFirstLogin === 1 ? "" : "s"}{" "}

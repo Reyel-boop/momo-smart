@@ -5,6 +5,7 @@ import { useId, useState, useTransition } from "react";
 import { PlusCircleIcon } from "~/app/_components/icons";
 import {
   addPerson,
+  deleteAccount,
   importStudents,
   resetPassword,
   setActive,
@@ -613,17 +614,22 @@ export function ImportStudentsButton({
   );
 }
 
-/** Per-person actions: new temporary password, turn the account off/on. */
+/**
+ * Per-person actions: new temporary password, turn the account off/on, and
+ * delete an account that asked to be deleted.
+ */
 export function PersonActions({
   userId,
   name,
   email,
   active,
+  deletionRequested = false,
 }: {
   userId: string;
   name: string;
   email: string;
   active: boolean;
+  deletionRequested?: boolean;
 }) {
   const [password, setPassword] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -669,6 +675,29 @@ export function PersonActions({
       >
         {active ? "Turn off" : "Turn on"}
       </button>
+      {deletionRequested && (
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            if (
+              !confirm(
+                `Delete ${name}'s account and all their data (grades, answers, stars)? This can't be undone.`,
+              )
+            ) {
+              return;
+            }
+            setError(null);
+            startTransition(async () => {
+              const result = await deleteAccount(userId);
+              if (!result.ok) setError(result.error);
+            });
+          }}
+          className="rounded-md bg-rose-600 px-2 py-1 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-50"
+        >
+          Delete account
+        </button>
+      )}
       {error && <span className="text-xs text-rose-600">{error}</span>}
       {password && (
         <Dialog

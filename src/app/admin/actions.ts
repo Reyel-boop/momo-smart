@@ -69,6 +69,16 @@ export async function resetPassword(
   }
 }
 
+export async function deleteAccount(userId: string) {
+  try {
+    await api.admin.deleteAccount({ userId });
+    revalidatePath("/admin", "layout");
+    return { ok: true as const };
+  } catch (error) {
+    return fail(error, "The account was not deleted.");
+  }
+}
+
 export async function setActive(userId: string, active: boolean) {
   try {
     await api.admin.setActive({ userId, active });
