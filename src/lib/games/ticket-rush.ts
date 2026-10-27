@@ -1,0 +1,526 @@
+/**
+ * Ticket Rush, a Telecommunications (Contact Center Services) game: the
+ * student works a shift at the queue. Tickets drop in one at a time, and
+ * each must be sorted into the right bin (call type, department, metric,
+ * call-flow step…) before the customer's patience runs out. Six shifts,
+ * each on one unit of the course.
+ *
+ * Scoring lives here so the server can score a shift from the answers.
+ */
+
+export type Ticket = {
+  id: string;
+  /** Who it's from, e.g. "Mr. Santos" or "Agent". */
+  from: string;
+  text: string;
+  /** The right bin's index. */
+  bin: number;
+  /** Shown when it's sorted wrong or runs out. */
+  why: string;
+};
+
+export type TicketLevel = {
+  id: string;
+  unit: number;
+  unitTitle: string;
+  title: string;
+  /** What the student does this shift. */
+  task: string;
+  bins: { label: string; icon: string }[];
+  /** Seconds before an unsorted ticket's customer gives up. */
+  patience: number;
+  tickets: Ticket[];
+};
+
+/** Accuracy (percent) for 1, 2 and 3 stars. */
+export const TICKET_STARS = [50, 70, 90] as const;
+
+const tickets = (
+  id: string,
+  rows: [from: string, text: string, bin: number, why: string][],
+): Ticket[] =>
+  rows.map(([from, text, bin, why], i) => ({
+    id: `${id}.${i}`,
+    from,
+    text,
+    bin,
+    why,
+  }));
+
+export const TICKET_LEVELS: TicketLevel[] = [
+  {
+    id: "ticket-1",
+    unit: 2,
+    unitTitle: "Inbound & Outbound",
+    title: "Inbound or Outbound?",
+    task: "Sort each call: did the customer call in, or does the agent call out?",
+    bins: [
+      { label: "Inbound", icon: "📥" },
+      { label: "Outbound", icon: "📤" },
+    ],
+    patience: 12,
+    tickets: tickets("ticket-1", [
+      [
+        "Mrs. Cruz",
+        "I'm calling because my bill is higher this month.",
+        0,
+        "The customer called the center: inbound.",
+      ],
+      [
+        "Campaign list",
+        "Call members to offer the new ₱999 fiber plan.",
+        1,
+        "Selling to a list of customers is an outbound sales call.",
+      ],
+      [
+        "Mr. Reyes",
+        "My internet has been down since this morning.",
+        0,
+        "Customers calling for help with a problem are inbound.",
+      ],
+      [
+        "Survey team",
+        "Call last week's customers to ask how satisfied they were.",
+        1,
+        "Survey calls are made by the agent: outbound.",
+      ],
+      [
+        "Ms. Lim",
+        "Hi, I want to check if my order was shipped.",
+        0,
+        "An order-status question from the customer is inbound.",
+      ],
+      [
+        "Collections",
+        "Remind customers whose payment is 30 days late.",
+        1,
+        "Payment reminders are outbound collection calls.",
+      ],
+      [
+        "Lola Nena",
+        "How do I change my password?",
+        0,
+        "A customer asking for help is inbound.",
+      ],
+      [
+        "Appointments",
+        "Confirm tomorrow's technician visits with each customer.",
+        1,
+        "Confirmation calls go out from the agent: outbound.",
+      ],
+      [
+        "Mr. Tan",
+        "I'd like to upgrade my plan, please.",
+        0,
+        "Even a sale is inbound when the customer called in.",
+      ],
+      [
+        "Follow-up list",
+        "Call back yesterday's customers to check the fix worked.",
+        1,
+        "Call-backs are made by the agent: outbound.",
+      ],
+    ]),
+  },
+  {
+    id: "ticket-2",
+    unit: 3,
+    unitTitle: "Skills Lab",
+    title: "Route the Queue",
+    task: "Send each customer to the team that can help them.",
+    bins: [
+      { label: "Billing", icon: "💳" },
+      { label: "Tech Support", icon: "🛠️" },
+      { label: "Sales", icon: "🛒" },
+      { label: "Customer Care", icon: "💬" },
+    ],
+    patience: 11,
+    tickets: tickets("ticket-2", [
+      [
+        "Mr. Garcia",
+        "I was charged twice for the same month.",
+        0,
+        "Charges and payments go to Billing.",
+      ],
+      [
+        "Ms. Dela Rosa",
+        "My router's light is blinking red.",
+        1,
+        "Equipment and connection problems go to Tech Support.",
+      ],
+      [
+        "Mr. Ong",
+        "Do you have a plan with faster speed?",
+        2,
+        "Buying or upgrading a plan is Sales.",
+      ],
+      [
+        "Mrs. Bautista",
+        "I want to update my home address on my account.",
+        3,
+        "Account changes go to Customer Care.",
+      ],
+      [
+        "Aling Rosa",
+        "Can I pay my bill in two parts?",
+        0,
+        "Payment arrangements go to Billing.",
+      ],
+      [
+        "Kuya Ben",
+        "The Wi-Fi keeps disconnecting every hour.",
+        1,
+        "An unstable connection is a technical problem.",
+      ],
+      [
+        "Ms. Yu",
+        "I'd like to add a second line for my son.",
+        2,
+        "Adding a new line is a sale.",
+      ],
+      [
+        "Mr. Navarro",
+        "Your technician was very rude to me.",
+        3,
+        "Complaints about service are handled by Customer Care.",
+      ],
+      [
+        "Mrs. Santos",
+        "Why is there a ₱150 late fee on my bill?",
+        0,
+        "Questions about fees are Billing.",
+      ],
+      [
+        "Ms. Ramos",
+        "I can't log in to the mobile app.",
+        1,
+        "App and login problems go to Tech Support.",
+      ],
+    ]),
+  },
+  {
+    id: "ticket-3",
+    unit: 4,
+    unitTitle: "Phone Etiquette",
+    title: "Etiquette Check",
+    task: "Quality check: is each agent line professional or not?",
+    bins: [
+      { label: "Professional", icon: "✅" },
+      { label: "Unprofessional", icon: "❌" },
+    ],
+    patience: 10,
+    tickets: tickets("ticket-3", [
+      [
+        "Agent",
+        "Thank you for calling Momo Telecom, this is Ana. How may I help you?",
+        0,
+        "A complete greeting: company, name and an offer to help.",
+      ],
+      [
+        "Agent",
+        "Yeah? What do you want?",
+        1,
+        "Too casual and rude. Greet the customer properly.",
+      ],
+      [
+        "Agent",
+        "May I place you on a brief hold while I check that?",
+        0,
+        "Always ask permission before a hold.",
+      ],
+      [
+        "Agent",
+        "Hold on.",
+        1,
+        "Placing someone on hold without asking is rude.",
+      ],
+      [
+        "Agent",
+        "I understand how frustrating that must be, sir.",
+        0,
+        "Empathy statements calm an upset customer.",
+      ],
+      [
+        "Agent",
+        "That's not my problem, call another number.",
+        1,
+        "Never refuse responsibility. Offer to help or transfer properly.",
+      ],
+      [
+        "Agent",
+        "Thank you for waiting, Ma'am. I have the answer for you.",
+        0,
+        "Thanking the customer after a hold is good etiquette.",
+      ],
+      [
+        "Agent",
+        "Uhh… I dunno, maybe?",
+        1,
+        "Fillers and guesses sound unsure. Check, then answer clearly.",
+      ],
+      [
+        "Agent",
+        "Is there anything else I can help you with today?",
+        0,
+        "Offer further help before closing the call.",
+      ],
+      [
+        "Agent",
+        "*hangs up without saying goodbye*",
+        1,
+        "Always close with a thank-you and a goodbye.",
+      ],
+    ]),
+  },
+  {
+    id: "ticket-4",
+    unit: 5,
+    unitTitle: "Beat the Metrics",
+    title: "Metrics Board",
+    task: "The supervisor reads a report. Which metric is it about?",
+    bins: [
+      { label: "AHT", icon: "⏱️" },
+      { label: "FCR", icon: "🎯" },
+      { label: "CSAT", icon: "😊" },
+      { label: "Abandon Rate", icon: "📵" },
+    ],
+    patience: 12,
+    tickets: tickets("ticket-4", [
+      [
+        "Report",
+        "Your calls average 6 minutes 40 seconds each.",
+        0,
+        "Average Handle Time: talk plus hold plus after-call work.",
+      ],
+      [
+        "Report",
+        "92% of your customers didn't need to call back.",
+        1,
+        "First Call Resolution: solved on the first call.",
+      ],
+      [
+        "Report",
+        "Customers rated you 4.8 out of 5 in the survey.",
+        2,
+        "Customer Satisfaction comes from survey ratings.",
+      ],
+      [
+        "Report",
+        "1 in 10 callers hung up before an agent answered.",
+        3,
+        "Abandon rate: callers who hang up while waiting.",
+      ],
+      [
+        "Report",
+        "Your after-call work is making your calls too long.",
+        0,
+        "After-call work is part of handle time.",
+      ],
+      [
+        "Report",
+        "This customer called 3 times about the same issue.",
+        1,
+        "Repeat calls mean the issue wasn't resolved the first time.",
+      ],
+      [
+        "Report",
+        '"The agent was so kind!" — survey comment',
+        2,
+        "Survey feedback measures satisfaction.",
+      ],
+      [
+        "Report",
+        "Long queues at lunchtime made callers give up.",
+        3,
+        "Callers giving up in the queue raises the abandon rate.",
+      ],
+      [
+        "Report",
+        "Team goal: keep each call under 5 minutes.",
+        0,
+        "A time target per call is an AHT goal.",
+      ],
+      [
+        "Report",
+        "Fix it on the first call so they don't call again.",
+        1,
+        "That's the goal of First Call Resolution.",
+      ],
+    ]),
+  },
+  {
+    id: "ticket-5",
+    unit: 7,
+    unitTitle: "Follow the Procedure",
+    title: "Resolve or Escalate?",
+    task: "Can you resolve it now, or must it go to a supervisor or another team?",
+    bins: [
+      { label: "Resolve now", icon: "✔️" },
+      { label: "Escalate to supervisor", icon: "⬆️" },
+      { label: "Transfer to department", icon: "🔀" },
+    ],
+    patience: 12,
+    tickets: tickets("ticket-5", [
+      [
+        "Ms. Aquino",
+        "What time does your store close?",
+        0,
+        "A simple question you can answer right away.",
+      ],
+      [
+        "Mr. Cruz",
+        "I demand to speak to your manager right now!",
+        1,
+        "When a customer asks for a supervisor, escalate.",
+      ],
+      [
+        "Mrs. Lopez",
+        "I need a refund of ₱25,000 for last year.",
+        1,
+        "Big refunds are beyond an agent's authority: escalate.",
+      ],
+      [
+        "Mr. Sy",
+        "My fiber line was cut by a construction crew.",
+        2,
+        "Line repairs go to the technical department.",
+      ],
+      [
+        "Lola Ising",
+        "Can you tell me my current balance?",
+        0,
+        "After verifying the account, you can answer this now.",
+      ],
+      [
+        "Ms. Torres",
+        "I'll report you to the government unless this is fixed.",
+        1,
+        "Legal and regulatory threats go to a supervisor.",
+      ],
+      [
+        "Mr. Ramos",
+        "I want to buy a business plan for my office.",
+        2,
+        "Business sales are handled by another department.",
+      ],
+      [
+        "Ms. Uy",
+        "Please resend my bill to my email.",
+        0,
+        "Resending a bill is a quick fix you can do yourself.",
+      ],
+      [
+        "Mr. Diaz",
+        "I was promised a discount by another agent last month.",
+        1,
+        "Disputes over past promises need a supervisor.",
+      ],
+      [
+        "Mrs. Lim",
+        "My phone was stolen, block my SIM now!",
+        2,
+        "Blocking a SIM goes to the fraud and security team.",
+      ],
+    ]),
+  },
+  {
+    id: "ticket-6",
+    unit: 8,
+    unitTitle: "Full Call Flow",
+    title: "Call Flow Order",
+    task: "Which part of the call flow does each agent line belong to?",
+    bins: [
+      { label: "Opening", icon: "👋" },
+      { label: "Probing", icon: "🔍" },
+      { label: "Resolution", icon: "🧩" },
+      { label: "Closing", icon: "🏁" },
+    ],
+    patience: 10,
+    tickets: tickets("ticket-6", [
+      [
+        "Agent",
+        "Good morning, thank you for calling Momo Telecom. This is Mia.",
+        0,
+        "The greeting opens the call.",
+      ],
+      [
+        "Agent",
+        "When did you first notice the problem?",
+        1,
+        "Questions that gather details are probing.",
+      ],
+      [
+        "Agent",
+        "I've reset your line. Please restart your modem now.",
+        2,
+        "Fixing the issue is resolution.",
+      ],
+      [
+        "Agent",
+        "Thank you for calling, and have a great day!",
+        3,
+        "Thanking and saying goodbye closes the call.",
+      ],
+      [
+        "Agent",
+        "May I have your account number to verify your identity?",
+        0,
+        "Verifying the caller is part of the opening.",
+      ],
+      [
+        "Agent",
+        "Are the lights on your modem green or red?",
+        1,
+        "Narrowing down the problem is probing.",
+      ],
+      [
+        "Agent",
+        "I've applied a ₱200 credit to your next bill.",
+        2,
+        "Giving the fix or the remedy is resolution.",
+      ],
+      [
+        "Agent",
+        "Is there anything else I can help you with?",
+        3,
+        "Offering further help happens at the closing.",
+      ],
+      [
+        "Agent",
+        "Just to confirm, the issue is slow internet at night?",
+        1,
+        "Paraphrasing to confirm the issue is part of probing.",
+      ],
+      [
+        "Agent",
+        "Your ticket number is 4417 in case you need it.",
+        3,
+        "Giving a reference number is part of the closing.",
+      ],
+    ]),
+  },
+];
+
+export function ticketStars(percent: number) {
+  return TICKET_STARS.filter((needed) => percent >= needed).length;
+}
+
+/**
+ * Scores a shift: one answer per ticket, the bin picked (-1 when the
+ * customer ran out of patience). Null when tickets are missing.
+ */
+export function scoreTickets(
+  level: TicketLevel,
+  answers: { id: string; bin: number }[],
+) {
+  const picked = new Map(answers.map((a) => [a.id, a.bin]));
+  if (level.tickets.some((t) => !picked.has(t.id))) return null;
+  const right = level.tickets.filter((t) => picked.get(t.id) === t.bin).length;
+  const percent = Math.round((right / level.tickets.length) * 100);
+  return {
+    right,
+    total: level.tickets.length,
+    percent,
+    stars: ticketStars(percent),
+  };
+}

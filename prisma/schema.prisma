@@ -1455,7 +1455,7 @@ model LiveAnswer {
 model GameProgress {
   id          String   @id @default(cuid())
   studentId   String
-  /// "code" or "call".
+  /// "code", "bug", "sprint", "call", "ticket", "quest" or "boss".
   game        String
   /// The level's id in the game's content, e.g. "cp-3-2".
   levelId     String

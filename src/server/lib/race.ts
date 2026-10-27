@@ -167,11 +167,11 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
     }
   }
   // Course games, and Momo's Quest on this class's units (best result).
-  const game = courseCode.endsWith("-CP")
-    ? "code"
+  const courseGames = courseCode.endsWith("-CP")
+    ? ["code", "bug", "sprint"]
     : courseCode.endsWith("-TEL")
-      ? "call"
-      : null;
+      ? ["call", "ticket"]
+      : [];
   const units = await db.assessment.findMany({
     where: { sectionId, unitId: { not: null }, assignmentId: null },
     select: { id: true },
@@ -180,7 +180,7 @@ async function starEvents(db: Db, sectionId: string, courseCode: string) {
     where: {
       student: { enrollments: { some: { sectionId, status: "ACTIVE" } } },
       OR: [
-        ...(game ? [{ game }] : []),
+        ...(courseGames.length ? [{ game: { in: courseGames } }] : []),
         { game: "quest", levelId: { in: units.map((u) => u.id) } },
         { game: "boss", levelId: `boss-${sectionId}` },
       ],

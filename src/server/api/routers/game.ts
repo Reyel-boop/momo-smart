@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { BUG_LEVELS, scoreBugs } from "~/lib/games/bug-hunt";
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
 import { CODE_LEVELS, codeStars } from "~/lib/games/code-quest";
 import {
@@ -10,16 +11,18 @@ import {
   questStars,
   replay,
 } from "~/lib/games/quest";
+import { SPRINT_LEVELS, scoreSprint } from "~/lib/games/tag-sprint";
+import { TICKET_LEVELS, scoreTickets } from "~/lib/games/ticket-rush";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 /**
- * Course games. Code Quest belongs to Computer Programming and Call
- * Simulator to Telecommunications; each is open only to students enrolled
- * in a class of that course. Levels unlock one after another, and the best
+ * Course games. Code Quest, Bug Hunt and Tag Sprint belong to Computer
+ * Programming; Call Simulator and Ticket Rush to Telecommunications. Each
+ * is open only to students enrolled in a class of that course. Levels unlock one after another, and the best
  * stars on each level count toward the leaderboard.
  */
-type Game = "code" | "call";
+type Game = keyof typeof GAMES;
 /** Progress rows also use "quest" (Momo's Quest, one level per unit quiz). */
 type SavedGame = Game | "quest" | "boss";
 
@@ -30,13 +33,33 @@ const GAMES = {
     codeSuffix: "-CP",
     levels: CODE_LEVELS,
   },
+  bug: {
+    title: "Bug Hunt",
+    course: "Computer Programming",
+    codeSuffix: "-CP",
+    levels: BUG_LEVELS,
+  },
+  sprint: {
+    title: "Tag Sprint",
+    course: "Computer Programming",
+    codeSuffix: "-CP",
+    levels: SPRINT_LEVELS,
+  },
   call: {
     title: "Call Simulator",
     course: "Telecommunications",
     codeSuffix: "-TEL",
     levels: CALL_LEVELS,
   },
+  ticket: {
+    title: "Ticket Rush",
+    course: "Telecommunications",
+    codeSuffix: "-TEL",
+    levels: TICKET_LEVELS,
+  },
 } as const;
+
+const gameInput = z.enum(["code", "bug", "sprint", "call", "ticket"]);
 
 /** The games this student can play, from the courses they're enrolled in. */
 async function gamesFor(db: PrismaClient, studentId: string) {
@@ -165,7 +188,7 @@ export const gameRouter = createTRPCRouter({
 
   /** Whether the student may play a level, and their best so far. */
   level: studentProcedure
-    .input(z.object({ game: z.enum(["code", "call"]), levelId: z.string() }))
+    .input(z.object({ game: gameInput, levelId: z.string() }))
     .query(async ({ ctx, input }) => {
       const done = await assertPlayable(
         ctx.db,
@@ -230,6 +253,98 @@ export const gameRouter = createTRPCRouter({
               ctx.db,
               ctx.studentId,
               "call",
+              input.levelId,
+              result.stars,
+              result.percent,
+            )
+          : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Bug Hunt: every line tapped and, per bug, the fixes picked. */
+  finishBug: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        taps: z.array(z.number().int().min(0)).max(60),
+        picks: z.array(z.array(z.number().int().min(0).max(2)).max(3)).max(6),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "bug", input.levelId);
+      const level = BUG_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreBugs(level, input.taps, input.picks);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Fix every bug first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        "bug",
+        input.levelId,
+        result.stars,
+        Math.max(0, 10 - result.mistakes),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Tag Sprint: every answer tapped in the round. */
+  finishSprint: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        answers: z
+          .array(z.object({ id: z.string(), choice: z.string() }))
+          .max(120),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "sprint", input.levelId);
+      const level = SPRINT_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreSprint(level, input.answers);
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "sprint",
+              input.levelId,
+              result.stars,
+              result.net,
+            )
+          : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Ticket Rush: the bin picked for every ticket (-1 when it ran out). */
+  finishTicket: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        answers: z
+          .array(z.object({ id: z.string(), bin: z.number().int().min(-1) }))
+          .max(40),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "ticket", input.levelId);
+      const level = TICKET_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreTickets(level, input.answers);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Finish the whole shift first.",
+        });
+      }
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "ticket",
               input.levelId,
               result.stars,
               result.percent,

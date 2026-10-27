@@ -19,6 +19,20 @@ const LOOK = {
     banner: "from-blue-600 to-indigo-700",
     emoji: "</>",
   },
+  bug: {
+    href: "/student/games/bug",
+    blurb:
+      "Find the bugs in broken pages: tap the buggy line, pick the fix, and watch the page heal.",
+    banner: "from-rose-600 to-orange-600",
+    emoji: "🐞",
+  },
+  sprint: {
+    href: "/student/games/sprint",
+    blurb:
+      "60 seconds, as many tags as you can: match each description to its tag or CSS property.",
+    banner: "from-fuchsia-600 to-violet-700",
+    emoji: "⚡",
+  },
   call: {
     href: "/student/games/call",
     blurb:
@@ -26,12 +40,19 @@ const LOOK = {
     banner: "from-emerald-600 to-teal-700",
     emoji: "☎",
   },
+  ticket: {
+    href: "/student/games/ticket",
+    blurb:
+      "Work a shift at the queue: sort every customer ticket before they run out of patience.",
+    banner: "from-cyan-600 to-emerald-700",
+    emoji: "🎧",
+  },
 } as const;
 
 /**
- * The student's course games: Code Quest for Computer Programming and Call
- * Simulator for Telecommunications, each listed only for students in that
- * course. Every level shows its stars, and locked levels wait for the one
+ * The student's course games: Code Quest, Bug Hunt and Tag Sprint for
+ * Computer Programming, Call Simulator and Ticket Rush for
+ * Telecommunications, each listed only for students in that course. Every level shows its stars, and locked levels wait for the one
  * before.
  */
 export default async function GamesPage() {
@@ -73,8 +94,8 @@ export default async function GamesPage() {
       {games.length === 0 && (
         <Card>
           <EmptyState>
-            Code Quest and Call Simulator appear here when you join Computer
-            Programming or Telecommunications.
+            The course games appear here when you join Computer Programming or
+            Telecommunications.
           </EmptyState>
         </Card>
       )}
@@ -82,6 +103,18 @@ export default async function GamesPage() {
       {games.map((g) => {
         const look = LOOK[g.game];
         const units = [...new Set(g.levels.map((l) => l.unit))];
+        // Games with one level per unit show every level in one grid.
+        const single = units.length === g.levels.length;
+        const groups = single
+          ? [{ key: "all", label: null, levels: g.levels }]
+          : units.map((unit) => {
+              const levels = g.levels.filter((l) => l.unit === unit);
+              return {
+                key: String(unit),
+                label: `Unit ${unit} · ${levels[0]!.unitTitle}`,
+                levels,
+              };
+            });
         const next = g.levels.find((l) => l.unlocked && !l.stars);
         return (
           <Card key={g.game} className="overflow-hidden">
@@ -132,13 +165,14 @@ export default async function GamesPage() {
             </div>
 
             <div className="space-y-5 px-5 py-5">
-              {units.map((unit) => {
-                const levels = g.levels.filter((l) => l.unit === unit);
+              {groups.map(({ key, label, levels }) => {
                 return (
-                  <div key={unit}>
-                    <p className="text-muted mb-2 text-xs font-bold tracking-wide uppercase">
-                      Unit {unit} · {levels[0]!.unitTitle}
-                    </p>
+                  <div key={key}>
+                    {label && (
+                      <p className="text-muted mb-2 text-xs font-bold tracking-wide uppercase">
+                        {label}
+                      </p>
+                    )}
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {levels.map((level) => {
                         const n = g.levels.indexOf(level) + 1;
@@ -160,6 +194,11 @@ export default async function GamesPage() {
                               )}
                             </span>
                             <span className="min-w-0 flex-1">
+                              {single && (
+                                <span className="text-muted block truncate text-[10px] font-bold tracking-wide uppercase">
+                                  Unit {level.unit} · {level.unitTitle}
+                                </span>
+                              )}
                               <span className="text-ink block truncate text-sm font-bold">
                                 {level.title}
                               </span>

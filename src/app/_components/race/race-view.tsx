@@ -113,8 +113,17 @@ export function RaceView({
   );
 }
 
-/** Sound on/off, remembered on this device; turning on unlocks audio. */
-export function SoundToggle({ className = "" }: { className?: string }) {
+/**
+ * Sound on/off, remembered on this device; turning on unlocks audio. The
+ * dark tone sits on dark game screens, the light one on plain pages.
+ */
+export function SoundToggle({
+  className = "",
+  tone = "dark",
+}: {
+  className?: string;
+  tone?: "dark" | "light";
+}) {
   const [on, setOn] = useState(true);
   useEffect(() => setOn(soundOn()), []);
   return (
@@ -127,8 +136,10 @@ export function SoundToggle({ className = "" }: { className?: string }) {
       }}
       onPointerDown={unlock}
       className={`rounded-lg px-3 py-1.5 text-xs font-bold ${
-        on ? "bg-white/15 text-white" : "bg-white/5 text-white/60"
-      } hover:bg-white/25 ${className}`}
+        tone === "light"
+          ? `border-line bg-surface hover:bg-canvas border ${on ? "text-ink" : "text-muted"}`
+          : `hover:bg-white/25 ${on ? "bg-white/15 text-white" : "bg-white/5 text-white/60"}`
+      } ${className}`}
       aria-pressed={on}
     >
       {on ? "🔊 Sound on" : "🔇 Sound off"}
