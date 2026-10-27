@@ -10,6 +10,7 @@ import { sfx, unlock } from "~/app/_components/sfx";
 import { Card } from "~/app/_components/ui";
 import {
   genderOf,
+  hasNaturalVoice,
   hush,
   loadVoices,
   say,
@@ -139,6 +140,11 @@ function Call({
   const bottom = useRef<HTMLDivElement>(null);
   // The call rings until the student answers it.
   const [connected, setConnected] = useState(false);
+  // Whether the device has a lifelike voice (else suggest Edge or Chrome).
+  const [natural, setNatural] = useState(true);
+  useEffect(() => {
+    void loadVoices().then(() => setNatural(hasNaturalVoice()));
+  }, []);
   const [speaking, setSpeaking] = useState<"customer" | "agent" | null>(null);
   const spoken = useRef(-1);
   const hungUp = useRef(false);
@@ -322,6 +328,12 @@ function Call({
               Turn your sound on: the customer speaks, and your replies are read
               back in the agent&apos;s voice.
             </p>
+            {!natural && (
+              <p className="max-w-sm rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                This device only has basic computer voices. For lifelike voices,
+                open Momo Smart in Microsoft Edge or Google Chrome.
+              </p>
+            )}
           </div>
         )}
 
