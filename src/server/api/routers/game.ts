@@ -1,12 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { scoreRun } from "~/lib/games/block-run";
 import { BUG_LEVELS, scoreBugs } from "~/lib/games/bug-hunt";
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
 import {
   GAME_IDS,
   GAMES,
   gamesForCourse,
+  RUN_GAMES,
   SCRAMBLE_GAMES,
   type GameId,
 } from "~/lib/games/catalog";
@@ -479,6 +481,38 @@ export const gameRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Spell every word first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        input.game,
+        input.levelId,
+        result.stars,
+        Math.max(0, 20 - result.mistakes),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Block Run (any subject): per gate, every answer platform stepped on. */
+  finishRun: studentProcedure
+    .input(
+      z.object({
+        game: z.enum(RUN_GAMES),
+        levelId: z.string(),
+        picks: z.array(z.array(z.number().int().min(0).max(2)).max(3)).max(10),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = GAMES[input.game].levels.find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreRun(level, input.picks);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Clear every gate first.",
         });
       }
       const saved = await saveBest(

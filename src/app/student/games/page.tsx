@@ -12,6 +12,15 @@ import { Hero, MomoPet, Monster } from "./quest/_components/art";
 export const metadata: Metadata = { title: "Games · Momo Smart" };
 export const dynamic = "force-dynamic";
 
+/** Block Run looks the same in every subject. */
+const RUN_LOOK = {
+  href: "/student/games/run",
+  blurb:
+    "A 3D obstacle-course adventure: run and jump across floating blocks, and land on the right answer at every gate to build the bridge onward.",
+  banner: "from-lime-500 to-sky-600",
+  emoji: "🧱",
+};
+
 const LOOK = {
   code: {
     href: "/student/games/code",
@@ -146,6 +155,14 @@ const LOOK = {
     banner: "from-teal-600 to-orange-600",
     emoji: "🔤",
   },
+  rcode: RUN_LOOK,
+  rtel: RUN_LOOK,
+  rmath: RUN_LOOK,
+  rsci: RUN_LOOK,
+  rap: RUN_LOOK,
+  reng: RUN_LOOK,
+  rfil: RUN_LOOK,
+  rtle: RUN_LOOK,
 } as const satisfies Record<
   GameId,
   { href: string; blurb: string; banner: string; emoji: string }

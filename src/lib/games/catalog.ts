@@ -5,6 +5,7 @@
  * each class's own unit quizzes.)
  */
 
+import { runLevelsOf } from "./block-run";
 import { BUG_LEVELS } from "./bug-hunt";
 import { CALL_LEVELS } from "./call-sim";
 import { CODE_LEVELS } from "./code-quest";
@@ -161,6 +162,55 @@ export const GAMES = {
     forCourse: isOtherTLE,
     levels: WORDS_TLE,
   },
+  // Block Run: a 3D obstacle course per subject, on the Word Scramble words.
+  rcode: {
+    title: "Block Run",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: runLevelsOf(WORDS_CP),
+  },
+  rtel: {
+    title: "Block Run",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: runLevelsOf(WORDS_TEL),
+  },
+  rmath: {
+    title: "Block Run",
+    course: "Mathematics",
+    forCourse: isMath,
+    levels: runLevelsOf(WORDS_MATH),
+  },
+  rsci: {
+    title: "Block Run",
+    course: "Science",
+    forCourse: isSci,
+    levels: runLevelsOf(WORDS_SCI),
+  },
+  rap: {
+    title: "Block Run",
+    course: "Araling Panlipunan",
+    forCourse: isAP,
+    levels: runLevelsOf(WORDS_AP),
+  },
+  reng: {
+    title: "Block Run",
+    course: "English",
+    forCourse: isEng,
+    levels: runLevelsOf(WORDS_ENG),
+  },
+  rfil: {
+    title: "Block Run",
+    course: "Filipino",
+    forCourse: isFil,
+    levels: runLevelsOf(WORDS_FIL),
+  },
+  rtle: {
+    title: "Block Run",
+    course: "TLE",
+    forCourse: isOtherTLE,
+    levels: runLevelsOf(WORDS_TLE),
+  },
 } satisfies Record<
   string,
   {
@@ -189,6 +239,18 @@ export const SCRAMBLE_GAMES = [
   "weng",
   "wfil",
   "wtle",
+] as const satisfies readonly GameId[];
+
+/** The Block Run games, which share one screen and one finish call. */
+export const RUN_GAMES = [
+  "rcode",
+  "rtel",
+  "rmath",
+  "rsci",
+  "rap",
+  "reng",
+  "rfil",
+  "rtle",
 ] as const satisfies readonly GameId[];
 
 export function levelsOf(game: GameId): readonly CatalogLevel[] {
