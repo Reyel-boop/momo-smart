@@ -7,6 +7,7 @@ import {
   GAME_IDS,
   GAMES,
   gamesForCourse,
+  SCRAMBLE_GAMES,
   type GameId,
 } from "~/lib/games/catalog";
 import { codeStars } from "~/lib/games/code-quest";
@@ -27,6 +28,7 @@ import { scoreTama, TAMA_LEVELS } from "~/lib/games/tama-o-mali";
 import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
 import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
 import { TOOL_LEVELS } from "~/lib/games/tool-shed";
+import { scoreScramble } from "~/lib/games/word-scramble";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
@@ -447,6 +449,45 @@ export const gameRouter = createTRPCRouter({
         input.levelId,
         result.stars,
         Math.max(0, 10 - result.mistakes),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Word Scramble (any subject): per word, the full guesses and hints. */
+  finishScramble: studentProcedure
+    .input(
+      z.object({
+        game: z.enum(SCRAMBLE_GAMES),
+        levelId: z.string(),
+        answers: z
+          .array(
+            z.object({
+              guesses: z.array(z.string().max(30)).min(1).max(40),
+              hints: z.number().int().min(0).max(30),
+            }),
+          )
+          .max(10),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = GAMES[input.game].levels.find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreScramble(level, input.answers);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Spell every word first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        input.game,
+        input.levelId,
+        result.stars,
+        Math.max(0, 20 - result.mistakes),
       );
       return { ...result, ...saved };
     }),

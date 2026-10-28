@@ -90,6 +90,62 @@ const LOOK = {
     banner: "from-amber-600 to-red-600",
     emoji: "🧰",
   },
+  wcode: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each coding word from its clue. Hints help, but cost a star.",
+    banner: "from-teal-600 to-blue-700",
+    emoji: "🔤",
+  },
+  wtel: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each contact center word from its clue.",
+    banner: "from-teal-600 to-emerald-700",
+    emoji: "🔤",
+  },
+  wmath: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each math word: sequences, polynomials, circles and more.",
+    banner: "from-teal-600 to-sky-700",
+    emoji: "🔤",
+  },
+  wsci: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each science word: plates, waves, light, cells and genes.",
+    banner: "from-teal-600 to-indigo-700",
+    emoji: "🔤",
+  },
+  wap: {
+    href: "/student/games/words",
+    blurb:
+      "Ayusin ang mga titik para mabuo ang salitang tinutukoy ng bawat clue.",
+    banner: "from-teal-600 to-amber-600",
+    emoji: "🔤",
+  },
+  weng: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each English word: myths, arguments, essays and research.",
+    banner: "from-teal-600 to-cyan-700",
+    emoji: "🔤",
+  },
+  wfil: {
+    href: "/student/games/words",
+    blurb:
+      "Buuin ang salita mula sa mga titik: mitolohiya, tayutay, epiko, tula at El Fili.",
+    banner: "from-teal-600 to-rose-600",
+    emoji: "🔤",
+  },
+  wtle: {
+    href: "/student/games/words",
+    blurb:
+      "Unscramble the letter tiles to spell each tool and term: computers, kitchen, farm and wiring.",
+    banner: "from-teal-600 to-orange-600",
+    emoji: "🔤",
+  },
 } as const satisfies Record<
   GameId,
   { href: string; blurb: string; banner: string; emoji: string }

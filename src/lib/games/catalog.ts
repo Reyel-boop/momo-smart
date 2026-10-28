@@ -16,6 +16,16 @@ import { TAMA_LEVELS } from "./tama-o-mali";
 import { SPRINT_LEVELS } from "./tag-sprint";
 import { TICKET_LEVELS } from "./ticket-rush";
 import { TOOL_LEVELS } from "./tool-shed";
+import {
+  WORDS_AP,
+  WORDS_CP,
+  WORDS_ENG,
+  WORDS_FIL,
+  WORDS_MATH,
+  WORDS_SCI,
+  WORDS_TEL,
+  WORDS_TLE,
+} from "./word-scramble";
 
 type CatalogLevel = {
   id: string;
@@ -26,6 +36,14 @@ type CatalogLevel = {
 
 const isCP = (code: string) => /-CP$/i.test(code);
 const isTEL = (code: string) => /-TEL$/i.test(code);
+const isMath = (code: string) => /^MATH\b/i.test(code);
+const isSci = (code: string) => /^SCI\b/i.test(code);
+const isAP = (code: string) => /^AP\b/i.test(code);
+const isEng = (code: string) => /^ENG\b/i.test(code);
+const isFil = (code: string) => /^FIL\b/i.test(code);
+/** Every TLE course except the two ICT strands with their own games. */
+const isOtherTLE = (code: string) =>
+  /^TLE\b/i.test(code) && !isCP(code) && !isTEL(code);
 
 export const GAMES = {
   code: {
@@ -61,40 +79,87 @@ export const GAMES = {
   math: {
     title: "Number Rush",
     course: "Mathematics",
-    forCourse: (code: string) => /^MATH\b/i.test(code),
+    forCourse: isMath,
     levels: MATH_LEVELS,
   },
   lab: {
     title: "Lab Sorter",
     course: "Science",
-    forCourse: (code: string) => /^SCI\b/i.test(code),
+    forCourse: isSci,
     levels: LAB_LEVELS,
   },
   tama: {
     title: "Tama o Mali",
     course: "Araling Panlipunan",
-    forCourse: (code: string) => /^AP\b/i.test(code),
+    forCourse: isAP,
     levels: TAMA_LEVELS,
   },
   grammar: {
     title: "Grammar Hunt",
     course: "English",
-    forCourse: (code: string) => /^ENG\b/i.test(code),
+    forCourse: isEng,
     levels: GRAMMAR_LEVELS,
   },
   salita: {
     title: "Salita Sprint",
     course: "Filipino",
-    forCourse: (code: string) => /^FIL\b/i.test(code),
+    forCourse: isFil,
     levels: SALITA_LEVELS,
   },
   tools: {
     title: "Tool Shed",
     course: "TLE",
-    // Every TLE course except the two ICT strands with their own games.
-    forCourse: (code: string) =>
-      /^TLE\b/i.test(code) && !isCP(code) && !isTEL(code),
+    forCourse: isOtherTLE,
     levels: TOOL_LEVELS,
+  },
+  // Word Scramble: one set of levels per subject, on one shared screen.
+  wcode: {
+    title: "Code Scramble",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: WORDS_CP,
+  },
+  wtel: {
+    title: "Call Center Scramble",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: WORDS_TEL,
+  },
+  wmath: {
+    title: "Math Scramble",
+    course: "Mathematics",
+    forCourse: isMath,
+    levels: WORDS_MATH,
+  },
+  wsci: {
+    title: "Science Scramble",
+    course: "Science",
+    forCourse: isSci,
+    levels: WORDS_SCI,
+  },
+  wap: {
+    title: "Ayusin ang Titik",
+    course: "Araling Panlipunan",
+    forCourse: isAP,
+    levels: WORDS_AP,
+  },
+  weng: {
+    title: "Word Scramble",
+    course: "English",
+    forCourse: isEng,
+    levels: WORDS_ENG,
+  },
+  wfil: {
+    title: "Buuin ang Salita",
+    course: "Filipino",
+    forCourse: isFil,
+    levels: WORDS_FIL,
+  },
+  wtle: {
+    title: "Tool Scramble",
+    course: "TLE",
+    forCourse: isOtherTLE,
+    levels: WORDS_TLE,
   },
 } satisfies Record<
   string,
@@ -113,6 +178,18 @@ export const GAME_IDS = Object.keys(GAMES) as [GameId, ...GameId[]];
 export function gamesForCourse(code: string): GameId[] {
   return GAME_IDS.filter((game) => GAMES[game].forCourse(code));
 }
+
+/** The Word Scramble games, which share one screen and one finish call. */
+export const SCRAMBLE_GAMES = [
+  "wcode",
+  "wtel",
+  "wmath",
+  "wsci",
+  "wap",
+  "weng",
+  "wfil",
+  "wtle",
+] as const satisfies readonly GameId[];
 
 export function levelsOf(game: GameId): readonly CatalogLevel[] {
   return GAMES[game].levels;
