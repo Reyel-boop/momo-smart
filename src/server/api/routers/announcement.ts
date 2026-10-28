@@ -41,12 +41,24 @@ export const announcementRouter = createTRPCRouter({
           publishedAt: { lte: now },
           OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
           ...(user.role === "ADMIN"
-            ? {}
+            ? {
+                AND: [
+                  {
+                    OR: [
+                      { schoolId: user.schoolId ?? "" },
+                      { section: { schoolId: user.schoolId ?? "" } },
+                    ],
+                  },
+                ],
+              }
             : {
                 AND: [
                   {
                     OR: [
-                      { scope: { in: ["SCHOOL", "DEPARTMENT"] } },
+                      {
+                        scope: { in: ["SCHOOL", "DEPARTMENT"] },
+                        schoolId: user.schoolId ?? "",
+                      },
                       { section: sectionScope },
                       { authorId: user.id },
                     ],
@@ -148,7 +160,11 @@ export const announcementRouter = createTRPCRouter({
 
       const { notify, ...data } = input;
       const announcement = await ctx.db.announcement.create({
-        data: { ...data, authorId: ctx.session.user.id },
+        data: {
+          ...data,
+          authorId: ctx.session.user.id,
+          schoolId: ctx.session.user.schoolId,
+        },
       });
 
       if (notify && input.sectionId) {
@@ -183,7 +199,7 @@ export const announcementRouter = createTRPCRouter({
       const sections = await ctx.db.section.findMany({
         where:
           ctx.session.user.role === "ADMIN"
-            ? {}
+            ? { schoolId: ctx.session.user.schoolId ?? "" }
             : { teacherId: ctx.teacherId ?? "" },
         select: { id: true },
       });
@@ -199,6 +215,7 @@ export const announcementRouter = createTRPCRouter({
           authorId: ctx.session.user.id,
           scope: "SECTION" as const,
           sectionId: section.id,
+          schoolId: ctx.session.user.schoolId,
           title: input.title,
           body: input.body,
           isPinned: input.isPinned,
@@ -232,7 +249,11 @@ export const announcementRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const announcement = await ctx.db.announcement.findUnique({
         where: { id: input.announcementId },
-        select: { authorId: true },
+        select: {
+          authorId: true,
+          schoolId: true,
+          section: { select: { schoolId: true } },
+        },
       });
       if (!announcement) {
         throw new TRPCError({
@@ -240,9 +261,12 @@ export const announcementRouter = createTRPCRouter({
           message: "Announcement not found.",
         });
       }
+      const sameSchool =
+        (announcement.schoolId ?? announcement.section?.schoolId) ===
+        ctx.session.user.schoolId;
       if (
         announcement.authorId !== ctx.session.user.id &&
-        ctx.session.user.role !== "ADMIN"
+        !(ctx.session.user.role === "ADMIN" && sameSchool)
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",

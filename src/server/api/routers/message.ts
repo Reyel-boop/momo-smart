@@ -7,7 +7,8 @@ import type { PrismaClient } from "../../../../generated/prisma";
 /**
  * Direct messaging between the people who share a classroom. A student may
  * only open a thread with a teacher who teaches them; teachers may message any
- * student on their roster (and each other).
+ * student on their roster (and each other). Everyone stays within their own
+ * school.
  */
 async function assertMayMessage(
   db: PrismaClient,
@@ -16,13 +17,12 @@ async function assertMayMessage(
     role: string;
     studentId: string | null;
     teacherId: string | null;
+    schoolId: string | null;
   },
   recipientIds: string[],
 ) {
-  if (actor.role === "ADMIN") return;
-
   const recipients = await db.user.findMany({
-    where: { id: { in: recipientIds } },
+    where: { id: { in: recipientIds }, schoolId: actor.schoolId ?? "" },
     select: {
       id: true,
       role: true,
@@ -33,6 +33,7 @@ async function assertMayMessage(
   if (recipients.length !== recipientIds.length) {
     throw new TRPCError({ code: "NOT_FOUND", message: "Recipient not found." });
   }
+  if (actor.role === "ADMIN") return;
 
   for (const recipient of recipients) {
     if (recipient.role === "ADMIN") continue;

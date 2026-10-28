@@ -2,12 +2,16 @@ import { TRPCError } from "@trpc/server";
 
 import type { PrismaClient, UserRole } from "../../../generated/prisma";
 
-/** The subset of the session used for authorisation decisions. */
+/**
+ * The subset of the session used for authorisation decisions. Admins pass
+ * the checks below only for records in their own school.
+ */
 export type Actor = {
   id: string;
   role: UserRole;
   studentId: string | null;
   teacherId: string | null;
+  schoolId: string | null;
 };
 
 const forbidden = (message: string) =>
@@ -16,9 +20,13 @@ const forbidden = (message: string) =>
 const notFound = (what: string) =>
   new TRPCError({ code: "NOT_FOUND", message: `${what} not found.` });
 
+/** Whether an admin may act on a record of the given school. */
+const adminOf = (actor: Actor, schoolId: string | null | undefined) =>
+  actor.role === "ADMIN" && !!actor.schoolId && actor.schoolId === schoolId;
+
 /**
- * Asserts the actor teaches the section (admins pass). Returns the section so
- * callers can reuse it instead of issuing a second read.
+ * Asserts the actor teaches the section (admins of its school pass). Returns
+ * the section so callers can reuse it instead of issuing a second read.
  */
 export async function assertTeachesSection(
   db: PrismaClient,
@@ -27,23 +35,35 @@ export async function assertTeachesSection(
 ) {
   const section = await db.section.findUnique({
     where: { id: sectionId },
-    select: { id: true, teacherId: true, courseId: true, termId: true },
+    select: {
+      id: true,
+      teacherId: true,
+      courseId: true,
+      termId: true,
+      schoolId: true,
+    },
   });
   if (!section) throw notFound("Section");
-  if (actor.role === "ADMIN") return section;
+  if (actor.role === "ADMIN") {
+    if (adminOf(actor, section.schoolId)) return section;
+    throw notFound("Section");
+  }
   if (!actor.teacherId || section.teacherId !== actor.teacherId) {
     throw forbidden("You do not teach this section.");
   }
   return section;
 }
 
-/** Asserts the actor is actively enrolled in the section (admins pass). */
+/** Asserts the actor is actively enrolled in the section (admins of its school pass). */
 export async function assertEnrolled(
   db: PrismaClient,
   actor: Actor,
   sectionId: string,
 ) {
-  if (actor.role === "ADMIN") return;
+  if (actor.role === "ADMIN") {
+    await assertTeachesSection(db, actor, sectionId);
+    return;
+  }
   if (!actor.studentId) throw forbidden("No student profile on this account.");
 
   const enrollment = await db.enrollment.findUnique({
@@ -59,15 +79,15 @@ export async function assertEnrolled(
 
 /**
  * Read access to a section: its teacher, an actively enrolled student, or an
- * admin. Use for shared reads such as the roster header or announcements.
+ * admin of its school. Use for shared reads such as the roster header or
+ * announcements.
  */
 export async function assertSectionAccess(
   db: PrismaClient,
   actor: Actor,
   sectionId: string,
 ) {
-  if (actor.role === "ADMIN") return;
-  if (actor.role === "TEACHER") {
+  if (actor.role === "TEACHER" || actor.role === "ADMIN") {
     await assertTeachesSection(db, actor, sectionId);
     return;
   }
@@ -76,14 +96,22 @@ export async function assertSectionAccess(
 
 /**
  * Asserts the actor may act on a student's record: the student themselves, a
- * teacher who has that student in one of their sections, or an admin.
+ * teacher who has that student in one of their sections, or an admin of
+ * the student's school.
  */
 export async function assertStudentAccess(
   db: PrismaClient,
   actor: Actor,
   studentId: string,
 ) {
-  if (actor.role === "ADMIN") return;
+  if (actor.role === "ADMIN") {
+    const student = await db.studentProfile.findUnique({
+      where: { id: studentId },
+      select: { user: { select: { schoolId: true } } },
+    });
+    if (adminOf(actor, student?.user.schoolId)) return;
+    throw forbidden("You do not have access to this student's record.");
+  }
   if (actor.studentId === studentId) return;
   if (actor.teacherId) {
     const shared = await db.enrollment.findFirst({
@@ -166,14 +194,16 @@ export async function assertSubmissionAccess(
           allowLate: true,
           closesAt: true,
           rubricId: true,
-          section: { select: { teacherId: true } },
+          section: { select: { teacherId: true, schoolId: true } },
         },
       },
     },
   });
   if (!submission) throw notFound("Submission");
 
-  if (actor.role === "ADMIN") return submission;
+  if (adminOf(actor, submission.assignment.section.schoolId)) {
+    return submission;
+  }
   if (actor.studentId && submission.studentId === actor.studentId) {
     return submission;
   }

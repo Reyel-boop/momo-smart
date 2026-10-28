@@ -39,7 +39,7 @@ export const calendarRouter = createTRPCRouter({
                   some: { studentId: user.studentId ?? "", status: "ACTIVE" },
                 },
               }
-            : {};
+            : { schoolId: user.schoolId ?? "" };
 
       const from = startOfDay(input.from);
       const to = endOfDay(input.to);
@@ -48,7 +48,11 @@ export const calendarRouter = createTRPCRouter({
         ctx.db.calendarEvent.findMany({
           where: {
             startAt: { gte: from, lte: to },
-            OR: [{ sectionId: null }, { section: sectionFilter }],
+            // School-wide events of the person's own school, and their classes' events.
+            OR: [
+              { sectionId: null, schoolId: user.schoolId ?? "" },
+              { section: sectionFilter },
+            ],
           },
           orderBy: { startAt: "asc" },
           select: {
@@ -185,7 +189,11 @@ export const calendarRouter = createTRPCRouter({
       }
 
       return ctx.db.calendarEvent.create({
-        data: { ...input, createdById: ctx.session.user.id },
+        data: {
+          ...input,
+          createdById: ctx.session.user.id,
+          schoolId: ctx.session.user.schoolId,
+        },
       });
     }),
 
@@ -194,14 +202,17 @@ export const calendarRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const event = await ctx.db.calendarEvent.findUnique({
         where: { id: input.eventId },
-        select: { createdById: true, sectionId: true },
+        select: { createdById: true, sectionId: true, schoolId: true },
       });
       if (!event) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Event not found." });
       }
       if (event.sectionId) {
         await assertTeachesSection(ctx.db, ctx.session.user, event.sectionId);
-      } else if (ctx.session.user.role !== "ADMIN") {
+      } else if (
+        ctx.session.user.role !== "ADMIN" ||
+        event.schoolId !== ctx.session.user.schoolId
+      ) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Not your event." });
       }
       return ctx.db.calendarEvent.delete({ where: { id: input.eventId } });

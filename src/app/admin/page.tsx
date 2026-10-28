@@ -10,7 +10,10 @@ export const dynamic = "force-dynamic";
 
 /** Admin home: the school at a glance and the setup steps. */
 export default async function AdminHome() {
-  const o = await api.admin.overview();
+  const [o, school] = await Promise.all([
+    api.admin.overview(),
+    api.admin.school(),
+  ]);
   const steps = [
     {
       done: o.teachers > 0,
@@ -41,7 +44,7 @@ export default async function AdminHome() {
   return (
     <div className="mx-auto max-w-[1100px] space-y-6">
       <PageHeader
-        title="School overview"
+        title={school.name}
         subtitle={
           o.term
             ? `${o.term.name} · ${longDate(o.term.startDate)} to ${longDate(o.term.endDate)}`
@@ -68,6 +71,32 @@ export default async function AdminHome() {
           </Link>
         ))}
       </div>
+
+      <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
+        <div>
+          <p className="text-muted text-[11px] font-bold tracking-wide uppercase">
+            School code
+          </p>
+          <p className="text-ink font-mono text-2xl font-extrabold tracking-wider">
+            {school.joinCode}
+          </p>
+        </div>
+        <p className="text-muted max-w-md text-sm">
+          Teachers sign up with this code to join your school. Students sign up
+          with a class code from their teacher (this code works too).
+        </p>
+      </Card>
+
+      {o.deletionRequests > 0 && (
+        <Link
+          href="/admin/people"
+          className="block rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800 hover:bg-rose-100"
+        >
+          {o.deletionRequests} account{o.deletionRequests === 1 ? "" : "s"}{" "}
+          asked to be deleted. Open People to review and delete{" "}
+          {o.deletionRequests === 1 ? "it" : "them"} →
+        </Link>
+      )}
 
       {o.pendingFirstLogin > 0 && (
         <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">

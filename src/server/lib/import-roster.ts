@@ -50,17 +50,20 @@ const graduationYear = (gradeLevel: number, now = new Date()) =>
  * everyone in the given classes. A student whose LRN already has an account
  * is only enrolled, so uploading the same form twice is safe. Given the
  * form's section (homeroom), everyone is placed in it; it is created if new.
+ * Everything happens in one school: an LRN registered at another school is
+ * refused, never moved.
  */
 export async function importRoster(
   db: PrismaClient,
   rows: RosterRow[],
   sectionIds: string[],
-  homeroom?: { name: string; gradeLevel: number } | null,
+  homeroom: { name: string; gradeLevel: number } | null | undefined,
+  schoolId: string,
 ): Promise<RosterResult[]> {
   const room = homeroom
     ? await db.homeroom.upsert({
-        where: { gradeLevel_name: homeroom },
-        create: homeroom,
+        where: { schoolId_gradeLevel_name: { ...homeroom, schoolId } },
+        create: { ...homeroom, schoolId },
         update: {},
         select: { id: true, name: true },
       })
@@ -71,8 +74,13 @@ export async function importRoster(
     try {
       const existing = await db.studentProfile.findUnique({
         where: { studentNumber: row.studentNumber },
-        select: { id: true },
+        select: { id: true, user: { select: { schoolId: true } } },
       });
+      if (existing && existing.user.schoolId !== schoolId) {
+        throw new Error(
+          "This LRN is already registered at another school. Ask the Momo owner to move the student.",
+        );
+      }
       let studentId = existing?.id ?? null;
       let password: string | null = null;
 
@@ -94,6 +102,7 @@ export async function importRoster(
             name: row.name,
             email: row.email ?? null,
             role: "STUDENT",
+            schoolId,
             passwordHash: await hash(password, 10),
             mustChangePassword: true,
             studentProfile: {

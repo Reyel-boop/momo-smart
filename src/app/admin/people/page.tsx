@@ -249,7 +249,9 @@ export default async function PeoplePage({
                             0}
                         </td>
                         <td className="px-4 py-3">
-                          {!person.isActive ? (
+                          {person.deletionRequestedAt ? (
+                            <Pill tone="rose">Asked to be deleted</Pill>
+                          ) : !person.isActive ? (
                             <Pill tone="slate">Turned off</Pill>
                           ) : person.mustChangePassword ? (
                             <Pill tone="amber">Not signed in yet</Pill>
@@ -271,6 +273,7 @@ export default async function PeoplePage({
                               ""
                             }
                             active={person.isActive}
+                            deletionRequested={!!person.deletionRequestedAt}
                           />
                         </td>
                       </tr>

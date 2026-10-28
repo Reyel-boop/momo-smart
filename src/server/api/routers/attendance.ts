@@ -47,7 +47,7 @@ export const attendanceRouter = createTRPCRouter({
         where: {
           termId: term.id,
           ...(ctx.session.user.role === "ADMIN"
-            ? {}
+            ? { schoolId: ctx.session.user.schoolId ?? "" }
             : { teacherId: ctx.teacherId ?? "" }),
           meetings: {
             some: { dayOfWeek, rotation: { in: ["ALL", rotation] } },
@@ -309,7 +309,7 @@ export const attendanceRouter = createTRPCRouter({
       const date = toDateOnly(input.date ?? new Date());
       const sectionScope =
         ctx.session.user.role === "ADMIN"
-          ? {}
+          ? { schoolId: ctx.session.user.schoolId ?? "" }
           : { teacherId: ctx.teacherId ?? "" };
 
       const rateFor = async (on: Date) => {

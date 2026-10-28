@@ -104,6 +104,40 @@ export const userRouter = createTRPCRouter({
     }),
 
   /** Changes the caller's password after checking the current one. */
+  /** Asks for this account and its data to be deleted, or takes it back. */
+  requestDeletion: protectedProcedure
+    .input(z.object({ cancel: z.boolean().default(false) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.isOwner) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "The owner account can't be deleted this way.",
+        });
+      }
+      const user = await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { deletionRequestedAt: input.cancel ? null : new Date() },
+        select: { name: true, schoolId: true, deletionRequestedAt: true },
+      });
+      // The school's admins get a notice to complete it.
+      if (!input.cancel && user.schoolId) {
+        const admins = await ctx.db.user.findMany({
+          where: { schoolId: user.schoolId, role: "ADMIN", isActive: true },
+          select: { id: true },
+        });
+        await ctx.db.notification.createMany({
+          data: admins.map((a) => ({
+            userId: a.id,
+            type: "SYSTEM" as const,
+            title: "Account deletion request",
+            body: `${user.name ?? "Someone"} asked for their account and data to be deleted.`,
+            linkUrl: "/admin/people",
+          })),
+        });
+      }
+      return { requestedAt: user.deletionRequestedAt };
+    }),
+
   changePassword: protectedProcedure
     .input(
       z.object({
@@ -251,7 +285,7 @@ export const userRouter = createTRPCRouter({
               sectionId: input.sectionId,
               section:
                 ctx.session.user.role === "ADMIN"
-                  ? undefined
+                  ? { schoolId: ctx.session.user.schoolId ?? "" }
                   : { teacherId: ctx.teacherId ?? "" },
             },
           },
@@ -288,6 +322,7 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      await assertStudentAccess(ctx.db, ctx.session.user, input.studentId);
       return ctx.db.accommodation.create({ data: input });
     }),
 });

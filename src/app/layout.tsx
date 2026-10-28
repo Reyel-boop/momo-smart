@@ -1,8 +1,9 @@
 import "~/styles/globals.css";
 
-import { type Metadata } from "next";
+import { type Metadata, type Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { ServiceWorker } from "~/app/_components/service-worker";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -15,9 +16,13 @@ export const metadata: Metadata = {
       // Fallback for browsers without SVG favicon support.
       { url: "/favicon.ico", sizes: "any" },
     ],
-    apple: "/icon.svg",
+    apple: "/apple-touch-icon.png",
   },
+  appleWebApp: { capable: true, title: "Momo", statusBarStyle: "default" },
 };
+
+/** The app bar color when installed (and in the Android app). */
+export const viewport: Viewport = { themeColor: "#12275e" };
 
 const geist = Geist({
   subsets: ["latin"],
@@ -31,6 +36,7 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body className="font-sans antialiased">
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <ServiceWorker />
       </body>
     </html>
   );

@@ -22,11 +22,11 @@ export function Topbar({
 }) {
   return (
     <header className="border-line bg-surface/90 sticky top-0 z-10 border-b backdrop-blur">
-      <div className="flex items-center gap-4 py-3 pr-5 pl-16 lg:pl-5">
+      <div className="flex items-center gap-2 py-3 pr-4 pl-16 sm:gap-4 sm:pr-5 lg:pl-5">
         <div className="flex shrink-0 items-center gap-2">
           <span className="text-ink text-sm font-bold">{termName}</span>
           {week !== null && (
-            <span className="bg-brand-soft text-brand rounded-full px-2.5 py-1 text-[11px] font-bold">
+            <span className="bg-brand-soft text-brand hidden rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline">
               Week {week}
             </span>
           )}

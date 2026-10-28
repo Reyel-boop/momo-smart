@@ -8,6 +8,7 @@ import {
   GridIcon,
   ListIcon,
   SettingsIcon,
+  SwitchIcon,
   UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
@@ -15,6 +16,7 @@ import { Avatar } from "~/app/_components/ui";
 import { logout } from "~/app/login/actions";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
+import { db } from "~/server/db";
 
 export const metadata: Metadata = {
   title: "Admin · Momo Smart",
@@ -35,7 +37,14 @@ const ICONS: Record<string, React.ReactNode> = {
   Sections: <ListIcon className="size-[18px]" />,
   Classes: <CapIcon className="size-[18px]" />,
   Settings: <SettingsIcon className="size-[18px]" />,
+  Schools: <SwitchIcon className="size-[18px]" />,
 };
+
+/** The owner also manages every school. */
+const OWNER_ITEMS: NavItem[] = [
+  ...ITEMS,
+  { label: "Schools", href: "/admin/schools" },
+];
 
 /** The registrar's portal: accounts, classes and enrollment. */
 export default async function AdminLayout({
@@ -48,6 +57,14 @@ export default async function AdminLayout({
   if (session.user.role !== "ADMIN") redirect(homeForRole(session.user.role));
   if (session.user.mustChangePassword) redirect("/account/password");
   const name = session.user.name ?? "Registrar";
+  const isOwner = session.user.isOwner;
+  const items = isOwner ? OWNER_ITEMS : ITEMS;
+  const school = session.user.schoolId
+    ? await db.school.findUnique({
+        where: { id: session.user.schoolId },
+        select: { name: true },
+      })
+    : null;
 
   return (
     <div className="bg-canvas flex min-h-screen">
@@ -60,11 +77,16 @@ export default async function AdminLayout({
                 Momo Smart
               </p>
               <p className="text-muted text-[11px] font-bold tracking-wide uppercase">
-                School Admin
+                {isOwner ? "Owner" : "School Admin"}
               </p>
             </div>
           </div>
-          <Nav items={ITEMS} icons={ICONS} />
+          {school && (
+            <p className="text-ink bg-canvas mt-4 rounded-lg px-3 py-2 text-xs leading-snug font-bold">
+              {school.name}
+            </p>
+          )}
+          <Nav items={items} icons={ICONS} />
         </div>
       </aside>
 
@@ -75,7 +97,7 @@ export default async function AdminLayout({
               aria-label="Admin"
               className="flex gap-1 overflow-x-auto lg:hidden"
             >
-              {ITEMS.map((item) => (
+              {items.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -85,7 +107,20 @@ export default async function AdminLayout({
                 </Link>
               ))}
             </nav>
-            <form action={logout} className="ml-auto flex items-center">
+            {isOwner && school && (
+              <Link
+                href="/admin/schools"
+                className="text-muted hover:bg-canvas hover:text-ink ml-auto hidden items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold sm:flex"
+                title="Switch to another school"
+              >
+                <SwitchIcon className="size-4" />
+                <span className="max-w-[260px] truncate">{school.name}</span>
+              </Link>
+            )}
+            <form
+              action={logout}
+              className={`${isOwner && school ? "" : "ml-auto"} flex items-center`}
+            >
               <button
                 type="submit"
                 className="hover:bg-canvas flex items-center gap-3 rounded-xl py-1 pr-2 pl-1 transition"

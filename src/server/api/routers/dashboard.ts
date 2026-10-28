@@ -41,7 +41,7 @@ export const dashboardRouter = createTRPCRouter({
   teacherOverview: teacherProcedure.query(async ({ ctx }) => {
     const sectionScope =
       ctx.session.user.role === "ADMIN"
-        ? {}
+        ? { schoolId: ctx.session.user.schoolId ?? "" }
         : { teacherId: ctx.teacherId ?? "" };
     const today = toDateOnly(new Date());
     const soon = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -150,7 +150,7 @@ export const dashboardRouter = createTRPCRouter({
         where: {
           termId,
           ...(ctx.session.user.role === "ADMIN"
-            ? {}
+            ? { schoolId: ctx.session.user.schoolId ?? "" }
             : { teacherId: ctx.teacherId ?? "" }),
         },
         orderBy: { period: "asc" },
@@ -221,7 +221,7 @@ export const dashboardRouter = createTRPCRouter({
       where: {
         section:
           ctx.session.user.role === "ADMIN"
-            ? {}
+            ? { schoolId: ctx.session.user.schoolId ?? "" }
             : { teacherId: ctx.teacherId ?? "" },
       },
       _count: { _all: true },
@@ -410,11 +410,17 @@ export const dashboardRouter = createTRPCRouter({
           },
         }),
         ctx.db.studentProfile.findMany({
-          where: { gradeLevel: profile.gradeLevel, user: { isActive: true } },
+          where: {
+            gradeLevel: profile.gradeLevel,
+            user: { isActive: true, schoolId: ctx.session.user.schoolId ?? "" },
+          },
           select: { id: true },
         }),
         ctx.db.studentProfile.count({
-          where: { gradeLevel: profile.gradeLevel, user: { isActive: true } },
+          where: {
+            gradeLevel: profile.gradeLevel,
+            user: { isActive: true, schoolId: ctx.session.user.schoolId ?? "" },
+          },
         }),
         starTotals(ctx.db),
         questionStarLedger(ctx.db, ctx.studentId),
@@ -525,8 +531,8 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   /**
-   * The star leaderboard: every active student ranked by stars — the whole
-   * school, the viewer's grade, or the viewer's section. Ties share a rank.
+   * The star leaderboard: every active student of the school ranked by
+   * stars — the whole school, the viewer's grade, or the viewer's section. Ties share a rank.
    * Returns the top 50 and, if lower, the viewer's own row.
    */
   leaderboard: studentProcedure
@@ -542,7 +548,8 @@ export const dashboardRouter = createTRPCRouter({
       const [students, totals] = await Promise.all([
         ctx.db.studentProfile.findMany({
           where: {
-            user: { isActive: true },
+            // Ranks are within the student's own school.
+            user: { isActive: true, schoolId: ctx.session.user.schoolId ?? "" },
             ...(input.scope === "grade" ? { gradeLevel: me.gradeLevel } : {}),
             ...(input.scope === "section"
               ? { sectionId: me.section?.id ?? "-" }

@@ -48,6 +48,10 @@ export const alertRouter = createTRPCRouter({
           : ctx.session.user.role === "ADMIN"
             ? undefined
             : { teacherId: ctx.teacherId ?? "" },
+        // An admin sees the alerts of their own school's students.
+        ...(ctx.session.user.role === "ADMIN"
+          ? { student: { user: { schoolId: ctx.session.user.schoolId ?? "" } } }
+          : {}),
       };
 
       const [items, total] = await Promise.all([
@@ -235,6 +239,8 @@ export const alertRouter = createTRPCRouter({
       }
       if (alert.sectionId) {
         await assertTeachesSection(ctx.db, ctx.session.user, alert.sectionId);
+      } else {
+        await assertStudentAccess(ctx.db, ctx.session.user, alert.studentId);
       }
 
       if (input.type === "ASSIGN_PEER_TUTOR") {
@@ -304,13 +310,15 @@ export const alertRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const alert = await ctx.db.alert.findUnique({
         where: { id: input.alertId },
-        select: { sectionId: true },
+        select: { sectionId: true, studentId: true },
       });
       if (!alert) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Alert not found." });
       }
       if (alert.sectionId) {
         await assertTeachesSection(ctx.db, ctx.session.user, alert.sectionId);
+      } else {
+        await assertStudentAccess(ctx.db, ctx.session.user, alert.studentId);
       }
 
       const resolved =

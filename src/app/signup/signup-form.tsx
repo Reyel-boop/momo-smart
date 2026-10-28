@@ -24,6 +24,9 @@ export function SignUpForm({
   const [state, formAction, pending] = useActionState(signUp, initialState);
   const [showPassword, setShowPassword] = useState(false);
   const id = useId();
+  const kept = state.values ?? {};
+  /** A field's value from the failed attempt. */
+  const keep = (name: string) => kept[name];
 
   const tab = (value: Role, label: string) => (
     <button
@@ -48,8 +51,8 @@ export function SignUpForm({
       </h1>
       <p className="text-muted mt-2 text-[15px]">
         {role === "TEACHER"
-          ? "Teachers can sign in right away. The registrar assigns your classes."
-          : "Use your school email. If your teacher gave you a class code, enter it to join the class now."}
+          ? "Ask your school admin for your school's code. You can sign in right away."
+          : "Enter the class code from your teacher. It joins you to the class and your school."}
       </p>
 
       <div
@@ -61,7 +64,12 @@ export function SignUpForm({
         {tab("STUDENT", "I'm a Student")}
       </div>
 
-      <form action={formAction} className="mt-6 space-y-4">
+      <form
+        action={formAction}
+        // Remount after a failed attempt so the fields show what was typed.
+        key={JSON.stringify(kept)}
+        className="mt-6 space-y-4"
+      >
         <input type="hidden" name="role" value={role} />
         {state.error && (
           <p
@@ -86,6 +94,7 @@ export function SignUpForm({
               <input
                 id={`${id}-title`}
                 name="title"
+                defaultValue={keep("title")}
                 maxLength={20}
                 placeholder="Ms."
                 className={input}
@@ -99,6 +108,7 @@ export function SignUpForm({
             <input
               id={`${id}-name`}
               name="name"
+              defaultValue={keep("name")}
               required
               maxLength={120}
               autoComplete="name"
@@ -115,6 +125,7 @@ export function SignUpForm({
           <input
             id={`${id}-email`}
             name="email"
+            defaultValue={keep("email")}
             type="email"
             required
             autoComplete="email"
@@ -133,6 +144,7 @@ export function SignUpForm({
                 <input
                   id={`${id}-lrn`}
                   name="studentNumber"
+                  defaultValue={keep("studentNumber")}
                   required
                   maxLength={40}
                   inputMode="numeric"
@@ -147,7 +159,7 @@ export function SignUpForm({
                   id={`${id}-grade`}
                   name="gradeLevel"
                   required
-                  defaultValue="10"
+                  defaultValue={keep("gradeLevel") ?? "10"}
                   className={input}
                 >
                   {[7, 8, 9, 10, 11, 12].map((g) => (
@@ -160,33 +172,57 @@ export function SignUpForm({
             </div>
             <div>
               <label htmlFor={`${id}-code`} className={labelClass}>
-                Class code{" "}
-                <span className="text-muted font-normal">(optional)</span>
+                Class code
               </label>
               <input
                 id={`${id}-code`}
                 name="classCode"
+                required
                 maxLength={20}
-                defaultValue={initialCode}
+                defaultValue={keep("classCode") ?? initialCode}
                 placeholder="e.g. 7F3A2C"
                 autoCapitalize="characters"
                 className={`${input} font-mono uppercase placeholder:font-sans placeholder:normal-case`}
               />
+              <p className="text-muted mt-1 text-xs">
+                From your teacher. Your school&apos;s code works too.
+              </p>
             </div>
           </>
         ) : (
-          <div>
-            <label htmlFor={`${id}-emp`} className={labelClass}>
-              Employee number{" "}
-              <span className="text-muted font-normal">(optional)</span>
-            </label>
-            <input
-              id={`${id}-emp`}
-              name="employeeNumber"
-              maxLength={40}
-              className={input}
-            />
-          </div>
+          <>
+            <div>
+              <label htmlFor={`${id}-school`} className={labelClass}>
+                School code
+              </label>
+              <input
+                id={`${id}-school`}
+                name="schoolCode"
+                defaultValue={keep("schoolCode")}
+                required
+                maxLength={20}
+                placeholder="e.g. S4F2A9C1"
+                autoCapitalize="characters"
+                className={`${input} font-mono uppercase placeholder:font-sans placeholder:normal-case`}
+              />
+              <p className="text-muted mt-1 text-xs">
+                Your school admin has it, on the Admin home page.
+              </p>
+            </div>
+            <div>
+              <label htmlFor={`${id}-emp`} className={labelClass}>
+                Employee number{" "}
+                <span className="text-muted font-normal">(optional)</span>
+              </label>
+              <input
+                id={`${id}-emp`}
+                name="employeeNumber"
+                defaultValue={keep("employeeNumber")}
+                maxLength={40}
+                className={input}
+              />
+            </div>
+          </>
         )}
 
         <div className="grid gap-3 sm:grid-cols-2">

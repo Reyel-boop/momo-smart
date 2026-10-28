@@ -25,6 +25,12 @@ export const env = createEnv({
       .transform((value) => value === "true"),
     /** Bearer token the demo reset route requires. */
     CRON_SECRET: z.string().optional(),
+    /** The Android app's package name on Google Play, e.g. "com.momosmart.app". */
+    ANDROID_PACKAGE_NAME: z.string().optional(),
+    /** Its signing key's SHA-256 fingerprint(s), comma-separated (Play Console → App integrity). */
+    ANDROID_SHA256_FINGERPRINTS: z.string().optional(),
+    /** Where people write about privacy or deleting their account. */
+    SUPPORT_EMAIL: z.string().email().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -49,6 +55,9 @@ export const env = createEnv({
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     DEMO_MODE: process.env.DEMO_MODE,
     CRON_SECRET: process.env.CRON_SECRET,
+    ANDROID_PACKAGE_NAME: process.env.ANDROID_PACKAGE_NAME,
+    ANDROID_SHA256_FINGERPRINTS: process.env.ANDROID_SHA256_FINGERPRINTS,
+    SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**
