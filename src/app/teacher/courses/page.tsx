@@ -35,7 +35,17 @@ const STATUS = {
  * major ("TLE 7", "TLE 9-CP", "TLE 10-EIM"…), then anything else.
  */
 const SUBJECT_ORDER = ["MATH", "SCI", "FIL", "ENG", "AP"];
-const TLE_MAJORS = ["AFA", "FCS", "IA", "CP", "TEL", "COOK", "ACP", "EIM"];
+const TLE_MAJORS = [
+  "AFA",
+  "FCS",
+  "IA",
+  "CP",
+  "TEL",
+  "COOK",
+  "ACP",
+  "EIM",
+  "BAKE",
+];
 const subjectRank = (code: string) => {
   const upper = code.toUpperCase();
   const tle = /^TLE (\d+)(?:-(\w+))?$/.exec(upper);
@@ -46,6 +56,29 @@ const subjectRank = (code: string) => {
   const index = SUBJECT_ORDER.indexOf(upper.split(" ")[0]!);
   return index === -1 ? 1000 : index;
 };
+
+/** Subject areas, so a teacher picks the area first, then the course. */
+const AREAS = [
+  { key: "MATH", label: "Mathematics" },
+  { key: "SCI", label: "Science" },
+  { key: "ENG", label: "English" },
+  { key: "FIL", label: "Filipino" },
+  { key: "AP", label: "Araling Panlipunan" },
+  { key: "TLE", label: "TLE & Technical-Professional" },
+  { key: "OTHER", label: "Other" },
+] as const;
+type AreaKey = (typeof AREAS)[number]["key"];
+
+const areaOf = (code: string): AreaKey => {
+  const head = code.toUpperCase().split(/[\s-]/)[0]!;
+  return AREAS.find((a) => a.key === head)?.key ?? "OTHER";
+};
+
+/** "TLE 10 – ICT: Computer Programming" → "ICT: Computer Programming". */
+const shortName = (name: string) => name.replace(/^TLE \d+\s*[–-]\s*/, "");
+
+/** The grade in a course code ("TLE 9-CP" → 9), for grouping TLE. */
+const gradeOf = (code: string) => Number(/\d+/.exec(code)?.[0] ?? 0);
 
 export default async function CoursesPage({
   searchParams,
@@ -76,6 +109,29 @@ export default async function CoursesPage({
   const canStart = (subject: { department: { id: string } }) =>
     !department || subject.department.id === department.id;
   const totalUnits = subjects.reduce((sum, s) => sum + s.units.length, 0);
+  const activeArea = active ? areaOf(active.code) : null;
+  const areas = AREAS.map((area) => {
+    const courses = subjects
+      .filter((s) => areaOf(s.code) === area.key)
+      .sort((a, b) => subjectRank(a.code) - subjectRank(b.code));
+    return { ...area, courses };
+  }).filter((area) => area.courses.length > 0);
+  const areaCourses =
+    areas.find((area) => area.key === activeArea)?.courses ?? [];
+  // TLE is long, so its courses are grouped by grade.
+  const groups =
+    activeArea === "TLE"
+      ? [...new Set(areaCourses.map((s) => gradeOf(s.code)))].map((grade) => ({
+          label:
+            grade >= 11
+              ? `Grade ${grade} · Senior High`
+              : grade <= 8
+                ? `Grade ${grade} · Exploratory`
+                : `Grade ${grade} · Specialized`,
+          courses: areaCourses.filter((s) => gradeOf(s.code) === grade),
+        }))
+      : [{ label: null, courses: areaCourses }];
+  const mine = subjects.filter((s) => s.sections.length > 0);
   const sectionCount = new Set(
     subjects.flatMap((s) => s.sections.map((section) => section.id)),
   ).size;
@@ -93,37 +149,80 @@ export default async function CoursesPage({
         </Card>
       ) : (
         <>
-          <nav
-            aria-label="Subjects"
-            className="flex gap-2 overflow-x-auto pb-1"
-          >
-            {subjects.map((subject) => {
-              const isActive = subject.id === active.id;
-              return (
-                <Link
-                  key={subject.id}
-                  href={`/teacher/courses?subject=${subject.id}`}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`shrink-0 rounded-xl border px-4 py-2.5 text-left transition ${
-                    isActive
-                      ? "border-navy-deep bg-navy-deep text-white shadow-sm"
-                      : "border-line bg-surface text-ink hover:border-brand"
-                  }`}
-                >
-                  <span className="block text-sm font-extrabold uppercase">
-                    {subject.name}
-                  </span>
-                  <span
-                    className={`block text-[11px] font-semibold ${isActive ? "text-white/70" : "text-muted"}`}
-                  >
-                    {subject.sections.length > 0
-                      ? `${subject.units.length} units · ${subject.completedUnits} completed`
-                      : `${subject.units.length} units · not teaching yet`}
-                  </span>
-                </Link>
-              );
-            })}
-          </nav>
+          <Card className="space-y-4 p-4 sm:p-5">
+            {mine.length > 0 && (
+              <div>
+                <p className="text-muted mb-2 text-[11px] font-bold tracking-wider uppercase">
+                  Your classes
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {mine.map((subject) => (
+                    <CourseChip
+                      key={subject.id}
+                      subject={subject}
+                      label={subject.name}
+                      active={subject.id === active.id}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <p className="text-muted mb-2 text-[11px] font-bold tracking-wider uppercase">
+                Subject area
+              </p>
+              <nav aria-label="Subject areas" className="flex flex-wrap gap-2">
+                {areas.map((area) => {
+                  const isActive = area.key === activeArea;
+                  const first =
+                    area.courses.find((s) => s.sections.length > 0) ??
+                    area.courses[0]!;
+                  return (
+                    <Link
+                      key={area.key}
+                      href={`/teacher/courses?subject=${first.id}`}
+                      aria-current={isActive ? "true" : undefined}
+                      className={`rounded-full border px-4 py-2 text-sm font-bold transition ${
+                        isActive
+                          ? "border-brand bg-brand text-white shadow-sm"
+                          : "border-line bg-surface text-ink hover:border-brand"
+                      }`}
+                    >
+                      {area.label}
+                      <span
+                        className={`ml-1.5 text-xs font-semibold ${isActive ? "text-white/75" : "text-muted"}`}
+                      >
+                        {area.courses.length}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            <div className="border-line space-y-3 border-t pt-4">
+              {groups.map((group) => (
+                <div key={group.label ?? "all"}>
+                  {group.label && (
+                    <p className="text-muted mb-2 text-xs font-bold">
+                      {group.label}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {group.courses.map((subject) => (
+                      <CourseChip
+                        key={subject.id}
+                        subject={subject}
+                        label={shortName(subject.name)}
+                        active={subject.id === active.id}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
 
           <Card className="overflow-hidden">
             <div className="bg-navy-deep relative overflow-hidden px-6 py-6">
@@ -403,9 +502,40 @@ export default async function CoursesPage({
   );
 }
 
-type Unit = Awaited<
-  ReturnType<typeof api.course.teachingUnits>
->[number]["units"][number];
+type Subject = Awaited<ReturnType<typeof api.course.teachingUnits>>[number];
+type Unit = Subject["units"][number];
+
+/** One course to pick: its name, units, and whether you teach it yet. */
+function CourseChip({
+  subject,
+  label,
+  active,
+}: {
+  subject: Subject;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={`/teacher/courses?subject=${subject.id}`}
+      aria-current={active ? "page" : undefined}
+      className={`max-w-full rounded-xl border px-4 py-2.5 text-left transition ${
+        active
+          ? "border-navy-deep bg-navy-deep text-white shadow-sm"
+          : "border-line bg-surface text-ink hover:border-brand"
+      }`}
+    >
+      <span className="block text-sm font-extrabold">{label}</span>
+      <span
+        className={`block text-[11px] font-semibold ${active ? "text-white/70" : "text-muted"}`}
+      >
+        {subject.sections.length > 0
+          ? `${subject.units.length} units · ${subject.completedUnits} completed`
+          : `${subject.units.length} units · not teaching yet`}
+      </span>
+    </Link>
+  );
+}
 
 /** The unit's closing questions, each section's results and the answer key. */
 function UnitQuestions({

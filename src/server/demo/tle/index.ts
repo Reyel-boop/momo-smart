@@ -6,7 +6,8 @@
  * course per major — Computer Programming, Cookery, Agricultural Crop
  * Production, and Electrical Installation and Maintenance; TLE 9 also has
  * Telecommunications (contact center services), and TLE 8 has Agriculture
- * and Fishery Arts, Family and Consumer Science, and Industrial Arts. Every lesson
+ * and Fishery Arts, Family and Consumer Science, and Industrial Arts. Grade 11
+ * has Bakery Operations, a senior high Technical-Professional elective. Every lesson
  * carries its lecture and every unit its Unit Questions.
  */
 import type { DemoSubject } from "../grade10";
@@ -17,6 +18,7 @@ import { familyAndConsumerScience8 } from "./fcs";
 import { industrialArts8 } from "./ia";
 import { TLE9 } from "./grade9";
 import { TLE10 } from "./grade10";
+import { bakeryOperations11 } from "./bakery";
 
 export const TLE_SUBJECTS: DemoSubject[] = [
   TLE7,
@@ -26,4 +28,5 @@ export const TLE_SUBJECTS: DemoSubject[] = [
   industrialArts8,
   ...TLE9,
   ...TLE10,
+  bakeryOperations11,
 ];

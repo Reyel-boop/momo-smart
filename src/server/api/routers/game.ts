@@ -258,7 +258,7 @@ export const gameRouter = createTRPCRouter({
     .input(
       z.object({
         levelId: z.string(),
-        taps: z.array(z.number().int().min(0)).max(60),
+        taps: z.array(z.number().int().min(0)).max(2000),
         picks: z.array(z.array(z.number().int().min(0).max(2)).max(3)).max(6),
       }),
     )
@@ -291,7 +291,7 @@ export const gameRouter = createTRPCRouter({
         levelId: z.string(),
         answers: z
           .array(z.object({ id: z.string(), choice: z.string() }))
-          .max(120),
+          .max(2000),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -430,7 +430,7 @@ export const gameRouter = createTRPCRouter({
     .input(
       z.object({
         levelId: z.string(),
-        taps: z.array(z.array(z.number().int().min(0)).max(30)).max(10),
+        taps: z.array(z.array(z.number().int().min(0)).max(1000)).max(10),
         picks: z.array(z.array(z.number().int().min(0).max(2)).max(3)).max(10),
       }),
     )
@@ -464,7 +464,7 @@ export const gameRouter = createTRPCRouter({
         answers: z
           .array(
             z.object({
-              guesses: z.array(z.string().max(30)).min(1).max(40),
+              guesses: z.array(z.string().max(30)).min(1).max(1000),
               hints: z.number().int().min(0).max(30),
             }),
           )
