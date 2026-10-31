@@ -4,11 +4,39 @@
  * NC II). One unit per quarter: breads, pastries, cakes and petit fours;
  * one lesson per learning competency or content group, each with a written
  * lecture, an activity and a self-check, and every unit with five Unit
- * Questions and five more for Live Quiz. Lessons have no video yet;
- * teachers can attach one from the Courses page.
+ * Questions and five more for Live Quiz.
  */
 import type { DemoLesson, DemoSubject, DemoUnit } from "../grade10";
 import { q, TLE_DEPARTMENT } from "./common";
+
+/**
+ * The lecture video for each lesson (YouTube id). Each was checked to exist
+ * and allow embedding, and chosen for covering the lesson’s topic —
+ * Philippine TLE Bread and Pastry Production lessons where there is one.
+ */
+export const BAKERY_VIDEOS: Record<string, string> = {
+  "Overview of the Baking Industry": "D_Yxanxb034", // History of Baking — Chef Lizzy’s Lecture Series
+  "Baking Tools and Equipment": "2aIZSLNn6XQ", // TLE BPP Baking Tools and Their Uses — Doc Mye
+  "Baking Ingredients and Substitutes": "Tzv3qJFMxG8", // TLE BPP Lesson 1 Basic Ingredients in Baking — Doc Mye
+  "Conversions, Measuring and Product Costing": "gXh-Xk_3RV0", // Bread and Pastry: Measuring Dry and Liquid Ingredients
+  "Bread Products and Mixing Methods": "1cyzfmBKELk", // What is the Sponge and Dough Method? — BAKERpedia
+  "Contemporary Bread-making Techniques": "caB0i_VuL2k", // Japanese Milk Bread, 65 °C Tangzhong Method — The apron
+  "Food Safety, Sanitation and Risk Assessment": "ploIT6TW6ag", // Safety and Sanitation in the Kitchen — With Frankie
+  "Packaging and Marketing Bakery Products": "znLw_rVu2KY", // BPP Packaging Lesson — Ms. Arl
+  "Introduction to Pastry": "TdMNDUJhVAA", // Pastry 101: beginner’s guide to pastry basics
+  "Kinds of Pastry and Pastry Quality": "isy6I36Zd3w", // Types of Pastries | Bread and Pastry Production — TLE Online Hub
+  "Crusts, Fillings and Coatings": "hMiGv5kZ5Og", // Different Types of Pie Pastries — Dom Bill
+  "Traditional and Contemporary Pastries": "QaD2xMCwYUk", // Croissants, Danish and cruffins — AntonyBakingworld
+  "Costing and Marketing Pastry Products": "KbacDjM14CM", // How to Cost Out a Recipe — Chef Colin Roche
+  "Fundamentals of Cake Production": "fiUmO3qtbcc", // Understanding Cake Batter — Khalil Omar
+  "Classifying Cakes and Judging Their Quality": "zwau7_LJz4A", // TLE BPP Lesson 4 Types, Kinds and Classification of Bakery Products — Doc Mye
+  "Cake Mixing Techniques": "ZzGJTytTDMo", // Cake Methods: All Basic Mixing Methods — Chef Bonus Sahoo
+  "Frostings, Icings and Glazes": "L9ctvPqvlMM", // Types of Frosting — WebstaurantStore
+  "Cake Decorating Trends and Mini Cakes": "5PycnD49s9c", // How to Decorate Bento Cakes — The Cakey Doc
+  "Petit Fours: Functions, Ingredients and Kinds": "FY05Txv1yeY", // Introduction to Petit Fours
+  "Traditional and Modern Petit Fours and Trends": "Qd93sIM87i0", // How to Make Perfect Petit Fours — Erin McDowell, Food52
+  "Producing Traditional Petit Fours": "tCZ_zSE6Fgc", // How To Make Petits Fours — Anna Olson
+};
 
 const lesson = (
   title: string,
@@ -21,7 +49,7 @@ const lesson = (
   summary,
   reading,
   questions,
-  lecture: { videoId: "", lecture },
+  lecture: { videoId: BAKERY_VIDEOS[title] ?? "", lecture },
 });
 
 const UNITS: DemoUnit[] = [
