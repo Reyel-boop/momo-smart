@@ -104,6 +104,10 @@ function Rules({ quiz }: { quiz: Quiz }) {
         time runs out, the question counts as wrong and the next one opens.
       </li>
       <li>
+        Don&apos;t know an answer? <b>Skip</b> it to go on right away — it
+        counts as wrong.
+      </li>
+      <li>
         After each answer you see right away whether you got it, the correct
         answer and the rationale.
       </li>
@@ -381,6 +385,23 @@ function QuestionCard({
         >
           {pending ? "Checking…" : left === 0 ? "Time's up" : "Submit answer"}
         </button>
+        {/* Not knowing the answer shouldn't mean waiting out the clock. */}
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              window.confirm(
+                "Skip this question? It counts as wrong, and you can't come back to it.",
+              )
+            ) {
+              send(null);
+            }
+          }}
+          disabled={pending || left === 0}
+          className="text-muted hover:text-ink mt-2 w-full rounded-xl px-5 py-2 text-sm font-semibold transition disabled:opacity-50"
+        >
+          Skip this question ›
+        </button>
       </form>
     </Card>
   );
@@ -410,13 +431,16 @@ function FeedbackCard({
       >
         {feedback.isCorrect
           ? "✓ Correct!"
-          : feedback.timedOut
-            ? "⏱ Time's up"
-            : "✗ Wrong"}
+          : feedback.skipped
+            ? "⏭ Skipped"
+            : feedback.timedOut
+              ? "⏱ Time's up"
+              : "✗ Wrong"}
       </p>
       <Rationale
         correct={feedback.isCorrect}
         timedOut={feedback.timedOut}
+        skipped={feedback.skipped}
         chosen={feedback.chosen}
         answer={feedback.correct}
         explanation={feedback.explanation}
@@ -576,12 +600,14 @@ type Choice = { label: string; text: string } | null;
 function Rationale({
   correct,
   timedOut,
+  skipped = false,
   chosen,
   answer,
   explanation,
 }: {
   correct: boolean;
   timedOut: boolean;
+  skipped?: boolean;
   chosen: Choice;
   answer: Choice;
   explanation: string | null;
@@ -597,9 +623,11 @@ function Rationale({
       <p className="font-bold">
         {correct && chosen
           ? `Correct! ${chosen.label}. ${chosen.text} is the right answer.`
-          : timedOut || !chosen
-            ? "No answer was given in time."
-            : `Not quite. You chose ${chosen.label}. ${chosen.text}`}
+          : skipped
+            ? "You skipped this question."
+            : timedOut || !chosen
+              ? "No answer was given."
+              : `Not quite. You chose ${chosen.label}. ${chosen.text}`}
       </p>
       {!correct && answer && (
         <p className="mt-1 font-semibold">

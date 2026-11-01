@@ -1129,6 +1129,8 @@ export const assessmentRouter = createTRPCRouter({
       return {
         isCorrect,
         timedOut: timedOut || !input.optionId,
+        // Skipped on purpose (no answer sent before the time was up).
+        skipped: !timedOut && !input.optionId,
         chosen: option ? { label: option.label, text: option.text } : null,
         correct: correct ? { label: correct.label, text: correct.text } : null,
         explanation: question.explanation,
