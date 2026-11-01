@@ -10,6 +10,7 @@ import { dashboardRouter } from "~/server/api/routers/dashboard";
 import { gradingRouter } from "~/server/api/routers/grading";
 import { lessonRouter } from "~/server/api/routers/lesson";
 import { gameRouter } from "~/server/api/routers/game";
+import { natRouter } from "~/server/api/routers/nat";
 import { liveRouter } from "~/server/api/routers/live";
 import { raceRouter } from "~/server/api/routers/race";
 import { schoolRouter } from "~/server/api/routers/school";
@@ -50,6 +51,7 @@ export const appRouter = createTRPCRouter({
   lesson: lessonRouter,
   live: liveRouter,
   game: gameRouter,
+  nat: natRouter,
   race: raceRouter,
   assignment: assignmentRouter,
   submission: submissionRouter,

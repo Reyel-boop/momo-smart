@@ -12,6 +12,7 @@ import {
   PlusCircleIcon,
   SettingsIcon,
   StarIcon,
+  TimerIcon,
   TrophyIcon,
   UsersIcon,
 } from "~/app/_components/icons";
@@ -31,6 +32,10 @@ export function Sidebar({
     { label: "Dashboard", href: "/student", exact: true },
     { label: "Courses", href: "/student/courses" },
     { label: "Assignments", href: "/student/assignments", badge: dueCount },
+    // Grade 10 takes the computer-based National Achievement Test.
+    ...(gradeLevel === 10
+      ? [{ label: "CB-NAT Review", href: "/student/nat" }]
+      : []),
     { label: "Live Quiz", href: "/student/live" },
     { label: "Games", href: "/student/games" },
     { label: "Group Race", href: "/student/race" },
@@ -43,6 +48,7 @@ export function Sidebar({
     Dashboard: <GridIcon className="size-[18px]" />,
     Courses: <CapIcon className="size-[18px]" />,
     Assignments: <ClipboardIcon className="size-[18px]" />,
+    "CB-NAT Review": <TimerIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
     Games: <TrophyIcon className="size-[18px]" />,
     "Group Race": <UsersIcon className="size-[18px]" />,

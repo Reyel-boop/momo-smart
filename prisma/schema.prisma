@@ -144,6 +144,7 @@ model StudentProfile {
   lessonProgress   LessonProgress[]
   lessonNotes      LessonNote[]
   attempts         AssessmentAttempt[]
+  natAttempts      NatAttempt[]
   attendance       AttendanceRecord[]
   alerts           Alert[]
   accommodations   Accommodation[]
@@ -980,6 +981,9 @@ model AssessmentAttempt {
   expiresAt      DateTime?
   submittedAt    DateTime?
   lastAutosaveAt DateTime?
+  /// Unit Questions: when the next question may open — the answered
+  /// question's 2 minutes must be up first.
+  nextQuestionAt DateTime?
   /// Extra minutes granted by an accommodation on this attempt.
   extraMinutes   Int       @default(0)
 
@@ -1570,4 +1574,95 @@ model QuestAnswer {
 
   @@unique([studentId, questionId])
   @@index([questionId])
+}
+
+// --- CB-NAT Review (Grade 10) -------------------------------------------------
+
+enum NatSubject {
+  ENGLISH
+  FILIPINO
+  MATH
+  SCIENCE
+  AP
+  MIXED
+}
+
+/// A CB-NAT practice test: questions given by the owner, shared by every
+/// school, answered one at a time against a 2-minute clock.
+model NatTest {
+  id          String     @id @default(cuid())
+  subject     NatSubject
+  title       String
+  description String?
+  maxAttempts Int        @default(3)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  questions NatQuestion[]
+  attempts  NatAttempt[]
+
+  @@unique([subject, title])
+}
+
+model NatQuestion {
+  id          String  @id @default(cuid())
+  testId      String
+  order       Int
+  prompt      String
+  explanation String?
+
+  test      NatTest       @relation(fields: [testId], references: [id], onDelete: Cascade)
+  options   NatOption[]
+  responses NatResponse[]
+
+  @@unique([testId, order])
+}
+
+model NatOption {
+  id         String  @id @default(cuid())
+  questionId String
+  order      Int
+  label      String
+  text       String
+  isCorrect  Boolean @default(false)
+
+  question NatQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model NatAttempt {
+  id             String        @id @default(cuid())
+  testId         String
+  studentId      String
+  attempt        Int           @default(1)
+  status         AttemptStatus @default(IN_PROGRESS)
+  startedAt      DateTime      @default(now())
+  submittedAt    DateTime?
+  /// When the open question was shown; null between questions.
+  openedAt       DateTime?
+  /// When the next question may open: the answered question's 2 minutes.
+  nextQuestionAt DateTime?
+  score          Float?
+  focusLosses    Int           @default(0)
+
+  test      NatTest        @relation(fields: [testId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  responses NatResponse[]
+
+  @@unique([testId, studentId, attempt])
+  @@index([studentId, status])
+}
+
+model NatResponse {
+  id         String   @id @default(cuid())
+  attemptId  String
+  questionId String
+  optionId   String?
+  isCorrect  Boolean  @default(false)
+  answeredAt DateTime @default(now())
+
+  attempt  NatAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question NatQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
 }

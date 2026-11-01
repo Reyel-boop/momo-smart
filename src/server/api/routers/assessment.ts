@@ -865,6 +865,7 @@ export const assessmentRouter = createTRPCRouter({
               totalScore: true,
               submittedAt: true,
               lastAutosaveAt: true,
+              nextQuestionAt: true,
               responses: {
                 select: {
                   questionId: true,
@@ -932,6 +933,15 @@ export const assessmentRouter = createTRPCRouter({
               score: running.responses.filter((r) => r.isCorrect).length,
               focusLosses: running._count.proctorEvents,
               current,
+              // Seconds until the next question may open (0 when it can).
+              nextOpensIn: running.nextQuestionAt
+                ? Math.max(
+                    0,
+                    Math.ceil(
+                      (running.nextQuestionAt.getTime() - Date.now()) / 1000,
+                    ),
+                  )
+                : 0,
             }
           : null,
         // The finished try under review, with answers and rationales.
@@ -1021,7 +1031,8 @@ export const assessmentRouter = createTRPCRouter({
   /**
    * Opens the next unanswered question and starts its clock. Opening the
    * question that is already open keeps its original start time, so
-   * reloading the page never resets the clock.
+   * reloading the page never resets the clock. The next question opens only
+   * once the answered one's 2 minutes are up, even if it was answered early.
    */
   openUnitQuestion: studentProcedure
     .input(z.object({ attemptId: z.string() }))
@@ -1032,9 +1043,18 @@ export const assessmentRouter = createTRPCRouter({
         input.attemptId,
       );
       if (!attempt.lastAutosaveAt) {
+        const wait = attempt.nextQuestionAt
+          ? attempt.nextQuestionAt.getTime() - Date.now()
+          : 0;
+        if (wait > 1000) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `The next question opens in ${Math.ceil(wait / 1000)} seconds, when this question's 2 minutes are up.`,
+          });
+        }
         await ctx.db.assessmentAttempt.update({
           where: { id: attempt.id },
-          data: { lastAutosaveAt: new Date() },
+          data: { lastAutosaveAt: new Date(), nextQuestionAt: null },
         });
       }
       return { ok: true };
@@ -1121,7 +1141,12 @@ export const assessmentRouter = createTRPCRouter({
                 autoScore: round(earned, 2),
                 totalScore: round(earned, 2),
               }
-            : { lastAutosaveAt: null },
+            : {
+                lastAutosaveAt: null,
+                nextQuestionAt: new Date(
+                  openedAt.getTime() + QUESTION_SECONDS * 1000,
+                ),
+              },
         }),
       ]);
 
@@ -1129,8 +1154,6 @@ export const assessmentRouter = createTRPCRouter({
       return {
         isCorrect,
         timedOut: timedOut || !input.optionId,
-        // Skipped on purpose (no answer sent before the time was up).
-        skipped: !timedOut && !input.optionId,
         chosen: option ? { label: option.label, text: option.text } : null,
         correct: correct ? { label: correct.label, text: correct.text } : null,
         explanation: question.explanation,
@@ -1612,6 +1635,7 @@ async function runningUnitAttempt(
       id: true,
       status: true,
       lastAutosaveAt: true,
+      nextQuestionAt: true,
       responses: { select: { questionId: true, pointsAwarded: true } },
       assessment: {
         select: {

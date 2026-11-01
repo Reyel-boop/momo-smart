@@ -9,6 +9,7 @@ import {
   ListIcon,
   SettingsIcon,
   SwitchIcon,
+  TimerIcon,
   UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
@@ -38,12 +39,14 @@ const ICONS: Record<string, React.ReactNode> = {
   Classes: <CapIcon className="size-[18px]" />,
   Settings: <SettingsIcon className="size-[18px]" />,
   Schools: <SwitchIcon className="size-[18px]" />,
+  "CB-NAT Review": <TimerIcon className="size-[18px]" />,
 };
 
 /** The owner also manages every school. */
 const OWNER_ITEMS: NavItem[] = [
   ...ITEMS,
   { label: "Schools", href: "/admin/schools" },
+  { label: "CB-NAT Review", href: "/admin/nat" },
 ];
 
 /** The registrar's portal: accounts, classes and enrollment. */

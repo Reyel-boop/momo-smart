@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 import { Card } from "~/app/_components/ui";
-import type { RouterOutputs } from "~/trpc/react";
 import {
   answerUnitQuestion,
   openNextUnitQuestion,
@@ -13,30 +12,114 @@ import {
   startUnitQuestions,
 } from "../actions";
 
-type Quiz = RouterOutputs["assessment"]["unitQuiz"];
-type Running = NonNullable<Quiz["running"]>;
+type Option = { id: string; label: string; text: string };
+
+/**
+ * What the focus-mode screen needs from a question set: a unit's questions
+ * (Courses) or a CB-NAT practice test. Before a try is finished only the
+ * open question is sent, without its answer; the review has them all.
+ */
+export type QuizView = {
+  id: string;
+  questionCount: number;
+  questionSeconds: number;
+  maxAttempts: number;
+  triesLeft: number;
+  totalPoints: number;
+  running: {
+    id: string;
+    attempt: number;
+    answeredCount: number;
+    score: number;
+    focusLosses: number;
+    /** Seconds until the next question may open (0 when it can). */
+    nextOpensIn: number;
+    current: {
+      number: number;
+      secondsLeft: number;
+      question: { id: string; prompt: string; options: Option[] } | null;
+    } | null;
+  } | null;
+  latest: {
+    attempt: number;
+    totalScore: number | null;
+    focusLosses: number;
+    responses: {
+      questionId: string;
+      selectedOptionIds: string[];
+      isCorrect: boolean | null;
+    }[];
+    /** Stars from this try and in all (Courses only). */
+    newStars?: number;
+    totalStars?: number;
+  } | null;
+  questions: {
+    id: string;
+    order: number;
+    prompt: string;
+    explanation: string | null;
+    options: (Option & { isCorrect: boolean })[];
+  }[];
+};
+
+type Choice = { label: string; text: string } | null;
+
+export type QuizFeedback = {
+  isCorrect: boolean;
+  timedOut: boolean;
+  chosen: Choice;
+  correct: Choice;
+  explanation: string | null;
+  finished: boolean;
+  score: number;
+  totalPoints: number;
+};
+
+type Result<T> = ({ ok: true } & T) | { ok: false; error: string };
+
+/** The server actions behind a question set. */
+export type QuizActions = {
+  start: (quizId: string) => Promise<Result<{ attemptId: string }>>;
+  open: (attemptId: string) => Promise<Result<object>>;
+  answer: (
+    attemptId: string,
+    questionId: string,
+    optionId: string | null,
+  ) => Promise<Result<{ feedback: QuizFeedback }>>;
+  focusLoss: (attemptId: string) => Promise<void>;
+};
+
+const UNIT_ACTIONS: QuizActions = {
+  start: startUnitQuestions,
+  open: openNextUnitQuestion,
+  answer: answerUnitQuestion,
+  focusLoss: reportUnitQuizFocusLoss,
+};
+
+type Running = NonNullable<QuizView["running"]>;
 type OpenQuestion = NonNullable<NonNullable<Running["current"]>["question"]>;
-type Feedback = Extract<
-  Awaited<ReturnType<typeof answerUnitQuestion>>,
-  { ok: true }
->["feedback"];
 
 const mmss = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
 /**
- * A unit's questions in focus mode: one question at a time on a full-screen
+ * A question set in focus mode: one question at a time on a full-screen
  * panel with a 2-minute clock (kept by the server, so reloading does not
  * reset it). Every answer — right, wrong or timed out — is followed at once
- * by the verdict, the correct answer and the rationale. After a try, the
- * whole try can be reviewed.
+ * by the verdict, the correct answer and the rationale; the next question
+ * opens only when the 2 minutes are up, so the time left goes to the
+ * rationale. After a try, the whole try can be reviewed.
  */
 export function UnitQuestionsForm({
   quiz,
   courseHref,
+  backLabel = "Back to the course",
+  actions = UNIT_ACTIONS,
 }: {
-  quiz: Quiz;
+  quiz: QuizView;
   courseHref: string;
+  backLabel?: string;
+  actions?: QuizActions;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +128,7 @@ export function UnitQuestionsForm({
   const start = () => {
     setError(null);
     startTransition(async () => {
-      const result = await startUnitQuestions(quiz.id);
+      const result = await actions.start(quiz.id);
       if (!result.ok) setError(result.error);
       router.refresh();
     });
@@ -58,6 +141,7 @@ export function UnitQuestionsForm({
         running={quiz.running}
         total={quiz.questionCount}
         questionSeconds={quiz.questionSeconds}
+        actions={actions}
       />
     );
   }
@@ -85,6 +169,7 @@ export function UnitQuestionsForm({
       quiz={quiz}
       latest={quiz.latest}
       courseHref={courseHref}
+      backLabel={backLabel}
       onRetry={start}
       pending={pending}
       error={error}
@@ -92,7 +177,7 @@ export function UnitQuestionsForm({
   );
 }
 
-function Rules({ quiz }: { quiz: Quiz }) {
+function Rules({ quiz }: { quiz: QuizView }) {
   return (
     <ul className="text-muted mt-3 list-disc space-y-1.5 pl-5 text-sm">
       <li>
@@ -100,12 +185,10 @@ function Rules({ quiz }: { quiz: Quiz }) {
         can&apos;t go back to a question once it&apos;s answered.
       </li>
       <li>
-        You have <b>{mmss(quiz.questionSeconds)} minutes per question</b>. When
-        time runs out, the question counts as wrong and the next one opens.
-      </li>
-      <li>
-        Don&apos;t know an answer? <b>Skip</b> it to go on right away — it
-        counts as wrong.
+        Each question gets <b>{mmss(quiz.questionSeconds)} minutes</b>. You can
+        answer early, but the next question opens only when the{" "}
+        {mmss(quiz.questionSeconds)} minutes are up — use the time to read the
+        rationale. If time runs out, the question counts as wrong.
       </li>
       <li>
         After each answer you see right away whether you got it, the correct
@@ -123,21 +206,42 @@ function Rules({ quiz }: { quiz: Quiz }) {
   );
 }
 
+/** Seconds left until `until` (ms), ticking while it's in the future. */
+function useSecondsUntil(until: number) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (until <= Date.now()) return;
+    const timer = setInterval(() => {
+      setNow(Date.now());
+      if (Date.now() >= until) clearInterval(timer);
+    }, 250);
+    return () => clearInterval(timer);
+  }, [until]);
+  return Math.max(0, Math.ceil((until - now) / 1000));
+}
+
 /** The full-screen panel for a running try. */
 function FocusMode({
   running,
   total,
   questionSeconds,
+  actions,
 }: {
   running: Running;
   total: number;
   questionSeconds: number;
+  actions: QuizActions;
 }) {
   const router = useRouter();
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [feedback, setFeedback] = useState<QuizFeedback | null>(null);
   const [focusLosses, setFocusLosses] = useState(running.focusLosses);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  // The next question opens when the answered one's 2 minutes are up.
+  const [lockUntil, setLockUntil] = useState(
+    () => Date.now() + running.nextOpensIn * 1000,
+  );
+  const locked = useSecondsUntil(lockUntil);
   const current = running.current;
   const questionOpen = Boolean(current?.question) && !feedback;
 
@@ -147,7 +251,7 @@ function FocusMode({
     const onHide = () => {
       if (document.visibilityState !== "hidden") return;
       setFocusLosses((n) => n + 1);
-      void reportUnitQuizFocusLoss(running.id);
+      void actions.focusLoss(running.id);
     };
     const onUnload = (event: BeforeUnloadEvent) => event.preventDefault();
     document.addEventListener("visibilitychange", onHide);
@@ -156,12 +260,12 @@ function FocusMode({
       document.removeEventListener("visibilitychange", onHide);
       window.removeEventListener("beforeunload", onUnload);
     };
-  }, [questionOpen, running.id]);
+  }, [questionOpen, running.id, actions]);
 
   const openNext = () => {
     setError(null);
     startTransition(async () => {
-      const result = await openNextUnitQuestion(running.id);
+      const result = await actions.open(running.id);
       if (!result.ok) setError(result.error);
       router.refresh();
     });
@@ -211,6 +315,7 @@ function FocusMode({
               number={number}
               total={total}
               pending={pending}
+              locked={feedback.finished ? 0 : locked}
               onNext={feedback.finished ? () => router.refresh() : openNext}
             />
           ) : current?.question ? (
@@ -222,7 +327,11 @@ function FocusMode({
               total={total}
               secondsLeft={current.secondsLeft}
               questionSeconds={questionSeconds}
-              onAnswered={setFeedback}
+              answer={actions.answer}
+              onAnswered={(result, deadline) => {
+                setLockUntil(deadline);
+                setFeedback(result);
+              }}
             />
           ) : (
             <Card className="p-6 text-center">
@@ -230,16 +339,21 @@ function FocusMode({
                 Question {number} of {total}
               </p>
               <p className="text-ink mt-2 text-lg font-bold">
-                Ready? The {mmss(questionSeconds)} clock starts when you open
-                the question.
+                {locked > 0
+                  ? `The next question opens in ${mmss(locked)}, when the last one's ${mmss(questionSeconds)} minutes are up.`
+                  : `Ready? The ${mmss(questionSeconds)} clock starts when you open the question.`}
               </p>
               <button
                 type="button"
                 onClick={openNext}
-                disabled={pending}
+                disabled={pending || locked > 0}
                 className="bg-brand mt-5 rounded-xl px-5 py-3 text-sm font-bold text-white hover:opacity-90 disabled:opacity-50"
               >
-                {pending ? "Opening…" : "Show question"}
+                {pending
+                  ? "Opening…"
+                  : locked > 0
+                    ? `Opens in ${mmss(locked)}`
+                    : "Show question"}
               </button>
             </Card>
           )}
@@ -262,6 +376,7 @@ function QuestionCard({
   total,
   secondsLeft,
   questionSeconds,
+  answer,
   onAnswered,
 }: {
   attemptId: string;
@@ -270,7 +385,9 @@ function QuestionCard({
   total: number;
   secondsLeft: number;
   questionSeconds: number;
-  onAnswered: (feedback: Feedback) => void;
+  answer: QuizActions["answer"];
+  /** The verdict, and when this question's time is up (ms). */
+  onAnswered: (feedback: QuizFeedback, deadline: number) => void;
 }) {
   const [chosen, setChosen] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -286,9 +403,9 @@ function QuestionCard({
     sent.current = true;
     setError(null);
     startTransition(async () => {
-      const result = await answerUnitQuestion(attemptId, question.id, optionId);
+      const result = await answer(attemptId, question.id, optionId);
       if (result.ok) {
-        onAnswered(result.feedback);
+        onAnswered(result.feedback, deadline.current);
       } else {
         sent.current = false;
         setError(result.error);
@@ -345,7 +462,7 @@ function QuestionCard({
         }}
       >
         <fieldset disabled={pending || left === 0}>
-          <legend className="text-ink mt-5 text-lg font-bold">
+          <legend className="text-ink mt-5 text-lg font-bold whitespace-pre-line">
             {question.prompt}
           </legend>
           <div className="mt-4 grid gap-2">
@@ -385,40 +502,29 @@ function QuestionCard({
         >
           {pending ? "Checking…" : left === 0 ? "Time's up" : "Submit answer"}
         </button>
-        {/* Not knowing the answer shouldn't mean waiting out the clock. */}
-        <button
-          type="button"
-          onClick={() => {
-            if (
-              window.confirm(
-                "Skip this question? It counts as wrong, and you can't come back to it.",
-              )
-            ) {
-              send(null);
-            }
-          }}
-          disabled={pending || left === 0}
-          className="text-muted hover:text-ink mt-2 w-full rounded-xl px-5 py-2 text-sm font-semibold transition disabled:opacity-50"
-        >
-          Skip this question ›
-        </button>
       </form>
     </Card>
   );
 }
 
-/** Shown right after each answer: verdict, correct answer, rationale. */
+/**
+ * Shown right after each answer: verdict, correct answer, rationale. The
+ * next question stays locked until this question's time is up.
+ */
 function FeedbackCard({
   feedback,
   number,
   total,
   pending,
+  locked,
   onNext,
 }: {
-  feedback: Feedback;
+  feedback: QuizFeedback;
   number: number;
   total: number;
   pending: boolean;
+  /** Seconds until the next question may open. */
+  locked: number;
   onNext: () => void;
 }) {
   return (
@@ -431,16 +537,13 @@ function FeedbackCard({
       >
         {feedback.isCorrect
           ? "✓ Correct!"
-          : feedback.skipped
-            ? "⏭ Skipped"
-            : feedback.timedOut
-              ? "⏱ Time's up"
-              : "✗ Wrong"}
+          : feedback.timedOut
+            ? "⏱ Time's up"
+            : "✗ Wrong"}
       </p>
       <Rationale
         correct={feedback.isCorrect}
         timedOut={feedback.timedOut}
-        skipped={feedback.skipped}
         chosen={feedback.chosen}
         answer={feedback.correct}
         explanation={feedback.explanation}
@@ -454,16 +557,24 @@ function FeedbackCard({
       <button
         type="button"
         onClick={onNext}
-        disabled={pending}
+        disabled={pending || locked > 0}
         autoFocus
-        className="bg-navy hover:bg-navy-deep mt-5 w-full rounded-xl px-5 py-3 text-sm font-bold text-white transition disabled:opacity-50"
+        className="bg-navy hover:bg-navy-deep mt-5 w-full rounded-xl px-5 py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending
           ? "Opening…"
           : feedback.finished
             ? "See my results"
-            : `Next question (${number + 1} of ${total}) — the clock starts`}
+            : locked > 0
+              ? `Next question opens in ${mmss(locked)}`
+              : `Next question (${number + 1} of ${total}) — the clock starts`}
       </button>
+      {locked > 0 && !pending && (
+        <p className="text-muted mt-2 text-center text-xs">
+          Read the rationale while you wait — the next question opens when this
+          question&apos;s time is up.
+        </p>
+      )}
     </Card>
   );
 }
@@ -473,13 +584,15 @@ function Review({
   quiz,
   latest,
   courseHref,
+  backLabel,
   onRetry,
   pending,
   error,
 }: {
-  quiz: Quiz;
-  latest: NonNullable<Quiz["latest"]>;
+  quiz: QuizView;
+  latest: NonNullable<QuizView["latest"]>;
   courseHref: string;
+  backLabel: string;
   onRetry: () => void;
   pending: boolean;
   error: string | null;
@@ -506,15 +619,17 @@ function Review({
                 : "Review the discussion and try again."}
           </span>
         </p>
-        <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-bold text-amber-800">
-          <span aria-hidden="true">⭐</span>
-          {latest.newStars > 0
-            ? `+${latest.newStars} Star${latest.newStars === 1 ? "" : "s"} earned this try`
-            : "No new stars this try"}
-          <span className="font-semibold text-amber-700">
-            · {latest.totalStars} of {quiz.totalPoints} stars from this unit
-          </span>
-        </p>
+        {latest.newStars !== undefined && (
+          <p className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-xl bg-amber-50 px-3 py-2 text-sm font-bold text-amber-800">
+            <span aria-hidden="true">⭐</span>
+            {latest.newStars > 0
+              ? `+${latest.newStars} Star${latest.newStars === 1 ? "" : "s"} earned this try`
+              : "No new stars this try"}
+            <span className="font-semibold text-amber-700">
+              · {latest.totalStars} of {quiz.totalPoints} stars from this unit
+            </span>
+          </p>
+        )}
         {latest.focusLosses > 0 && (
           <p className="mt-1 text-xs font-semibold text-amber-700">
             You left the quiz screen {latest.focusLosses} time
@@ -537,7 +652,7 @@ function Review({
             href={courseHref}
             className="border-line bg-surface text-ink hover:bg-canvas rounded-xl border px-4 py-2.5 text-sm font-semibold"
           >
-            Back to the course
+            {backLabel}
           </Link>
         </div>
       </Card>
@@ -551,7 +666,7 @@ function Review({
           return (
             <li key={question.id}>
               <Card className="p-5">
-                <p className="text-ink font-semibold">
+                <p className="text-ink font-semibold whitespace-pre-line">
                   {question.order}. {question.prompt}
                 </p>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -594,20 +709,16 @@ function Review({
   );
 }
 
-type Choice = { label: string; text: string } | null;
-
 /** The explanation shown for every answered question, right or wrong. */
 function Rationale({
   correct,
   timedOut,
-  skipped = false,
   chosen,
   answer,
   explanation,
 }: {
   correct: boolean;
   timedOut: boolean;
-  skipped?: boolean;
   chosen: Choice;
   answer: Choice;
   explanation: string | null;
@@ -623,11 +734,9 @@ function Rationale({
       <p className="font-bold">
         {correct && chosen
           ? `Correct! ${chosen.label}. ${chosen.text} is the right answer.`
-          : skipped
-            ? "You skipped this question."
-            : timedOut || !chosen
-              ? "No answer was given."
-              : `Not quite. You chose ${chosen.label}. ${chosen.text}`}
+          : timedOut || !chosen
+            ? "No answer was given in time."
+            : `Not quite. You chose ${chosen.label}. ${chosen.text}`}
       </p>
       {!correct && answer && (
         <p className="mt-1 font-semibold">
