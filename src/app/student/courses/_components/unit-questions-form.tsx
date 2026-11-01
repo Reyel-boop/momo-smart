@@ -462,9 +462,8 @@ function QuestionCard({
         }}
       >
         <fieldset disabled={pending || left === 0}>
-          <legend className="text-ink mt-5 text-lg font-bold whitespace-pre-line">
-            {question.prompt}
-          </legend>
+          <legend className="sr-only">Question {number}</legend>
+          <Prompt text={question.prompt} />
           <div className="mt-4 grid gap-2">
             {question.options.map((option) => {
               const checked = chosen === option.id;
@@ -666,9 +665,10 @@ function Review({
           return (
             <li key={question.id}>
               <Card className="p-5">
-                <p className="text-ink font-semibold whitespace-pre-line">
-                  {question.order}. {question.prompt}
+                <p className="text-muted text-xs font-bold">
+                  Question {question.order}
                 </p>
+                <Prompt text={question.prompt} small />
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {question.options.map((option) => {
                     const isChosen = option.id === chosenId;
@@ -705,6 +705,32 @@ function Review({
           );
         })}
       </ol>
+    </div>
+  );
+}
+
+/**
+ * A question's text. When it starts with a reading passage (paragraphs
+ * separated by a blank line), the passage is shown in a box in normal type
+ * and only the question itself in bold.
+ */
+function Prompt({ text, small = false }: { text: string; small?: boolean }) {
+  const parts = text.split(/\n\s*\n/);
+  const ask = parts.pop() ?? text;
+  return (
+    <div className={small ? "mt-1" : "mt-5"}>
+      {parts.length > 0 && (
+        <div className="border-line bg-canvas text-ink mb-3 space-y-2 rounded-xl border px-4 py-3 text-sm leading-relaxed whitespace-pre-line">
+          {parts.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </div>
+      )}
+      <p
+        className={`text-ink font-bold whitespace-pre-line ${small ? "text-sm" : "text-lg"}`}
+      >
+        {ask}
+      </p>
     </div>
   );
 }
