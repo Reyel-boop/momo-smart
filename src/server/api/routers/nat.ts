@@ -4,7 +4,9 @@ import { z } from "zod";
 import {
   createTRPCRouter,
   ownerProcedure,
+  schoolOf,
   studentProcedure,
+  teacherProcedure,
 } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
 
@@ -444,6 +446,107 @@ export const natRouter = createTRPCRouter({
       });
       return { ok: true };
     }),
+
+  // --- Teachers: the tests with answers, and their school's results -------
+
+  /**
+   * Every test with its answer key and rationales (hidden ones too, marked,
+   * so teachers can check them), and how the Grade 10 students of the
+   * teacher's school did: each student's tries and best score.
+   */
+  teacherView: teacherProcedure.query(async ({ ctx }) => {
+    const schoolId = schoolOf(ctx.session.user);
+    const tests = await ctx.db.natTest.findMany({
+      orderBy: [{ subject: "asc" }, { title: "asc" }],
+      select: {
+        id: true,
+        subject: true,
+        title: true,
+        maxAttempts: true,
+        publishedAt: true,
+        questions: {
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            order: true,
+            prompt: true,
+            explanation: true,
+            options: {
+              orderBy: { order: "asc" },
+              select: { label: true, text: true, isCorrect: true },
+            },
+          },
+        },
+        attempts: {
+          where: { student: { user: { schoolId } } },
+          select: {
+            status: true,
+            score: true,
+            submittedAt: true,
+            student: {
+              select: {
+                id: true,
+                studentNumber: true,
+                user: { select: { name: true } },
+                section: { select: { name: true, gradeLevel: true } },
+              },
+            },
+          },
+        },
+      },
+    });
+    return tests.map(({ attempts, ...t }) => {
+      const byStudent = new Map<
+        string,
+        {
+          name: string;
+          lrn: string;
+          section: string | null;
+          tries: number;
+          best: number | null;
+          inProgress: boolean;
+          lastAt: Date | null;
+        }
+      >();
+      for (const a of attempts) {
+        const st = a.student;
+        const row = byStudent.get(st.id) ?? {
+          name: st.user.name ?? "Student",
+          lrn: st.studentNumber,
+          section: st.section
+            ? `Grade ${st.section.gradeLevel} – ${st.section.name}`
+            : null,
+          tries: 0,
+          best: null,
+          inProgress: false,
+          lastAt: null,
+        };
+        row.tries++;
+        if (a.status === "IN_PROGRESS") row.inProgress = true;
+        if (a.status === "GRADED") {
+          row.best = Math.max(row.best ?? 0, a.score ?? 0);
+          if (a.submittedAt && (!row.lastAt || a.submittedAt > row.lastAt)) {
+            row.lastAt = a.submittedAt;
+          }
+        }
+        byStudent.set(st.id, row);
+      }
+      const students = [...byStudent.values()].sort(
+        (x, y) =>
+          (x.section ?? "").localeCompare(y.section ?? "") ||
+          x.name.localeCompare(y.name),
+      );
+      const finished = students.filter((x) => x.best !== null);
+      return {
+        ...t,
+        students,
+        averageBest: finished.length
+          ? finished.reduce((sum, x) => sum + (x.best ?? 0), 0) /
+            finished.length
+          : null,
+      };
+    });
+  }),
 
   // --- Owner: the question sets ----------------------------------------------
 

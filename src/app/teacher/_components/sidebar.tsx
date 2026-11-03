@@ -11,6 +11,7 @@ import {
   PlayIcon,
   SettingsIcon,
   StarIcon,
+  TimerIcon,
   TrophyIcon,
   UsersIcon,
 } from "~/app/_components/icons";
@@ -42,6 +43,7 @@ export function Sidebar({
     { label: "Roster", href: "/teacher/roster" },
     { label: "Live Quiz", href: "/teacher/live" },
     { label: "Group Race", href: "/teacher/race" },
+    { label: "CB-NAT Review", href: "/teacher/nat" },
     { label: "Grades", href: "/teacher/grades" },
     { label: "Calendar", href: "/teacher/calendar" },
     { label: "Messages", href: "/teacher/messages", dot: unreadMessages > 0 },
@@ -54,6 +56,7 @@ export function Sidebar({
     Roster: <UsersIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
     "Group Race": <TrophyIcon className="size-[18px]" />,
+    "CB-NAT Review": <TimerIcon className="size-[18px]" />,
     Grades: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,
