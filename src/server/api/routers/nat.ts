@@ -594,11 +594,12 @@ export const natRouter = createTRPCRouter({
   }),
 
   /**
-   * Adds tests from the uploaded spreadsheet. A test with the same subject
+   * Adds tests read from an uploaded file (any teacher, an admin or the
+   * owner; they start hidden). A test with the same subject
    * and title has its questions replaced — unless students already took it,
    * so their results stay right.
    */
-  importTests: ownerProcedure
+  importTests: teacherProcedure
     .input(
       z.object({
         tests: z
@@ -692,8 +693,8 @@ export const natRouter = createTRPCRouter({
       return { created, replaced, questions: questionCount };
     }),
 
-  /** Shows a test to Grade 10 students, or hides it. */
-  setPublished: ownerProcedure
+  /** Shows a test to Grade 10 students, or hides it (teachers too). */
+  setPublished: teacherProcedure
     .input(z.object({ testId: z.string(), published: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.natTest.update({
@@ -704,7 +705,7 @@ export const natRouter = createTRPCRouter({
     }),
 
   /** Changes how many tries each student gets. */
-  setMaxAttempts: ownerProcedure
+  setMaxAttempts: teacherProcedure
     .input(
       z.object({
         testId: z.string(),

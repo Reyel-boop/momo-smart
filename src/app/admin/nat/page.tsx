@@ -17,7 +17,7 @@ export default async function NatAdminPage() {
     <div className="mx-auto max-w-[1200px] space-y-6">
       <PageHeader
         title="CB-NAT Review"
-        subtitle="Practice tests for Grade 10 in every school. Fill in the question template, upload it, check the preview, then publish each test when it's ready."
+        subtitle="Practice tests for Grade 10 in every school. Upload a reviewer in any format, check the preview, then publish each test when it's ready. Teachers can add and publish tests too."
       />
       <NatManager />
     </div>

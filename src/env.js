@@ -31,6 +31,8 @@ export const env = createEnv({
     ANDROID_SHA256_FINGERPRINTS: z.string().optional(),
     /** Where people write about privacy or deleting their account. */
     SUPPORT_EMAIL: z.string().email().optional(),
+    /** Claude reads uploaded CB-NAT reviewers (Admin/Teacher → CB-NAT Review). */
+    ANTHROPIC_API_KEY: z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -58,6 +60,7 @@ export const env = createEnv({
     ANDROID_PACKAGE_NAME: process.env.ANDROID_PACKAGE_NAME,
     ANDROID_SHA256_FINGERPRINTS: process.env.ANDROID_SHA256_FINGERPRINTS,
     SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

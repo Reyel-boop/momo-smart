@@ -1,10 +1,12 @@
 import { type Metadata } from "next";
 
 import { ChevronDownIcon } from "~/app/_components/icons";
+import { NatUploader } from "~/app/_components/nat-uploader";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { NAT_SUBJECT_INFO, NAT_SUBJECT_ORDER } from "~/lib/nat";
 import { api } from "~/trpc/server";
+import { PublishToggle } from "./publish-toggle";
 
 export const metadata: Metadata = { title: "CB-NAT Review · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -39,9 +41,13 @@ export default async function TeacherNatPage() {
         subtitle="Grade 10 practice tests for the Computer-Based National Achievement Test. Students answer one question at a time, 2 minutes each, and read the rationale after every answer. See your students' results and each test's answer key."
       />
 
+      <NatUploader />
+
       {subjects.length === 0 && (
         <Card>
-          <EmptyState>No CB-NAT practice tests yet.</EmptyState>
+          <EmptyState>
+            No CB-NAT practice tests yet. Upload a reviewer above.
+          </EmptyState>
         </Card>
       )}
 
@@ -68,6 +74,11 @@ export default async function TeacherNatPage() {
                     ) : (
                       <Pill tone="amber">Not yet open — being checked</Pill>
                     )}
+                    <PublishToggle
+                      testId={t.id}
+                      published={!!t.publishedAt}
+                      aiAnswers
+                    />
                     <Pill tone="slate">
                       {done.length} student{done.length === 1 ? "" : "s"}{" "}
                       finished
