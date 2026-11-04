@@ -45,6 +45,7 @@ const TLE_MAJORS = [
   "ACP",
   "EIM",
   "BAKE",
+  "EMS",
 ];
 const subjectRank = (code: string) => {
   const upper = code.toUpperCase();
