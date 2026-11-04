@@ -46,6 +46,10 @@ const TLE_MAJORS = [
   "EIM",
   "BAKE",
   "EMS",
+  "HWM",
+  "FBP",
+  "PREP",
+  "FBO",
 ];
 const subjectRank = (code: string) => {
   const upper = code.toUpperCase();
@@ -75,8 +79,11 @@ const areaOf = (code: string): AreaKey => {
   return AREAS.find((a) => a.key === head)?.key ?? "OTHER";
 };
 
-/** "TLE 10 – ICT: Computer Programming" → "ICT: Computer Programming". */
-const shortName = (name: string) => name.replace(/^TLE \d+\s*[–-]\s*/, "");
+/**
+ * "TLE 10 – ICT: Computer Programming" → "ICT: Computer Programming". A course
+ * for two grades ("TLE 9–10 – FCS: …") keeps its name, which shows both.
+ */
+const shortName = (name: string) => name.replace(/^TLE \d+\s+[–-]\s*/, "");
 
 /** The grade in a course code ("TLE 9-CP" → 9), for grouping TLE. */
 const gradeOf = (code: string) => Number(/\d+/.exec(code)?.[0] ?? 0);
