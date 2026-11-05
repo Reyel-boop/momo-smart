@@ -1,13 +1,20 @@
 "use client";
 
+import { uploadPresigned } from "@vercel/blob/client";
 import { useId, useState } from "react";
 
 import { FileIcon } from "~/app/_components/icons";
-import { attachUploadedFiles, removeAttachment } from "../actions";
-import { useUploadThing } from "./uploadthing";
+import { UPLOAD_MAX_BYTES, uploadPath } from "~/lib/uploads";
+import {
+  attachUploadedFiles,
+  registerUpload,
+  removeAttachment,
+} from "../actions";
 
-/** Mirrors the types allowed by the `submissionFile` route. */
-const ACCEPT = ".pdf,.docx,.pptx,.xlsx,.csv,.txt,image/*";
+/** Mirrors UPLOAD_TYPES in ~/lib/uploads. */
+const ACCEPT =
+  ".pdf,.docx,.pptx,.xlsx,.csv,.txt,.png,.jpg,.jpeg,.webp,.gif,.heic";
+const MAX_FILES = 5;
 
 export type Attachment = {
   id: string;
@@ -17,8 +24,8 @@ export type Attachment = {
 };
 
 /**
- * Drag-and-drop upload for a draft. Files upload straight to UploadThing, then
- * get attached to the draft, which re-renders the page with the new list.
+ * Drag-and-drop upload for a draft. Files go straight to the private store,
+ * then get attached to the draft, which re-renders the page with the new list.
  */
 export function FileDropzone({
   assignmentId,
@@ -35,22 +42,47 @@ export function FileDropzone({
   const [error, setError] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
 
-  const { startUpload, isUploading } = useUploadThing("submissionFile", {
-    onUploadProgress: setProgress,
-    onUploadError: (uploadError) => setError(uploadError.message),
-  });
+  const [isUploading, setIsUploading] = useState(false);
 
   const upload = async (files: File[]) => {
     if (files.length === 0 || isUploading) return;
     setError(null);
+    if (files.length > MAX_FILES) {
+      setError(`Upload up to ${MAX_FILES} files at a time.`);
+      return;
+    }
+    const tooBig = files.find((file) => file.size > UPLOAD_MAX_BYTES);
+    if (tooBig) {
+      setError(`${tooBig.name} is over 32 MB.`);
+      return;
+    }
     setProgress(0);
+    setIsUploading(true);
     try {
-      const uploaded = await startUpload(files);
-      if (!uploaded) return;
-      const result = await attachUploadedFiles(
-        assignmentId,
-        uploaded.map((file) => file.serverData.fileId),
-      );
+      const total = files.reduce((sum, file) => sum + file.size, 0);
+      let done = 0;
+      const fileIds: string[] = [];
+      for (const file of files) {
+        const blob = await uploadPresigned(
+          uploadPath(file.name, crypto.randomUUID()),
+          file,
+          {
+            access: "private",
+            handleUploadUrl: "/api/upload",
+            contentType: file.type || undefined,
+            onUploadProgress: ({ loaded }) =>
+              setProgress(Math.round(((done + loaded) / total) * 100)),
+          },
+        );
+        done += file.size;
+        const saved = await registerUpload(blob.pathname, file.name);
+        if (!saved.ok) {
+          setError(saved.error);
+          return;
+        }
+        fileIds.push(saved.fileId);
+      }
+      const result = await attachUploadedFiles(assignmentId, fileIds);
       if (!result.ok) setError(result.error);
     } catch (uploadError) {
       setError(
@@ -58,6 +90,8 @@ export function FileDropzone({
           ? uploadError.message
           : "The upload failed. Please try again.",
       );
+    } finally {
+      setIsUploading(false);
     }
   };
 

@@ -1,6 +1,10 @@
+import { randomUUID as createId } from "node:crypto";
+
+import { head } from "@vercel/blob";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { UPLOAD_PREFIX } from "~/lib/uploads";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -57,6 +61,46 @@ export const submissionRouter = createTRPCRouter({
         data: { ...input, uploadedById: ctx.session.user.id },
       }),
     ),
+
+  /**
+   * Records a browser upload. Size and type come from the store, not the
+   * browser, and the file is opened through the signed-in /api/files route.
+   */
+  registerUpload: studentProcedure
+    .input(
+      z.object({
+        pathname: z.string().min(1).max(300),
+        fileName: z.string().min(1).max(255),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.pathname.startsWith(UPLOAD_PREFIX)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "That file isn't in the upload folder.",
+        });
+      }
+      const stored = await head(input.pathname).catch(() => null);
+      if (!stored) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "The upload didn't finish. Please try again.",
+        });
+      }
+      const id = createId();
+      return ctx.db.fileObject.create({
+        data: {
+          id,
+          storageKey: input.pathname,
+          url: `/api/files/${id}`,
+          fileName: input.fileName,
+          mimeType: stored.contentType,
+          sizeBytes: stored.size,
+          uploadedById: ctx.session.user.id,
+        },
+        select: { id: true },
+      });
+    }),
 
   /** Creates or updates the student's draft for an assignment. */
   saveDraft: studentProcedure

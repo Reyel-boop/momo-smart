@@ -12,8 +12,6 @@ export const env = createEnv({
         ? z.string()
         : z.string().optional(),
     DATABASE_URL: z.string().url(),
-    /** UploadThing API token. Optional so the app runs without it; submission uploads need it. */
-    UPLOADTHING_TOKEN: z.string().optional(),
     /**
      * Turns on the public demo: one-click sign-in from /demo, the in-app demo
      * banner and the scheduled reset route. Only enable on a dedicated demo
@@ -54,7 +52,6 @@ export const env = createEnv({
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
-    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     DEMO_MODE: process.env.DEMO_MODE,
     CRON_SECRET: process.env.CRON_SECRET,
     ANDROID_PACKAGE_NAME: process.env.ANDROID_PACKAGE_NAME,

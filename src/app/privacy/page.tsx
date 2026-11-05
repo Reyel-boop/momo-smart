@@ -107,9 +107,9 @@ export default function PrivacyPage() {
             </li>
             <li>
               <b>Service providers</b> that host Momo for us: Vercel (website
-              and app hosting), Neon (database) and UploadThing (uploaded
-              files). Lesson videos are played from YouTube, which has its own
-              privacy policy. They process data only to run Momo.
+              and app hosting, and private storage for uploaded files) and Neon
+              (database). Lesson videos are played from YouTube, which has its
+              own privacy policy. They process data only to run Momo.
             </li>
           </ul>
           <p>

@@ -29,6 +29,22 @@ async function attempt(
   }
 }
 
+/** Records a file that just reached the store; returns its id. */
+export async function registerUpload(
+  pathname: string,
+  fileName: string,
+): Promise<{ ok: true; fileId: string } | { ok: false; error: string }> {
+  try {
+    const file = await api.submission.registerUpload({ pathname, fileName });
+    return { ok: true, fileId: file.id };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "The file wasn't saved.",
+    };
+  }
+}
+
 /** Attaches freshly uploaded files to the student's draft. */
 export async function attachUploadedFiles(
   assignmentId: string,
