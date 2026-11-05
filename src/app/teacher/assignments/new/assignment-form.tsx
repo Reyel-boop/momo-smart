@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 
 import {
   createAssignment,
+  updateAssignment,
   type AssignmentType,
   type SubmissionFormat,
 } from "./actions";
@@ -35,25 +36,62 @@ export type ClassOption = {
   units: Array<{ id: string; label: string }>;
 };
 
+/** An assignment being edited; without one the form creates a new one. */
+export type ExistingAssignment = {
+  id: string;
+  unitId: string;
+  title: string;
+  description: string;
+  type: AssignmentType;
+  format: SubmissionFormat;
+  pointsPossible: number;
+  /** ISO timestamp, shown in the browser's own time zone. */
+  dueAt: string;
+  allowLate: boolean;
+  isPublished: boolean;
+  submitted: number;
+};
+
+/** An ISO time as a datetime-local value, in the browser's time zone. */
+function localInput(iso: string) {
+  const date = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export function AssignmentForm({
   classes,
   initialSectionId,
+  existing,
 }: {
   classes: ClassOption[];
   initialSectionId: string;
+  existing?: ExistingAssignment;
 }) {
   const router = useRouter();
   const id = useId();
   const [sectionId, setSectionId] = useState(initialSectionId);
   const units = classes.find((c) => c.id === sectionId)?.units ?? [];
-  const [unitId, setUnitId] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState<AssignmentType>("WORKSHEET");
-  const [format, setFormat] = useState<SubmissionFormat>("FILE_UPLOAD");
-  const [points, setPoints] = useState("20");
+  const [unitId, setUnitId] = useState(existing?.unitId ?? "");
+  const [title, setTitle] = useState(existing?.title ?? "");
+  const [description, setDescription] = useState(existing?.description ?? "");
+  const [type, setType] = useState<AssignmentType>(
+    existing?.type ?? "WORKSHEET",
+  );
+  const [format, setFormat] = useState<SubmissionFormat>(
+    existing?.format ?? "FILE_UPLOAD",
+  );
+  const [points, setPoints] = useState(String(existing?.pointsPossible ?? 20));
   const [dueAt, setDueAt] = useState("");
-  const [allowLate, setAllowLate] = useState(true);
+  const [allowLate, setAllowLate] = useState(existing?.allowLate ?? true);
+  // Set after mounting: the server doesn't know the browser's time zone.
+  const existingDue = existing?.dueAt;
+  useEffect(() => {
+    if (existingDue) setDueAt(localInput(existingDue));
+  }, [existingDue]);
+  const formatLocked =
+    !!existing &&
+    (existing.submitted > 0 || existing.format === "ONLINE_ASSESSMENT");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -61,18 +99,24 @@ export function AssignmentForm({
     setError(null);
     const due = new Date(dueAt);
     startTransition(async () => {
-      const result = await createAssignment({
+      const fields = {
         sectionId,
         unitId,
         title,
         description,
         type,
-        format,
         pointsPossible: Number(points),
         dueAt: Number.isNaN(due.getTime()) ? "" : due.toISOString(),
         allowLate,
         publish,
-      });
+      };
+      const result = existing
+        ? await updateAssignment({
+            ...fields,
+            assignmentId: existing.id,
+            format: formatLocked ? undefined : format,
+          })
+        : await createAssignment({ ...fields, format });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -89,7 +133,7 @@ export function AssignmentForm({
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        save(true);
+        save(!existing || !existing.isPublished);
       }}
       className="space-y-5 p-5"
     >
@@ -101,6 +145,7 @@ export function AssignmentForm({
           <select
             id={`${id}-class`}
             value={sectionId}
+            disabled={!!existing}
             onChange={(e) => {
               setSectionId(e.target.value);
               setUnitId("");
@@ -189,6 +234,7 @@ export function AssignmentForm({
           <select
             id={`${id}-format`}
             value={format}
+            disabled={formatLocked}
             onChange={(e) => setFormat(e.target.value as SubmissionFormat)}
             className={field}
           >
@@ -197,6 +243,9 @@ export function AssignmentForm({
                 {f.label}
               </option>
             ))}
+            {format === "ONLINE_ASSESSMENT" && (
+              <option value="ONLINE_ASSESSMENT">Online quiz</option>
+            )}
           </select>
         </div>
         <div>
@@ -239,26 +288,41 @@ export function AssignmentForm({
         Accept late work
       </label>
 
+      {existing && existing.submitted > 0 && (
+        <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          {existing.submitted} student
+          {existing.submitted === 1 ? " has" : "s have"} already submitted, so
+          the hand-in method is locked. Changing the points updates their
+          grades.
+        </p>
+      )}
+
       {error && (
         <p role="alert" className="text-sm text-rose-600">
           {error}
         </p>
       )}
       <div className="flex flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => save(false)}
-          disabled={pending}
-          className="border-line text-ink hover:bg-canvas rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60"
-        >
-          Save as draft
-        </button>
+        {!existing?.isPublished && (
+          <button
+            type="button"
+            onClick={() => save(false)}
+            disabled={pending}
+            className="border-line text-ink hover:bg-canvas rounded-lg border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          >
+            {existing ? "Save draft" : "Save as draft"}
+          </button>
+        )}
         <button
           type="submit"
           disabled={pending}
           className="bg-navy hover:bg-navy-deep rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         >
-          {pending ? "Saving…" : "Publish to students"}
+          {pending
+            ? "Saving…"
+            : existing?.isPublished
+              ? "Save changes"
+              : "Publish to students"}
         </button>
       </div>
     </form>

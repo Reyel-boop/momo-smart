@@ -127,7 +127,7 @@ function AssignmentTable({
         <EmptyState>Nothing here yet.</EmptyState>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] border-collapse text-left">
+          <table className="w-full min-w-[960px] border-collapse text-left">
             <thead>
               <tr className="bg-canvas text-muted text-[11px] font-bold tracking-wider uppercase">
                 <th className="px-5 py-3">Assignment</th>
@@ -137,6 +137,9 @@ function AssignmentTable({
                 <th className="px-4 py-3">Points</th>
                 <th className="px-4 py-3">Submitted</th>
                 <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-line divide-y">
@@ -183,6 +186,14 @@ function AssignmentTable({
                         </Pill>
                       )}
                     </div>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <Link
+                      href={`/teacher/assignments/${row.id}/edit`}
+                      className="text-brand text-xs font-bold hover:underline"
+                    >
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))}

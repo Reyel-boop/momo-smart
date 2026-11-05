@@ -11,6 +11,7 @@ import {
   assertSectionAccess,
   assertTeachesSection,
 } from "~/server/lib/permissions";
+import { refreshEnrollmentGrade } from "~/server/lib/grading";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 const assignmentTypes = [
@@ -116,6 +117,9 @@ export const assignmentRouter = createTRPCRouter({
           allowLate: true,
           graceMinutes: true,
           publishedAt: true,
+          _count: {
+            select: { submissions: { where: { submittedAt: { not: null } } } },
+          },
           section: {
             select: {
               id: true,
@@ -396,6 +400,9 @@ export const assignmentRouter = createTRPCRouter({
         assignmentId: z.string(),
         title: z.string().min(1).max(200).optional(),
         description: z.string().max(10_000).optional(),
+        type: z.enum(assignmentTypes).optional(),
+        format: z.enum(submissionFormats).optional(),
+        unitId: z.string().nullable().optional(),
         pointsPossible: z.number().min(0).max(1000).optional(),
         dueAt: z.date().optional(),
         closesAt: z.date().nullable().optional(),
@@ -409,7 +416,15 @@ export const assignmentRouter = createTRPCRouter({
       const { assignmentId, ...data } = input;
       const assignment = await ctx.db.assignment.findUnique({
         where: { id: assignmentId },
-        select: { sectionId: true },
+        select: {
+          sectionId: true,
+          format: true,
+          pointsPossible: true,
+          section: { select: { courseId: true } },
+          _count: {
+            select: { submissions: { where: { submittedAt: { not: null } } } },
+          },
+        },
       });
       if (!assignment) {
         throw new TRPCError({
@@ -423,7 +438,56 @@ export const assignmentRouter = createTRPCRouter({
         assignment.sectionId,
       );
 
-      return ctx.db.assignment.update({ where: { id: assignmentId }, data });
+      // Work already handed in one way can't be moved to another.
+      if (
+        data.format &&
+        data.format !== assignment.format &&
+        assignment._count.submissions > 0
+      ) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message:
+            "Students have already submitted, so the hand-in method can't change.",
+        });
+      }
+      if (data.unitId) {
+        const unit = await ctx.db.unit.findFirst({
+          where: { id: data.unitId, courseId: assignment.section.courseId },
+          select: { id: true },
+        });
+        if (!unit) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "That unit isn't part of this class.",
+          });
+        }
+      }
+
+      const updated = await ctx.db.assignment.update({
+        where: { id: assignmentId },
+        data,
+      });
+
+      // Scores are out of the points, so running grades move with them.
+      if (
+        data.pointsPossible !== undefined &&
+        data.pointsPossible !== assignment.pointsPossible
+      ) {
+        const submitted = await ctx.db.submission.findMany({
+          where: { assignmentId, grade: { isNot: null } },
+          distinct: ["studentId"],
+          select: { studentId: true },
+        });
+        for (const { studentId } of submitted) {
+          await refreshEnrollmentGrade(
+            ctx.db,
+            assignment.sectionId,
+            studentId,
+            "Assignment points changed",
+          );
+        }
+      }
+      return updated;
     }),
 
   publish: teacherProcedure
