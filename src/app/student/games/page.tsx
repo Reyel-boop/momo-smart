@@ -12,13 +12,34 @@ import { Hero, MomoPet, Monster } from "./quest/_components/art";
 export const metadata: Metadata = { title: "Games · Momo Smart" };
 export const dynamic = "force-dynamic";
 
+/** The Block Run race stays hidden until it has passed its test. */
+const RACE_OPEN = false as boolean;
+
 /** Block Run looks the same in every subject. */
 const RUN_LOOK = {
   href: "/student/games/run",
   blurb:
-    "A 3D obstacle-course adventure: run and jump across floating blocks, and land on the right answer at every gate to build the bridge onward.",
+    "A 3D obstacle course: dodge rolling balls and spinning bars, ride moving blocks, and land on the right answer at every gate.",
   banner: "from-lime-500 to-sky-600",
   emoji: "🧱",
+};
+
+/** Word Hunt looks the same in every subject. */
+const HUNT_LOOK = {
+  href: "/student/games/hunt",
+  blurb:
+    "A word search with a twist: you only get the clues, so work out each word, then find it in the letters.",
+  banner: "from-violet-600 to-fuchsia-700",
+  emoji: "🔍",
+};
+
+/** Turbo Takbo looks the same in every subject. */
+const TURBO_LOOK = {
+  href: "/student/games/turbo",
+  blurb:
+    "Tap as fast as you can to build speed, then answer the clue to open each gate. A wrong answer drops your speed!",
+  banner: "from-yellow-500 to-orange-600",
+  emoji: "💨",
 };
 
 const LOOK = {
@@ -163,6 +184,43 @@ const LOOK = {
   reng: RUN_LOOK,
   rfil: RUN_LOOK,
   rtle: RUN_LOOK,
+  lava: {
+    href: "/student/games/lava",
+    blurb:
+      "The lava is rising! Solve each problem to climb a floor. Miss five and the lava catches you.",
+    banner: "from-orange-600 to-red-700",
+    emoji: "🌋",
+  },
+  bansa: {
+    href: "/student/games/bansa",
+    blurb:
+      "60 segundo: hulaan ang bansa mula sa kabisera at watawat, at ang lalawigan mula sa pasyalan at pista.",
+    banner: "from-emerald-600 to-sky-700",
+    emoji: "🌏",
+  },
+  kusina: {
+    href: "/student/games/kusina",
+    blurb:
+      "Serve the customers at your karinderya: pick the right ingredients for each Filipino dish before they lose patience.",
+    banner: "from-orange-500 to-rose-600",
+    emoji: "🍲",
+  },
+  hcode: HUNT_LOOK,
+  htel: HUNT_LOOK,
+  hmath: HUNT_LOOK,
+  hsci: HUNT_LOOK,
+  hap: HUNT_LOOK,
+  heng: HUNT_LOOK,
+  hfil: HUNT_LOOK,
+  htle: HUNT_LOOK,
+  tcode: TURBO_LOOK,
+  ttel: TURBO_LOOK,
+  tmath: TURBO_LOOK,
+  tsci: TURBO_LOOK,
+  tap: TURBO_LOOK,
+  teng: TURBO_LOOK,
+  tfil: TURBO_LOOK,
+  ttle: TURBO_LOOK,
 } as const satisfies Record<
   GameId,
   { href: string; blurb: string; banner: string; emoji: string }
@@ -271,6 +329,14 @@ export default async function GamesPage() {
                   >
                     <PlayIcon className="size-4" />
                     {g.cleared === 0 ? "Start" : "Continue"}
+                  </Link>
+                )}
+                {RACE_OPEN && look === RUN_LOOK && (
+                  <Link
+                    href="/student/games/run/room"
+                    className="mt-2 ml-2 inline-flex items-center gap-1.5 rounded-lg bg-amber-400 px-3 py-1.5 text-sm font-bold text-slate-900 hover:bg-amber-300"
+                  >
+                    🏁 Race classmates
                   </Link>
                 )}
               </div>

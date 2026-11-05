@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { BANSA_LEVELS } from "~/lib/games/bansa-quiz";
 import { scoreRun } from "~/lib/games/block-run";
 import { BUG_LEVELS, scoreBugs } from "~/lib/games/bug-hunt";
 import { CALL_LEVELS, scoreCall } from "~/lib/games/call-sim";
@@ -8,13 +9,17 @@ import {
   GAME_IDS,
   GAMES,
   gamesForCourse,
+  HUNT_GAMES,
   RUN_GAMES,
   SCRAMBLE_GAMES,
+  TURBO_GAMES,
   type GameId,
 } from "~/lib/games/catalog";
 import { codeStars } from "~/lib/games/code-quest";
 import { GRAMMAR_LEVELS, scoreGrammar } from "~/lib/games/grammar-hunt";
+import { KARINDERYA_LEVELS, scoreKarinderya } from "~/lib/games/karinderya";
 import { LAB_LEVELS } from "~/lib/games/lab-sorter";
+import { LAVA_LEVELS } from "~/lib/games/lava-climb";
 import { MATH_LEVELS, MATH_PROBLEMS, scoreMath } from "~/lib/games/number-rush";
 import {
   BOSS,
@@ -30,6 +35,8 @@ import { scoreTama, TAMA_LEVELS } from "~/lib/games/tama-o-mali";
 import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
 import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
 import { TOOL_LEVELS } from "~/lib/games/tool-shed";
+import { scoreTurbo } from "~/lib/games/turbo-takbo";
+import { scoreHunt } from "~/lib/games/word-hunt";
 import { scoreScramble } from "~/lib/games/word-scramble";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
 import type { PrismaClient } from "../../../../generated/prisma";
@@ -51,10 +58,14 @@ const SORT_GAMES = {
   lab: LAB_LEVELS,
   tools: TOOL_LEVELS,
 };
-const SPEED_GAMES = { sprint: SPRINT_LEVELS, salita: SALITA_LEVELS };
+const SPEED_GAMES = {
+  sprint: SPRINT_LEVELS,
+  salita: SALITA_LEVELS,
+  bansa: BANSA_LEVELS,
+};
 
 /** The games this student can play, from the courses they're enrolled in. */
-async function gamesFor(db: PrismaClient, studentId: string) {
+export async function gamesFor(db: PrismaClient, studentId: string) {
   const enrollments = await db.enrollment.findMany({
     where: { studentId, status: "ACTIVE" },
     select: { section: { select: { course: { select: { code: true } } } } },
@@ -86,7 +97,7 @@ function isUnlocked(
   return index === 0 || (done.get(levels[index - 1]!.id)?.stars ?? 0) > 0;
 }
 
-async function assertPlayable(
+export async function assertPlayable(
   db: PrismaClient,
   studentId: string,
   game: Game,
@@ -287,7 +298,7 @@ export const gameRouter = createTRPCRouter({
   finishSpeed: studentProcedure
     .input(
       z.object({
-        game: z.enum(["sprint", "salita"]),
+        game: z.enum(["sprint", "salita", "bansa"]),
         levelId: z.string(),
         answers: z
           .array(z.object({ id: z.string(), choice: z.string() }))
@@ -356,6 +367,7 @@ export const gameRouter = createTRPCRouter({
   finishMath: studentProcedure
     .input(
       z.object({
+        game: z.enum(["math", "lava"]).default("math"),
         levelId: z.string(),
         answers: z
           .array(
@@ -368,8 +380,9 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertPlayable(ctx.db, ctx.studentId, "math", input.levelId);
-      const level = MATH_LEVELS.find((l) => l.id === input.levelId)!;
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const levels = input.game === "lava" ? LAVA_LEVELS : MATH_LEVELS;
+      const level = levels.find((l) => l.id === input.levelId)!;
       const result = scoreMath(level, input.answers);
       if (!result) {
         throw new TRPCError({
@@ -382,7 +395,7 @@ export const gameRouter = createTRPCRouter({
           ? await saveBest(
               ctx.db,
               ctx.studentId,
-              "math",
+              input.game,
               input.levelId,
               result.stars,
               result.right,
@@ -491,6 +504,117 @@ export const gameRouter = createTRPCRouter({
         result.stars,
         Math.max(0, 20 - result.mistakes),
       );
+      return { ...result, ...saved };
+    }),
+
+  /** Word Hunt (any subject): the words found and the hints used. */
+  finishHunt: studentProcedure
+    .input(
+      z.object({
+        game: z.enum(HUNT_GAMES),
+        levelId: z.string(),
+        found: z.array(z.string().max(60)).max(10),
+        hints: z.number().int().min(0).max(30),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = GAMES[input.game].levels.find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreHunt(level, input.found, input.hints);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Find every word first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        input.game,
+        input.levelId,
+        result.stars,
+        Math.max(0, 20 - result.hints),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Turbo Takbo (any subject): every guess at every gate. */
+  finishTurbo: studentProcedure
+    .input(
+      z.object({
+        game: z.enum(TURBO_GAMES),
+        levelId: z.string(),
+        gates: z
+          .array(
+            z.object({
+              id: z.string().max(60),
+              guesses: z.array(z.string().max(40)).min(1).max(10),
+            }),
+          )
+          .max(10),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = GAMES[input.game].levels.find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreTurbo(level, input.gates);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Open every gate first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        input.game,
+        input.levelId,
+        result.stars,
+        Math.max(0, 20 - result.mistakes),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Karinderya Rush: the ingredients plated for every order. */
+  finishKarinderya: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        plates: z
+          .array(
+            z.object({
+              id: z.string().max(40),
+              picks: z.array(z.string().max(40)).max(12),
+            }),
+          )
+          .max(10),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "kusina", input.levelId);
+      const level = KARINDERYA_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreKarinderya(level, input.plates);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Serve every customer first.",
+        });
+      }
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "kusina",
+              input.levelId,
+              result.stars,
+              result.right,
+            )
+          : { best: 0, newStars: 0 };
       return { ...result, ...saved };
     }),
 

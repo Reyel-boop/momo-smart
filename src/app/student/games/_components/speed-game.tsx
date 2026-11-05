@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SoundToggle } from "~/app/_components/race/race-view";
 import { sfx, unlock } from "~/app/_components/sfx";
 import { Card } from "~/app/_components/ui";
+import { BANSA_LEVELS } from "~/lib/games/bansa-quiz";
 import { SALITA_LEVELS } from "~/lib/games/salita-sprint";
 import {
   SPEED_SECONDS,
@@ -17,7 +18,7 @@ import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
 import { api } from "~/trpc/react";
 import { LevelHeader, LevelResult, LockedLevel, shuffled } from "./shared";
 
-export type SpeedGame = "sprint" | "salita";
+export type SpeedGame = "sprint" | "salita" | "bansa";
 
 /** Each speed game's levels and its look and words. */
 const SPEED_GAMES: Record<
@@ -57,6 +58,20 @@ const SPEED_GAMES: Record<
     code: false,
     headings: {
       top: "📜 Ang galing mo!",
+      pass: "⏱ Tapos na ang oras!",
+      fail: "⏱ Tapos na ang oras — subukan muli",
+    },
+  },
+  bansa: {
+    levels: BANSA_LEVELS,
+    name: "Bansa Quiz",
+    emoji: "🌏",
+    gradient: "from-emerald-600 via-teal-600 to-sky-700",
+    rules:
+      "May lalabas na clue. Piliin agad ang tamang bansa o lalawigan! 5 sunod-sunod na tama, doble ang puntos; 10, triple. Ang mali ay bawas na isang puntos at maikling hinto.",
+    code: false,
+    headings: {
+      top: "🌏 Bihasa ka sa mapa!",
       pass: "⏱ Tapos na ang oras!",
       fail: "⏱ Tapos na ang oras — subukan muli",
     },

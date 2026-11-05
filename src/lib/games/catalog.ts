@@ -5,18 +5,23 @@
  * each class's own unit quizzes.)
  */
 
+import { BANSA_LEVELS } from "./bansa-quiz";
 import { runLevelsOf } from "./block-run";
 import { BUG_LEVELS } from "./bug-hunt";
 import { CALL_LEVELS } from "./call-sim";
 import { CODE_LEVELS } from "./code-quest";
 import { GRAMMAR_LEVELS } from "./grammar-hunt";
+import { KARINDERYA_LEVELS } from "./karinderya";
 import { LAB_LEVELS } from "./lab-sorter";
+import { LAVA_LEVELS } from "./lava-climb";
 import { MATH_LEVELS } from "./number-rush";
 import { SALITA_LEVELS } from "./salita-sprint";
 import { TAMA_LEVELS } from "./tama-o-mali";
 import { SPRINT_LEVELS } from "./tag-sprint";
 import { TICKET_LEVELS } from "./ticket-rush";
 import { TOOL_LEVELS } from "./tool-shed";
+import { turboLevelsOf } from "./turbo-takbo";
+import { huntLevelsOf } from "./word-hunt";
 import {
   WORDS_AP,
   WORDS_CP,
@@ -45,6 +50,9 @@ const isFil = (code: string) => /^FIL\b/i.test(code);
 /** Every TLE course except the two ICT strands with their own games. */
 const isOtherTLE = (code: string) =>
   /^TLE\b/i.test(code) && !isCP(code) && !isTEL(code);
+
+/** Built but not offered yet: these open for other subjects later. */
+const notYet = (_code: string) => false;
 
 export const GAMES = {
   code: {
@@ -211,6 +219,122 @@ export const GAMES = {
     forCourse: isOtherTLE,
     levels: runLevelsOf(WORDS_TLE),
   },
+  lava: {
+    title: "Lava Climb",
+    course: "Mathematics",
+    forCourse: notYet,
+    levels: LAVA_LEVELS,
+  },
+  bansa: {
+    title: "Bansa Quiz",
+    course: "Araling Panlipunan",
+    forCourse: notYet,
+    levels: BANSA_LEVELS,
+  },
+  kusina: {
+    title: "Karinderya Rush",
+    course: "TLE",
+    forCourse: notYet,
+    levels: KARINDERYA_LEVELS,
+  },
+  // Word Hunt: a word search per subject, on the Word Scramble words.
+  hcode: {
+    title: "Word Hunt",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: huntLevelsOf(WORDS_CP),
+  },
+  htel: {
+    title: "Word Hunt",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: huntLevelsOf(WORDS_TEL),
+  },
+  hmath: {
+    title: "Word Hunt",
+    course: "Mathematics",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_MATH),
+  },
+  hsci: {
+    title: "Word Hunt",
+    course: "Science",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_SCI),
+  },
+  hap: {
+    title: "Word Hunt",
+    course: "Araling Panlipunan",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_AP),
+  },
+  heng: {
+    title: "Word Hunt",
+    course: "English",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_ENG),
+  },
+  hfil: {
+    title: "Word Hunt",
+    course: "Filipino",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_FIL),
+  },
+  htle: {
+    title: "Word Hunt",
+    course: "TLE",
+    forCourse: notYet,
+    levels: huntLevelsOf(WORDS_TLE),
+  },
+  // Turbo Takbo: a tap-for-speed run per subject, on the same words.
+  tcode: {
+    title: "Turbo Takbo",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: turboLevelsOf(WORDS_CP),
+  },
+  ttel: {
+    title: "Turbo Takbo",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: turboLevelsOf(WORDS_TEL),
+  },
+  tmath: {
+    title: "Turbo Takbo",
+    course: "Mathematics",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_MATH),
+  },
+  tsci: {
+    title: "Turbo Takbo",
+    course: "Science",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_SCI),
+  },
+  tap: {
+    title: "Turbo Takbo",
+    course: "Araling Panlipunan",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_AP),
+  },
+  teng: {
+    title: "Turbo Takbo",
+    course: "English",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_ENG),
+  },
+  tfil: {
+    title: "Turbo Takbo",
+    course: "Filipino",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_FIL),
+  },
+  ttle: {
+    title: "Turbo Takbo",
+    course: "TLE",
+    forCourse: notYet,
+    levels: turboLevelsOf(WORDS_TLE),
+  },
 } satisfies Record<
   string,
   {
@@ -251,6 +375,30 @@ export const RUN_GAMES = [
   "reng",
   "rfil",
   "rtle",
+] as const satisfies readonly GameId[];
+
+/** The Word Hunt games, which share one screen and one finish call. */
+export const HUNT_GAMES = [
+  "hcode",
+  "htel",
+  "hmath",
+  "hsci",
+  "hap",
+  "heng",
+  "hfil",
+  "htle",
+] as const satisfies readonly GameId[];
+
+/** The Turbo Takbo games, which share one screen and one finish call. */
+export const TURBO_GAMES = [
+  "tcode",
+  "ttel",
+  "tmath",
+  "tsci",
+  "tap",
+  "teng",
+  "tfil",
+  "ttle",
 ] as const satisfies readonly GameId[];
 
 export function levelsOf(game: GameId): readonly CatalogLevel[] {
