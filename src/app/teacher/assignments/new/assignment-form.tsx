@@ -133,7 +133,7 @@ export function AssignmentForm({
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        save(!existing || !existing.isPublished);
+        save(!existing?.isPublished);
       }}
       className="space-y-5 p-5"
     >
