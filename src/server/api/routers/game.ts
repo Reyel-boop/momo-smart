@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import { BAKE_LEVELS, scoreBake } from "~/lib/games/bake-shop";
 import { BANSA_LEVELS } from "~/lib/games/bansa-quiz";
 import { scoreRun } from "~/lib/games/block-run";
 import { BUG_LEVELS, scoreBugs } from "~/lib/games/bug-hunt";
@@ -575,6 +576,42 @@ export const gameRouter = createTRPCRouter({
         input.levelId,
         result.stars,
         Math.max(0, 20 - result.mistakes),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Bake Shop: every step tapped for every recipe. */
+  finishBake: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        recipes: z
+          .array(
+            z.object({
+              id: z.string().max(40),
+              taps: z.array(z.string().max(80)).max(100),
+            }),
+          )
+          .max(5),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "bake", input.levelId);
+      const level = BAKE_LEVELS.find((l) => l.id === input.levelId)!;
+      const result = scoreBake(level, input.recipes);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Finish every recipe first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        "bake",
+        input.levelId,
+        result.stars,
+        Math.max(0, 30 - result.mistakes),
       );
       return { ...result, ...saved };
     }),

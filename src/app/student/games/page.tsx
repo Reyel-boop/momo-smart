@@ -198,6 +198,13 @@ const LOOK = {
     banner: "from-emerald-600 to-sky-700",
     emoji: "🌏",
   },
+  bake: {
+    href: "/student/games/bake",
+    blurb:
+      "The recipe cards got mixed up! Put every step back in order to bake breads, pastries, cakes and petit fours.",
+    banner: "from-amber-500 to-pink-600",
+    emoji: "🧑‍🍳",
+  },
   kusina: {
     href: "/student/games/kusina",
     blurb:

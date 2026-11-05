@@ -5,6 +5,7 @@
  * each class's own unit quizzes.)
  */
 
+import { BAKE_LEVELS } from "./bake-shop";
 import { BANSA_LEVELS } from "./bansa-quiz";
 import { runLevelsOf } from "./block-run";
 import { BUG_LEVELS } from "./bug-hunt";
@@ -51,6 +52,9 @@ const isFil = (code: string) => /^FIL\b/i.test(code);
 const isOtherTLE = (code: string) =>
   /^TLE\b/i.test(code) && !isCP(code) && !isTEL(code);
 
+/** Courses that teach baking, and courses that teach cooking. */
+const isBaking = (code: string) => /-(BAKE|PREP)$/i.test(code);
+const isCooking = (code: string) => /-(COOK|PREP|FBO)$/i.test(code);
 /** Built but not offered yet: these open for other subjects later. */
 const notYet = (_code: string) => false;
 
@@ -234,8 +238,14 @@ export const GAMES = {
   kusina: {
     title: "Karinderya Rush",
     course: "TLE",
-    forCourse: notYet,
+    forCourse: isCooking,
     levels: KARINDERYA_LEVELS,
+  },
+  bake: {
+    title: "Bake Shop",
+    course: "TLE",
+    forCourse: isBaking,
+    levels: BAKE_LEVELS,
   },
   // Word Hunt: a word search per subject, on the Word Scramble words.
   hcode: {
