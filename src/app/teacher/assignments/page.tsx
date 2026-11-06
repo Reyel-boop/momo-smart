@@ -103,7 +103,7 @@ export default async function AssignmentsPage({
 }
 
 type Row = Awaited<ReturnType<typeof api.assignment.listForSection>>[number] & {
-  section: { code: string; course: { code: string } };
+  section: { code: string; studentCount: number; course: { code: string } };
 };
 
 function AssignmentTable({
