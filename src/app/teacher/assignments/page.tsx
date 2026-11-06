@@ -149,7 +149,12 @@ function AssignmentTable({
                   className="hover:bg-canvas/60 align-top transition"
                 >
                   <td className="px-5 py-4">
-                    <p className="text-ink text-sm font-bold">{row.title}</p>
+                    <Link
+                      href={`/teacher/assignments/${row.id}`}
+                      className="text-ink hover:text-brand text-sm font-bold hover:underline"
+                    >
+                      {row.title}
+                    </Link>
                     {row.unit && (
                       <p className="text-muted mt-0.5 text-xs">
                         {row.unit.title}
@@ -170,8 +175,13 @@ function AssignmentTable({
                   <td className="text-ink px-4 py-4 text-xs font-semibold">
                     {row.pointsPossible}
                   </td>
-                  <td className="text-muted px-4 py-4 text-xs font-semibold">
-                    {row._count.submissions}
+                  <td className="px-4 py-4 text-xs font-semibold">
+                    <Link
+                      href={`/teacher/assignments/${row.id}`}
+                      className="text-brand hover:underline"
+                    >
+                      {row._count.submissions} of {row.section.studentCount}
+                    </Link>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex flex-wrap items-center gap-1.5">

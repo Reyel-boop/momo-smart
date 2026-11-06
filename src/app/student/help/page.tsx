@@ -32,7 +32,7 @@ const TOPICS: HelpTopic[] = [
     answer: (
       <>
         After a unit&apos;s lessons, answer its five Unit Questions. They come
-        one at a time and you have 2 minutes for each. When time runs out the
+        one at a time and you have 30 seconds for each. When time runs out the
         question counts as wrong. After every answer you see whether it was
         right, the correct answer and why. You get two tries and your best score
         counts. Stay on the quiz screen — leaving it is recorded.

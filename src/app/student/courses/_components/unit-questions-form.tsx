@@ -102,12 +102,18 @@ type OpenQuestion = NonNullable<NonNullable<Running["current"]>["question"]>;
 const mmss = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
+/** A question's time limit in words: "30 seconds", "2 minutes". */
+const timeLabel = (seconds: number) =>
+  seconds < 60
+    ? `${seconds} seconds`
+    : `${seconds / 60} minute${seconds === 60 ? "" : "s"}`;
+
 /**
  * A question set in focus mode: one question at a time on a full-screen
- * panel with a 2-minute clock (kept by the server, so reloading does not
+ * panel with a per-question clock (kept by the server, so reloading does not
  * reset it). Every answer — right, wrong or timed out — is followed at once
  * by the verdict, the correct answer and the rationale; the next question
- * opens only when the 2 minutes are up, so the time left goes to the
+ * opens only when the clock is up, so the time left goes to the
  * rationale. After a try, the whole try can be reviewed.
  */
 export function UnitQuestionsForm({
@@ -185,9 +191,9 @@ function Rules({ quiz }: { quiz: QuizView }) {
         can&apos;t go back to a question once it&apos;s answered.
       </li>
       <li>
-        Each question gets <b>{mmss(quiz.questionSeconds)} minutes</b>. You can
+        Each question gets <b>{timeLabel(quiz.questionSeconds)}</b>. You can
         answer early, but the next question opens only when the{" "}
-        {mmss(quiz.questionSeconds)} minutes are up — use the time to read the
+        {timeLabel(quiz.questionSeconds)} are up — use the time to read the
         rationale. If time runs out, the question counts as wrong.
       </li>
       <li>
@@ -237,7 +243,7 @@ function FocusMode({
   const [focusLosses, setFocusLosses] = useState(running.focusLosses);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  // The next question opens when the answered one's 2 minutes are up.
+  // The next question opens when the answered one's time is up.
   const [lockUntil, setLockUntil] = useState(
     () => Date.now() + running.nextOpensIn * 1000,
   );
@@ -340,8 +346,8 @@ function FocusMode({
               </p>
               <p className="text-ink mt-2 text-lg font-bold">
                 {locked > 0
-                  ? `The next question opens in ${mmss(locked)}, when the last one's ${mmss(questionSeconds)} minutes are up.`
-                  : `Ready? The ${mmss(questionSeconds)} clock starts when you open the question.`}
+                  ? `The next question opens in ${mmss(locked)}, when the last one's ${timeLabel(questionSeconds)} are up.`
+                  : `Ready? The ${timeLabel(questionSeconds)} clock starts when you open the question.`}
               </p>
               <button
                 type="button"

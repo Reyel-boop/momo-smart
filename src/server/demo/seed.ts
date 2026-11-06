@@ -762,7 +762,7 @@ async function build() {
           unitId: unit.id,
           title: `Unit ${unitIndex + 1} Questions`,
           instructions:
-            "Read the unit discussion first. The five questions come one at a time, 2 minutes each, and you see the rationale after every answer. You have two tries; your best score counts.",
+            "Read the unit discussion first. The five questions come one at a time, 30 seconds each, and you see the rationale after every answer. You have two tries; your best score counts.",
           totalPoints: quiz.length,
           maxAttempts: 2,
           allowScratchpad: false,

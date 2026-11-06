@@ -60,7 +60,7 @@ export async function startUnitQuestions(
   }
 }
 
-/** Opens the next question of a running try; its 2-minute clock starts now. */
+/** Opens the next question of a running try; its clock starts now. */
 export async function openNextUnitQuestion(
   attemptId: string,
 ): Promise<Result<object>> {

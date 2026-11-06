@@ -562,8 +562,8 @@ function UnitQuestions({
             Unit Questions · {questions.length} items
           </p>
           <p className="text-muted mt-0.5 text-xs">
-            Students answer these after the discussion, one at a time with 2
-            minutes each, and see the rationale after every answer. Two tries,
+            Students answer these after the discussion, one at a time with 30
+            seconds each, and see the rationale after every answer. Two tries,
             best score counts.
           </p>
         </div>

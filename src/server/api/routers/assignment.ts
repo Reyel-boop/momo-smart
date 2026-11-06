@@ -35,6 +35,9 @@ const submissionFormats = [
   "ON_PAPER",
 ] as const;
 
+/** The last word of a name, for sorting a class list by surname. */
+const surname = (name: string) => name.trim().split(/\s+/).at(-1) ?? name;
+
 export const assignmentRouter = createTRPCRouter({
   /** Assignments for a section, with per-student submission state for staff. */
   listForSection: protectedProcedure
@@ -73,7 +76,9 @@ export const assignmentRouter = createTRPCRouter({
             select: { id: true, title: true, type: true, totalPoints: true },
           },
           category: { select: { id: true, name: true, weightPercent: true } },
-          _count: { select: { submissions: true } },
+          _count: {
+            select: { submissions: { where: { submittedAt: { not: null } } } },
+          },
           submissions: {
             where: { studentId: ctx.session.user.studentId ?? "" },
             orderBy: { attempt: "desc" },
@@ -356,6 +361,118 @@ export const assignmentRouter = createTRPCRouter({
       };
     });
   }),
+
+  /**
+   * The class roster split by who has handed in an assignment. Everyone
+   * actively enrolled appears, including students with no submission at all.
+   */
+  submissionStatus: teacherProcedure
+    .input(z.object({ assignmentId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const assignment = await ctx.db.assignment.findUnique({
+        where: { id: input.assignmentId },
+        select: {
+          id: true,
+          title: true,
+          dueAt: true,
+          pointsPossible: true,
+          sectionId: true,
+          section: {
+            select: { code: true, course: { select: { name: true } } },
+          },
+        },
+      });
+      if (!assignment) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Assignment not found.",
+        });
+      }
+      await assertTeachesSection(
+        ctx.db,
+        ctx.session.user,
+        assignment.sectionId,
+      );
+
+      const [roster, submissions] = await Promise.all([
+        ctx.db.enrollment.findMany({
+          where: { sectionId: assignment.sectionId, status: "ACTIVE" },
+          select: {
+            studentId: true,
+            student: { select: { user: { select: { name: true } } } },
+          },
+        }),
+        ctx.db.submission.findMany({
+          where: { assignmentId: assignment.id },
+          orderBy: { attempt: "asc" },
+          select: {
+            id: true,
+            studentId: true,
+            status: true,
+            timeliness: true,
+            submittedAt: true,
+            grade: { select: { status: true, score: true } },
+          },
+        }),
+      ]);
+
+      // Ordered by attempt, so the newest attempt wins.
+      const latest = new Map(submissions.map((s) => [s.studentId, s]));
+      const people = roster
+        .map((entry) => ({
+          studentId: entry.studentId,
+          name: entry.student.user.name ?? "Student",
+          submission: latest.get(entry.studentId) ?? null,
+        }))
+        .sort((a, b) =>
+          surname(a.name).localeCompare(surname(b.name), "en", {
+            sensitivity: "base",
+          }),
+        );
+
+      const handedIn = (status?: string) =>
+        status === "SUBMITTED" || status === "RETURNED" || status === "GRADED";
+
+      return {
+        assignment: {
+          id: assignment.id,
+          title: assignment.title,
+          dueAt: assignment.dueAt,
+          pointsPossible: assignment.pointsPossible,
+          sectionId: assignment.sectionId,
+          classLabel: `${assignment.section.course.name} — ${assignment.section.code}`,
+        },
+        submitted: people.flatMap(({ studentId, name, submission }) =>
+          submission && handedIn(submission.status)
+            ? [
+                {
+                  studentId,
+                  name,
+                  submissionId: submission.id,
+                  submittedAt: submission.submittedAt,
+                  timeliness: submission.timeliness,
+                  graded: submission.grade?.status === "RELEASED",
+                  score: submission.grade?.score ?? null,
+                },
+              ]
+            : [],
+        ),
+        notSubmitted: people
+          .filter(
+            (p) =>
+              !handedIn(p.submission?.status) &&
+              p.submission?.status !== "EXCUSED",
+          )
+          .map(({ studentId, name, submission }) => ({
+            studentId,
+            name,
+            started: submission?.status === "DRAFT",
+          })),
+        excused: people
+          .filter((p) => p.submission?.status === "EXCUSED")
+          .map(({ studentId, name }) => ({ studentId, name })),
+      };
+    }),
 
   // --- Authoring ------------------------------------------------------------
 

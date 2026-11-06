@@ -759,7 +759,7 @@ export const assessmentRouter = createTRPCRouter({
       return attempt;
     }),
 
-  // --- Unit questions (2 minutes each, auto-scored, after a unit) ----------
+  // --- Unit questions (30 seconds each, auto-scored, after a unit) ---------
 
   /** The "Unit Questions" of each unit in a course, with the caller's best score. */
   unitQuizzes: studentProcedure
@@ -1032,7 +1032,7 @@ export const assessmentRouter = createTRPCRouter({
    * Opens the next unanswered question and starts its clock. Opening the
    * question that is already open keeps its original start time, so
    * reloading the page never resets the clock. The next question opens only
-   * once the answered one's 2 minutes are up, even if it was answered early.
+   * once the answered one's time is up, even if it was answered early.
    */
   openUnitQuestion: studentProcedure
     .input(z.object({ attemptId: z.string() }))
@@ -1605,7 +1605,7 @@ async function postAttemptToGradebook(
 }
 
 /** Each unit question must be answered within this many seconds. */
-const QUESTION_SECONDS = 120;
+const QUESTION_SECONDS = 30;
 /** Allowance for network delay before a late answer stops counting. */
 const GRACE_SECONDS = 5;
 
