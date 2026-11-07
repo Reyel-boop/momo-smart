@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata, type Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { OLD_BROWSER_SCRIPT } from "~/app/_components/old-browsers";
 import { ServiceWorker } from "~/app/_components/service-worker";
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -34,6 +35,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
+      <head>
+        {/* Runs before every other script: fills in built-ins that iOS 12
+            lacks and reports script errors. */}
+        <script dangerouslySetInnerHTML={{ __html: OLD_BROWSER_SCRIPT }} />
+      </head>
       <body className="font-sans antialiased">
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <ServiceWorker />

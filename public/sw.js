@@ -31,7 +31,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode !== "navigate") return;
   event.respondWith(
     fetch(event.request).catch(() =>
-      caches.match(OFFLINE_URL).then((page) => page ?? Response.error()),
+      caches.match(OFFLINE_URL).then((page) => page || Response.error()),
     ),
   );
 });
