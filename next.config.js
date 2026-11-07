@@ -19,6 +19,7 @@ const config = {
     "next-auth",
     "@auth/core",
     "@vercel/blob",
+    "@vercel/oidc",
     "three",
   ],
 };
