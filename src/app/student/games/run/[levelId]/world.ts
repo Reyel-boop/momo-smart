@@ -360,8 +360,11 @@ export function createWorld(
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };
-  const observer = new ResizeObserver(resize);
-  observer.observe(canvas);
+  // Old iPhones (iOS 12) have no ResizeObserver; follow the window there.
+  const observer =
+    typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
+  if (observer) observer.observe(canvas);
+  else window.addEventListener("resize", resize);
   resize();
 
   const camPos = new T.Vector3(0, 5, 8);
@@ -576,7 +579,8 @@ export function createWorld(
     },
     dispose: () => {
       cancelAnimationFrame(frame);
-      observer.disconnect();
+      observer?.disconnect();
+      window.removeEventListener("resize", resize);
       scene.traverse((o) => {
         const m = o as THREE_NS.Mesh;
         m.geometry?.dispose();

@@ -98,11 +98,9 @@ function PasswordNotice({
           type="button"
           className={secondary}
           onClick={() => {
-            void navigator.clipboard
-              .writeText(
-                `Sign in with: ${email}\nTemporary password: ${password}`,
-              )
-              .then(() => setCopied(true));
+            void copyText(
+              `Sign in with: ${email}\nTemporary password: ${password}`,
+            ).then(() => setCopied(true));
           }}
         >
           {copied ? "Copied" : "Copy"}
@@ -714,4 +712,18 @@ export function PersonActions({
       )}
     </div>
   );
+}
+
+/** Copies text; old iPhones (iOS 12) have no navigator.clipboard. */
+async function copyText(text: string) {
+  if (navigator.clipboard) return navigator.clipboard.writeText(text);
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand("copy");
+  area.remove();
 }

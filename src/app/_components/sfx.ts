@@ -30,7 +30,13 @@ export function setSoundOn(on: boolean) {
 /** Call from a click so later effects can play. */
 export function unlock() {
   if (typeof window === "undefined") return;
-  ctx ??= new AudioContext();
+  // iOS 12 Safari only has the prefixed webkitAudioContext.
+  const Ctor =
+    window.AudioContext ??
+    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+  if (!Ctor) return;
+  ctx ??= new Ctor();
   if (ctx.state === "suspended") void ctx.resume();
 }
 
