@@ -11,9 +11,10 @@
  * 3. gives old Safari copies of rules that use :where(), which it would
  *    otherwise drop entirely;
  * 4. stands in for flexbox `gap`, which Safari only supports from 14.1, with
- *    margins between items.
+ *    margins between items;
+ * 5. repeats the `translate`/`scale`/`rotate` properties as `transform`.
  *
- * Steps 3 and 4 sit inside `@supports not (translate: 0)`: the `translate`
+ * Steps 3 to 5 sit inside `@supports not (translate: 0)`: the `translate`
  * property arrived in Safari 14.1 together with flex gap, so only browsers
  * older than that ever apply them.
  */
@@ -134,6 +135,27 @@ const plugin = () => ({
         }
         node.remove();
       });
+
+      // 5. The `translate`, `scale` and `rotate` properties (Safari 14.1+)
+      //    as a classic `transform`, or old Safari never moves the element:
+      //    slide-in menus would stay open over the page.
+      const parts = [];
+      rule.each((node) => {
+        if (node.type !== "decl") return;
+        const value = node.value.trim();
+        if (value === "none") return;
+        const args = value.split(/\s+(?![^(]*\))/);
+        if (node.prop === "translate")
+          parts.push(`translate(${args.join(", ")})`);
+        else if (node.prop === "scale") parts.push(`scale(${args.join(", ")})`);
+        else if (node.prop === "rotate" && args.length === 1)
+          parts.push(`rotate(${value})`);
+      });
+      if (parts.length > 0 && !rule.parent?.params?.includes("translate")) {
+        const copy = rule.clone({ nodes: [] });
+        copy.append({ prop: "transform", value: parts.join(" ") });
+        oldRules.push({ rule: copy, after: rule });
+      }
 
       // 3. Old-Safari copies of :where() rules.
       if (rule.selector.includes(":where(")) {
