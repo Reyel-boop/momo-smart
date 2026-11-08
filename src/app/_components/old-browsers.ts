@@ -102,4 +102,23 @@ export const OLD_BROWSER_SCRIPT = `(function () {
     var r = e.reason || {};
     report("Unhandled promise: " + (r.message || r), r.stack);
   });
+  // React reports errors it catches (the "Application error" screen) through
+  // reportError where it exists, and console.error where it doesn't (iOS 12).
+  def(window, "reportError", function (err) {
+    report("reportError: " + ((err && err.message) || err), err && err.stack);
+    if (window.console) console.error(err);
+  });
+  if (window.console && console.error) {
+    var original = console.error;
+    console.error = function () {
+      for (var i = 0; i < arguments.length; i++) {
+        var a = arguments[i];
+        if (a && (a instanceof Error || a.stack)) {
+          report("console.error: " + a.message, a.stack);
+          break;
+        }
+      }
+      return original.apply(console, arguments);
+    };
+  }
 })();`;
