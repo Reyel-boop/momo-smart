@@ -11,124 +11,37 @@
  * Scoring lives here so the server can score a level from what was heard.
  */
 
-export type SpeakLine = {
-  text: string;
-  /** A pronunciation or delivery tip shown under the line. */
-  tip?: string;
-};
+import { EASY_CALLS, EASY_READS } from "./speak-easy";
+import { HARD_CALLS, HARD_READS } from "./speak-hard";
+import {
+  ANYTHING_ELSE,
+  EASY,
+  EMPATHY,
+  GOODBYE,
+  HARD,
+  HOLD,
+  MIDDLE,
+  POLITE,
+  SORRY,
+  THANK,
+  need,
+  opening,
+  type SpeakLevel,
+  type SpeakStep,
+} from "./speak-kit";
+import { MIDDLE_CALLS, MIDDLE_READS } from "./speak-middle";
 
-/** Something a good reply must contain: any one of `any` counts. */
-export type SpeakNeed = { label: string; any: string[] };
+export type {
+  SpeakCallLevel,
+  SpeakLevel,
+  SpeakLine,
+  SpeakNeed,
+  SpeakReadLevel,
+  SpeakStep,
+} from "./speak-kit";
 
-export type SpeakStep = {
-  /** The call-flow skill, e.g. "Opening". */
-  skill: string;
-  /** What the customer says (empty on the opening, where the call rings). */
-  customer: string;
-  /** What the student should do in their reply. */
-  task: string;
-  /** A model reply, shown after the student speaks. */
-  sample: string;
-  needs: SpeakNeed[];
-};
-
-type Base = {
-  id: string;
-  unit: 1 | 2 | 3;
-  unitTitle: "Easy" | "Middle Level" | "Difficult";
-  title: string;
-};
-
-export type SpeakReadLevel = Base & { kind: "READ"; lines: SpeakLine[] };
-export type SpeakCallLevel = Base & {
-  kind: "CALL";
-  caller: string;
-  setup: string;
-  /** The agent's name, used in the model replies. */
-  agent: string;
-  steps: SpeakStep[];
-};
-export type SpeakLevel = SpeakReadLevel | SpeakCallLevel;
-
-const EASY = { unit: 1, unitTitle: "Easy" } as const;
-const MIDDLE = { unit: 2, unitTitle: "Middle Level" } as const;
-const HARD = { unit: 3, unitTitle: "Difficult" } as const;
-
-const need = (label: string, ...any: string[]): SpeakNeed => ({ label, any });
-const THANK = need("Thank the customer", "thank", "thanks", "salamat");
-const SORRY = need(
-  "Apologize",
-  "sorry",
-  "apologize",
-  "apologise",
-  "apologies",
-  "pasensya",
-);
-const EMPATHY = need(
-  "Show you understand",
-  "understand",
-  "i see",
-  "i know how",
-  "frustrating",
-  "must be",
-  "i hear you",
-);
-const POLITE = need(
-  "Ask politely",
-  "please",
-  "may i",
-  "could i",
-  "could you",
-  "can i",
-  "would you",
-);
-const HOLD = need(
-  "Ask them to hold or wait",
-  "hold",
-  "moment",
-  "wait",
-  "second",
-  "minute",
-);
-const ANYTHING_ELSE = need(
-  "Ask if there's anything else",
-  "anything else",
-  "other concern",
-  "else i can",
-);
-const GOODBYE = need(
-  "Close the call politely",
-  "great day",
-  "good day",
-  "nice day",
-  "wonderful day",
-  "goodbye",
-  "bye",
-  "take care",
-  "have a",
-);
-
-/** The opening every call needs: thank, company, your name, offer help. */
-const opening = (company: string, agent: string): SpeakStep => ({
-  skill: "Opening",
-  customer: "",
-  task: `Answer the call: thank the caller, say the company name (${company}), give your name, and offer to help.`,
-  sample: `Thank you for calling ${company}, this is ${agent}. How may I help you today?`,
-  needs: [
-    THANK,
-    need(
-      `Say “${company}”`,
-      company.toLowerCase(),
-      "momo",
-      "mo mo",
-      company.split(" ")[1]!.toLowerCase(),
-    ),
-    need("Give your name", "this is", "my name is", "i am", "im", "speaking"),
-    need("Offer to help", "help", "assist"),
-  ],
-});
-
-export const SPEAK_LEVELS: SpeakLevel[] = [
+/** The first 12 levels; their ids keep students' stars. */
+const ORIGINAL: SpeakLevel[] = [
   // ---------------------------------------------------------------- Easy
   {
     ...EASY,
@@ -719,6 +632,33 @@ export const SPEAK_LEVELS: SpeakLevel[] = [
       },
     ],
   },
+];
+
+const byId = (id: string) => ORIGINAL.find((l) => l.id === id)!;
+
+/**
+ * Every level, in play order: for each category, its 20 Speech Tests, then
+ * its 20 Voice Calls.
+ */
+export const SPEAK_LEVELS: SpeakLevel[] = [
+  byId("spk-1-1"),
+  byId("spk-1-2"),
+  ...EASY_READS,
+  byId("spk-1-3"),
+  byId("spk-1-4"),
+  ...EASY_CALLS,
+  byId("spk-2-1"),
+  byId("spk-2-2"),
+  ...MIDDLE_READS,
+  byId("spk-2-3"),
+  byId("spk-2-4"),
+  ...MIDDLE_CALLS,
+  byId("spk-3-1"),
+  byId("spk-3-2"),
+  ...HARD_READS,
+  byId("spk-3-3"),
+  byId("spk-3-4"),
+  ...HARD_CALLS,
 ];
 
 // ------------------------------------------------------------------ Scoring

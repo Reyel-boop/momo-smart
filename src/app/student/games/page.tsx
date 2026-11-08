@@ -298,18 +298,38 @@ export default async function GamesPage() {
         const units = [...new Set(g.levels.map((l) => l.unit))];
         // Games with one level per unit show every level in one grid.
         const single = units.length === g.levels.length;
-        const groups = single
+        const fold = UNIT_IS_LEVEL.has(g.game);
+        const groups: {
+          key: string;
+          label: string | null;
+          levels: typeof g.levels;
+        }[] = single
           ? [{ key: "all", label: null, levels: g.levels }]
-          : units.map((unit) => {
-              const levels = g.levels.filter((l) => l.unit === unit);
-              return {
-                key: String(unit),
-                label: UNIT_IS_LEVEL.has(g.game)
-                  ? levels[0]!.unitTitle
-                  : `Unit ${unit} · ${levels[0]!.unitTitle}`,
-                levels,
-              };
-            });
+          : fold
+            ? // Speak Up!: each category, split into Speech Tests and Voice Calls.
+              units.flatMap((unit) =>
+                [
+                  { icon: "🎤", name: "Speech Tests" },
+                  { icon: "📞", name: "Voice Calls" },
+                ].map(({ icon, name }) => {
+                  const levels = g.levels.filter(
+                    (l) => l.unit === unit && l.title.startsWith(icon),
+                  );
+                  return {
+                    key: `${unit}-${icon}`,
+                    label: `${levels[0]?.unitTitle ?? ""} · ${icon} ${name}`,
+                    levels,
+                  };
+                }),
+              )
+            : units.map((unit) => {
+                const levels = g.levels.filter((l) => l.unit === unit);
+                return {
+                  key: String(unit),
+                  label: `Unit ${unit} · ${levels[0]!.unitTitle}`,
+                  levels,
+                };
+              });
         const next = g.levels.find((l) => l.unlocked && !l.stars);
         return (
           <Card key={g.game} className="overflow-hidden">
@@ -369,6 +389,92 @@ export default async function GamesPage() {
 
             <div className="space-y-5 px-5 py-5">
               {groups.map(({ key, label, levels }) => {
+                if (levels.length === 0) return null;
+                const grid = (
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {levels.map((level) => {
+                      const n = g.levels.indexOf(level) + 1;
+                      const body = (
+                        <>
+                          <span
+                            className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
+                              level.stars
+                                ? "bg-amber-100 text-amber-700"
+                                : level.unlocked
+                                  ? "bg-brand-soft text-brand"
+                                  : "bg-slate-100 text-slate-400"
+                            }`}
+                          >
+                            {level.unlocked ? (
+                              n
+                            ) : (
+                              <LockIcon className="size-4" />
+                            )}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            {single && (
+                              <span className="text-muted block truncate text-[10px] font-bold tracking-wide uppercase">
+                                Unit {level.unit} · {level.unitTitle}
+                              </span>
+                            )}
+                            <span className="text-ink block truncate text-sm font-bold">
+                              {level.title}
+                            </span>
+                            <span className="mt-0.5 block">
+                              <Stars
+                                count={level.stars ?? 0}
+                                className="size-3.5"
+                              />
+                            </span>
+                          </span>
+                          {level.unlocked && !level.stars && (
+                            <Pill tone="blue">Play</Pill>
+                          )}
+                        </>
+                      );
+                      return level.unlocked ? (
+                        <Link
+                          key={level.id}
+                          href={`${look.href}/${level.id}`}
+                          className="border-line hover:border-brand hover:bg-brand-soft/40 flex items-center gap-3 rounded-xl border px-3 py-2.5 transition"
+                        >
+                          {body}
+                        </Link>
+                      ) : (
+                        <div
+                          key={level.id}
+                          title="Finish the level before this one to unlock it"
+                          className="border-line flex items-center gap-3 rounded-xl border px-3 py-2.5 opacity-60"
+                        >
+                          {body}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+                if (fold) {
+                  const cleared = levels.filter((l) => (l.stars ?? 0) > 0);
+                  return (
+                    <details
+                      key={key}
+                      open={!!next && levels.includes(next)}
+                      className="group border-line rounded-xl border"
+                    >
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 select-none [&::-webkit-details-marker]:hidden">
+                        <span className="text-ink text-sm font-extrabold">
+                          {label}
+                        </span>
+                        <span className="text-muted flex items-center gap-2 text-xs font-semibold">
+                          {cleared.length} / {levels.length} cleared
+                          <span className="transition group-open:rotate-180">
+                            ▾
+                          </span>
+                        </span>
+                      </summary>
+                      <div className="px-4 pb-4">{grid}</div>
+                    </details>
+                  );
+                }
                 return (
                   <div key={key}>
                     {label && (
@@ -376,66 +482,7 @@ export default async function GamesPage() {
                         {label}
                       </p>
                     )}
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {levels.map((level) => {
-                        const n = g.levels.indexOf(level) + 1;
-                        const body = (
-                          <>
-                            <span
-                              className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
-                                level.stars
-                                  ? "bg-amber-100 text-amber-700"
-                                  : level.unlocked
-                                    ? "bg-brand-soft text-brand"
-                                    : "bg-slate-100 text-slate-400"
-                              }`}
-                            >
-                              {level.unlocked ? (
-                                n
-                              ) : (
-                                <LockIcon className="size-4" />
-                              )}
-                            </span>
-                            <span className="min-w-0 flex-1">
-                              {single && (
-                                <span className="text-muted block truncate text-[10px] font-bold tracking-wide uppercase">
-                                  Unit {level.unit} · {level.unitTitle}
-                                </span>
-                              )}
-                              <span className="text-ink block truncate text-sm font-bold">
-                                {level.title}
-                              </span>
-                              <span className="mt-0.5 block">
-                                <Stars
-                                  count={level.stars ?? 0}
-                                  className="size-3.5"
-                                />
-                              </span>
-                            </span>
-                            {level.unlocked && !level.stars && (
-                              <Pill tone="blue">Play</Pill>
-                            )}
-                          </>
-                        );
-                        return level.unlocked ? (
-                          <Link
-                            key={level.id}
-                            href={`${look.href}/${level.id}`}
-                            className="border-line hover:border-brand hover:bg-brand-soft/40 flex items-center gap-3 rounded-xl border px-3 py-2.5 transition"
-                          >
-                            {body}
-                          </Link>
-                        ) : (
-                          <div
-                            key={level.id}
-                            title="Finish the level before this one to unlock it"
-                            className="border-line flex items-center gap-3 rounded-xl border px-3 py-2.5 opacity-60"
-                          >
-                            {body}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {grid}
                   </div>
                 );
               })}

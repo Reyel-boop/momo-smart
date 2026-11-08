@@ -28,13 +28,14 @@ import {
   normalizeSpeech,
   type SpeakLevel,
 } from "~/lib/games/speak-up";
+import { FEMALE_AGENTS } from "~/lib/games/speak-kit";
 import { api } from "~/trpc/react";
 import { LevelResult, LockedLevel } from "../../_components/shared";
 import { Stars } from "../../_components/stars";
 
 type Answer = { heard: string; score: number };
 
-const FEMALE_AGENTS = new Set(["ana", "bea", "mia", "kim"]);
+const FEMALE = new Set(FEMALE_AGENTS.map((n) => n.toLowerCase()));
 
 const tone = (score: number) =>
   score >= 90
@@ -185,9 +186,7 @@ function Play({
   const agent: Speaker = {
     role: "agent",
     gender:
-      !isCall || FEMALE_AGENTS.has(level.agent.toLowerCase())
-        ? "female"
-        : "male",
+      !isCall || FEMALE.has(level.agent.toLowerCase()) ? "female" : "male",
   };
   const current = answers[index];
 
