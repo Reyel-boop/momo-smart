@@ -41,7 +41,7 @@ export default async function ReportCardPage({
     : "/teacher/grades";
 
   const cell = "border border-slate-400 px-2 py-1.5 text-center";
-  const q = card.quarterDates;
+  const q = card.termDates;
 
   return (
     <div className="mx-auto max-w-[900px] space-y-4">
@@ -121,8 +121,8 @@ export default async function ReportCardPage({
                 <th rowSpan={2} className={`${cell} text-left`}>
                   Learning Areas
                 </th>
-                <th colSpan={4} className={cell}>
-                  Quarter
+                <th colSpan={3} className={cell}>
+                  Term
                 </th>
                 <th rowSpan={2} className={cell}>
                   Final Rating
@@ -132,8 +132,8 @@ export default async function ReportCardPage({
                 </th>
               </tr>
               <tr className="bg-slate-100">
-                {[1, 2, 3, 4].map((n) => (
-                  <th key={n} className={`${cell} w-14`}>
+                {[1, 2, 3].map((n) => (
+                  <th key={n} className={`${cell} w-16`}>
                     {n}
                   </th>
                 ))}
@@ -153,11 +153,20 @@ export default async function ReportCardPage({
                       </span>
                     ))}
                   </td>
-                  {row.quarters.map((grade, i) => (
-                    <td key={i} className={cell}>
-                      {grade ?? ""}
+                  {row.singleTerm ? (
+                    <td colSpan={3} className={cell}>
+                      {row.terms[0] ?? ""}
+                      <span className="block text-[10px] text-slate-500">
+                        One term only
+                      </span>
                     </td>
-                  ))}
+                  ) : (
+                    row.terms.map((grade, i) => (
+                      <td key={i} className={cell}>
+                        {grade ?? ""}
+                      </td>
+                    ))
+                  )}
                   <td className={`${cell} font-bold`}>{row.final ?? ""}</td>
                   <td
                     className={`${cell} ${row.remarks === "Failed" ? "font-bold text-rose-700" : ""}`}
@@ -167,7 +176,7 @@ export default async function ReportCardPage({
                 </tr>
               ))}
               <tr className="bg-slate-50">
-                <td colSpan={5} className={`${cell} text-right font-bold`}>
+                <td colSpan={4} className={`${cell} text-right font-bold`}>
                   General Average
                 </td>
                 <td className={`${cell} font-extrabold`}>
@@ -228,11 +237,12 @@ export default async function ReportCardPage({
         <p className="mt-5 text-[10px] leading-relaxed text-slate-500">
           Grades are computed from released scores in Momo using DepEd Order No.
           8, s. 2015 (Written Work, Performance Tasks and Quarterly Assessment,
-          then transmuted). Quarters: Q1 {day(q[0]!)}–{day(q[1]!)}, Q2{" "}
-          {day(q[1]!)}–{day(q[2]!)}, Q3 {day(q[2]!)}–{day(q[3]!)}, Q4{" "}
-          {day(q[3]!)}–{day(q[4]!)}. Blank cells mean no graded work yet
+          then transmuted). Terms: Term 1 {day(q[0]!)}–{day(q[1]!)}, Term 2{" "}
+          {day(q[1]!)}–{day(q[2]!)}, Term 3 {day(q[2]!)}–{day(q[3]!)}. TLE is a
+          one-term subject, so all its work makes one grade. Blank cells mean no
+          graded work yet
           {card.juniorHigh ? " or a subject not taught in Momo" : ""}. The final
-          rating and general average appear once every quarter has a grade.
+          rating and general average appear once every term has a grade.
         </p>
       </div>
     </div>

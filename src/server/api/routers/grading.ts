@@ -7,8 +7,9 @@ import {
   LEARNING_AREAS,
   componentOf,
   learningAreaOf,
-  quarterGrade,
-  quarterOf,
+  isSingleTerm,
+  termGrade,
+  termOf,
   type LearningArea,
   type ScoredItem,
 } from "~/server/lib/deped";
@@ -585,7 +586,7 @@ export const gradingRouter = createTRPCRouter({
 
   /**
    * A student's DepEd report card (SF9): one row per learning area with the
-   * four quarter grades, final rating and remarks. Classes in the same
+   * three term grades (one grade for TLE, a one-term subject), final rating and remarks. Classes in the same
    * learning area (two TLE classes, say) count as one subject.
    */
   reportCard: teacherProcedure
@@ -664,7 +665,7 @@ export const gradingRouter = createTRPCRouter({
         area: LearningArea | null;
         name: string;
         classes: string[];
-        items: Record<1 | 2 | 3 | 4, ScoredItem[]>;
+        items: Record<1 | 2 | 3, ScoredItem[]>;
       };
       const subjects = new Map<string, Subject>();
       for (const { section } of student.enrollments) {
@@ -679,7 +680,7 @@ export const gradingRouter = createTRPCRouter({
               ? (LEARNING_AREAS.find((a) => a.id === area)?.name ?? key)
               : section.course.name,
             classes: [],
-            items: { 1: [], 2: [], 3: [], 4: [] },
+            items: { 1: [], 2: [], 3: [] },
           };
           subjects.set(key, subject);
         }
@@ -699,12 +700,11 @@ export const gradingRouter = createTRPCRouter({
             score = submission.grade.score;
           }
           if (score === null || assignment.pointsPossible <= 0) continue;
-          const quarter = quarterOf(
-            assignment.dueAt,
-            term.startDate,
-            term.endDate,
-          );
-          subject.items[quarter].push({
+          // A one-term subject (TLE) puts all its work toward one grade.
+          const termNo = isSingleTerm(area)
+            ? 1
+            : termOf(assignment.dueAt, term.startDate, term.endDate);
+          subject.items[termNo].push({
             component: componentOf(assignment),
             score,
             possible: assignment.pointsPossible,
@@ -717,12 +717,17 @@ export const gradingRouter = createTRPCRouter({
         name: string,
         key: string,
       ) => {
-        const quarters = ([1, 2, 3, 4] as const).map((q) =>
-          subject ? quarterGrade(subject.area, subject.items[q]) : null,
-        );
-        const final = quarters.every((q) => q !== null)
+        const area = subject?.area ?? (key as LearningArea);
+        const singleTerm = isSingleTerm(area);
+        const terms = singleTerm
+          ? [subject ? termGrade(subject.area, subject.items[1]) : null]
+          : ([1, 2, 3] as const).map((n) =>
+              subject ? termGrade(subject.area, subject.items[n]) : null,
+            );
+        const final = terms.every((g) => g !== null)
           ? Math.round(
-              quarters.reduce<number>((sum, q) => sum + (q ?? 0), 0) / 4,
+              terms.reduce<number>((sum, g) => sum + (g ?? 0), 0) /
+                terms.length,
             )
           : null;
         return {
@@ -730,7 +735,8 @@ export const gradingRouter = createTRPCRouter({
           name,
           inMomo: !!subject,
           classes: subject?.classes ?? [],
-          quarters,
+          singleTerm,
+          terms,
           final,
           remarks: final === null ? null : final >= 75 ? "Passed" : "Failed",
         };
@@ -771,9 +777,9 @@ export const gradingRouter = createTRPCRouter({
         },
         school: student.user.school,
         schoolYear: term.schoolYear,
-        /** First day of each quarter, then the last day of the year. */
-        quarterDates: [0, 1, 2, 3, 4].map(
-          (i) => new Date(term.startDate.getTime() + (span * i) / 4),
+        /** First day of each term, then the last day of the year. */
+        termDates: [0, 1, 2, 3].map(
+          (i) => new Date(term.startDate.getTime() + (span * i) / 3),
         ),
         juniorHigh,
         rows,

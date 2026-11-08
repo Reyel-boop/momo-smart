@@ -136,15 +136,20 @@ export const DESCRIPTORS = [
 ];
 
 /**
- * Quarter (1–4) a date falls in. The school year is split into four equal
- * parts between its start and end dates; work outside it is clamped.
+ * The school year has three terms. Term (1–3) a date falls in: the year is
+ * split into three equal parts between its start and end dates; work outside
+ * it is clamped.
  */
-export function quarterOf(date: Date, start: Date, end: Date): 1 | 2 | 3 | 4 {
+export const TERMS = 3;
+export function termOf(date: Date, start: Date, end: Date): 1 | 2 | 3 {
   const span = end.getTime() - start.getTime();
   if (span <= 0) return 1;
-  const part = Math.floor(((date.getTime() - start.getTime()) / span) * 4);
-  return (Math.min(3, Math.max(0, part)) + 1) as 1 | 2 | 3 | 4;
+  const part = Math.floor(((date.getTime() - start.getTime()) / span) * TERMS);
+  return (Math.min(TERMS - 1, Math.max(0, part)) + 1) as 1 | 2 | 3;
 }
+
+/** TLE is taken for one term only, so it has a single grade for the year. */
+export const isSingleTerm = (area: LearningArea | null) => area === "TLE";
 
 export type ScoredItem = {
   component: Component;
@@ -153,10 +158,10 @@ export type ScoredItem = {
 };
 
 /**
- * One quarter's grade for a learning area from its scored work. A
+ * One term's grade for a learning area from its scored work. A
  * component with no work yet is left out and the others share its weight.
  */
-export function quarterGrade(
+export function termGrade(
   area: LearningArea | null,
   items: ScoredItem[],
 ): number | null {
