@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SectionPicker, type PickerSection } from "./section-picker";
 
 /** Consistent title block across the student and teacher sub-pages. */
 export function PageHeader({
@@ -29,42 +29,12 @@ export function PageHeader({
   );
 }
 
-/** Pill row used to switch the page between the teacher's sections. */
-export function SectionTabs({
-  sections,
-  activeId,
-  basePath,
-  allLabel,
-}: {
-  sections: Array<{ id: string; label: string }>;
+/** Dropdown used to switch the page between the teacher's sections. */
+export function SectionTabs(props: {
+  sections: PickerSection[];
   activeId: string | null;
   basePath: string;
   allLabel?: string;
 }) {
-  const tab = (href: string, label: string, active: boolean) => (
-    <Link
-      key={href}
-      href={href}
-      className={`rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition ${
-        active
-          ? "bg-navy text-white"
-          : "border-line bg-surface text-ink hover:bg-canvas border"
-      }`}
-    >
-      {label}
-    </Link>
-  );
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {allLabel && tab(basePath, allLabel, activeId === null)}
-      {sections.map((section) =>
-        tab(
-          `${basePath}?section=${section.id}`,
-          section.label,
-          activeId === section.id,
-        ),
-      )}
-    </div>
-  );
+  return <SectionPicker {...props} />;
 }

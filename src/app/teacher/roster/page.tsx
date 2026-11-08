@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { UsersIcon } from "~/app/_components/icons";
 import { PageHeader, SectionTabs } from "~/app/_components/page-header";
+import { subjectLabel } from "~/server/lib/deped";
 import {
   Avatar,
   Card,
@@ -71,7 +72,8 @@ export default async function RosterPage({
       <SectionTabs
         sections={sections.map((s) => ({
           id: s.id,
-          label: `${s.course.name} — ${s.code}`,
+          label: s.code,
+          group: subjectLabel({ code: s.course.code, name: s.course.name }),
         }))}
         activeId={activeId}
         basePath="/teacher/roster"

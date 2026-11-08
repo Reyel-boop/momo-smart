@@ -5,6 +5,7 @@ import { ClipboardIcon, PlusCircleIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
 import { humanise } from "~/app/_components/format";
 import { PageHeader, SectionTabs } from "~/app/_components/page-header";
+import { subjectLabel } from "~/server/lib/deped";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
 
 export const metadata: Metadata = { title: "Assignments · Momo Smart" };
@@ -81,7 +82,8 @@ export default async function AssignmentsPage({
       <SectionTabs
         sections={sections.map((s) => ({
           id: s.id,
-          label: `${s.course.code} — ${s.code}`,
+          label: s.code,
+          group: subjectLabel({ code: s.course.code, name: s.course.name }),
         }))}
         activeId={activeId}
         basePath="/teacher/assignments"

@@ -3,7 +3,7 @@ import { type Metadata } from "next";
 
 import { DownloadIcon, StarIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
-import { PageHeader } from "~/app/_components/page-header";
+import { PageHeader, SectionTabs } from "~/app/_components/page-header";
 import { subjectLabel } from "~/server/lib/deped";
 import {
   Avatar,
@@ -92,33 +92,10 @@ export default async function GradesPage({
   const active = sections.find((s) => s.id === sectionParam) ?? sections[0]!;
   const gradebook = await api.grading.gradebook({ sectionId: active.id });
 
-  // Classes grouped by subject ("TLE 10"), then by section within it.
-  const subjects: Array<{ label: string; sections: typeof sections }> = [];
-  for (const s of sections) {
-    const label = subjectLabel({ code: s.course.code, name: s.course.name });
-    const group = subjects.find((g) => g.label === label);
-    if (group) group.sections.push(s);
-    else subjects.push({ label, sections: [s] });
-  }
-  subjects.sort((a, b) =>
-    a.label.localeCompare(b.label, undefined, { numeric: true }),
-  );
-  const activeSubject = subjects.find((g) =>
-    g.sections.some((s) => s.id === active.id),
-  )!;
-  const tab = (href: string, label: string, on: boolean, big = false) => (
-    <Link
-      key={href}
-      href={href}
-      className={`rounded-xl whitespace-nowrap transition ${big ? "px-4 py-2 text-sm font-bold" : "px-3.5 py-2 text-xs font-semibold"} ${
-        on
-          ? "bg-navy text-white"
-          : "border-line bg-surface text-ink hover:bg-canvas border"
-      }`}
-    >
-      {label}
-    </Link>
-  );
+  const activeSubject = subjectLabel({
+    code: active.course.code,
+    name: active.course.name,
+  });
 
   const graded = gradebook.rows.filter((row) => row.currentPercent !== null);
   const average =
@@ -134,7 +111,7 @@ export default async function GradesPage({
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageHeader
         title="Grades"
-        subtitle={`${activeSubject.label} — ${active.code} (${active.course.name}) • ${gradebook.rows.length} students • ${gradebook.assignments.length} published assignments${average !== null ? ` • class average ${average}%` : ""}.`}
+        subtitle={`${activeSubject} — ${active.code} (${active.course.name}) • ${gradebook.rows.length} students • ${gradebook.assignments.length} published assignments${average !== null ? ` • class average ${average}%` : ""}.`}
         action={
           <Link
             href={`/teacher/grades/export?section=${active.id}`}
@@ -147,29 +124,15 @@ export default async function GradesPage({
         }
       />
 
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-muted mr-1 text-[11px] font-bold tracking-wider uppercase">
-            Subject
-          </span>
-          {subjects.map((g) =>
-            tab(
-              `/teacher/grades?section=${g.sections[0]!.id}`,
-              g.label,
-              g === activeSubject,
-              true,
-            ),
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-muted mr-1 text-[11px] font-bold tracking-wider uppercase">
-            Section
-          </span>
-          {activeSubject.sections.map((s) =>
-            tab(`/teacher/grades?section=${s.id}`, s.code, s.id === active.id),
-          )}
-        </div>
-      </div>
+      <SectionTabs
+        sections={sections.map((s) => ({
+          id: s.id,
+          label: s.code,
+          group: subjectLabel({ code: s.course.code, name: s.course.name }),
+        }))}
+        activeId={active.id}
+        basePath="/teacher/grades"
+      />
 
       <Card>
         <CardHeader

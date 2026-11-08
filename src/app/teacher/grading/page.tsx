@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import Link from "next/link";
 
 import { PageHeader, SectionTabs } from "~/app/_components/page-header";
+import { subjectLabel } from "~/server/lib/deped";
 import { api } from "~/trpc/server";
 import { GradingQueue } from "../_components/grading-queue";
 
@@ -60,7 +61,8 @@ export default async function GradingPage({
       <SectionTabs
         sections={sections.map((s) => ({
           id: s.id,
-          label: `${s.course.name} — ${s.code}`,
+          label: s.code,
+          group: subjectLabel({ code: s.course.code, name: s.course.name }),
         }))}
         activeId={sectionId ?? null}
         basePath="/teacher/grading"
