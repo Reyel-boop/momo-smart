@@ -53,7 +53,15 @@ export default async function ReportCardPage({
         >
           ← Back to Grades
         </Link>
-        <PrintButton />
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/teacher/students/${studentId}/record`}
+            className="border-line bg-surface text-ink hover:bg-canvas rounded-xl border px-4 py-2 text-sm font-bold transition"
+          >
+            Courses &amp; quizzes
+          </Link>
+          <PrintButton />
+        </div>
       </div>
 
       <div

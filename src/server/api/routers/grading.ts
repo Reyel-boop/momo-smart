@@ -8,6 +8,7 @@ import {
   componentOf,
   learningAreaOf,
   isSingleTerm,
+  subjectLabel,
   termGrade,
   termOf,
   type LearningArea,
@@ -792,6 +793,300 @@ export const gradingRouter = createTRPCRouter({
         juniorHigh,
         rows,
         generalAverage,
+      };
+    }),
+
+  /**
+   * A student's record: every course they have taken, in every school
+   * year, with the quizzes they took in each (Unit Questions, quiz and
+   * exam assignments, Live Quizzes), plus their CB-NAT Review tries.
+   */
+  studentRecord: teacherProcedure
+    .input(z.object({ studentId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      await assertStudentAccess(ctx.db, ctx.session.user, input.studentId);
+      const studentId = input.studentId;
+
+      const student = await ctx.db.studentProfile.findUnique({
+        where: { id: studentId },
+        select: {
+          id: true,
+          studentNumber: true,
+          gradeLevel: true,
+          homeroom: true,
+          section: { select: { name: true } },
+          user: { select: { name: true } },
+          enrollments: {
+            select: {
+              id: true,
+              status: true,
+              enrolledAt: true,
+              droppedAt: true,
+              section: {
+                select: {
+                  id: true,
+                  code: true,
+                  term: {
+                    select: {
+                      id: true,
+                      name: true,
+                      schoolYear: true,
+                      startDate: true,
+                      isCurrent: true,
+                    },
+                  },
+                  course: {
+                    select: {
+                      code: true,
+                      name: true,
+                      department: { select: { code: true } },
+                    },
+                  },
+                  teacher: {
+                    select: { user: { select: { name: true, title: true } } },
+                  },
+                  assessments: {
+                    where: {
+                      unitId: { not: null },
+                      assignmentId: null,
+                      publishedAt: { not: null },
+                    },
+                    select: {
+                      id: true,
+                      title: true,
+                      totalPoints: true,
+                      unit: { select: { order: true, title: true } },
+                      attempts: {
+                        where: { studentId },
+                        orderBy: { attempt: "asc" },
+                        select: {
+                          status: true,
+                          totalScore: true,
+                          autoScore: true,
+                          startedAt: true,
+                          submittedAt: true,
+                        },
+                      },
+                    },
+                  },
+                  assignments: {
+                    where: {
+                      publishedAt: { not: null },
+                      OR: [
+                        { type: { in: ["QUIZ", "EXAM"] } },
+                        { assessment: { isNot: null } },
+                      ],
+                    },
+                    orderBy: { dueAt: "asc" },
+                    select: {
+                      id: true,
+                      title: true,
+                      type: true,
+                      pointsPossible: true,
+                      dueAt: true,
+                      submissions: {
+                        where: { studentId },
+                        orderBy: { attempt: "desc" },
+                        take: 1,
+                        select: {
+                          status: true,
+                          submittedAt: true,
+                          grade: { select: { score: true, status: true } },
+                        },
+                      },
+                    },
+                  },
+                  liveGames: {
+                    where: { players: { some: { studentId } } },
+                    orderBy: { createdAt: "asc" },
+                    select: {
+                      id: true,
+                      createdAt: true,
+                      assessment: { select: { title: true } },
+                      players: { select: { studentId: true, score: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          natAttempts: {
+            where: { status: { not: "IN_PROGRESS" } },
+            orderBy: { startedAt: "asc" },
+            select: {
+              id: true,
+              attempt: true,
+              score: true,
+              submittedAt: true,
+              startedAt: true,
+              test: {
+                select: {
+                  title: true,
+                  subject: true,
+                  _count: { select: { questions: true } },
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!student) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Student not found.",
+        });
+      }
+
+      type QuizRow = {
+        key: string;
+        title: string;
+        kind: "UNIT" | "QUIZ" | "EXAM" | "LIVE";
+        date: Date;
+        score: number | null;
+        possible: number | null;
+        /** Short note, e.g. "2 tries", "Not checked yet", "Place 3 of 25". */
+        note: string | null;
+        state: "DONE" | "PENDING" | "MISSING" | "IN_PROGRESS" | "EXCUSED";
+      };
+      const now = new Date();
+
+      const courses = student.enrollments.map((enrollment) => {
+        const { section } = enrollment;
+        const quizzes: QuizRow[] = [];
+
+        // Unit Questions: the best finished try counts.
+        for (const assessment of section.assessments) {
+          const [first] = assessment.attempts;
+          if (!first) continue;
+          const scoreOf = (a: typeof first) => a.totalScore ?? a.autoScore ?? 0;
+          let best: typeof first | null = null;
+          for (const a of assessment.attempts) {
+            if (a.status !== "GRADED" && a.status !== "SUBMITTED") continue;
+            if (!best || scoreOf(a) > scoreOf(best)) best = a;
+          }
+          const tries = assessment.attempts.length;
+          quizzes.push({
+            key: `unit-${assessment.id}`,
+            title: !assessment.unit
+              ? assessment.title
+              : /^unit\s/i.test(assessment.unit.title)
+                ? assessment.unit.title
+                : `Unit ${assessment.unit.order}: ${assessment.unit.title}`,
+            kind: "UNIT",
+            date: best?.submittedAt ?? first.startedAt,
+            score: best ? round(scoreOf(best)) : null,
+            possible: assessment.totalPoints,
+            note: tries > 1 ? `${tries} tries` : null,
+            state: best ? "DONE" : "IN_PROGRESS",
+          });
+        }
+
+        // Quiz and exam assignments, scored once the grade is released.
+        for (const assignment of section.assignments) {
+          const submission = assignment.submissions[0];
+          const grade = submission?.grade;
+          const releasedScore =
+            grade?.status === "RELEASED" ? grade.score : null;
+          const state: QuizRow["state"] =
+            submission?.status === "EXCUSED"
+              ? "EXCUSED"
+              : releasedScore !== null
+                ? "DONE"
+                : submission?.status === "MISSING" ||
+                    (!submission && assignment.dueAt < now)
+                  ? "MISSING"
+                  : "PENDING";
+          quizzes.push({
+            key: `asg-${assignment.id}`,
+            title: assignment.title,
+            kind: assignment.type === "EXAM" ? "EXAM" : "QUIZ",
+            date: submission?.submittedAt ?? assignment.dueAt,
+            score: state === "MISSING" ? 0 : releasedScore,
+            possible: assignment.pointsPossible,
+            note:
+              state === "PENDING"
+                ? submission
+                  ? "Not checked yet"
+                  : "Not yet submitted"
+                : null,
+            state,
+          });
+        }
+
+        // Live Quizzes: points earned and place in the class.
+        for (const game of section.liveGames) {
+          const me = game.players.find((p) => p.studentId === studentId);
+          if (!me) continue;
+          const place =
+            game.players.filter((p) => p.score > me.score).length + 1;
+          quizzes.push({
+            key: `live-${game.id}`,
+            title: `Live Quiz — ${game.assessment.title}`,
+            kind: "LIVE",
+            date: game.createdAt,
+            score: me.score,
+            possible: null,
+            note: `Place ${place} of ${game.players.length}`,
+            state: "DONE",
+          });
+        }
+
+        quizzes.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        let sum = 0;
+        let counted = 0;
+        for (const q of quizzes) {
+          if (q.score === null || !q.possible) continue;
+          sum += q.score / q.possible;
+          counted += 1;
+        }
+
+        const teacher = section.teacher.user;
+        return {
+          enrollmentId: enrollment.id,
+          subject: subjectLabel(section.course),
+          courseName: section.course.name,
+          sectionCode: section.code,
+          teacher: [teacher.title, teacher.name].filter(Boolean).join(" "),
+          term: section.term,
+          status: enrollment.status,
+          enrolledAt: enrollment.enrolledAt,
+          droppedAt: enrollment.droppedAt,
+          unitSets: section.assessments.length,
+          unitSetsTaken: section.assessments.filter(
+            (a) => a.attempts.length > 0,
+          ).length,
+          quizAverage: counted > 0 ? round((sum / counted) * 100) : null,
+          quizzes,
+        };
+      });
+
+      // Newest school year first; within a year, by subject.
+      courses.sort(
+        (a, b) =>
+          b.term.startDate.getTime() - a.term.startDate.getTime() ||
+          a.subject.localeCompare(b.subject) ||
+          a.sectionCode.localeCompare(b.sectionCode),
+      );
+
+      return {
+        student: {
+          id: student.id,
+          name: student.user.name ?? "Student",
+          studentNumber: student.studentNumber,
+          gradeLevel: student.gradeLevel,
+          section: student.section?.name ?? student.homeroom ?? null,
+        },
+        courses,
+        nat: student.natAttempts.map((a) => ({
+          id: a.id,
+          test: a.test.title,
+          subject: a.test.subject,
+          attempt: a.attempt,
+          score: a.score,
+          possible: a.test._count.questions,
+          date: a.submittedAt ?? a.startedAt,
+        })),
       };
     }),
 });

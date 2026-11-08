@@ -182,23 +182,33 @@ export default async function GradesPage({
                       scope="row"
                       className="bg-surface sticky left-0 z-10 px-5 py-3 text-left font-normal"
                     >
-                      <Link
-                        href={`/teacher/grades/student/${row.student.id}?section=${active.id}`}
-                        className="group flex items-center gap-3"
-                      >
+                      <div className="flex items-center gap-3">
                         <Avatar name={row.student.name} size="sm" />
                         <div className="min-w-0">
-                          <p className="text-ink group-hover:text-brand truncate text-sm font-bold group-hover:underline">
+                          <Link
+                            href={`/teacher/grades/student/${row.student.id}?section=${active.id}`}
+                            className="text-ink hover:text-brand block truncate text-sm font-bold hover:underline"
+                          >
                             {row.student.name}
-                          </p>
-                          <p className="text-muted text-xs">
+                          </Link>
+                          <p className="text-muted text-xs whitespace-nowrap">
                             #{row.student.studentNumber} ·{" "}
-                            <span className="text-brand font-semibold">
+                            <Link
+                              href={`/teacher/grades/student/${row.student.id}?section=${active.id}`}
+                              className="text-brand font-semibold hover:underline"
+                            >
                               Report card
-                            </span>
+                            </Link>{" "}
+                            ·{" "}
+                            <Link
+                              href={`/teacher/students/${row.student.id}/record`}
+                              className="text-brand font-semibold hover:underline"
+                            >
+                              Record
+                            </Link>
                           </p>
                         </div>
-                      </Link>
+                      </div>
                     </th>
                     <td className="px-4 py-3">
                       {row.currentPercent === null ? (

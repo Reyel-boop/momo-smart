@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { type Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { humanise, longDate } from "~/app/_components/format";
@@ -45,11 +46,25 @@ export default async function StudentProfilePage({
         title={name}
         subtitle={`${student.studentNumber} · Grade ${student.gradeLevel}${student.cumulativeGpa != null ? ` · GPA ${student.cumulativeGpa.toFixed(2)}` : ""}`}
         action={
-          <NewMessage
-            contacts={[{ id: student.user.id, name }]}
-            basePath="/teacher/messages"
-            label={`Message ${name.split(" ")[0]}`}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/teacher/students/${studentId}/record`}
+              className="bg-navy hover:bg-navy-deep rounded-xl px-4 py-2.5 text-sm font-bold text-white transition"
+            >
+              Courses &amp; quizzes
+            </Link>
+            <Link
+              href={`/teacher/grades/student/${studentId}`}
+              className="border-line bg-surface text-ink hover:bg-canvas rounded-xl border px-4 py-2.5 text-sm font-bold transition"
+            >
+              Report card
+            </Link>
+            <NewMessage
+              contacts={[{ id: student.user.id, name }]}
+              basePath="/teacher/messages"
+              label={`Message ${name.split(" ")[0]}`}
+            />
+          </div>
         }
       />
 

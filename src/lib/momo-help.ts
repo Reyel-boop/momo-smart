@@ -411,6 +411,27 @@ export const HELP: HelpEntry[] = [
     ],
   },
   {
+    id: "t-student-record",
+    roles: T,
+    question: "Where can I see a student's courses and quizzes?",
+    answer:
+      "Open Grades and tap “Record” under the student's name, or open the student from your Roster and tap “Courses & quizzes”. It lists every course the student has taken, by school year, with each quiz: Unit Questions, quiz and exam assignments, Live Quizzes and CB-NAT tries, plus their scores.",
+    link: { label: "Open Grades", href: "/teacher/grades" },
+    keywords: [
+      "record",
+      "student record",
+      "history",
+      "courses taken",
+      "quizzes",
+      "quiz",
+      "quiz scores",
+      "taken",
+      "previous",
+      "past",
+      "kasaysayan",
+    ],
+  },
+  {
     id: "t-export",
     roles: T,
     question: "How do I export grades?",
