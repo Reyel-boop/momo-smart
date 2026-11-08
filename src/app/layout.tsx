@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { OLD_BROWSER_SCRIPT } from "~/app/_components/old-browsers";
 import { ServiceWorker } from "~/app/_components/service-worker";
+import { UpdateBar } from "~/app/_components/update-bar";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <ServiceWorker />
+        <UpdateBar version={process.env.VERCEL_DEPLOYMENT_ID ?? "dev"} />
       </body>
     </html>
   );
