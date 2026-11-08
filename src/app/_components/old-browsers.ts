@@ -66,6 +66,12 @@ export const OLD_BROWSER_SCRIPT = `(function () {
     });
   });
   def(window, "queueMicrotask", function (f) { Promise.resolve().then(f); });
+  // React checks form data against these when a form is sent (sign-in, for
+  // one); without them iOS 12 throws "Can't find variable: BigInt64Array".
+  // Stand-ins let the "is it one of these?" check simply answer no.
+  ["BigInt64Array", "BigUint64Array"].forEach(function (name) {
+    def(window, name, function () { throw new TypeError(name + " is not supported"); });
+  });
   def(window, "structuredClone", function (v) { return v === undefined ? v : JSON.parse(JSON.stringify(v)); });
   if (window.crypto && window.crypto.getRandomValues) {
     def(window.crypto, "randomUUID", function () {
