@@ -17,6 +17,7 @@ import { LAB_LEVELS } from "./lab-sorter";
 import { LAVA_LEVELS } from "./lava-climb";
 import { MATH_LEVELS } from "./number-rush";
 import { SALITA_LEVELS } from "./salita-sprint";
+import { SPEAK_LEVELS } from "./speak-up";
 import { TAMA_LEVELS } from "./tama-o-mali";
 import { SPRINT_LEVELS } from "./tag-sprint";
 import { TICKET_LEVELS } from "./ticket-rush";
@@ -82,6 +83,14 @@ export const GAMES = {
     course: "Telecommunications",
     forCourse: isTEL,
     levels: CALL_LEVELS,
+  },
+  speak: {
+    title: "Speak Up!",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: SPEAK_LEVELS,
+    /** Each category's Speech Tests and Voice Calls open on their own. */
+    openUnits: true,
   },
   ticket: {
     title: "Ticket Rush",
@@ -352,6 +361,8 @@ export const GAMES = {
     course: string;
     forCourse: (code: string) => boolean;
     levels: readonly CatalogLevel[];
+    /** Each unit's first level (of each kind) is open, not only the first. */
+    openUnits?: boolean;
   }
 >;
 

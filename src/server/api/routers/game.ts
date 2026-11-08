@@ -30,6 +30,7 @@ import {
   replay,
 } from "~/lib/games/quest";
 import { SALITA_LEVELS } from "~/lib/games/salita-sprint";
+import { itemsOf, scoreSpeak, SPEAK_LEVELS } from "~/lib/games/speak-up";
 import { scoreSort } from "~/lib/games/sort";
 import { scoreSpeed } from "~/lib/games/speed";
 import { scoreTama, TAMA_LEVELS } from "~/lib/games/tama-o-mali";
@@ -95,7 +96,21 @@ function isUnlocked(
   const levels = GAMES[game].levels;
   const index = levels.findIndex((l) => l.id === levelId);
   if (index < 0) return false;
-  return index === 0 || (done.get(levels[index - 1]!.id)?.stars ?? 0) > 0;
+  if (index === 0) return true;
+  const before = levels[index - 1]!;
+  const meta = GAMES[game];
+  const openUnits = "openUnits" in meta && meta.openUnits;
+  // With open units, each unit's first level of each kind starts open
+  // (Speak Up!: every category's first Speech Test and first Voice Call).
+  const kindOf = (l: object) => ("kind" in l ? String(l.kind) : "");
+  const level = levels[index]!;
+  if (
+    openUnits &&
+    (before.unit !== level.unit || kindOf(before) !== kindOf(level))
+  ) {
+    return true;
+  }
+  return (done.get(before.id)?.stars ?? 0) > 0;
 }
 
 export async function assertPlayable(
@@ -257,6 +272,38 @@ export const gameRouter = createTRPCRouter({
               ctx.db,
               ctx.studentId,
               "call",
+              input.levelId,
+              result.stars,
+              result.percent,
+            )
+          : { best: 0, newStars: 0 };
+      return { ...result, ...saved };
+    }),
+
+  /** Speak Up!: what the microphone heard for each line or call step. */
+  finishSpeak: studentProcedure
+    .input(
+      z.object({
+        levelId: z.string(),
+        heard: z.array(z.string().max(1000)).max(12),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, "speak", input.levelId);
+      const level = SPEAK_LEVELS.find((l) => l.id === input.levelId)!;
+      if (input.heard.length !== itemsOf(level)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Say every line first.",
+        });
+      }
+      const result = scoreSpeak(level, input.heard);
+      const saved =
+        result.stars > 0
+          ? await saveBest(
+              ctx.db,
+              ctx.studentId,
+              "speak",
               input.levelId,
               result.stars,
               result.percent,

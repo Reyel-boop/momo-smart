@@ -15,6 +15,9 @@ export const dynamic = "force-dynamic";
 /** The Block Run race stays hidden until it has passed its test. */
 const RACE_OPEN = false as boolean;
 
+/** Games whose units are difficulty levels, shown without "Unit N". */
+const UNIT_IS_LEVEL = new Set<GameId>(["speak"]);
+
 /** Block Run looks the same in every subject. */
 const RUN_LOOK = {
   href: "/student/games/run",
@@ -70,6 +73,13 @@ const LOOK = {
       "Take customer calls: choose what to say at each step, keep the customer happy and finish on time.",
     banner: "from-emerald-600 to-teal-700",
     emoji: "☎",
+  },
+  speak: {
+    href: "/student/games/speak",
+    blurb:
+      "Talk like a real agent, out loud: 🎤 Speech Tests (read each line clearly) and 📞 Voice Calls (answer the customer with your voice). Easy, Middle Level and Difficult.",
+    banner: "from-emerald-500 to-sky-700",
+    emoji: "🎤",
   },
   ticket: {
     href: "/student/games/ticket",
@@ -294,7 +304,9 @@ export default async function GamesPage() {
               const levels = g.levels.filter((l) => l.unit === unit);
               return {
                 key: String(unit),
-                label: `Unit ${unit} · ${levels[0]!.unitTitle}`,
+                label: UNIT_IS_LEVEL.has(g.game)
+                  ? levels[0]!.unitTitle
+                  : `Unit ${unit} · ${levels[0]!.unitTitle}`,
                 levels,
               };
             });
