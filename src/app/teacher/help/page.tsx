@@ -31,7 +31,7 @@ const TOPICS: HelpTopic[] = [
   {
     question: "How do Unit Questions work for students?",
     answer:
-      "Students answer five questions per unit, one at a time, with 2 minutes each. The server keeps the clock, so reloading doesn't reset it. Every answer shows the student the correct answer and the rationale. They get two tries and the best score counts. On Courses, each unit shows its questions, answer key and each section's results — including how often students left the quiz screen.",
+      "Students answer five questions per unit, one at a time, with 30 seconds each (CB-NAT Review keeps 2 minutes). The server keeps the clock, so reloading doesn't reset it. Every answer shows the student the correct answer and the rationale. They get two tries and the best score counts. On Courses, each unit shows its questions, answer key and each section's results — including how often students left the quiz screen.",
   },
   {
     question: "How do I create an assignment?",

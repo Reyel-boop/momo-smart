@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { DemoBanner } from "~/app/_components/demo-banner";
 import { env } from "~/env";
+import { MomoChat } from "~/app/_components/momo-chat";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
 import { isDemoEmail } from "~/server/demo/accounts";
@@ -64,6 +65,14 @@ export default async function TeacherLayout({
         />
         <main className="min-w-0 flex-1 px-5 py-6 lg:px-8">{children}</main>
       </div>
+      <MomoChat
+        role="TEACHER"
+        firstName={
+          me.title
+            ? `${me.title} ${(me.name ?? "").split(" ").pop()}`
+            : (me.name ?? "").split(" ")[0]
+        }
+      />
     </div>
   );
 }

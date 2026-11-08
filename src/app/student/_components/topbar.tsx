@@ -23,7 +23,7 @@ export function Topbar({
   return (
     <header className="border-line bg-surface/90 sticky top-0 z-10 border-b backdrop-blur">
       <div className="flex items-center gap-4 py-3 pr-5 pl-16 lg:pl-5">
-        <span className="text-ink shrink-0 px-2 py-1.5 text-sm font-bold">
+        <span className="text-ink min-w-0 truncate px-2 py-1.5 text-sm font-bold">
           {termName}
         </span>
 

@@ -46,7 +46,7 @@ export function UpdateBar({ version }: { version: string }) {
     <button
       type="button"
       onClick={() => window.location.reload()}
-      className="bg-navy fixed bottom-4 left-1/2 z-[100] rounded-full px-5 py-3 text-sm font-bold whitespace-nowrap text-white shadow-lg"
+      className="bg-navy fixed top-4 left-1/2 z-[100] rounded-full px-5 py-3 text-sm font-bold whitespace-nowrap text-white shadow-lg"
       style={{ transform: "translateX(-50%)" }}
     >
       ✨ Momo was updated — tap to refresh
