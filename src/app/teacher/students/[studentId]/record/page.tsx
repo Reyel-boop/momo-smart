@@ -24,14 +24,12 @@ const day = (date: Date) =>
   });
 
 const KIND_LABEL: Record<Quiz["kind"], string> = {
-  UNIT: "Unit Questions",
   QUIZ: "Quiz",
   EXAM: "Exam",
   LIVE: "Live Quiz",
 };
 
 const KIND_TONE = {
-  UNIT: "blue",
   QUIZ: "violet",
   EXAM: "rose",
   LIVE: "amber",
@@ -86,7 +84,7 @@ export default async function StudentRecordPage({
     year.courses.push(course);
   }
 
-  const allQuizzes = courses.flatMap((c) => c.quizzes);
+  const allQuizzes = courses.flatMap((c) => [...c.units, ...c.quizzes]);
   const taken = allQuizzes.filter((q) => q.state === "DONE").length;
   const scored = allQuizzes.filter(
     (q) => q.score !== null && q.possible && q.possible > 0,
@@ -283,71 +281,125 @@ function CourseCard({ course }: { course: Course }) {
         </div>
       </div>
 
-      {course.unitSets > 0 && (
-        <p className="text-muted bg-canvas/60 px-5 py-2 text-xs">
-          Unit Questions answered:{" "}
-          <span className="text-ink font-bold">
-            {course.unitSetsTaken} of {course.unitSets}
-          </span>{" "}
-          unit{course.unitSets === 1 ? "" : "s"}
-        </p>
-      )}
+      <div className="divide-line grid divide-y md:grid-cols-2 md:divide-x md:divide-y-0">
+        {/* Column 1: Unit Questions checklist */}
+        <div>
+          <div className="bg-canvas/60 flex items-center justify-between gap-2 px-5 py-2">
+            <p className="text-ink text-xs font-extrabold tracking-wide uppercase">
+              Unit Questions
+            </p>
+            {course.units.length > 0 && (
+              <p className="text-muted text-xs">
+                <span className="text-ink font-bold">
+                  {course.unitsDone} of {course.units.length}
+                </span>{" "}
+                answered
+              </p>
+            )}
+          </div>
+          {course.units.length === 0 ? (
+            <p className="text-muted px-5 py-4 text-sm">
+              No Unit Questions in this course.
+            </p>
+          ) : (
+            <ul className="divide-line divide-y">
+              {course.units.map((unit) => (
+                <li
+                  key={unit.key}
+                  className="flex items-center gap-3 px-5 py-2.5"
+                >
+                  <span
+                    aria-label={
+                      unit.state === "DONE"
+                        ? "Answered"
+                        : unit.state === "IN_PROGRESS"
+                          ? "Started, not finished"
+                          : "Not answered"
+                    }
+                    className={`flex size-6 shrink-0 items-center justify-center rounded-md border-2 text-sm font-extrabold ${
+                      unit.state === "DONE"
+                        ? "border-emerald-600 bg-emerald-600 text-white"
+                        : unit.state === "IN_PROGRESS"
+                          ? "border-amber-400 bg-amber-50 text-amber-600"
+                          : "border-slate-300 bg-white text-transparent"
+                    }`}
+                  >
+                    {unit.state === "DONE"
+                      ? "✓"
+                      : unit.state === "IN_PROGRESS"
+                        ? "…"
+                        : ""}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`text-sm font-semibold ${unit.state === "DONE" ? "text-ink" : "text-muted"}`}
+                    >
+                      {unit.title}
+                    </p>
+                    <p className="text-muted text-xs">
+                      {unit.state === "DONE"
+                        ? `${unit.date ? day(unit.date) : ""}${unit.tries > 1 ? ` · ${unit.tries} tries` : ""}`
+                        : unit.state === "IN_PROGRESS"
+                          ? "Started, not finished"
+                          : "Not answered yet"}
+                    </p>
+                  </div>
+                  {unit.state === "DONE" && (
+                    <ScoreCell score={unit.score} possible={unit.possible} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      {course.quizzes.length === 0 ? (
-        <p className="text-muted px-5 py-4 text-sm">No quizzes taken yet.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-muted text-left text-xs font-bold">
-              <tr>
-                <th className="px-5 py-2">Quiz</th>
-                <th className="hidden px-3 py-2 sm:table-cell">Type</th>
-                <th className="hidden px-3 py-2 sm:table-cell">Date</th>
-                <th className="px-5 py-2 text-right">Score</th>
-              </tr>
-            </thead>
-            <tbody className="divide-line divide-y">
+        {/* Column 2: assignments and Live Quizzes */}
+        <div>
+          <div className="bg-canvas/60 px-5 py-2">
+            <p className="text-ink text-xs font-extrabold tracking-wide uppercase">
+              Assignments &amp; Live Quizzes
+            </p>
+          </div>
+          {course.quizzes.length === 0 ? (
+            <p className="text-muted px-5 py-4 text-sm">
+              No quiz assignments or Live Quizzes yet.
+            </p>
+          ) : (
+            <ul className="divide-line divide-y">
               {course.quizzes.map((quiz) => (
-                <tr key={quiz.key}>
-                  <td className="text-ink px-5 py-2.5">
-                    <p className="font-semibold">{quiz.title}</p>
-                    <p className="text-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:hidden">
+                <li
+                  key={quiz.key}
+                  className="flex items-center gap-3 px-5 py-2.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-ink text-sm font-semibold">
+                      {quiz.title}
+                    </p>
+                    <p className="text-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                       <Pill tone={KIND_TONE[quiz.kind]}>
                         {KIND_LABEL[quiz.kind]}
                       </Pill>
                       {day(quiz.date)}
+                      {quiz.note && <span>· {quiz.note}</span>}
                     </p>
-                    {quiz.note && (
-                      <p className="text-muted text-xs">{quiz.note}</p>
-                    )}
-                  </td>
-                  <td className="hidden px-3 py-2.5 sm:table-cell">
-                    <Pill tone={KIND_TONE[quiz.kind]}>
-                      {KIND_LABEL[quiz.kind]}
-                    </Pill>
-                  </td>
-                  <td className="text-muted hidden px-3 py-2.5 whitespace-nowrap sm:table-cell">
-                    {day(quiz.date)}
-                  </td>
-                  <td className="px-5 py-2.5 text-right">
+                  </div>
+                  <div className="shrink-0 text-right">
                     {quiz.state === "MISSING" ? (
                       <Pill tone="rose">Missing · 0</Pill>
                     ) : quiz.state === "EXCUSED" ? (
                       <Pill tone="slate">Excused</Pill>
-                    ) : quiz.state === "IN_PROGRESS" ? (
-                      <Pill tone="amber">Not finished</Pill>
                     ) : quiz.state === "PENDING" ? (
                       <Pill tone="slate">Pending</Pill>
                     ) : (
                       <ScoreCell score={quiz.score} possible={quiz.possible} />
                     )}
-                  </td>
-                </tr>
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          )}
         </div>
-      )}
+      </div>
     </Card>
   );
 }

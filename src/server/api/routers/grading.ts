@@ -940,13 +940,13 @@ export const gradingRouter = createTRPCRouter({
       type QuizRow = {
         key: string;
         title: string;
-        kind: "UNIT" | "QUIZ" | "EXAM" | "LIVE";
+        kind: "QUIZ" | "EXAM" | "LIVE";
         date: Date;
         score: number | null;
         possible: number | null;
         /** Short note, e.g. "2 tries", "Not checked yet", "Place 3 of 25". */
         note: string | null;
-        state: "DONE" | "PENDING" | "MISSING" | "IN_PROGRESS" | "EXCUSED";
+        state: "DONE" | "PENDING" | "MISSING" | "EXCUSED";
       };
       const now = new Date();
 
@@ -954,32 +954,37 @@ export const gradingRouter = createTRPCRouter({
         const { section } = enrollment;
         const quizzes: QuizRow[] = [];
 
-        // Unit Questions: the best finished try counts.
-        for (const assessment of section.assessments) {
-          const [first] = assessment.attempts;
-          if (!first) continue;
-          const scoreOf = (a: typeof first) => a.totalScore ?? a.autoScore ?? 0;
-          let best: typeof first | null = null;
-          for (const a of assessment.attempts) {
-            if (a.status !== "GRADED" && a.status !== "SUBMITTED") continue;
-            if (!best || scoreOf(a) > scoreOf(best)) best = a;
-          }
-          const tries = assessment.attempts.length;
-          quizzes.push({
-            key: `unit-${assessment.id}`,
-            title: !assessment.unit
-              ? assessment.title
-              : /^unit\s/i.test(assessment.unit.title)
-                ? assessment.unit.title
-                : `Unit ${assessment.unit.order}: ${assessment.unit.title}`,
-            kind: "UNIT",
-            date: best?.submittedAt ?? first.startedAt,
-            score: best ? round(scoreOf(best)) : null,
-            possible: assessment.totalPoints,
-            note: tries > 1 ? `${tries} tries` : null,
-            state: best ? "DONE" : "IN_PROGRESS",
+        // Unit Questions: every unit, checked once answered. The best
+        // finished try counts.
+        const units = [...section.assessments]
+          .sort((a, b) => (a.unit?.order ?? 0) - (b.unit?.order ?? 0))
+          .map((assessment) => {
+            const scoreOf = (a: (typeof assessment.attempts)[number]) =>
+              a.totalScore ?? a.autoScore ?? 0;
+            let best: (typeof assessment.attempts)[number] | null = null;
+            for (const a of assessment.attempts) {
+              if (a.status !== "GRADED" && a.status !== "SUBMITTED") continue;
+              if (!best || scoreOf(a) > scoreOf(best)) best = a;
+            }
+            return {
+              key: assessment.id,
+              order: assessment.unit?.order ?? null,
+              title: !assessment.unit
+                ? assessment.title
+                : /^unit\s/i.test(assessment.unit.title)
+                  ? assessment.unit.title
+                  : `Unit ${assessment.unit.order}: ${assessment.unit.title}`,
+              state: best
+                ? ("DONE" as const)
+                : assessment.attempts.length > 0
+                  ? ("IN_PROGRESS" as const)
+                  : ("NOT_TAKEN" as const),
+              date: best?.submittedAt ?? null,
+              score: best ? round(scoreOf(best)) : null,
+              possible: assessment.totalPoints,
+              tries: assessment.attempts.length,
+            };
           });
-        }
 
         // Quiz and exam assignments, scored once the grade is released.
         for (const assignment of section.assignments) {
@@ -1035,7 +1040,7 @@ export const gradingRouter = createTRPCRouter({
 
         let sum = 0;
         let counted = 0;
-        for (const q of quizzes) {
+        for (const q of [...units, ...quizzes]) {
           if (q.score === null || !q.possible) continue;
           sum += q.score / q.possible;
           counted += 1;
@@ -1052,11 +1057,9 @@ export const gradingRouter = createTRPCRouter({
           status: enrollment.status,
           enrolledAt: enrollment.enrolledAt,
           droppedAt: enrollment.droppedAt,
-          unitSets: section.assessments.length,
-          unitSetsTaken: section.assessments.filter(
-            (a) => a.attempts.length > 0,
-          ).length,
+          unitsDone: units.filter((u) => u.state === "DONE").length,
           quizAverage: counted > 0 ? round((sum / counted) * 100) : null,
+          units,
           quizzes,
         };
       });
