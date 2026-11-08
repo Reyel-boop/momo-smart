@@ -83,25 +83,19 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
     task.format === "TEXT_ENTRY" ||
     task.format === "EXTERNAL_LINK";
 
+  // Any one of these is enough: a typed answer, a file, or a link. Typing is
+  // always offered, whatever the teacher picked, so no one gets stuck.
+  const linkOk = isHttpUrl(externalUrl);
   const requirement =
-    task.format === "FILE_UPLOAD"
-      ? task.attachments.length > 0
-        ? null
-        : "Attach at least one file to submit."
-      : task.format === "TEXT_ENTRY"
-        ? textBody.trim()
-          ? null
-          : "Write your response to submit."
-        : task.format === "EXTERNAL_LINK"
-          ? isHttpUrl(externalUrl)
-            ? null
-            : "Add a valid https:// link to submit."
-          : null;
+    textBody.trim() || task.attachments.length > 0 || linkOk
+      ? null
+      : externalUrl.trim()
+        ? "That link doesn't look right. Type your answer in the box instead."
+        : "Type your answer in the box to submit.";
 
   const work = {
-    textBody: task.format === "TEXT_ENTRY" ? textBody : undefined,
-    externalUrl:
-      task.format === "EXTERNAL_LINK" && externalUrl ? externalUrl : undefined,
+    textBody: textBody.trim() ? textBody : undefined,
+    externalUrl: linkOk ? externalUrl : undefined,
   };
 
   const save = () =>
@@ -172,20 +166,13 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
           </div>
         )}
 
-        {task.format === "FILE_UPLOAD" && (
-          <FileDropzone
-            assignmentId={task.id}
-            submissionId={task.submissionId}
-            attachments={task.attachments}
-          />
-        )}
-        {task.format === "TEXT_ENTRY" && (
+        {online && (
           <div>
             <label
               htmlFor={`response-${task.id}`}
-              className="text-ink text-xs font-bold"
+              className="text-ink text-sm font-bold"
             >
-              Your response
+              ✏️ Type your answer here
             </label>
             <textarea
               id={`response-${task.id}`}
@@ -193,31 +180,51 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
               value={textBody}
               onChange={(event) => setTextBody(event.target.value)}
               maxLength={200_000}
-              className="border-line bg-canvas text-ink focus:border-brand focus:bg-surface focus:ring-brand/10 mt-2 w-full resize-y rounded-xl border px-3 py-2 text-sm transition outline-none focus:ring-4"
+              placeholder="Write your answer, then tap Submit."
+              className="border-line bg-canvas text-ink focus:border-brand focus:bg-surface focus:ring-brand/10 mt-2 w-full resize-y rounded-xl border px-3 py-2 text-base transition outline-none focus:ring-4"
             />
             <p className="text-muted mt-1 text-right text-[11px]">
               {textBody.trim() ? textBody.trim().split(/\s+/).length : 0} words
             </p>
           </div>
         )}
-        {task.format === "EXTERNAL_LINK" && (
-          <div>
-            <label
-              htmlFor={`link-${task.id}`}
-              className="text-ink text-xs font-bold"
-            >
-              Link to your work
-            </label>
-            <input
-              id={`link-${task.id}`}
-              type="url"
-              inputMode="url"
-              value={externalUrl}
-              onChange={(event) => setExternalUrl(event.target.value)}
-              placeholder="https://"
-              className="border-line bg-canvas text-ink focus:border-brand focus:bg-surface focus:ring-brand/10 mt-2 w-full rounded-xl border px-3 py-2.5 text-sm transition outline-none focus:ring-4"
-            />
-          </div>
+        {online && (
+          <details
+            className="border-line rounded-xl border px-4 py-3"
+            open={
+              task.format === "FILE_UPLOAD" ||
+              task.attachments.length > 0 ||
+              !!task.externalUrl
+            }
+          >
+            <summary className="text-ink cursor-pointer text-xs font-bold">
+              Optional: attach a file or a link
+            </summary>
+            <div className="mt-3 space-y-4">
+              <FileDropzone
+                assignmentId={task.id}
+                submissionId={task.submissionId}
+                attachments={task.attachments}
+              />
+              <div>
+                <label
+                  htmlFor={`link-${task.id}`}
+                  className="text-ink text-xs font-bold"
+                >
+                  Link to your work
+                </label>
+                <input
+                  id={`link-${task.id}`}
+                  type="url"
+                  inputMode="url"
+                  value={externalUrl}
+                  onChange={(event) => setExternalUrl(event.target.value)}
+                  placeholder="https://"
+                  className="border-line bg-canvas text-ink focus:border-brand focus:bg-surface focus:ring-brand/10 mt-2 w-full rounded-xl border px-3 py-2.5 text-sm transition outline-none focus:ring-4"
+                />
+              </div>
+            </div>
+          </details>
         )}
         {!online && (
           <p className="border-line bg-canvas/60 text-muted rounded-xl border px-4 py-3 text-xs">
@@ -277,16 +284,6 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
                 {notice}
               </p>
             )}
-            {task.format !== "FILE_UPLOAD" && (
-              <button
-                type="button"
-                onClick={save}
-                disabled={busy}
-                className="border-line text-ink hover:bg-canvas w-full rounded-xl border px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60"
-              >
-                {saving ? "Saving…" : "Save Draft"}
-              </button>
-            )}
             <button
               type="button"
               onClick={submit}
@@ -299,6 +296,14 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
                 : task.stars > 0
                   ? `Submit for ${task.stars} Stars`
                   : "Submit Assignment"}
+            </button>
+            <button
+              type="button"
+              onClick={save}
+              disabled={busy}
+              className="text-muted hover:text-ink w-full px-4 py-1.5 text-xs font-semibold transition disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Not finished? Save it for later"}
             </button>
             <p className="text-muted text-center text-[11px]">
               {requirement ??

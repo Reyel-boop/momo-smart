@@ -43,17 +43,13 @@ export function dueDescription(dueAt: Date, now: Date): string {
 
 function instructionsFor(assignment: MyAssignment, now: Date): string[] {
   const lines: string[] = [];
-  if (assignment.format === "FILE_UPLOAD") {
+  if (
+    assignment.format === "FILE_UPLOAD" ||
+    assignment.format === "TEXT_ENTRY" ||
+    assignment.format === "EXTERNAL_LINK"
+  ) {
     lines.push(
-      "Attach your work as one or more files — PDF, Word, PowerPoint, Excel, CSV, text or images.",
-    );
-  } else if (assignment.format === "TEXT_ENTRY") {
-    lines.push(
-      "Type your response below. You can save a draft and come back to it.",
-    );
-  } else if (assignment.format === "EXTERNAL_LINK") {
-    lines.push(
-      "Paste a link to your work and make sure your teacher can open it.",
+      "Type your answer in the box below, then tap Submit. Adding a file or a link is optional.",
     );
   }
   if (assignment.rubric) {

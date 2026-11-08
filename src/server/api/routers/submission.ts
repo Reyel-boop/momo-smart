@@ -218,24 +218,16 @@ export const submissionRouter = createTRPCRouter({
         });
       }
 
-      // Format-specific completeness checks.
-      const hasFiles = input.fileIds.length > 0;
-      if (assignment.format === "FILE_UPLOAD" && !hasFiles) {
+      // Any online hand-in is accepted as a typed answer, a file or a link,
+      // whatever format the teacher picked; it just can't be empty.
+      const hasWork =
+        input.fileIds.length > 0 ||
+        !!input.textBody?.trim() ||
+        !!input.externalUrl;
+      if (!hasWork) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "This assignment requires a file upload.",
-        });
-      }
-      if (assignment.format === "TEXT_ENTRY" && !input.textBody?.trim()) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "This assignment requires a text response.",
-        });
-      }
-      if (assignment.format === "EXTERNAL_LINK" && !input.externalUrl) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "This assignment requires a link.",
+          message: "Type your answer in the box before submitting.",
         });
       }
 
