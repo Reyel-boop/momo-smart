@@ -67,6 +67,13 @@ export default async function StudentAssignments({
     completed: completed.length,
   };
 
+  // Work the teacher checked in the last week, for the note at the top.
+  const recentlyChecked = completed.filter(
+    (a) =>
+      a.submission?.grade?.releasedAt &&
+      now.getTime() - a.submission.grade.releasedAt.getTime() <= WEEK_MS,
+  );
+
   const requestedTab = param(params.tab);
   const tab: Tab = TABS.some((t) => t.id === requestedTab)
     ? (requestedTab as Tab)
@@ -142,6 +149,27 @@ export default async function StudentAssignments({
           })}
         </nav>
       </div>
+
+      {recentlyChecked.length > 0 && tab !== "completed" && (
+        <Link
+          href="/student/assignments?tab=completed"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 transition hover:bg-emerald-100"
+        >
+          <span className="text-sm text-emerald-900">
+            <span className="font-extrabold">
+              ✅ Your teacher already checked your answer
+              {recentlyChecked.length === 1 ? "" : "s"}!
+            </span>{" "}
+            {recentlyChecked.length === 1
+              ? `"${recentlyChecked[0]!.title}" has a score now.`
+              : `${recentlyChecked.length} assignments have scores now.`}
+          </span>
+          <span className="inline-flex items-center gap-1 text-sm font-bold text-emerald-800">
+            See my score{recentlyChecked.length === 1 ? "" : "s"}
+            <ArrowRightIcon className="size-3.5" />
+          </span>
+        </Link>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-8">

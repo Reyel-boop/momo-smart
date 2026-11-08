@@ -130,11 +130,14 @@ export default async function AssignmentSubmissionsPage({
                           <Pill tone={timing.tone}>{timing.label}</Pill>
                         )}
                         {student.graded ? (
-                          <Pill tone="blue">
-                            {student.score ?? "–"}/{assignment.pointsPossible}
+                          <Pill tone="green">
+                            ✓ Released · {student.score ?? "–"}/
+                            {assignment.pointsPossible}
                           </Pill>
+                        ) : student.gradedNotReleased ? (
+                          <Pill tone="amber">Graded · not released</Pill>
                         ) : (
-                          <Pill tone="slate">To grade</Pill>
+                          <Pill tone="slate">Not checked yet</Pill>
                         )}
                       </span>
                     </Link>

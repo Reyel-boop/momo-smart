@@ -26,7 +26,7 @@ function statusOf(assignment: MyAssignment, urgency: DueUrgency): Status {
           ? " (grace period)"
           : "";
     return {
-      label: `Submitted ${submission.submittedAt ? shortDate(submission.submittedAt) : ""}${timing} — awaiting grade`,
+      label: `Submitted ${submission.submittedAt ? shortDate(submission.submittedAt) : ""}${timing} — waiting for your teacher to check`,
       text: "text-emerald-700",
       dot: "bg-emerald-500",
     };

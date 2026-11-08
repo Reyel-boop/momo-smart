@@ -452,6 +452,7 @@ export const assignmentRouter = createTRPCRouter({
                   submittedAt: submission.submittedAt,
                   timeliness: submission.timeliness,
                   graded: submission.grade?.status === "RELEASED",
+                  gradedNotReleased: submission.grade?.status === "COMPLETED",
                   score: submission.grade?.score ?? null,
                 },
               ]

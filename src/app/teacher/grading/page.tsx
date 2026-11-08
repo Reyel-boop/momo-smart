@@ -22,7 +22,12 @@ const PAGE_SIZE = 10;
 export default async function GradingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ section?: string; sort?: string; cursor?: string }>;
+  searchParams: Promise<{
+    section?: string;
+    sort?: string;
+    cursor?: string;
+    view?: string;
+  }>;
 }) {
   const params = await searchParams;
   const sections = await api.course.mySections();
@@ -31,11 +36,13 @@ export default async function GradingPage({
       ? params.section
       : undefined;
   const sort: Sort = SORTS.find((s) => s.id === params.sort)?.id ?? "OLDEST";
+  const view = params.view === "checked" ? "CHECKED" : "TODO";
 
   const [queue, summary] = await Promise.all([
     api.grading.queue({
       sectionId,
       sort,
+      view,
       cursor: params.cursor ?? null,
       limit: PAGE_SIZE,
     }),
@@ -44,7 +51,12 @@ export default async function GradingPage({
 
   const href = (extra: Record<string, string | undefined>) => {
     const query = new URLSearchParams();
-    const merged = { section: sectionId, sort, ...extra };
+    const merged = {
+      section: sectionId,
+      sort,
+      view: view === "CHECKED" ? "checked" : undefined,
+      ...extra,
+    };
     for (const [key, value] of Object.entries(merged)) {
       if (value) query.set(key, value);
     }
@@ -68,6 +80,27 @@ export default async function GradingPage({
         basePath="/teacher/grading"
         allLabel="All sections"
       />
+      <nav aria-label="Show" className="flex flex-wrap items-center gap-2">
+        {(
+          [
+            ["TODO", `Needs grading (${summary.total})`, undefined],
+            ["CHECKED", "✓ Already checked", "checked"],
+          ] as const
+        ).map(([id, label, value]) => (
+          <Link
+            key={id}
+            href={href({ view: value, cursor: undefined })}
+            aria-current={id === view ? "true" : undefined}
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+              id === view
+                ? "bg-navy text-white"
+                : "border-line bg-surface text-ink hover:bg-canvas border"
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
       <nav aria-label="Sort" className="flex flex-wrap items-center gap-2">
         <span className="text-muted text-xs font-semibold">Sort:</span>
         {SORTS.map((s) => (
@@ -87,6 +120,7 @@ export default async function GradingPage({
       </nav>
       <GradingQueue
         items={queue.items}
+        view={view}
         total={summary.total}
         sectionCount={summary.sections}
         nextHref={queue.nextCursor ? href({ cursor: queue.nextCursor }) : null}

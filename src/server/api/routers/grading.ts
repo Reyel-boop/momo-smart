@@ -38,6 +38,8 @@ export const gradingRouter = createTRPCRouter({
       z.object({
         sectionId: z.string().optional(),
         sort: z.enum(["OLDEST", "NEWEST", "DUE_DATE"]).default("OLDEST"),
+        /** TODO: still to grade. CHECKED: graded already (released or not). */
+        view: z.enum(["TODO", "CHECKED"]).default("TODO"),
         cursor: z.string().nullish(),
         limit: z.number().int().min(1).max(50).default(10),
       }),
@@ -56,11 +58,15 @@ export const gradingRouter = createTRPCRouter({
 
       const items = await ctx.db.submission.findMany({
         where: {
-          status: "SUBMITTED",
-          OR: [
-            { grade: null },
-            { grade: { status: { in: ["PENDING", "IN_PROGRESS"] } } },
-          ],
+          ...(input.view === "CHECKED"
+            ? { grade: { status: { in: ["COMPLETED", "RELEASED"] } } }
+            : {
+                status: "SUBMITTED",
+                OR: [
+                  { grade: null },
+                  { grade: { status: { in: ["PENDING", "IN_PROGRESS"] } } },
+                ],
+              }),
           assignment: {
             sectionId: input.sectionId,
             section: gradableSections(ctx.session.user, ctx.teacherId),
@@ -121,7 +127,9 @@ export const gradingRouter = createTRPCRouter({
               },
             },
           },
-          grade: { select: { id: true, status: true } },
+          grade: {
+            select: { id: true, status: true, score: true, releasedAt: true },
+          },
         },
       });
 

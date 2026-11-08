@@ -29,9 +29,15 @@ type QueueItem = {
     title: string;
     type: string;
     format: string;
+    pointsPossible?: number;
     section: { code: string; course: { code: string } };
     rubric: { type: string } | null;
   };
+  grade?: {
+    status: string;
+    score: number | null;
+    releasedAt: Date | null;
+  } | null;
   attachments: Array<{
     file: { fileName: string; mimeType: string; sizeBytes: number };
   }>;
@@ -49,6 +55,29 @@ const TIMELINESS: Record<
 const pageLink =
   "border-line bg-surface text-ink hover:bg-canvas inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition";
 
+/** Whether the teacher has checked the work and the student can see it. */
+export function GradeTag({
+  grade,
+  pointsPossible,
+}: {
+  grade: { status: string; score: number | null } | null;
+  pointsPossible?: number;
+}) {
+  if (grade?.status === "RELEASED") {
+    return (
+      <Pill tone="green">
+        ✓ Released
+        {grade.score !== null &&
+          ` · ${grade.score}${pointsPossible ? `/${pointsPossible}` : ""}`}
+      </Pill>
+    );
+  }
+  if (grade?.status === "COMPLETED") {
+    return <Pill tone="amber">Graded · not released</Pill>;
+  }
+  return <Pill tone="slate">Not checked yet</Pill>;
+}
+
 /**
  * Submissions waiting for a grade. On the dashboard (`compact`) it links to
  * the full queue; on the Grading page it pages with `nextHref`/`firstHref`.
@@ -60,7 +89,9 @@ export function GradingQueue({
   compact = false,
   nextHref = null,
   firstHref = null,
+  view = "TODO",
 }: {
+  view?: "TODO" | "CHECKED";
   items: QueueItem[];
   total: number;
   sectionCount: number;
@@ -72,8 +103,14 @@ export function GradingQueue({
     <Card>
       <CardHeader
         icon={<ClipboardIcon className="size-[18px]" />}
-        title="Priority Grading Queue"
-        subtitle={`${total} student ${total === 1 ? "file" : "files"} ready for rubric grading`}
+        title={
+          view === "CHECKED" ? "Already Checked" : "Priority Grading Queue"
+        }
+        subtitle={
+          view === "CHECKED"
+            ? "Work you have graded. Released scores are visible to the student."
+            : `${total} student ${total === 1 ? "file" : "files"} ready for rubric grading`
+        }
         action={
           compact && (
             <>
@@ -91,7 +128,11 @@ export function GradingQueue({
       />
 
       {items.length === 0 ? (
-        <EmptyState>Nothing waiting — the queue is clear.</EmptyState>
+        <EmptyState>
+          {view === "CHECKED"
+            ? "Nothing graded yet."
+            : "Nothing waiting — the queue is clear."}
+        </EmptyState>
       ) : (
         <>
           <div className="overflow-x-auto">
@@ -102,7 +143,7 @@ export function GradingQueue({
                   <th className="px-4 py-3">Assignment title</th>
                   <th className="px-4 py-3">Section</th>
                   <th className="px-4 py-3">Timeline</th>
-                  <th className="px-4 py-3">Rubric</th>
+                  <th className="px-4 py-3">Status</th>
                   <th className="px-5 py-3 text-right">Action</th>
                 </tr>
               </thead>
@@ -168,23 +209,21 @@ export function GradingQueue({
                       </td>
 
                       <td className="px-4 py-4">
-                        {item.assignment.rubric ? (
-                          item.assignment.rubric.type === "STANDARD" ? (
-                            <Pill tone="green">Rubric Attached</Pill>
-                          ) : (
-                            <Pill tone="amber">Manual Scale</Pill>
-                          )
-                        ) : (
-                          <Pill tone="slate">No rubric</Pill>
-                        )}
+                        <GradeTag
+                          grade={item.grade ?? null}
+                          pointsPossible={item.assignment.pointsPossible}
+                        />
                       </td>
 
                       <td className="px-5 py-4 text-right">
                         <Link
                           href={`/teacher/grading/${item.id}`}
-                          className="bg-navy hover:bg-navy-deep inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white transition"
+                          className="bg-navy hover:bg-navy-deep inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold whitespace-nowrap text-white transition"
                         >
-                          Grade Now
+                          {item.grade?.status === "RELEASED" ||
+                          item.grade?.status === "COMPLETED"
+                            ? "View / Edit"
+                            : "Grade Now"}
                           <ArrowRightIcon className="size-3.5" />
                         </Link>
                       </td>
@@ -197,7 +236,9 @@ export function GradingQueue({
 
           <div className="border-line flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3">
             <p className="text-muted text-xs">
-              Showing {items.length} of {total} submissions needing grading
+              {view === "CHECKED"
+                ? `Showing ${items.length} checked submissions`
+                : `Showing ${items.length} of ${total} submissions needing grading`}
             </p>
             <div className="flex items-center gap-2">
               {compact ? (
