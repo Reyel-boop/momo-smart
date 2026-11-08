@@ -3,7 +3,8 @@ import { type Metadata } from "next";
 
 import { DownloadIcon, StarIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/server";
-import { PageHeader, SectionTabs } from "~/app/_components/page-header";
+import { PageHeader } from "~/app/_components/page-header";
+import { subjectLabel } from "~/server/lib/deped";
 import {
   Avatar,
   Card,
@@ -91,6 +92,34 @@ export default async function GradesPage({
   const active = sections.find((s) => s.id === sectionParam) ?? sections[0]!;
   const gradebook = await api.grading.gradebook({ sectionId: active.id });
 
+  // Classes grouped by subject ("TLE 10"), then by section within it.
+  const subjects: Array<{ label: string; sections: typeof sections }> = [];
+  for (const s of sections) {
+    const label = subjectLabel({ code: s.course.code, name: s.course.name });
+    const group = subjects.find((g) => g.label === label);
+    if (group) group.sections.push(s);
+    else subjects.push({ label, sections: [s] });
+  }
+  subjects.sort((a, b) =>
+    a.label.localeCompare(b.label, undefined, { numeric: true }),
+  );
+  const activeSubject = subjects.find((g) =>
+    g.sections.some((s) => s.id === active.id),
+  )!;
+  const tab = (href: string, label: string, on: boolean, big = false) => (
+    <Link
+      key={href}
+      href={href}
+      className={`rounded-xl whitespace-nowrap transition ${big ? "px-4 py-2 text-sm font-bold" : "px-3.5 py-2 text-xs font-semibold"} ${
+        on
+          ? "bg-navy text-white"
+          : "border-line bg-surface text-ink hover:bg-canvas border"
+      }`}
+    >
+      {label}
+    </Link>
+  );
+
   const graded = gradebook.rows.filter((row) => row.currentPercent !== null);
   const average =
     graded.length > 0
@@ -105,7 +134,7 @@ export default async function GradesPage({
     <div className="mx-auto max-w-[1400px] space-y-6">
       <PageHeader
         title="Grades"
-        subtitle={`${active.course.name} — ${active.code} • ${gradebook.rows.length} students • ${gradebook.assignments.length} published assignments${average !== null ? ` • class average ${average}%` : ""}.`}
+        subtitle={`${activeSubject.label} — ${active.code} (${active.course.name}) • ${gradebook.rows.length} students • ${gradebook.assignments.length} published assignments${average !== null ? ` • class average ${average}%` : ""}.`}
         action={
           <Link
             href={`/teacher/grades/export?section=${active.id}`}
@@ -118,24 +147,44 @@ export default async function GradesPage({
         }
       />
 
-      <SectionTabs
-        sections={sections.map((s) => ({
-          id: s.id,
-          label: `${s.course.code} — ${s.code}`,
-        }))}
-        activeId={active.id}
-        basePath="/teacher/grades"
-      />
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-muted mr-1 text-[11px] font-bold tracking-wider uppercase">
+            Subject
+          </span>
+          {subjects.map((g) =>
+            tab(
+              `/teacher/grades?section=${g.sections[0]!.id}`,
+              g.label,
+              g === activeSubject,
+              true,
+            ),
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-muted mr-1 text-[11px] font-bold tracking-wider uppercase">
+            Section
+          </span>
+          {activeSubject.sections.map((s) =>
+            tab(`/teacher/grades?section=${s.id}`, s.code, s.id === active.id),
+          )}
+        </div>
+      </div>
 
       <Card>
         <CardHeader
           icon={<StarIcon className="size-[18px]" />}
           title="Gradebook"
-          subtitle="Released scores only; ungraded work is flagged for the queue."
+          subtitle="Released scores only. Tap a student's name to open their report card."
         />
 
-        {gradebook.assignments.length === 0 ? (
-          <EmptyState>No published assignments in this section yet.</EmptyState>
+        {gradebook.assignments.length === 0 && (
+          <p className="text-muted px-5 pt-3 text-xs">
+            No published assignments in this section yet.
+          </p>
+        )}
+        {gradebook.rows.length === 0 ? (
+          <EmptyState>No students in this section yet.</EmptyState>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
@@ -170,17 +219,23 @@ export default async function GradesPage({
                       scope="row"
                       className="bg-surface sticky left-0 z-10 px-5 py-3 text-left font-normal"
                     >
-                      <div className="flex items-center gap-3">
+                      <Link
+                        href={`/teacher/grades/student/${row.student.id}?section=${active.id}`}
+                        className="group flex items-center gap-3"
+                      >
                         <Avatar name={row.student.name} size="sm" />
                         <div className="min-w-0">
-                          <p className="text-ink truncate text-sm font-bold">
+                          <p className="text-ink group-hover:text-brand truncate text-sm font-bold group-hover:underline">
                             {row.student.name}
                           </p>
                           <p className="text-muted text-xs">
-                            #{row.student.studentNumber}
+                            #{row.student.studentNumber} ·{" "}
+                            <span className="text-brand font-semibold">
+                              Report card
+                            </span>
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     </th>
                     <td className="px-4 py-3">
                       {row.currentPercent === null ? (

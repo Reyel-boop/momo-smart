@@ -3,7 +3,19 @@ import { z } from "zod";
 
 import { createTRPCRouter, teacherProcedure } from "~/server/api/trpc";
 import { letterFor, refreshEnrollmentGrade, round } from "~/server/lib/grading";
-import { assertTeachesSection } from "~/server/lib/permissions";
+import {
+  LEARNING_AREAS,
+  componentOf,
+  learningAreaOf,
+  quarterGrade,
+  quarterOf,
+  type LearningArea,
+  type ScoredItem,
+} from "~/server/lib/deped";
+import {
+  assertStudentAccess,
+  assertTeachesSection,
+} from "~/server/lib/permissions";
 import type { Prisma } from "../../../../generated/prisma";
 
 /** Scopes a query to the sections the caller may grade (an admin: their school's). */
@@ -568,6 +580,204 @@ export const gradingRouter = createTRPCRouter({
             ]),
           ),
         })),
+      };
+    }),
+
+  /**
+   * A student's DepEd report card (SF9): one row per learning area with the
+   * four quarter grades, final rating and remarks. Classes in the same
+   * learning area (two TLE classes, say) count as one subject.
+   */
+  reportCard: teacherProcedure
+    .input(z.object({ studentId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      await assertStudentAccess(ctx.db, ctx.session.user, input.studentId);
+
+      const term = await ctx.db.term.findFirst({
+        where: { isCurrent: true },
+        select: { id: true, schoolYear: true, startDate: true, endDate: true },
+      });
+
+      const student = await ctx.db.studentProfile.findUnique({
+        where: { id: input.studentId },
+        select: {
+          id: true,
+          studentNumber: true,
+          gradeLevel: true,
+          homeroom: true,
+          section: { select: { name: true } },
+          user: {
+            select: {
+              name: true,
+              school: { select: { name: true, depedId: true, address: true } },
+            },
+          },
+          enrollments: {
+            where: { status: "ACTIVE", section: { termId: term?.id ?? "" } },
+            select: {
+              section: {
+                select: {
+                  course: {
+                    select: {
+                      code: true,
+                      name: true,
+                      department: { select: { code: true } },
+                    },
+                  },
+                  teacher: {
+                    select: { user: { select: { name: true, title: true } } },
+                  },
+                  assignments: {
+                    where: { publishedAt: { not: null } },
+                    select: {
+                      type: true,
+                      pointsPossible: true,
+                      dueAt: true,
+                      category: { select: { name: true } },
+                      submissions: {
+                        where: { studentId: input.studentId },
+                        orderBy: { attempt: "desc" },
+                        take: 1,
+                        select: {
+                          status: true,
+                          grade: { select: { score: true, status: true } },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!student || !term) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Student not found.",
+        });
+      }
+
+      // Group the student's classes into report-card subjects.
+      type Subject = {
+        key: string;
+        area: LearningArea | null;
+        name: string;
+        classes: string[];
+        items: Record<1 | 2 | 3 | 4, ScoredItem[]>;
+      };
+      const subjects = new Map<string, Subject>();
+      for (const { section } of student.enrollments) {
+        const area = learningAreaOf(section.course);
+        const key = area ?? section.course.code;
+        let subject = subjects.get(key);
+        if (!subject) {
+          subject = {
+            key,
+            area,
+            name: area
+              ? (LEARNING_AREAS.find((a) => a.id === area)?.name ?? key)
+              : section.course.name,
+            classes: [],
+            items: { 1: [], 2: [], 3: [], 4: [] },
+          };
+          subjects.set(key, subject);
+        }
+        const teacher = section.teacher.user;
+        const line = `${section.course.name} — ${[teacher.title, teacher.name].filter(Boolean).join(" ")}`;
+        if (!subject.classes.includes(line)) subject.classes.push(line);
+
+        for (const assignment of section.assignments) {
+          const submission = assignment.submissions[0];
+          let score: number | null = null;
+          if (submission?.status === "MISSING") score = 0;
+          else if (
+            submission?.status !== "EXCUSED" &&
+            submission?.grade?.status === "RELEASED" &&
+            submission.grade.score !== null
+          ) {
+            score = submission.grade.score;
+          }
+          if (score === null || assignment.pointsPossible <= 0) continue;
+          const quarter = quarterOf(
+            assignment.dueAt,
+            term.startDate,
+            term.endDate,
+          );
+          subject.items[quarter].push({
+            component: componentOf(assignment),
+            score,
+            possible: assignment.pointsPossible,
+          });
+        }
+      }
+
+      const toRow = (
+        subject: Subject | undefined,
+        name: string,
+        key: string,
+      ) => {
+        const quarters = ([1, 2, 3, 4] as const).map((q) =>
+          subject ? quarterGrade(subject.area, subject.items[q]) : null,
+        );
+        const final = quarters.every((q) => q !== null)
+          ? Math.round(
+              quarters.reduce<number>((sum, q) => sum + (q ?? 0), 0) / 4,
+            )
+          : null;
+        return {
+          key,
+          name,
+          inMomo: !!subject,
+          classes: subject?.classes ?? [],
+          quarters,
+          final,
+          remarks: final === null ? null : final >= 75 ? "Passed" : "Failed",
+        };
+      };
+
+      // Junior High uses the fixed DepEd learning areas; Senior High lists
+      // each subject the student takes.
+      const juniorHigh = student.gradeLevel <= 10;
+      const rows = juniorHigh
+        ? [
+            ...LEARNING_AREAS.map((a) =>
+              toRow(subjects.get(a.id), a.name, a.id),
+            ),
+            ...[...subjects.values()]
+              .filter((s) => s.area === null)
+              .map((s) => toRow(s, s.name, s.key)),
+          ]
+        : [...subjects.values()].map((s) => toRow(s, s.name, s.key));
+
+      const finals = rows.map((r) => r.final);
+      const generalAverage =
+        rows.length > 0 && finals.every((f) => f !== null)
+          ? round(
+              finals.reduce<number>((sum, f) => sum + (f ?? 0), 0) /
+                finals.length,
+              2,
+            )
+          : null;
+
+      const span = term.endDate.getTime() - term.startDate.getTime();
+      return {
+        student: {
+          id: student.id,
+          name: student.user.name ?? "Student",
+          lrn: student.studentNumber,
+          gradeLevel: student.gradeLevel,
+          section: student.section?.name ?? student.homeroom ?? null,
+        },
+        school: student.user.school,
+        schoolYear: term.schoolYear,
+        /** First day of each quarter, then the last day of the year. */
+        quarterDates: [0, 1, 2, 3, 4].map(
+          (i) => new Date(term.startDate.getTime() + (span * i) / 4),
+        ),
+        juniorHigh,
+        rows,
+        generalAverage,
       };
     }),
 });
