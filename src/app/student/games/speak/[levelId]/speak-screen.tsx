@@ -300,6 +300,42 @@ function Play({
     });
   };
 
+  const answerCall = () => {
+    unlock();
+    sfx.pickup();
+    void loadVoices();
+    setConnected(true);
+  };
+
+  // Space bar: answers the ringing call, starts recording, and stops it.
+  const onSpace = useRef<() => void>(() => undefined);
+  onSpace.current = () => {
+    if (!ready || finished) return;
+    if (!connected) answerCall();
+    else if (phase === "listening") listener.current?.stop();
+    else if (!(isCall && talking)) startListening();
+  };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code !== "Space" && event.key !== " ") return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.isContentEditable ||
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT"
+      ) {
+        return;
+      }
+      // Keep the page from scrolling and a focused button from clicking.
+      event.preventDefault();
+      if (event.repeat) return;
+      onSpace.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const total = answers.reduce((s, a) => s + (a?.score ?? 0), 0);
   const average = Math.round(total / count);
 
@@ -375,20 +411,18 @@ function Play({
             type="button"
             disabled={!ready}
             onPointerDown={unlock}
-            onClick={() => {
-              unlock();
-              sfx.pickup();
-              void loadVoices();
-              setConnected(true);
-            }}
+            onClick={answerCall}
             className="answer-btn rounded-full bg-emerald-500 px-8 py-3 text-lg font-black text-white shadow-lg hover:bg-emerald-600 disabled:opacity-50"
           >
             📞 Answer
           </button>
           <p className="text-muted max-w-sm text-xs">
             Turn your sound on. The customer talks first; then tap the
-            microphone and <b>say your reply out loud</b>. You are {level.agent}
-            , the agent.
+            microphone (or press <Key /> Space) and{" "}
+            <b>say your reply out loud</b>. You are {level.agent}, the agent.
+            <span className="mt-1 hidden sm:block">
+              Press <Key /> Space to answer.
+            </span>
           </p>
         </div>
         <Styles />
@@ -549,12 +583,12 @@ function Play({
           )}
           <p className="text-muted text-center text-sm font-semibold">
             {phase === "listening"
-              ? "Listening… speak now. Tap ■ when you're done."
+              ? "Listening… speak now. Tap ■ (or press Space) when you're done."
               : isCall && talking
                 ? `${level.caller} is talking…`
                 : current
-                  ? "Tap 🎤 to try again — your best try counts."
-                  : "Tap 🎤 and speak."}
+                  ? "Tap 🎤 or press Space to try again — your best try counts."
+                  : "Tap 🎤 or press Space, then speak."}
           </p>
           {phase === "listening" && (
             <p className="text-ink min-h-6 max-w-lg text-center text-base italic">
@@ -641,6 +675,15 @@ function Play({
       </div>
       <Styles />
     </Card>
+  );
+}
+
+/** A keyboard key, e.g. the Space bar. */
+function Key() {
+  return (
+    <span className="border-line bg-surface mr-0.5 inline-block rounded border px-1 align-middle text-[10px] font-bold">
+      ␣
+    </span>
   );
 }
 
