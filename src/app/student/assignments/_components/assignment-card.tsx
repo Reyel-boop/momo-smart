@@ -118,7 +118,9 @@ export function AssignmentCard({
         </p>
         {assignment.description && (
           <p className="text-muted mt-3 text-sm leading-relaxed">
-            {assignment.description}
+            {/* A unit activity's steps show when it's opened; the list
+                shows only its goal (the first paragraph). */}
+            {assignment.description.split(/\n\s*\n/)[0]}
           </p>
         )}
         {attached > 0 && (

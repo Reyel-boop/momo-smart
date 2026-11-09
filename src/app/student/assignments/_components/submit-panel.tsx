@@ -152,7 +152,7 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
               Submission Instructions
             </h3>
             {task.description && (
-              <p className="text-muted mt-1.5 text-xs leading-relaxed">
+              <p className="text-muted mt-1.5 text-xs leading-relaxed whitespace-pre-line">
                 {task.description}
               </p>
             )}

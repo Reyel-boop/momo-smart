@@ -12,6 +12,10 @@ import {
   assertTeachesSection,
 } from "~/server/lib/permissions";
 import { refreshEnrollmentGrade } from "~/server/lib/grading";
+import {
+  isUnitActivity,
+  openEarnedActivities,
+} from "~/server/lib/unit-activity";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 const assignmentTypes = [
@@ -257,7 +261,23 @@ export const assignmentRouter = createTRPCRouter({
    * to-do / submitted / completed. Grades appear only once released.
    */
   mine: studentProcedure.query(async ({ ctx }) => {
-    const assignments = await ctx.db.assignment.findMany({
+    // Unit Activities open once the unit's questions are done.
+    await openEarnedActivities(ctx.db, ctx.studentId);
+    const finishedUnits = await ctx.db.assessmentAttempt.findMany({
+      where: {
+        studentId: ctx.studentId,
+        status: "GRADED",
+        assessment: { unitId: { not: null }, assignmentId: null },
+      },
+      distinct: ["assessmentId"],
+      select: { assessment: { select: { sectionId: true, unitId: true } } },
+    });
+    const unlocked = new Set(
+      finishedUnits.map(
+        (f) => `${f.assessment.sectionId}:${f.assessment.unitId}`,
+      ),
+    );
+    const found = await ctx.db.assignment.findMany({
       where: {
         publishedAt: { not: null },
         section: {
@@ -278,6 +298,7 @@ export const assignmentRouter = createTRPCRouter({
         dueAt: true,
         closesAt: true,
         allowLate: true,
+        unitId: true,
         section: {
           select: {
             id: true,
@@ -342,6 +363,11 @@ export const assignmentRouter = createTRPCRouter({
         },
       },
     });
+
+    // A unit activity stays hidden until the student has done its questions.
+    const assignments = found.filter(
+      (a) => !isUnitActivity(a) || unlocked.has(`${a.section.id}:${a.unitId}`),
+    );
 
     return assignments.map(({ submissions, ...assignment }) => {
       const latest = submissions[0] ?? null;

@@ -13,6 +13,10 @@ import {
   assertSectionAccess,
   assertTeachesSection,
 } from "~/server/lib/permissions";
+import {
+  UNIT_ACTIVITY_POINTS,
+  ensureUnitActivity,
+} from "~/server/lib/unit-activity";
 import type { PrismaClient } from "../../../../generated/prisma";
 
 /** Question types the engine can score without a human in the loop. */
@@ -892,6 +896,40 @@ export const assessmentRouter = createTRPCRouter({
       const running = attempts.find((a) => a.status === "IN_PROGRESS") ?? null;
       const triesLeft = Math.max(0, quiz.maxAttempts - attempts.length);
 
+      // Finishing the questions opens the unit's activity.
+      const opened =
+        graded.length > 0
+          ? await ensureUnitActivity(ctx.db, quiz.sectionId, unit)
+          : null;
+      const handedIn = opened
+        ? await ctx.db.submission.findFirst({
+            where: { assignmentId: opened.id, studentId: ctx.studentId },
+            orderBy: { attempt: "desc" },
+            select: {
+              status: true,
+              grade: { select: { status: true, score: true } },
+            },
+          })
+        : null;
+      const activity = opened
+        ? {
+            id: opened.id,
+            title: opened.title.replace(/^🧩 Unit \d+ Activity: /u, ""),
+            state:
+              handedIn?.grade?.status === "RELEASED"
+                ? ("CHECKED" as const)
+                : handedIn?.status === "SUBMITTED" ||
+                    handedIn?.status === "GRADED"
+                  ? ("SUBMITTED" as const)
+                  : ("TODO" as const),
+            score:
+              handedIn?.grade?.status === "RELEASED"
+                ? handedIn.grade.score
+                : null,
+            points: UNIT_ACTIVITY_POINTS,
+          }
+        : null;
+
       // The question the running try is on: the first one not yet answered.
       let current = null;
       if (running) {
@@ -918,6 +956,7 @@ export const assessmentRouter = createTRPCRouter({
       return {
         ...rest,
         unit,
+        activity,
         questionCount: questions.length,
         questionSeconds: QUESTION_SECONDS,
         triesLeft,

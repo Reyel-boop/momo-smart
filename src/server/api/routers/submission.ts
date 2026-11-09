@@ -12,6 +12,7 @@ import {
   teacherProcedure,
 } from "~/server/api/trpc";
 import { timelinessFor } from "~/server/lib/grading";
+import { isUnitActivity, unitQuestionsDone } from "~/server/lib/unit-activity";
 import {
   assertEnrolled,
   assertSubmissionAccess,
@@ -184,6 +185,8 @@ export const submissionRouter = createTRPCRouter({
         where: { id: input.assignmentId },
         select: {
           id: true,
+          title: true,
+          unitId: true,
           sectionId: true,
           format: true,
           dueAt: true,
@@ -201,6 +204,20 @@ export const submissionRouter = createTRPCRouter({
       }
       await assertEnrolled(ctx.db, ctx.session.user, assignment.sectionId);
       await assertOwnFiles(ctx.db, ctx.session.user.id, input.fileIds);
+      if (
+        isUnitActivity(assignment) &&
+        !(await unitQuestionsDone(
+          ctx.db,
+          ctx.studentId,
+          assignment.sectionId,
+          assignment.unitId!,
+        ))
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Finish this unit's Unit Questions first.",
+        });
+      }
 
       const now = new Date();
       if (assignment.closesAt && now > assignment.closesAt) {

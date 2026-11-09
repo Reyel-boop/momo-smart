@@ -101,6 +101,36 @@ export default async function UnitQuestionsPage({
         quiz={quiz}
         courseHref={`/student/courses?course=${unit.course.id}`}
       />
+
+      {quiz.activity && (
+        <Card className="overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-5 text-white">
+            <div className="min-w-0">
+              <p className="text-xs font-black tracking-wide text-white/80 uppercase">
+                🧩 Next: Unit Activity
+              </p>
+              <h2 className="mt-0.5 text-xl font-extrabold">
+                {quiz.activity.title}
+              </h2>
+              <p className="mt-1 text-sm text-white/90">
+                {quiz.activity.state === "CHECKED"
+                  ? `✅ Checked by your teacher: ${quiz.activity.score ?? 0}/${quiz.activity.points}`
+                  : quiz.activity.state === "SUBMITTED"
+                    ? "📤 Submitted — waiting for your teacher to check."
+                    : `A short, easy task about this unit — about 10–15 minutes. Worth ${quiz.activity.points} points.`}
+              </p>
+            </div>
+            <Link
+              href={`/student/assignments?${quiz.activity.state === "TODO" ? `assignment=${quiz.activity.id}` : "tab=" + (quiz.activity.state === "CHECKED" ? "completed" : "submitted")}`}
+              className="text-navy shrink-0 rounded-xl bg-white px-5 py-2.5 text-sm font-black shadow hover:bg-white/90"
+            >
+              {quiz.activity.state === "TODO"
+                ? "Start the activity →"
+                : "View →"}
+            </Link>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
