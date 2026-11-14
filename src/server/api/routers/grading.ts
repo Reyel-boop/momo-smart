@@ -18,6 +18,7 @@ import {
   assertStudentAccess,
   assertTeachesSection,
 } from "~/server/lib/permissions";
+import { autoCheckWaitingActivities } from "~/server/lib/unit-activity";
 import type { Prisma } from "../../../../generated/prisma";
 
 /** Scopes a query to the sections the caller may grade (an admin: their school's). */
@@ -49,6 +50,13 @@ export const gradingRouter = createTRPCRouter({
       if (input.sectionId) {
         await assertTeachesSection(ctx.db, ctx.session.user, input.sectionId);
       }
+      // Unit activities check themselves; clear any still waiting first.
+      await autoCheckWaitingActivities(ctx.db, {
+        assignment: {
+          sectionId: input.sectionId,
+          section: gradableSections(ctx.session.user, ctx.teacherId),
+        },
+      });
 
       const orderBy: Prisma.SubmissionOrderByWithRelationInput =
         input.sort === "NEWEST"
@@ -145,6 +153,9 @@ export const gradingRouter = createTRPCRouter({
   /** Headline counts for the "Ungraded Queue" stat card. */
   queueSummary: teacherProcedure.query(async ({ ctx }) => {
     const sectionScope = gradableSections(ctx.session.user, ctx.teacherId);
+    await autoCheckWaitingActivities(ctx.db, {
+      assignment: { section: sectionScope },
+    });
     const soon = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const [total, dueWithin24h, sections] = await Promise.all([

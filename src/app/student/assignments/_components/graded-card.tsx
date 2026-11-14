@@ -37,7 +37,10 @@ export function GradedCard({ assignment }: { assignment: MyAssignment }) {
 
       {!excused && (
         <p className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-          ✅ Checked by your teacher
+          {/* Unit activities are checked automatically when handed in. */}
+          {grade?.feedback?.startsWith("Checked automatically by Momo")
+            ? "✅ Checked by Momo"
+            : "✅ Checked by your teacher"}
         </p>
       )}
       <h3 className="text-ink mt-3 text-base leading-snug font-bold">

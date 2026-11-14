@@ -115,8 +115,11 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
         ...work,
         fileIds: task.attachments.map((file) => file.id),
       });
-      if (result.ok) router.push("/student/assignments?tab=submitted");
-      else setError(result.error);
+      if (result.ok) {
+        router.push(
+          `/student/assignments?tab=${result.checked ? "completed" : "submitted"}`,
+        );
+      } else setError(result.error);
     });
 
   const rubricIds = new Set(task.rubric.map((criterion) => criterion.id));

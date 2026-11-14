@@ -79,11 +79,14 @@ export async function saveDraft(
 export async function submitAssignment(
   assignmentId: string,
   work: { fileIds: string[]; textBody?: string; externalUrl?: string },
-) {
-  const result = await attempt(() =>
-    api.submission.submit({ assignmentId, ...work }),
-  );
+): Promise<ActionResult & { checked?: boolean }> {
+  // A unit activity is checked the moment it's handed in.
+  let checked = false;
+  const result = await attempt(async () => {
+    const saved = await api.submission.submit({ assignmentId, ...work });
+    checked = saved.status === "GRADED";
+  });
   // Due counts on the sidebar and dashboard change too.
   if (result.ok) revalidatePath("/student", "layout");
-  return result;
+  return result.ok ? { ...result, checked } : result;
 }

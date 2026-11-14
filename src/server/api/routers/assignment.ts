@@ -13,6 +13,7 @@ import {
 } from "~/server/lib/permissions";
 import { refreshEnrollmentGrade } from "~/server/lib/grading";
 import {
+  autoCheckWaitingActivities,
   isUnitActivity,
   openEarnedActivities,
 } from "~/server/lib/unit-activity";
@@ -263,6 +264,8 @@ export const assignmentRouter = createTRPCRouter({
   mine: studentProcedure.query(async ({ ctx }) => {
     // Unit Activities open once the unit's questions are done.
     await openEarnedActivities(ctx.db, ctx.studentId);
+    // ...and are checked automatically (this catches older hand-ins).
+    await autoCheckWaitingActivities(ctx.db, { studentId: ctx.studentId });
     const finishedUnits = await ctx.db.assessmentAttempt.findMany({
       where: {
         studentId: ctx.studentId,

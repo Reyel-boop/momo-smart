@@ -1,12 +1,14 @@
 import { activityFor, describe } from "~/lib/unit-activities";
+import { letterFor, refreshEnrollmentGrade, round } from "~/server/lib/grading";
 import type { Prisma, PrismaClient } from "../../../generated/prisma";
 
 /**
  * Unit Activities: after a student finishes a unit's Unit Questions, the
  * unit's short performance task opens as an assignment in their class. It is
  * created once per class (the first time anyone there finishes), counts as a
- * Performance Task, is due at the end of the school year, and is checked by
- * the teacher like any other assignment.
+ * Performance Task, and is due at the end of the school year. Momo checks
+ * it automatically when it's handed in (see autoCheckUnitActivity); the
+ * teacher can still change the grade like any other.
  */
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -157,4 +159,134 @@ export async function openEarnedActivities(
       await ensureUnitActivity(db, sectionId, unit);
     }
   }
+}
+
+/** Points taken off a unit activity handed in after its due date. */
+export const UNIT_ACTIVITY_LATE_PENALTY = 3;
+
+const AUTO_FEEDBACK =
+  "Checked automatically by Momo: full points for doing the activity.";
+
+/**
+ * Unit activities are checked automatically: full points for handing one
+ * in, minus 3 if it was late. The grade is released right away, and the
+ * teacher can still change it like any other grade. Only a grade that is
+ * still waiting (PENDING) is touched, so a teacher's own check is never
+ * overwritten and running this twice does nothing.
+ */
+export async function autoCheckUnitActivity(
+  db: PrismaClient,
+  submissionId: string,
+) {
+  const submission = await db.submission.findUnique({
+    where: { id: submissionId },
+    select: {
+      status: true,
+      studentId: true,
+      timeliness: true,
+      grade: { select: { status: true } },
+      assignment: {
+        select: {
+          title: true,
+          unitId: true,
+          sectionId: true,
+          pointsPossible: true,
+        },
+      },
+    },
+  });
+  if (
+    submission?.status !== "SUBMITTED" ||
+    submission.grade?.status !== "PENDING" ||
+    !isUnitActivity(submission.assignment)
+  ) {
+    return null;
+  }
+
+  const { assignment } = submission;
+  const penalty =
+    submission.timeliness === "LATE" ? UNIT_ACTIVITY_LATE_PENALTY : 0;
+  const score = Math.max(0, round(assignment.pointsPossible - penalty, 2));
+  const percent =
+    assignment.pointsPossible > 0
+      ? (score / assignment.pointsPossible) * 100
+      : 0;
+  const now = new Date();
+
+  const checked = await db.$transaction(async (tx) => {
+    // Claim the waiting grade; a teacher (or another request) got there
+    // first if nothing matches.
+    const claimed = await tx.grade.updateMany({
+      where: { submissionId, status: "PENDING" },
+      data: {
+        status: "RELEASED",
+        graderId: null,
+        score,
+        latePenalty: penalty,
+        letter: letterFor(percent),
+        feedback:
+          penalty > 0
+            ? `${AUTO_FEEDBACK} ${penalty} points off because it was late.`
+            : AUTO_FEEDBACK,
+        gradedAt: now,
+        releasedAt: now,
+      },
+    });
+    if (claimed.count === 0) return false;
+    await tx.submission.update({
+      where: { id: submissionId },
+      data: { status: "GRADED" },
+    });
+    return true;
+  });
+  if (!checked) return null;
+
+  await refreshEnrollmentGrade(
+    db,
+    assignment.sectionId,
+    submission.studentId,
+    `Graded: ${assignment.title}`,
+  );
+  const student = await db.studentProfile.findUnique({
+    where: { id: submission.studentId },
+    select: { userId: true },
+  });
+  if (student) {
+    await db.notification.create({
+      data: {
+        userId: student.userId,
+        type: "GRADE_RELEASED",
+        title: `Grade posted: ${assignment.title}`,
+        body: `${score} / ${assignment.pointsPossible} (${letterFor(percent)})`,
+        linkUrl: `/assignments/submissions/${submissionId}`,
+      },
+    });
+  }
+  return { score, penalty };
+}
+
+/**
+ * Checks unit activities that were handed in before automatic checking
+ * existed (or whose check didn't finish). `where` scopes the search, e.g.
+ * to one student or to a teacher's classes.
+ */
+export async function autoCheckWaitingActivities(
+  db: PrismaClient,
+  where: { studentId?: string; assignment?: Prisma.AssignmentWhereInput },
+) {
+  const waiting = await db.submission.findMany({
+    where: {
+      studentId: where.studentId,
+      status: "SUBMITTED",
+      grade: { status: "PENDING" },
+      assignment: {
+        ...where.assignment,
+        unitId: { not: null },
+        title: { startsWith: "🧩 Unit " },
+      },
+    },
+    select: { id: true },
+    take: 200,
+  });
+  for (const { id } of waiting) await autoCheckUnitActivity(db, id);
 }

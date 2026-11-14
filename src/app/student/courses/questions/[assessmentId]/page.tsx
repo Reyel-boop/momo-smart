@@ -114,10 +114,10 @@ export default async function UnitQuestionsPage({
               </h2>
               <p className="mt-1 text-sm text-white/90">
                 {quiz.activity.state === "CHECKED"
-                  ? `✅ Checked by your teacher: ${quiz.activity.score ?? 0}/${quiz.activity.points}`
+                  ? `✅ Checked: ${quiz.activity.score ?? 0}/${quiz.activity.points}`
                   : quiz.activity.state === "SUBMITTED"
-                    ? "📤 Submitted — waiting for your teacher to check."
-                    : `A short, easy task about this unit — about 10–15 minutes. Worth ${quiz.activity.points} points.`}
+                    ? "📤 Submitted — being checked."
+                    : `A short, easy task about this unit — about 10–15 minutes. Worth ${quiz.activity.points} points when you hand it in (3 off if late).`}
               </p>
             </div>
             <Link
