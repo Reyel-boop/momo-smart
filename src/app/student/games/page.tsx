@@ -7,6 +7,7 @@ import { Card, EmptyState, Pill } from "~/app/_components/ui";
 import { type GameId } from "~/lib/games/catalog";
 import { api } from "~/trpc/server";
 import { Stars } from "./_components/stars";
+import { HeroPicker } from "./_components/hero-rive";
 import { Hero, MomoPet, Monster } from "./quest/_components/art";
 
 export const metadata: Metadata = { title: "Games · Momo Smart" };
@@ -277,13 +278,21 @@ export default async function GamesPage() {
             <PlayIcon className="size-4" /> Play
           </span>
         </div>
-        <Hero className="absolute right-28 -bottom-4 hidden w-32 transition group-hover:-translate-y-1 sm:block" />
+        <Hero className="absolute right-28 bottom-3 hidden w-28 transition group-hover:-translate-y-1 sm:block" />
         <MomoPet className="absolute right-[13.5rem] bottom-1 hidden w-20 sm:block" />
         <Monster
           kind="boss"
           className="absolute right-2 bottom-2 hidden w-24 sm:block"
         />
       </Link>
+
+      <Card className="p-5">
+        <h2 className="text-lg font-black">Choose your hero</h2>
+        <p className="mb-3 text-sm text-slate-500">
+          Your hero fights beside Momo in Momo&apos;s Quest.
+        </p>
+        <HeroPicker />
+      </Card>
 
       {games.length === 0 && (
         <Card>

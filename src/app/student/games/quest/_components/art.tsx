@@ -1,4 +1,5 @@
 import type { EnemyKind } from "~/lib/games/quest";
+import { HeroRive } from "../../_components/hero-rive";
 
 /**
  * Momo's Quest artwork in a bright chibi-anime style: the adventurer (big
@@ -10,7 +11,21 @@ import type { EnemyKind } from "~/lib/games/quest";
 /** Faces for the manga moments: ready, fired up, laughing, crying, shocked. */
 export type Mood = "normal" | "determined" | "laugh" | "cry" | "shock";
 
+/**
+ * The student's hero: their chosen StudioRun character, live. (Rive can't
+ * change faces, so the manga moods all show the same live character.)
+ */
 export function Hero({
+  className = "",
+}: {
+  className?: string;
+  mood?: Mood;
+}) {
+  return <HeroRive className={className} />;
+}
+
+/** The original drawn adventurer, kept for reference. */
+export function HeroDrawn({
   className = "",
   mood = "normal",
 }: {

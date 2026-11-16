@@ -40,7 +40,7 @@ export default async function QuestPage() {
             every new correct answer, plus bonus stars for winning.
           </p>
         </div>
-        <Hero className="absolute right-28 -bottom-4 hidden w-32 sm:block" />
+        <Hero className="absolute right-28 bottom-3 hidden w-28 sm:block" />
         <MomoPet className="absolute right-[13.5rem] bottom-1 hidden w-20 sm:block" />
         <Monster
           kind="dragon"
