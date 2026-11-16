@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { type Metadata, type Viewport } from "next";
 import { Geist } from "next/font/google";
 
+import { HubSignout } from "~/app/_components/hub-signout";
 import { OLD_BROWSER_SCRIPT } from "~/app/_components/old-browsers";
 import { ServiceWorker } from "~/app/_components/service-worker";
 import { UpdateBar } from "~/app/_components/update-bar";
@@ -45,6 +46,7 @@ export default function RootLayout({
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <ServiceWorker />
         <UpdateBar version={process.env.VERCEL_DEPLOYMENT_ID ?? "dev"} />
+        <HubSignout />
       </body>
     </html>
   );

@@ -63,5 +63,6 @@ export async function login(
 }
 
 export async function logout() {
-  await signOut({ redirectTo: "/" });
+  // ?signedout lets the School Hub (when Momo is open inside it) return to Reyel
+  await signOut({ redirectTo: "/?signedout=1" });
 }
