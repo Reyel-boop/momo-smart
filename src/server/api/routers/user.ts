@@ -26,6 +26,7 @@ export const userRouter = createTRPCRouter({
         image: true,
         title: true,
         role: true,
+        lastLoginAt: true,
         studentProfile: {
           select: {
             id: true,

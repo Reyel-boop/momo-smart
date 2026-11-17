@@ -4,13 +4,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /**
- * "What's new in Momo": a full-screen post that opens by itself the first
- * time someone opens Momo after an update, and closes with ✕, "Got it!" or
- * Escape. Each device remembers (per account) the last update it showed.
- * The account menu's "What's new" opens it again.
+ * The welcome post: a full-screen page that opens every time someone opens
+ * their account (once per sign-in and once per browser visit), with their
+ * own reminders on top and "What's new in Momo" below. It closes with ✕,
+ * "Got it!" or Escape. The account menu's "What's new" opens it again.
  *
  * To announce a new update, add an entry at the top of UPDATES with a new id.
  */
+
+export type Reminder = {
+  icon: string;
+  text: string;
+  href?: string;
+  /** Shown in red: overdue or missing work. */
+  urgent?: boolean;
+};
 
 type Item = {
   icon: string;
@@ -116,21 +124,27 @@ export function WhatsNew({
   userId,
   role,
   firstName,
+  signedInAt,
+  reminders,
 }: {
   userId: string;
   role: "student" | "teacher";
   firstName: string;
+  /** The last sign-in time: a new sign-in shows the post again. */
+  signedInAt: string | null;
+  reminders: Reminder[];
 }) {
   const latest = UPDATES[0]!;
-  const key = `momo-whats-new:${userId}`;
+  // Once per sign-in, and once per browser visit (sessionStorage).
+  const key = `momo-opened:${userId}:${signedInAt ?? ""}`;
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     let seen: string | null = null;
     try {
-      seen = localStorage.getItem(key);
+      seen = sessionStorage.getItem(key);
     } catch {}
-    if (seen !== latest.id) setOpen(true);
+    if (!seen) setOpen(true);
     const reopen = () => setOpen(true);
     window.addEventListener(OPEN_EVENT, reopen);
     return () => window.removeEventListener(OPEN_EVENT, reopen);
@@ -151,13 +165,18 @@ export function WhatsNew({
 
   function close() {
     try {
-      localStorage.setItem(key, latest.id);
+      sessionStorage.setItem(key, "1");
     } catch {}
     setOpen(false);
   }
 
   if (!open) return null;
   const items = latest[role];
+  const today = new Date().toLocaleDateString("en-PH", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <div
@@ -177,24 +196,79 @@ export function WhatsNew({
 
       <div className="from-navy to-brand bg-gradient-to-br px-6 pt-14 pb-24 text-center text-white">
         <p className="text-5xl" aria-hidden="true">
-          🎉
+          👋
         </p>
         <p className="mt-3 text-xs font-bold tracking-[0.25em] text-amber-300 uppercase">
-          Update · {latest.date}
+          {today}
         </p>
         <h1
           id="whats-new-title"
           className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl"
         >
-          What&apos;s new in Momo
+          Welcome back, {firstName}!
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-white/85 sm:text-base">
-          Hi {firstName}! Here&apos;s what changed. Tap a button to try it, or
-          close this to continue.
+          Here are your reminders and what&apos;s new in Momo.
         </p>
       </div>
 
-      <div className="mx-auto -mt-16 grid max-w-5xl gap-4 px-4 pb-10 sm:grid-cols-2">
+      <section className="mx-auto -mt-16 max-w-5xl px-4">
+        <div className="border-line bg-surface shadow-card rounded-2xl border p-5">
+          <h2 className="text-ink flex items-center gap-2 text-lg font-extrabold">
+            <span aria-hidden="true">🔔</span> Your reminders
+          </h2>
+          {reminders.length === 0 ? (
+            <p className="mt-2 text-sm font-semibold text-emerald-700">
+              ✅ You&apos;re all caught up. Nothing needs your attention right
+              now!
+            </p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {reminders.map((r) => {
+                const body = (
+                  <>
+                    <span className="text-lg" aria-hidden="true">
+                      {r.icon}
+                    </span>
+                    <span className="min-w-0 flex-1">{r.text}</span>
+                    {r.href && (
+                      <span className="text-brand shrink-0 text-xs font-bold">
+                        Open →
+                      </span>
+                    )}
+                  </>
+                );
+                const cls = `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold ${
+                  r.urgent ? "bg-rose-50 text-rose-800" : "bg-canvas text-ink"
+                }`;
+                return (
+                  <li key={r.text}>
+                    {r.href ? (
+                      <Link
+                        href={r.href}
+                        onClick={close}
+                        className={`${cls} hover:ring-brand/30 transition hover:ring-2`}
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div className={cls}>{body}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <h2 className="text-ink mx-auto mt-8 max-w-5xl px-4 text-lg font-extrabold">
+        🎉 What&apos;s new in Momo{" "}
+        <span className="text-muted text-sm font-semibold">
+          · {latest.date}
+        </span>
+      </h2>
+      <div className="mx-auto mt-3 grid max-w-5xl gap-4 px-4 pb-10 sm:grid-cols-2">
         {items.map((item) => (
           <article
             key={item.title}
@@ -236,8 +310,8 @@ export function WhatsNew({
           Got it!
         </button>
         <p className="text-muted mt-3 text-xs">
-          You can open this again anytime: click your name at the top, then
-          &ldquo;What&apos;s new&rdquo;.
+          This opens each time you open Momo. To see it again now, click your
+          name at the top, then &ldquo;What&apos;s new&rdquo;.
         </p>
       </div>
     </div>

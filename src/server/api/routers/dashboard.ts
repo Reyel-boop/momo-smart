@@ -300,7 +300,9 @@ export const dashboardRouter = createTRPCRouter({
           gradeLevel: true,
           cumulativeGpa: true,
           gpaPercentile: true,
-          user: { select: { name: true, image: true, email: true } },
+          user: {
+            select: { name: true, image: true, email: true, lastLoginAt: true },
+          },
         },
       }),
       // This term's class sessions only (the card says "this term").

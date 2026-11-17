@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { DemoBanner } from "~/app/_components/demo-banner";
 import { env } from "~/env";
 import { MomoChat } from "~/app/_components/momo-chat";
+import { teacherReminders } from "~/app/_components/reminders";
 import { WhatsNew } from "~/app/_components/whats-new";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
@@ -85,6 +86,15 @@ export default async function TeacherLayout({
             ? `${me.title} ${(me.name ?? "").split(" ").pop()}`
             : ((me.name ?? "").split(" ")[0] ?? "there")
         }
+        signedInAt={me.lastLoginAt?.toISOString() ?? null}
+        reminders={teacherReminders({
+          ungraded: overview.ungradedCount,
+          attendancePending: overview.attendancePending,
+          atRisk: overview.atRiskCount,
+          unread,
+          email: me.email ?? null,
+          image: me.image ?? null,
+        })}
       />
     </div>
   );

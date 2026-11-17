@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { DemoBanner } from "~/app/_components/demo-banner";
 import { env } from "~/env";
 import { MomoChat } from "~/app/_components/momo-chat";
+import { studentReminders } from "~/app/_components/reminders";
 import { WhatsNew } from "~/app/_components/whats-new";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
@@ -66,6 +67,13 @@ export default async function StudentLayout({
         userId={session.user.id}
         role="student"
         firstName={studentName.split(" ")[0] ?? "there"}
+        signedInAt={overview.profile.user.lastLoginAt?.toISOString() ?? null}
+        reminders={studentReminders({
+          due: dueSoon,
+          unread,
+          email: overview.profile.user.email,
+          image: overview.profile.user.image,
+        })}
       />
     </div>
   );
