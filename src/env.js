@@ -23,6 +23,8 @@ export const env = createEnv({
       .transform((value) => value === "true"),
     /** Bearer token the demo reset route requires. */
     CRON_SECRET: z.string().optional(),
+    /** Shared with the School Hub, which asks for each day's email reminders. */
+    REMINDER_SECRET: z.string().min(32).optional(),
     /** The Android app's package name on Google Play, e.g. "com.momosmart.app". */
     ANDROID_PACKAGE_NAME: z.string().optional(),
     /** Its signing key's SHA-256 fingerprint(s), comma-separated (Play Console → App integrity). */
@@ -54,6 +56,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     DEMO_MODE: process.env.DEMO_MODE,
     CRON_SECRET: process.env.CRON_SECRET,
+    REMINDER_SECRET: process.env.REMINDER_SECRET,
     ANDROID_PACKAGE_NAME: process.env.ANDROID_PACKAGE_NAME,
     ANDROID_SHA256_FINGERPRINTS: process.env.ANDROID_SHA256_FINGERPRINTS,
     SUPPORT_EMAIL: process.env.SUPPORT_EMAIL,
