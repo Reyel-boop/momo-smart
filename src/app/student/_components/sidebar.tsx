@@ -42,6 +42,7 @@ export function Sidebar({
     { label: "Scores", href: "/student/scores" },
     { label: "Calendar", href: "/student/calendar" },
     { label: "Messages", href: "/student/messages", dot: unreadMessages > 0 },
+    { label: "My Profile", href: "/student/profile" },
   ];
 
   const icons: Record<string, React.ReactNode> = {
@@ -55,6 +56,7 @@ export function Sidebar({
     Scores: <StarIcon className="size-[18px]" />,
     Calendar: <CalendarIcon className="size-[18px]" />,
     Messages: <ChatIcon className="size-[18px]" />,
+    "My Profile": <UsersIcon className="size-[18px]" />,
   };
 
   const content = (

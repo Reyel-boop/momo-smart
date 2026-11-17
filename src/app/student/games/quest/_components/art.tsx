@@ -15,12 +15,7 @@ export type Mood = "normal" | "determined" | "laugh" | "cry" | "shock";
  * The student's hero: their chosen StudioRun character, live. (Rive can't
  * change faces, so the manga moods all show the same live character.)
  */
-export function Hero({
-  className = "",
-}: {
-  className?: string;
-  mood?: Mood;
-}) {
+export function Hero({ className = "" }: { className?: string; mood?: Mood }) {
   return <HeroRive className={className} />;
 }
 

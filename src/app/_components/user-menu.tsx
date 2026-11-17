@@ -17,6 +17,7 @@ export function UserMenu({
   image,
   base,
   showText = true,
+  profileHref,
 }: {
   name: string;
   /** "ID: #123" for students, the department for teachers. */
@@ -26,6 +27,8 @@ export function UserMenu({
   /** "/student" or "/teacher" */
   base: string;
   showText?: boolean;
+  /** The "My profile" page (defaults to the profile part of Settings). */
+  profileHref?: string;
 }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -87,7 +90,7 @@ export function UserMenu({
           <div className="border-line my-1 border-t" />
           <Link
             role="menuitem"
-            href={`${settings}#profile`}
+            href={profileHref ?? `${settings}#profile`}
             className={item}
             onClick={() => setOpen(false)}
           >

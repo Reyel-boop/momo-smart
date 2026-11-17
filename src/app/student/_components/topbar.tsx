@@ -80,6 +80,7 @@ export function Topbar({
             email={email}
             image={image}
             base="/student"
+            profileHref="/student/profile"
           />
         </div>
       </div>

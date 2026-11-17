@@ -17,6 +17,7 @@ import {
   starTotals,
 } from "~/server/lib/stars";
 import { assertTeachesSection } from "~/server/lib/permissions";
+import { sectionProgressOf } from "~/server/lib/progress";
 import { autoCheckWaitingSubmissions } from "~/server/lib/unit-activity";
 
 const GAME_LABELS: Record<string, { title: string; course: string }> = {
@@ -635,172 +636,99 @@ export const dashboardRouter = createTRPCRouter({
         ctx.session.user,
         input.sectionId,
       );
-      // Hand-ins check themselves; clear any still waiting first.
-      await autoCheckWaitingSubmissions(ctx.db, {
-        assignment: { sectionId: section.id },
-      });
-      const now = new Date();
+      return sectionProgressOf(ctx.db, section);
+    }),
 
-      const [
-        enrollments,
-        unitCount,
-        assignments,
-        attempts,
-        attendance,
-        totals,
-      ] = await Promise.all([
-        ctx.db.enrollment.findMany({
-          where: { sectionId: section.id, status: "ACTIVE" },
-          orderBy: { student: { user: { name: "asc" } } },
-          select: {
-            currentPercent: true,
-            currentLetter: true,
-            syllabusPercent: true,
-            student: {
-              select: {
-                id: true,
-                studentNumber: true,
-                user: {
-                  select: { name: true, image: true, lastLoginAt: true },
-                },
+  /**
+   * The student's own profile: who they are, and their status in each class
+   * this term (the same figures and status their teacher sees).
+   */
+  myProfile: studentProcedure.query(async ({ ctx }) => {
+    const [me, enrollments, totals, gpa] = await Promise.all([
+      ctx.db.studentProfile.findUniqueOrThrow({
+        where: { id: ctx.studentId },
+        select: {
+          studentNumber: true,
+          gradeLevel: true,
+          graduationYear: true,
+          section: { select: { name: true } },
+          user: {
+            select: {
+              name: true,
+              email: true,
+              image: true,
+              school: { select: { name: true } },
+            },
+          },
+        },
+      }),
+      ctx.db.enrollment.findMany({
+        where: {
+          studentId: ctx.studentId,
+          status: "ACTIVE",
+          section: { term: { isCurrent: true } },
+        },
+        orderBy: { section: { period: "asc" } },
+        select: {
+          section: {
+            select: {
+              id: true,
+              courseId: true,
+              code: true,
+              period: true,
+              course: { select: { name: true } },
+              teacher: {
+                select: { user: { select: { name: true, title: true } } },
               },
             },
           },
-        }),
-        ctx.db.unit.count({ where: { courseId: section.courseId } }),
-        // Work that is already due (past its due date).
-        ctx.db.assignment.findMany({
-          where: {
-            sectionId: section.id,
-            publishedAt: { not: null },
-            dueAt: { lte: now },
-          },
-          select: {
-            id: true,
-            submissions: { select: { studentId: true, status: true } },
-          },
-        }),
-        // Unit Questions finished in this class.
-        ctx.db.assessmentAttempt.findMany({
-          where: {
-            status: "GRADED",
-            assessment: {
-              sectionId: section.id,
-              unitId: { not: null },
-              assignmentId: null,
-            },
-          },
-          distinct: ["studentId", "assessmentId"],
-          select: {
-            studentId: true,
-            assessment: { select: { unitId: true } },
-          },
-        }),
-        ctx.db.attendanceRecord.groupBy({
-          by: ["studentId", "status"],
-          where: { session: { sectionId: section.id } },
-          _count: { _all: true },
-        }),
-        starTotals(ctx.db),
-      ]);
-
-      const unitsDone = new Map<string, Set<string>>();
-      for (const a of attempts) {
-        if (!a.assessment.unitId) continue;
-        const set = unitsDone.get(a.studentId) ?? new Set<string>();
-        set.add(a.assessment.unitId);
-        unitsDone.set(a.studentId, set);
-      }
-      const attendanceOf = new Map<
-        string,
-        { attended: number; total: number }
-      >();
-      for (const row of attendance) {
-        const cur = attendanceOf.get(row.studentId) ?? {
-          attended: 0,
-          total: 0,
-        };
-        cur.total += row._count._all;
-        if (row.status !== "ABSENT" && row.status !== "EXCUSED") {
-          cur.attended += row._count._all;
-        }
-        attendanceOf.set(row.studentId, cur);
-      }
-
-      const HANDED_IN = new Set(["SUBMITTED", "GRADED", "RETURNED"]);
-      const students = enrollments.map((e) => {
-        const id = e.student.id;
-        let due = 0;
-        let handedIn = 0;
-        for (const a of assignments) {
-          const mine = a.submissions.find((sub) => sub.studentId === id);
-          if (mine?.status === "EXCUSED") continue;
-          due += 1;
-          if (mine && HANDED_IN.has(mine.status)) handedIn += 1;
-        }
-        const att = attendanceOf.get(id);
-        const attendanceRate =
-          att && att.total > 0 ? round((att.attended / att.total) * 100) : null;
-        const grade = e.currentPercent;
-        const missing = due - handedIn;
-        // Needs help: failing, 2+ missing, or attending under 80%.
-        // Watch: close to failing, 1 missing, or attending under 90%.
-        const status =
-          (grade !== null && grade < 75) ||
-          missing >= 2 ||
-          (attendanceRate !== null && attendanceRate < 80)
-            ? ("NEEDS_HELP" as const)
-            : (grade !== null && grade < 80) ||
-                missing === 1 ||
-                (attendanceRate !== null && attendanceRate < 90)
-              ? ("WATCH" as const)
-              : ("ON_TRACK" as const);
-        return {
-          studentId: id,
-          name: e.student.user.name ?? "Student",
-          image: e.student.user.image,
-          studentNumber: e.student.studentNumber,
-          grade,
-          letter: e.currentLetter,
-          lessonsPercent: Math.round(e.syllabusPercent ?? 0),
-          unitsDone: unitsDone.get(id)?.size ?? 0,
-          due,
-          handedIn,
-          missing,
-          attendanceRate,
-          stars: totals.get(id)?.total ?? 0,
-          lastLoginAt: e.student.user.lastLoginAt,
-          status,
-        };
-      });
-
-      const graded = students.filter((s) => s.grade !== null);
-      return {
-        unitCount,
-        dueCount: assignments.length,
-        students,
-        summary: {
-          count: students.length,
-          average:
-            graded.length > 0
-              ? round(
-                  graded.reduce((sum, s) => sum + s.grade!, 0) / graded.length,
-                )
-              : null,
-          lessonsAverage:
-            students.length > 0
-              ? Math.round(
-                  students.reduce((sum, s) => sum + s.lessonsPercent, 0) /
-                    students.length,
-                )
-              : 0,
-          needsHelp: students.filter((s) => s.status === "NEEDS_HELP").length,
-          watch: students.filter((s) => s.status === "WATCH").length,
-          onTrack: students.filter((s) => s.status === "ON_TRACK").length,
-          missingTotal: students.reduce((sum, s) => sum + s.missing, 0),
         },
-      };
-    }),
+      }),
+      starTotals(ctx.db),
+      computeGpa(ctx.db, ctx.studentId),
+    ]);
+
+    const classes = [];
+    for (const { section } of enrollments) {
+      const data = await sectionProgressOf(ctx.db, section, totals);
+      const mine = data.students.find((s) => s.studentId === ctx.studentId);
+      if (!mine) continue;
+      const teacher = section.teacher.user;
+      classes.push({
+        sectionId: section.id,
+        course: section.course.name,
+        code: section.code,
+        period: section.period,
+        teacher: [teacher.title, teacher.name].filter(Boolean).join(" "),
+        unitCount: data.unitCount,
+        ...mine,
+      });
+    }
+    const order = { NEEDS_HELP: 0, WATCH: 1, ON_TRACK: 2 } as const;
+    const overall =
+      classes.length === 0
+        ? null
+        : classes.reduce(
+            (worst, c) => (order[c.status] < order[worst] ? c.status : worst),
+            "ON_TRACK" as keyof typeof order,
+          );
+
+    return {
+      name: me.user.name ?? "Student",
+      email: me.user.email,
+      image: me.user.image,
+      school: me.user.school?.name ?? null,
+      studentNumber: me.studentNumber,
+      gradeLevel: me.gradeLevel,
+      graduationYear: me.graduationYear,
+      homeroom: me.section?.name ?? null,
+      gpa,
+      stars: totals.get(ctx.studentId)?.total ?? 0,
+      overall,
+      missingTotal: classes.reduce((n, c) => n + c.missing, 0),
+      classes,
+    };
+  }),
 
   /** Recomputes and caches the student's GPA after grades change. */
   refreshGpa: studentProcedure.mutation(async ({ ctx }) => {
