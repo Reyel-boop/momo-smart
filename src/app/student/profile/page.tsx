@@ -14,8 +14,13 @@ export const dynamic = "force-dynamic";
 type Status = NonNullable<RouterOutputs["dashboard"]["myProfile"]["overall"]>;
 const STATUS: Record<
   Status,
-  { label: string; tone: "green" | "amber" | "rose"; note: string }
+  { label: string; tone: "green" | "amber" | "rose" | "slate"; note: string }
 > = {
+  NEW: {
+    label: "Just started",
+    tone: "slate",
+    note: "No grades or attendance yet. Start your lessons and Unit Questions!",
+  },
   ON_TRACK: {
     label: "On track",
     tone: "green",
@@ -171,7 +176,7 @@ export default async function ProfilePage() {
                 </Pill>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 <Stat
                   label="Grade"
                   value={
@@ -248,8 +253,8 @@ function Stat({
   className?: string;
 }) {
   return (
-    <div className="border-line bg-canvas/60 rounded-xl border px-3 py-2">
-      <p className="text-muted text-[10px] font-bold tracking-wide uppercase">
+    <div className="border-line bg-canvas/60 min-w-0 rounded-xl border px-3 py-2">
+      <p className="text-muted truncate text-[10px] font-bold tracking-wide uppercase">
         {label}
       </p>
       <p className={`text-lg font-extrabold ${className ?? "text-ink"}`}>

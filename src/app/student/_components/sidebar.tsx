@@ -29,6 +29,7 @@ export function Sidebar({
   unreadMessages: number;
 }) {
   const items: NavItem[] = [
+    { label: "My Profile", href: "/student/profile" },
     { label: "Dashboard", href: "/student", exact: true },
     { label: "Courses", href: "/student/courses" },
     { label: "Assignments", href: "/student/assignments", badge: dueCount },
@@ -42,7 +43,6 @@ export function Sidebar({
     { label: "Scores", href: "/student/scores" },
     { label: "Calendar", href: "/student/calendar" },
     { label: "Messages", href: "/student/messages", dot: unreadMessages > 0 },
-    { label: "My Profile", href: "/student/profile" },
   ];
 
   const icons: Record<string, React.ReactNode> = {

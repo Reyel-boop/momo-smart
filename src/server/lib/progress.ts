@@ -116,16 +116,19 @@ export async function sectionProgressOf(
     const missing = due - handedIn;
     // Needs help: failing, 2+ missing, or attending under 80%.
     // Watch: close to failing, 1 missing, or attending under 90%.
+    // Nothing to judge yet: no grade, no work due and no attendance taken.
     const status =
-      (grade !== null && grade < 75) ||
-      missing >= 2 ||
-      (attendanceRate !== null && attendanceRate < 80)
-        ? ("NEEDS_HELP" as const)
-        : (grade !== null && grade < 80) ||
-            missing === 1 ||
-            (attendanceRate !== null && attendanceRate < 90)
-          ? ("WATCH" as const)
-          : ("ON_TRACK" as const);
+      grade === null && due === 0 && attendanceRate === null
+        ? ("NEW" as const)
+        : (grade !== null && grade < 75) ||
+            missing >= 2 ||
+            (attendanceRate !== null && attendanceRate < 80)
+          ? ("NEEDS_HELP" as const)
+          : (grade !== null && grade < 80) ||
+              missing === 1 ||
+              (attendanceRate !== null && attendanceRate < 90)
+            ? ("WATCH" as const)
+            : ("ON_TRACK" as const);
     return {
       studentId: id,
       name: e.student.user.name ?? "Student",

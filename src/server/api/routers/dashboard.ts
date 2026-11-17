@@ -704,13 +704,13 @@ export const dashboardRouter = createTRPCRouter({
         ...mine,
       });
     }
-    const order = { NEEDS_HELP: 0, WATCH: 1, ON_TRACK: 2 } as const;
+    const order = { NEEDS_HELP: 0, WATCH: 1, ON_TRACK: 2, NEW: 3 } as const;
     const overall =
       classes.length === 0
         ? null
         : classes.reduce(
             (worst, c) => (order[c.status] < order[worst] ? c.status : worst),
-            "ON_TRACK" as keyof typeof order,
+            "NEW" as keyof typeof order,
           );
 
     return {

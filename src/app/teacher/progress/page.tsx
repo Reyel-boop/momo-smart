@@ -23,11 +23,12 @@ type Status = Row["status"];
 
 const STATUS: Record<
   Status,
-  { label: string; tone: "green" | "amber" | "rose"; order: number }
+  { label: string; tone: "green" | "amber" | "rose" | "slate"; order: number }
 > = {
   NEEDS_HELP: { label: "Needs help", tone: "rose", order: 0 },
   WATCH: { label: "Watch", tone: "amber", order: 1 },
   ON_TRACK: { label: "On track", tone: "green", order: 2 },
+  NEW: { label: "Just started", tone: "slate", order: 3 },
 };
 const FILTERS = [
   ["all", "Everyone"],

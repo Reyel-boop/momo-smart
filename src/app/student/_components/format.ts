@@ -2,15 +2,9 @@ import { clockOf, weekdayName } from "~/app/_components/format";
 
 /** Presentation helpers specific to the student screens. */
 
-const GRADE_NAMES: Record<number, string> = {
-  9: "Freshman",
-  10: "Sophomore",
-  11: "Junior",
-  12: "Senior",
-};
-
+/** DepEd schools say "Grade 7" to "Grade 12" (not Freshman, Sophomore…). */
 export function gradeLevelName(gradeLevel: number): string {
-  return GRADE_NAMES[gradeLevel] ?? `Grade ${gradeLevel}`;
+  return `Grade ${gradeLevel}`;
 }
 
 /** Video position, e.g. 1452 → "24:12". */
