@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { DemoBanner } from "~/app/_components/demo-banner";
 import { env } from "~/env";
 import { MomoChat } from "~/app/_components/momo-chat";
+import { WhatsNew } from "~/app/_components/whats-new";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
 import { isDemoEmail } from "~/server/demo/accounts";
@@ -61,6 +62,11 @@ export default async function StudentLayout({
         <main className="min-w-0 flex-1 px-5 py-6 lg:px-8">{children}</main>
       </div>
       <MomoChat role="STUDENT" firstName={studentName.split(" ")[0]} />
+      <WhatsNew
+        userId={session.user.id}
+        role="student"
+        firstName={studentName.split(" ")[0] ?? "there"}
+      />
     </div>
   );
 }

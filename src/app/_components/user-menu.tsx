@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { logout } from "~/app/login/actions";
 import { Avatar } from "~/app/_components/ui";
+import { openWhatsNew } from "~/app/_components/whats-new";
 
 /**
  * The name and picture in the top bar: opens a menu for the profile, the
@@ -128,6 +129,18 @@ export function UserMenu({
           >
             Settings &amp; password
           </Link>
+          <button
+            type="button"
+            role="menuitem"
+            className={item}
+            onClick={() => {
+              setOpen(false);
+              openWhatsNew();
+            }}
+          >
+            What&apos;s new
+            <span className="text-[11px]">🎉</span>
+          </button>
           <div className="border-line my-1 border-t" />
           <form action={logout}>
             <button
