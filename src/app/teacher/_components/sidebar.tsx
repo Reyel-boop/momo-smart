@@ -12,6 +12,7 @@ import {
   SettingsIcon,
   StarIcon,
   TimerIcon,
+  TrendUpIcon,
   TrophyIcon,
   UsersIcon,
 } from "~/app/_components/icons";
@@ -41,6 +42,7 @@ export function Sidebar({
       badge: ungradedCount,
     },
     { label: "Roster", href: "/teacher/roster" },
+    { label: "Class Progress", href: "/teacher/progress" },
     { label: "Live Quiz", href: "/teacher/live" },
     { label: "Group Race", href: "/teacher/race" },
     { label: "CB-NAT Review", href: "/teacher/nat" },
@@ -54,6 +56,7 @@ export function Sidebar({
     Courses: <CapIcon className="size-[18px]" />,
     Assignments: <ClipboardIcon className="size-[18px]" />,
     Roster: <UsersIcon className="size-[18px]" />,
+    "Class Progress": <TrendUpIcon className="size-[18px]" />,
     "Live Quiz": <PlayIcon className="size-[18px]" />,
     "Group Race": <TrophyIcon className="size-[18px]" />,
     "CB-NAT Review": <TimerIcon className="size-[18px]" />,

@@ -138,10 +138,10 @@ function SectionCard({
             : "Syllabus: not started"}
         </p>
         <Link
-          href={`/teacher/roster?section=${section.sectionId}`}
+          href={`/teacher/progress?section=${section.sectionId}`}
           className="text-brand inline-flex shrink-0 items-center gap-0.5 text-xs font-bold hover:underline"
         >
-          Open Roster
+          See Progress
           <ChevronRightIcon className="size-3.5" />
         </Link>
       </div>
