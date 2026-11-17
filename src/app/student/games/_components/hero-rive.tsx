@@ -34,7 +34,7 @@ const CROP = { x: 0.198, y: 0.578, size: 0.1916, aspect: 1.74 };
 let wasmSet = false;
 let fileBuffer: Promise<ArrayBuffer> | null = null;
 /** Download the 13 MB file once and share it with every hero on the page. */
-function loadFile() {
+export function loadFile() {
   if (!wasmSet) {
     RuntimeLoader.setWasmUrl("/rive/rive.wasm");
     wasmSet = true;

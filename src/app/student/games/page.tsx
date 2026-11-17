@@ -46,6 +46,15 @@ const TURBO_LOOK = {
   emoji: "💨",
 };
 
+/** Studio Run looks the same in every subject. */
+const STUDIO_LOOK = {
+  href: "/student/games/studio",
+  blurb:
+    "A cosmic runner: tap to jump over obstacles, and answer a question from the unit every time you grab an item. Reach the finish!",
+  banner: "from-indigo-700 to-fuchsia-600",
+  emoji: "🚀",
+};
+
 const LOOK = {
   code: {
     href: "/student/games/code",
@@ -239,6 +248,14 @@ const LOOK = {
   teng: TURBO_LOOK,
   tfil: TURBO_LOOK,
   ttle: TURBO_LOOK,
+  scode: STUDIO_LOOK,
+  stel: STUDIO_LOOK,
+  smath: STUDIO_LOOK,
+  ssci: STUDIO_LOOK,
+  sap: STUDIO_LOOK,
+  seng: STUDIO_LOOK,
+  sfil: STUDIO_LOOK,
+  stle: STUDIO_LOOK,
 } as const satisfies Record<
   GameId,
   { href: string; blurb: string; banner: string; emoji: string }

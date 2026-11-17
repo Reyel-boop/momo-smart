@@ -18,6 +18,7 @@ import { LAVA_LEVELS } from "./lava-climb";
 import { MATH_LEVELS } from "./number-rush";
 import { SALITA_LEVELS } from "./salita-sprint";
 import { SPEAK_LEVELS } from "./speak-up";
+import { studioLevelsOf } from "./studio-run";
 import { TAMA_LEVELS } from "./tama-o-mali";
 import { SPRINT_LEVELS } from "./tag-sprint";
 import { TICKET_LEVELS } from "./ticket-rush";
@@ -354,6 +355,55 @@ export const GAMES = {
     forCourse: notYet,
     levels: turboLevelsOf(WORDS_TLE),
   },
+  // Studio Run: the StudioRun runner (Rive, CC BY 4.0) with the same words.
+  scode: {
+    title: "Studio Run",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: studioLevelsOf(WORDS_CP),
+  },
+  stel: {
+    title: "Studio Run",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: studioLevelsOf(WORDS_TEL),
+  },
+  smath: {
+    title: "Studio Run",
+    course: "Mathematics",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_MATH),
+  },
+  ssci: {
+    title: "Studio Run",
+    course: "Science",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_SCI),
+  },
+  sap: {
+    title: "Studio Run",
+    course: "Araling Panlipunan",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_AP),
+  },
+  seng: {
+    title: "Studio Run",
+    course: "English",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_ENG),
+  },
+  sfil: {
+    title: "Studio Run",
+    course: "Filipino",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_FIL),
+  },
+  stle: {
+    title: "Studio Run",
+    course: "TLE",
+    forCourse: notYet,
+    levels: studioLevelsOf(WORDS_TLE),
+  },
 } satisfies Record<
   string,
   {
@@ -420,6 +470,18 @@ export const TURBO_GAMES = [
   "teng",
   "tfil",
   "ttle",
+] as const satisfies readonly GameId[];
+
+/** The Studio Run games, which share one screen and Turbo Takbo's finish call. */
+export const STUDIO_GAMES = [
+  "scode",
+  "stel",
+  "smath",
+  "ssci",
+  "sap",
+  "seng",
+  "sfil",
+  "stle",
 ] as const satisfies readonly GameId[];
 
 export function levelsOf(game: GameId): readonly CatalogLevel[] {

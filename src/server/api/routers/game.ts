@@ -13,6 +13,7 @@ import {
   HUNT_GAMES,
   RUN_GAMES,
   SCRAMBLE_GAMES,
+  STUDIO_GAMES,
   TURBO_GAMES,
   type GameId,
 } from "~/lib/games/catalog";
@@ -588,11 +589,11 @@ export const gameRouter = createTRPCRouter({
       return { ...result, ...saved };
     }),
 
-  /** Turbo Takbo (any subject): every guess at every gate. */
+  /** Turbo Takbo and Studio Run (any subject): every guess at every word. */
   finishTurbo: studentProcedure
     .input(
       z.object({
-        game: z.enum(TURBO_GAMES),
+        game: z.enum([...TURBO_GAMES, ...STUDIO_GAMES]),
         levelId: z.string(),
         gates: z
           .array(
