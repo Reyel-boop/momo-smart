@@ -103,6 +103,77 @@ export const userRouter = createTRPCRouter({
       });
     }),
 
+  /**
+   * Changes the caller's email (also used to sign in, with the LRN or student
+   * number). The current password confirms it's really them.
+   */
+  changeEmail: protectedProcedure
+    .input(
+      z.object({
+        email: z.string().trim().toLowerCase().email().max(254),
+        password: z.string().min(1).max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (env.DEMO_MODE) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Emails can't be changed in the demo.",
+        });
+      }
+      const user = await ctx.db.user.findUnique({
+        where: { id: ctx.session.user.id },
+        select: { passwordHash: true, email: true },
+      });
+      if (
+        !user?.passwordHash ||
+        !(await compare(input.password, user.passwordHash))
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Your password is not correct.",
+        });
+      }
+      if (user.email?.toLowerCase() === input.email)
+        return { email: input.email };
+      const taken = await ctx.db.user.findFirst({
+        where: {
+          email: { equals: input.email, mode: "insensitive" },
+          NOT: { id: ctx.session.user.id },
+        },
+        select: { id: true },
+      });
+      if (taken) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "That email is already used by another account.",
+        });
+      }
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { email: input.email, emailVerified: null },
+      });
+      return { email: input.email };
+    }),
+
+  /** Sets or clears the caller's profile picture (stored at /api/avatar). */
+  setImage: protectedProcedure
+    .input(z.object({ image: z.string().max(200).nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      const own = `/api/avatar/${ctx.session.user.id}?v=`;
+      if (input.image !== null && !input.image.startsWith(own)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Not your picture.",
+        });
+      }
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { image: input.image },
+      });
+      return { image: input.image };
+    }),
+
   /** Changes the caller's password after checking the current one. */
   /** Asks for this account and its data to be deleted, or takes it back. */
   requestDeletion: protectedProcedure

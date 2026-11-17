@@ -1,24 +1,29 @@
 import Link from "next/link";
 
-import { logout } from "~/app/login/actions";
 import {
   BellIcon,
   HelpIcon,
   PlusCircleIcon,
   SearchIcon,
 } from "~/app/_components/icons";
-import { Avatar } from "~/app/_components/ui";
+import { UserMenu } from "~/app/_components/user-menu";
 
 export function Topbar({
   termName,
   week,
   teacherName,
   unreadNotifications,
+  department,
+  email,
+  image,
 }: {
   termName: string;
   week: number | null;
   teacherName: string;
   unreadNotifications: number;
+  department: string;
+  email: string | null;
+  image: string | null;
 }) {
   return (
     <header className="border-line bg-surface/90 sticky top-0 z-10 border-b backdrop-blur">
@@ -77,16 +82,14 @@ export function Topbar({
             New Assignment
           </Link>
 
-          <form action={logout} className="flex items-center">
-            <button
-              type="submit"
-              className="rounded-full transition hover:opacity-80"
-              title={`${teacherName} — sign out`}
-            >
-              <span className="sr-only">Sign out</span>
-              <Avatar name={teacherName} size="lg" />
-            </button>
-          </form>
+          <UserMenu
+            name={teacherName}
+            subtitle={department}
+            email={email}
+            image={image}
+            base="/teacher"
+            showText={false}
+          />
         </div>
       </div>
     </header>

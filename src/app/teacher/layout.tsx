@@ -62,6 +62,9 @@ export default async function TeacherLayout({
           week={overview.term?.week ?? null}
           teacherName={me.name ?? "Teacher"}
           unreadNotifications={unread}
+          department={me.teacherProfile?.department?.name ?? "Faculty"}
+          email={me.email ?? null}
+          image={me.image ?? null}
         />
         <main className="min-w-0 flex-1 px-5 py-6 lg:px-8">{children}</main>
       </div>

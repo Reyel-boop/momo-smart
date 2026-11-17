@@ -2,12 +2,17 @@ import Link from "next/link";
 
 import { env } from "~/env";
 import { humanise } from "~/app/_components/format";
-import { LockIcon, SettingsIcon, UsersIcon } from "~/app/_components/icons";
+import {
+  BellIcon,
+  LockIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "~/app/_components/icons";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, CardHeader } from "~/app/_components/ui";
 import { logout } from "~/app/login/actions";
 import { api } from "~/trpc/server";
-import { PasswordForm, ProfileForm } from "./forms";
+import { EmailForm, PasswordForm, PhotoForm, ProfileForm } from "./forms";
 
 /** The Settings page for either portal: profile, account details, password. */
 export async function SettingsView() {
@@ -38,10 +43,32 @@ export async function SettingsView() {
     <div className="mx-auto max-w-[900px] space-y-6">
       <PageHeader
         title="Settings"
-        subtitle="Your profile, account details and password."
+        subtitle="Your profile, picture, email, account details and password."
       />
 
-      <Card>
+      <Card id="photo" className="scroll-mt-24">
+        <CardHeader
+          icon={<UsersIcon className="size-[18px]" />}
+          title="Profile picture"
+          subtitle="Shown beside your name in Momo"
+        />
+        <PhotoForm
+          name={me.name ?? ""}
+          image={me.image ?? null}
+          locked={env.DEMO_MODE}
+        />
+      </Card>
+
+      <Card id="email" className="scroll-mt-24">
+        <CardHeader
+          icon={<BellIcon className="size-[18px]" />}
+          title="Email address"
+          subtitle="For school updates and reminders; you can also sign in with it"
+        />
+        <EmailForm email={me.email ?? null} locked={env.DEMO_MODE} />
+      </Card>
+
+      <Card id="profile" className="scroll-mt-24">
         <CardHeader
           icon={<SettingsIcon className="size-[18px]" />}
           title="Profile"
@@ -76,7 +103,7 @@ export async function SettingsView() {
         </dl>
       </Card>
 
-      <Card>
+      <Card id="password" className="scroll-mt-24">
         <CardHeader
           icon={<LockIcon className="size-[18px]" />}
           title="Password"

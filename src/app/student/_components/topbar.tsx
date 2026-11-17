@@ -1,24 +1,27 @@
 import Link from "next/link";
 
-import { logout } from "~/app/login/actions";
 import {
   BellIcon,
   HelpIcon,
   PlusCircleIcon,
   SearchIcon,
 } from "~/app/_components/icons";
-import { Avatar } from "~/app/_components/ui";
+import { UserMenu } from "~/app/_components/user-menu";
 
 export function Topbar({
   termName,
   studentName,
   studentNumber,
   unreadNotifications,
+  email,
+  image,
 }: {
   termName: string;
   studentName: string;
   studentNumber: string;
   unreadNotifications: number;
+  email: string | null;
+  image: string | null;
 }) {
   return (
     <header className="border-line bg-surface/90 sticky top-0 z-10 border-b backdrop-blur">
@@ -71,24 +74,13 @@ export function Topbar({
             <HelpIcon className="size-5" />
           </Link>
 
-          <form action={logout} className="flex items-center">
-            <button
-              type="submit"
-              className="hover:bg-canvas flex items-center gap-3 rounded-xl py-1 pr-2 pl-1 text-left transition"
-              title={`${studentName} — sign out`}
-            >
-              <span className="sr-only">Sign out</span>
-              <Avatar name={studentName} size="lg" />
-              <span className="hidden min-w-0 xl:block">
-                <span className="text-ink block text-sm font-bold">
-                  {studentName}
-                </span>
-                <span className="text-muted block text-[11px] font-semibold">
-                  ID: #{studentNumber}
-                </span>
-              </span>
-            </button>
-          </form>
+          <UserMenu
+            name={studentName}
+            subtitle={`ID: #${studentNumber}`}
+            email={email}
+            image={image}
+            base="/student"
+          />
         </div>
       </div>
     </header>

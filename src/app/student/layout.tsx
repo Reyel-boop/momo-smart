@@ -55,6 +55,8 @@ export default async function StudentLayout({
           studentName={studentName}
           studentNumber={overview.profile.studentNumber}
           unreadNotifications={unread}
+          email={overview.profile.user.email ?? null}
+          image={overview.profile.user.image ?? null}
         />
         <main className="min-w-0 flex-1 px-5 py-6 lg:px-8">{children}</main>
       </div>

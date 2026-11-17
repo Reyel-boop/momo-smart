@@ -4,9 +4,12 @@ import { avatarTone, initials } from "./format";
 export function Avatar({
   name,
   size = "md",
+  src,
 }: {
   name: string | null | undefined;
   size?: "sm" | "md" | "lg";
+  /** A profile picture; the initials show when there is none. */
+  src?: string | null;
 }) {
   const dimensions =
     size === "sm"
@@ -15,6 +18,17 @@ export function Avatar({
         ? "size-11 text-sm"
         : "size-9 text-xs";
 
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        className={`${dimensions} shrink-0 rounded-full object-cover`}
+      />
+    );
+  }
   return (
     <span
       className={`${dimensions} ${avatarTone(name ?? "?")} inline-flex shrink-0 items-center justify-center rounded-full font-bold`}
@@ -58,12 +72,16 @@ export function Pill({
 export function Card({
   children,
   className = "",
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Lets a link jump to this card (e.g. /settings#email). */
+  id?: string;
 }) {
   return (
     <section
+      id={id}
       className={`border-line bg-surface shadow-card rounded-2xl border ${className}`}
     >
       {children}
