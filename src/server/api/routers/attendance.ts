@@ -335,12 +335,23 @@ export const attendanceRouter = createTRPCRouter({
         };
       };
 
-      const previousDay = new Date(date);
-      previousDay.setUTCDate(previousDay.getUTCDate() - 1);
+      // The previous *school* day: the latest earlier day with attendance
+      // taken (so Monday compares with Friday, not with Sunday).
+      const previous = await ctx.db.attendanceSession.findFirst({
+        where: {
+          date: { lt: date },
+          section: sectionScope,
+          records: { some: {} },
+        },
+        orderBy: { date: "desc" },
+        select: { date: true },
+      });
 
       const [today, yesterday] = await Promise.all([
         rateFor(date),
-        rateFor(previousDay),
+        previous
+          ? rateFor(previous.date)
+          : Promise.resolve({ rate: null as number | null }),
       ]);
 
       return {

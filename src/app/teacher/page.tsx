@@ -44,8 +44,13 @@ export default async function TeacherDashboard() {
   ]);
 
   const tutors = await tutorsFor(alerts.items);
+  // Attendance is due for a class that is meeting now or has met; a class
+  // later today isn't pending yet.
   const pendingPeriod = daySchedule.periods.find(
-    (period) => period.state !== "SUBMITTED",
+    (period) => period.state === "PENDING" || period.state === "IN_SESSION",
+  );
+  const laterToday = daySchedule.periods.some(
+    (period) => period.state === "UPCOMING",
   );
   const surname = me.name?.split(" ").slice(-1)[0] ?? "there";
 
@@ -74,7 +79,11 @@ export default async function TeacherDashboard() {
             {overview.ungradedCount === 1 ? "" : "s"} awaiting evaluation
             {pendingPeriod
               ? ` and Period ${pendingPeriod.period} attendance pending.`
-              : " and attendance is complete for today."}
+              : daySchedule.periods.length === 0
+                ? ". No classes meet today."
+                : laterToday
+                  ? " and attendance is up to date so far today."
+                  : " and attendance is complete for today."}
           </p>
         </div>
 

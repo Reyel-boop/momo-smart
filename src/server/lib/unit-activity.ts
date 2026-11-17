@@ -6,9 +6,9 @@ import type { Prisma, PrismaClient } from "../../../generated/prisma";
  * Unit Activities: after a student finishes a unit's Unit Questions, the
  * unit's short performance task opens as an assignment in their class. It is
  * created once per class (the first time anyone there finishes), counts as a
- * Performance Task, and is due at the end of the school year. Momo checks
- * it automatically when it's handed in (see autoCheckUnitActivity); the
- * teacher can still change the grade like any other.
+ * Performance Task, and is due at the end of the school year. Like every
+ * assignment, Momo checks it automatically when it's handed in (see
+ * autoCheckSubmission); the teacher can still change the grade.
  */
 
 type Db = PrismaClient | Prisma.TransactionClient;
@@ -161,20 +161,20 @@ export async function openEarnedActivities(
   }
 }
 
-/** Points taken off a unit activity handed in after its due date. */
-export const UNIT_ACTIVITY_LATE_PENALTY = 3;
+/** Points taken off any assignment handed in after its due date. */
+export const LATE_PENALTY = 5;
 
 const AUTO_FEEDBACK =
-  "Checked automatically by Momo: full points for doing the activity.";
+  "Checked automatically by Momo: full points for handing it in on time.";
 
 /**
- * Unit activities are checked automatically: full points for handing one
- * in, minus 3 if it was late. The grade is released right away, and the
- * teacher can still change it like any other grade. Only a grade that is
- * still waiting (PENDING) is touched, so a teacher's own check is never
- * overwritten and running this twice does nothing.
+ * Every assignment is checked automatically when it's handed in: full
+ * points on time, minus 5 if it was late. The grade is released right away,
+ * and the teacher can still change it like any other grade. Only a grade
+ * that is still waiting (PENDING) is touched, so a teacher's own check is
+ * never overwritten and running this twice does nothing.
  */
-export async function autoCheckUnitActivity(
+export async function autoCheckSubmission(
   db: PrismaClient,
   submissionId: string,
 ) {
@@ -197,15 +197,13 @@ export async function autoCheckUnitActivity(
   });
   if (
     submission?.status !== "SUBMITTED" ||
-    submission.grade?.status !== "PENDING" ||
-    !isUnitActivity(submission.assignment)
+    submission.grade?.status !== "PENDING"
   ) {
     return null;
   }
 
   const { assignment } = submission;
-  const penalty =
-    submission.timeliness === "LATE" ? UNIT_ACTIVITY_LATE_PENALTY : 0;
+  const penalty = submission.timeliness === "LATE" ? LATE_PENALTY : 0;
   const score = Math.max(0, round(assignment.pointsPossible - penalty, 2));
   const percent =
     assignment.pointsPossible > 0
@@ -226,7 +224,7 @@ export async function autoCheckUnitActivity(
         letter: letterFor(percent),
         feedback:
           penalty > 0
-            ? `${AUTO_FEEDBACK} ${penalty} points off because it was late.`
+            ? `Checked automatically by Momo: full points for handing it in, minus ${penalty} because it was late.`
             : AUTO_FEEDBACK,
         gradedAt: now,
         releasedAt: now,
@@ -266,11 +264,11 @@ export async function autoCheckUnitActivity(
 }
 
 /**
- * Checks unit activities that were handed in before automatic checking
- * existed (or whose check didn't finish). `where` scopes the search, e.g.
- * to one student or to a teacher's classes.
+ * Checks hand-ins still waiting for a grade (handed in before automatic
+ * checking existed, or whose check didn't finish). `where` scopes the
+ * search, e.g. to one student or to a teacher's classes.
  */
-export async function autoCheckWaitingActivities(
+export async function autoCheckWaitingSubmissions(
   db: PrismaClient,
   where: { studentId?: string; assignment?: Prisma.AssignmentWhereInput },
 ) {
@@ -279,14 +277,10 @@ export async function autoCheckWaitingActivities(
       studentId: where.studentId,
       status: "SUBMITTED",
       grade: { status: "PENDING" },
-      assignment: {
-        ...where.assignment,
-        unitId: { not: null },
-        title: { startsWith: "🧩 Unit " },
-      },
+      assignment: where.assignment,
     },
     select: { id: true },
     take: 200,
   });
-  for (const { id } of waiting) await autoCheckUnitActivity(db, id);
+  for (const { id } of waiting) await autoCheckSubmission(db, id);
 }

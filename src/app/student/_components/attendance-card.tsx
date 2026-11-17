@@ -20,7 +20,7 @@ export function AttendanceCard({ attendance }: { attendance: Attendance }) {
       <CardHeader
         icon={<UserCheckIcon className="size-4" />}
         title="Attendance Record"
-        subtitle={`${attendance.totalDays} day${attendance.totalDays === 1 ? "" : "s"} recorded this term`}
+        subtitle={`${attendance.totalDays} class${attendance.totalDays === 1 ? "" : "es"} recorded this term`}
         action={
           <Pill tone={attendance.inGoodStanding ? "green" : "rose"}>
             {attendance.inGoodStanding ? "Good Standing" : "Needs Attention"}

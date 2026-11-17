@@ -34,7 +34,7 @@ export default async function AdminHome() {
       href: "/admin/classes",
     },
     {
-      done: false,
+      done: o.enrollments > 0,
       title: "Enroll students in classes",
       text: "Open a class and add its students.",
       href: "/admin/classes",

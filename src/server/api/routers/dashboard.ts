@@ -16,6 +16,7 @@ import {
   starsFor,
   starTotals,
 } from "~/server/lib/stars";
+import { autoCheckWaitingSubmissions } from "~/server/lib/unit-activity";
 
 const GAME_LABELS: Record<string, { title: string; course: string }> = {
   ...Object.fromEntries(
@@ -45,6 +46,11 @@ export const dashboardRouter = createTRPCRouter({
         : { teacherId: ctx.teacherId ?? "" };
     const today = toDateOnly(new Date());
     const soon = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // Hand-ins are checked automatically; clear any still waiting before
+    // counting, so "awaiting evaluation" matches the grading queue.
+    await autoCheckWaitingSubmissions(ctx.db, {
+      assignment: { section: sectionScope },
+    });
 
     const [
       term,
@@ -67,7 +73,9 @@ export const dashboardRouter = createTRPCRouter({
         },
       }),
       ctx.db.section.count({ where: sectionScope }),
-      ctx.db.enrollment.count({
+      // Students, not enrollments: one student in several classes counts once.
+      ctx.db.enrollment.groupBy({
+        by: ["studentId"],
         where: { status: "ACTIVE", section: sectionScope },
       }),
       ctx.db.submission.count({
@@ -118,7 +126,7 @@ export const dashboardRouter = createTRPCRouter({
       term: term
         ? { ...term, week: weekOfTerm(term.startDate, new Date()) }
         : null,
-      totalEnrolled: enrolledCount,
+      totalEnrolled: enrolledCount.length,
       sectionCount,
       ungradedCount: ungraded,
       ungradedDueWithin24h: ungradedSoon,
@@ -219,10 +227,13 @@ export const dashboardRouter = createTRPCRouter({
     const rows = await ctx.db.sectionPacing.groupBy({
       by: ["status"],
       where: {
-        section:
-          ctx.session.user.role === "ADMIN"
+        // This term's classes only (the card is labelled with the term).
+        section: {
+          term: { isCurrent: true },
+          ...(ctx.session.user.role === "ADMIN"
             ? { schoolId: ctx.session.user.schoolId ?? "" }
-            : { teacherId: ctx.teacherId ?? "" },
+            : { teacherId: ctx.teacherId ?? "" }),
+        },
       },
       _count: { _all: true },
     });
@@ -274,7 +285,11 @@ export const dashboardRouter = createTRPCRouter({
     const now = new Date();
     const today = toDateOnly(now);
 
-    const [profile, term, attendanceRows, gpa] = await Promise.all([
+    const term = await ctx.db.term.findFirst({
+      where: { isCurrent: true },
+      select: { id: true, name: true, startDate: true },
+    });
+    const [profile, attendanceRows, gpa] = await Promise.all([
       ctx.db.studentProfile.findUniqueOrThrow({
         where: { id: ctx.studentId },
         select: {
@@ -286,13 +301,13 @@ export const dashboardRouter = createTRPCRouter({
           user: { select: { name: true, image: true } },
         },
       }),
-      ctx.db.term.findFirst({
-        where: { isCurrent: true },
-        select: { id: true, name: true, startDate: true },
-      }),
+      // This term's class sessions only (the card says "this term").
       ctx.db.attendanceRecord.groupBy({
         by: ["status"],
-        where: { studentId: ctx.studentId },
+        where: {
+          studentId: ctx.studentId,
+          ...(term ? { session: { section: { termId: term.id } } } : {}),
+        },
         _count: { _all: true },
       }),
       computeGpa(ctx.db, ctx.studentId),
@@ -303,6 +318,8 @@ export const dashboardRouter = createTRPCRouter({
     ) as Record<string, number>;
     const totalDays = Object.values(counts).reduce((sum, n) => sum + n, 0);
     const present = (counts.PRESENT ?? 0) + (counts.REMOTE ?? 0);
+    // A late arrival still attended, as on the teacher's dashboard.
+    const attended = present + (counts.TARDY ?? 0);
 
     // Classes still ahead today, by period.
     const meetings = await ctx.db.sectionMeeting.findMany({
@@ -354,11 +371,12 @@ export const dashboardRouter = createTRPCRouter({
       gpaPercentile: profile.gpaPercentile,
       attendance: {
         present,
+        attended,
         excused: counts.EXCUSED ?? 0,
         tardy: counts.TARDY ?? 0,
         absent: counts.ABSENT ?? 0,
         totalDays,
-        rate: totalDays > 0 ? round((present / totalDays) * 100) : null,
+        rate: totalDays > 0 ? round((attended / totalDays) * 100) : null,
         inGoodStanding: (counts.ABSENT ?? 0) === 0,
       },
       classesRemainingToday: remaining.length,

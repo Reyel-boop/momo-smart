@@ -78,7 +78,7 @@ export function Welcome({
               {attendance.rate === null ? "—" : `${attendance.rate}%`}
             </p>
             <p className="text-muted mt-1 text-[11px] font-semibold">
-              {attendance.present} of {attendance.totalDays} Days
+              {attendance.attended} of {attendance.totalDays} classes
             </p>
           </Tile>
 

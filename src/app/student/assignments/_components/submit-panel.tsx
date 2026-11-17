@@ -310,7 +310,7 @@ export function SubmitPanel({ task }: { task: PanelTask }) {
             </button>
             <p className="text-muted text-center text-[11px]">
               {requirement ??
-                "Submitting timestamps your work and locks edits until your teacher reviews it."}
+                "Momo checks it the moment you submit: full points on time, 5 points off if late. Your teacher can still review it."}
             </p>
           </div>
         )}

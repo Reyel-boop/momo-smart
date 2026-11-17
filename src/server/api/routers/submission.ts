@@ -13,7 +13,7 @@ import {
 } from "~/server/api/trpc";
 import { timelinessFor } from "~/server/lib/grading";
 import {
-  autoCheckUnitActivity,
+  autoCheckSubmission,
   isUnitActivity,
   unitQuestionsDone,
 } from "~/server/lib/unit-activity";
@@ -329,12 +329,10 @@ export const submissionRouter = createTRPCRouter({
         data: { status: "RESOLVED", resolvedAt: now },
       });
 
-      // Unit activities are checked on the spot: full points, minus 3 late.
-      if (isUnitActivity(assignment)) {
-        const checked = await autoCheckUnitActivity(ctx.db, submission.id);
-        if (checked) {
-          return { ...submission, status: "GRADED" as const, timeliness };
-        }
+      // Every assignment is checked on the spot: full points, minus 5 late.
+      const checked = await autoCheckSubmission(ctx.db, submission.id);
+      if (checked) {
+        return { ...submission, status: "GRADED" as const, timeliness };
       }
 
       return { ...submission, timeliness };

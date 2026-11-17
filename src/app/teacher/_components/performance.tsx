@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRightIcon, TrendUpIcon } from "~/app/_components/icons";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
+import { letterFor } from "~/server/lib/grading";
 import { AnnouncementButton } from "./announcement-button";
 
 type SectionPerformance = {
@@ -17,20 +18,6 @@ type SectionPerformance = {
 
 /** Accent per card, echoing the coloured rules in the design. */
 const ACCENTS = ["bg-teal-500", "bg-brand", "bg-amber-500", "bg-violet-500"];
-
-function letterFor(percent: number): string {
-  if (percent >= 97) return "A+";
-  if (percent >= 93) return "A";
-  if (percent >= 90) return "A-";
-  if (percent >= 87) return "B+";
-  if (percent >= 83) return "B";
-  if (percent >= 80) return "B-";
-  if (percent >= 77) return "C+";
-  if (percent >= 73) return "C";
-  if (percent >= 70) return "C-";
-  if (percent >= 60) return "D";
-  return "F";
-}
 
 export function Performance({ sections }: { sections: SectionPerformance[] }) {
   const classes = sections.map((section) => ({

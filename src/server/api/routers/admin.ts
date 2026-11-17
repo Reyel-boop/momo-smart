@@ -214,6 +214,7 @@ export const adminRouter = createTRPCRouter({
       term,
       pendingFirstLogin,
       deletionRequests,
+      enrollments,
     ] = await Promise.all([
       ctx.db.user.count({
         where: { schoolId, role: "TEACHER", isActive: true },
@@ -235,8 +236,16 @@ export const adminRouter = createTRPCRouter({
       ctx.db.user.count({
         where: { schoolId, deletionRequestedAt: { not: null } },
       }),
+      // Students enrolled in this term's classes (the last setup step).
+      ctx.db.enrollment.count({
+        where: {
+          status: "ACTIVE",
+          section: { schoolId, term: { isCurrent: true } },
+        },
+      }),
     ]);
     return {
+      enrollments,
       teachers,
       students,
       classes,

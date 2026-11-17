@@ -10,6 +10,8 @@ type Stat = {
   value: string;
   unit?: string;
   delta?: string;
+  /** A drop shows in red, a rise in green. */
+  deltaDown?: boolean;
   footnote: string;
   accent: string;
   iconClass: string;
@@ -61,6 +63,7 @@ export function StatCards({
         attendanceDelta === null || attendanceDelta === 0
           ? undefined
           : `${attendanceDelta > 0 ? "+" : ""}${attendanceDelta}%`,
+      deltaDown: attendanceDelta !== null && attendanceDelta < 0,
       footnote: `${excusedToday} excused absence${excusedToday === 1 ? "" : "s"}`,
       accent: "bg-emerald-500",
       iconClass: "bg-emerald-50 text-emerald-600",
@@ -106,7 +109,9 @@ export function StatCards({
               </span>
             )}
             {stat.delta && (
-              <span className="text-xs font-bold text-emerald-600">
+              <span
+                className={`text-xs font-bold ${stat.deltaDown ? "text-rose-600" : "text-emerald-600"}`}
+              >
                 {stat.delta}
               </span>
             )}

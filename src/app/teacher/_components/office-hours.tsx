@@ -85,6 +85,8 @@ export function OfficeHours({
                 {deadline.description ? `${deadline.description}: ` : ""}
                 {deadline.startAt.toLocaleDateString("en-US", {
                   weekday: "long",
+                  month: "short",
+                  day: "numeric",
                 })}
                 ,{" "}
                 {deadline.startAt.toLocaleTimeString("en-US", {
