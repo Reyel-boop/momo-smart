@@ -98,6 +98,43 @@ export const authConfig = {
     // A school day plus a margin; re-authentication is cheap.
     maxAge: 12 * 60 * 60,
   },
+  // Momo also runs inside the School Hub (another site, in a frame). Browsers
+  // drop the default SameSite=Lax cookies there, so sign-in never sticks.
+  // In production the auth cookies are SameSite=None and Partitioned (kept
+  // per top-level site), which works both in the Hub and in its own tab.
+  ...(process.env.NODE_ENV === "production" && {
+    cookies: {
+      sessionToken: {
+        name: "__Secure-authjs.session-token",
+        options: {
+          httpOnly: true,
+          sameSite: "none",
+          path: "/",
+          secure: true,
+          partitioned: true,
+        },
+      },
+      callbackUrl: {
+        name: "__Secure-authjs.callback-url",
+        options: {
+          sameSite: "none",
+          path: "/",
+          secure: true,
+          partitioned: true,
+        },
+      },
+      csrfToken: {
+        name: "__Host-authjs.csrf-token",
+        options: {
+          httpOnly: true,
+          sameSite: "none",
+          path: "/",
+          secure: true,
+          partitioned: true,
+        },
+      },
+    },
+  }),
   pages: {
     signIn: "/login",
     error: "/login",
