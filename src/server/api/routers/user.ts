@@ -3,6 +3,7 @@ import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 
 import { env } from "~/env";
+import { forgetAccount } from "~/server/auth/config";
 import {
   adminProcedure,
   createTRPCRouter,
@@ -245,6 +246,7 @@ export const userRouter = createTRPCRouter({
           mustChangePassword: false,
         },
       });
+      forgetAccount(ctx.session.user.id);
       return { ok: true };
     }),
 

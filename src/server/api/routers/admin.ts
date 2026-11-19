@@ -5,6 +5,7 @@ import { hash } from "bcryptjs";
 import { z } from "zod";
 
 import { adminProcedure, createTRPCRouter, schoolOf } from "~/server/api/trpc";
+import { forgetAccount } from "~/server/auth/config";
 import { createUnitQuizzesForSection } from "~/server/curriculum";
 import { homeroom, importRoster, rosterRow } from "~/server/lib/import-roster";
 import type { PrismaClient } from "../../../../generated/prisma";
@@ -600,6 +601,7 @@ export const adminRouter = createTRPCRouter({
           mustChangePassword: true,
         },
       });
+      forgetAccount(input.userId);
       return { password };
     }),
 
@@ -623,6 +625,7 @@ export const adminRouter = createTRPCRouter({
         where: { id: input.userId },
         data: { isActive: input.active },
       });
+      forgetAccount(input.userId);
       return { ok: true };
     }),
 

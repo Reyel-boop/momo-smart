@@ -10,7 +10,7 @@ import { api } from "~/trpc/react";
 export function LiveBanner() {
   const pathname = usePathname();
   const { data: game } = api.live.mine.useQuery(undefined, {
-    refetchInterval: 8000,
+    refetchInterval: 20_000,
   });
   if (!game || pathname.startsWith("/student/live")) return null;
   return (

@@ -91,6 +91,40 @@ const credentialsSchema = z.object({
  *
  * @see https://authjs.dev/getting-started/authentication/credentials
  */
+const ACCOUNT_TTL_MS = 30_000;
+const accountCache = new Map<string, { at: number; row: AccountRow | null }>();
+type AccountRow = Awaited<ReturnType<typeof readAccount>>;
+function readAccount(id: string) {
+  return db.user.findUnique({
+    where: { id },
+    select: {
+      isActive: true,
+      role: true,
+      mustChangePassword: true,
+      schoolId: true,
+      isOwner: true,
+      studentProfile: { select: { id: true } },
+      teacherProfile: { select: { id: true } },
+    },
+  });
+}
+async function accountOf(id: string) {
+  const hit = accountCache.get(id);
+  if (hit && Date.now() - hit.at < ACCOUNT_TTL_MS) return hit.row;
+  const row = await readAccount(id);
+  // Accounts that must still change their password are always re-read, so
+  // the change applies on the very next page (no loop back to the form).
+  if (row && !row.mustChangePassword) {
+    if (accountCache.size > 5000) accountCache.clear();
+    accountCache.set(id, { at: Date.now(), row });
+  } else accountCache.delete(id);
+  return row;
+}
+/** Forget a cached account (after a password change, deactivation, etc.). */
+export function forgetAccount(id: string) {
+  accountCache.delete(id);
+}
+
 export const authConfig = {
   adapter: PrismaAdapter(db),
   session: {
@@ -209,23 +243,20 @@ export const authConfig = {
       const current = readClaims(token);
       if (!current.id) return null;
 
-      // A JWT outlives the row it describes, so re-read the account on each
-      // request: deleted or deactivated users lose access immediately instead
-      // of staying signed in until the token expires, and role or profile
-      // changes apply without a fresh sign-in. `auth()` is cached per request,
-      // so this costs one indexed lookup per request.
-      const account = await db.user.findUnique({
-        where: { id: current.id },
-        select: {
-          isActive: true,
-          role: true,
-          mustChangePassword: true,
-          schoolId: true,
-          isOwner: true,
-          studentProfile: { select: { id: true } },
-          teacherProfile: { select: { id: true } },
-        },
-      });
+      // A JWT outlives the row it describes, so the account is re-read:
+      // deleted or deactivated users lose access, and role or profile changes
+      // apply without a fresh sign-in. The answer is reused for 30 seconds per
+      // server instance, so a class of students clicking around doesn't send
+      // one lookup per request. If the database is briefly unreachable, the
+      // student stays signed in with the claims they already have instead of
+      // being signed out or shown an error.
+      let account: AccountRow | null;
+      try {
+        account = await accountOf(current.id);
+      } catch (e) {
+        console.error("[auth] account check skipped (database busy)", e);
+        return token;
+      }
 
       // Returning null invalidates the session; the caller sees a signed-out
       // visitor rather than a 500 from a dangling user id.
