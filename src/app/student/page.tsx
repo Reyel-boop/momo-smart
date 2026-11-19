@@ -1,4 +1,5 @@
 import { api } from "~/trpc/server";
+import { getDueTwoWeeks, getStudentOverview } from "./_data";
 import { ActiveCourses } from "./_components/active-courses";
 import { Announcements } from "./_components/announcements";
 import { AttendanceCard } from "./_components/attendance-card";
@@ -13,11 +14,11 @@ export const dynamic = "force-dynamic";
 export default async function StudentDashboard() {
   const [overview, resume, stars, dueSoon, announcements, sections] =
     await Promise.all([
-      api.dashboard.studentOverview(),
+      getStudentOverview(),
       api.lesson.resumePoint(),
       api.dashboard.studentStars(),
       // Two weeks, so each course card can show its next piece of work.
-      api.assignment.dueSoon({ withinDays: 14 }),
+      getDueTwoWeeks(),
       api.announcement.feed({ limit: 3 }),
       api.course.mySections(),
     ]);

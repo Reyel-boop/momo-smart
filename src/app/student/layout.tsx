@@ -10,6 +10,7 @@ import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
 import { isDemoEmail } from "~/server/demo/accounts";
 import { api } from "~/trpc/server";
+import { getDueTwoWeeks, getStudentOverview, withinAWeek } from "./_data";
 import { LiveBanner } from "./_components/live-banner";
 import { Sidebar } from "./_components/sidebar";
 import { Topbar } from "./_components/topbar";
@@ -31,11 +32,12 @@ export default async function StudentLayout({
   if (session.user.role !== "STUDENT") redirect(homeForRole(session.user.role));
   if (session.user.mustChangePassword) redirect("/account/password");
 
-  const [overview, dueSoon, unread] = await Promise.all([
-    api.dashboard.studentOverview(),
-    api.assignment.dueSoon({ withinDays: 7 }),
+  const [overview, dueTwoWeeks, unread] = await Promise.all([
+    getStudentOverview(),
+    getDueTwoWeeks(),
     api.notification.unreadCount(),
   ]);
+  const dueSoon = withinAWeek(dueTwoWeeks);
 
   const studentName = overview.profile.user.name ?? "Student";
 

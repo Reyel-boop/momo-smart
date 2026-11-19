@@ -46,6 +46,31 @@ const isUnreachable = (e: unknown) => {
   );
 };
 const WAITS_MS = [500, 1500, 3000];
+
+/*
+ * A short memory of answers that almost never change, so a class of students
+ * opening pages doesn't ask the (small, free) database the same thing again
+ * and again. Each server keeps its own copy; any change to that table made
+ * through this server clears it at once, and every copy expires on its own.
+ */
+const READS = new Set([
+  "findFirst",
+  "findFirstOrThrow",
+  "findUnique",
+  "findUniqueOrThrow",
+  "findMany",
+  "count",
+]);
+const KEEP_MS: Record<string, number> = {
+  Term: 60_000, // the current school term
+  School: 60_000,
+  Notification: 15_000, // the unread badge, asked on every page
+};
+const memory = new Map<string, { at: number; value: Promise<unknown> }>();
+function forgetModel(model: string) {
+  for (const key of memory.keys())
+    if (key.startsWith(model + ":")) memory.delete(key);
+}
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const createPrismaClient = () =>
@@ -58,18 +83,37 @@ const createPrismaClient = () =>
     // is tried again (up to 3 times, waiting a little longer each time)
     // instead of failing the page.
     query: {
-      async $allOperations({ args, query }) {
-        for (let attempt = 0; ; attempt++) {
-          try {
-            return (await query(args)) as unknown;
-          } catch (e) {
-            if (attempt >= WAITS_MS.length || !isUnreachable(e)) throw e;
-            await sleep(WAITS_MS[attempt]!);
+      async $allOperations({ model, operation, args, query }) {
+        const keep = model ? KEEP_MS[model] : undefined;
+        if (keep && model) {
+          if (!READS.has(operation)) forgetModel(model);
+          // Notifications: only the unread count is kept, not the lists.
+          else if (model !== "Notification" || operation === "count") {
+            const key = `${model}:${operation}:${JSON.stringify(args)}`;
+            const hit = memory.get(key);
+            if (hit && Date.now() - hit.at < keep) return hit.value;
+            const value = runWithRetry(() => query(args));
+            if (memory.size > 2000) memory.clear();
+            memory.set(key, { at: Date.now(), value });
+            value.catch(() => memory.delete(key));
+            return value;
           }
         }
+        return runWithRetry(() => query(args));
       },
     },
   });
+
+async function runWithRetry(run: () => Promise<unknown>): Promise<unknown> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await run();
+    } catch (e) {
+      if (attempt >= WAITS_MS.length || !isUnreachable(e)) throw e;
+      await sleep(WAITS_MS[attempt]!);
+    }
+  }
+}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
