@@ -496,7 +496,7 @@ export function EmailForm({
         <Status status={status} />
       </div>
       <p className="text-muted text-xs">
-        Use the same email as in the School Hub so your reminders include your
+        Use the same email as in AskReyel so your reminders include your
         Momo work.
       </p>
     </form>

@@ -57,7 +57,7 @@ const UPDATES: Update[] = [
       {
         icon: "✉️",
         title: "Add your email address",
-        text: "Get school updates and reminders. You can also sign in with your email. Use the same email as in the School Hub.",
+        text: "Get school updates and reminders. You can also sign in with your email. Use the same email as in AskReyel.",
         href: "/student/settings#email",
         cta: "Add my email",
       },
