@@ -16,6 +16,9 @@ function databaseUrl() {
       url.searchParams.set("connect_timeout", "20");
     if (!url.searchParams.has("pool_timeout"))
       url.searchParams.set("pool_timeout", "20");
+    // Neon's "-pooler" address is PgBouncer: tell Prisma, as Neon recommends.
+    if (url.hostname.includes("-pooler") && !url.searchParams.has("pgbouncer"))
+      url.searchParams.set("pgbouncer", "true");
     return url.toString();
   } catch {
     return raw;
@@ -24,15 +27,25 @@ function databaseUrl() {
 
 /** Errors that mean "the database could not be reached right now". */
 const RETRYABLE = new Set(["P1001", "P1002", "P1017", "P2024"]);
-const errorCode = (e: unknown) => {
-  if (typeof e !== "object" || e === null) return undefined;
-  const x = e as { code?: unknown; errorCode?: unknown };
-  return typeof x.code === "string"
-    ? x.code
-    : typeof x.errorCode === "string"
-      ? x.errorCode
-      : undefined;
+const UNREACHABLE =
+  /can't reach database server|timed out fetching a new connection|connection (?:was )?(?:closed|reset|terminated)|server has closed the connection|ECONNRESET|ETIMEDOUT/i;
+// Prisma doesn't always attach a code: "Can't reach database server" arrives
+// as an initialization error with errorCode undefined. Check the message too.
+const isUnreachable = (e: unknown) => {
+  if (typeof e !== "object" || e === null) return false;
+  const x = e as { code?: unknown; errorCode?: unknown; message?: unknown };
+  const code =
+    typeof x.code === "string"
+      ? x.code
+      : typeof x.errorCode === "string"
+        ? x.errorCode
+        : "";
+  return (
+    RETRYABLE.has(code) ||
+    (typeof x.message === "string" && UNREACHABLE.test(x.message))
+  );
 };
+const WAITS_MS = [500, 1500, 3000];
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const createPrismaClient = () =>
@@ -42,16 +55,16 @@ const createPrismaClient = () =>
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   }).$extends({
     // A query that failed only because the database was briefly unreachable
-    // is tried again (twice, after a short wait) instead of failing the page.
+    // is tried again (up to 3 times, waiting a little longer each time)
+    // instead of failing the page.
     query: {
       async $allOperations({ args, query }) {
         for (let attempt = 0; ; attempt++) {
           try {
             return (await query(args)) as unknown;
           } catch (e) {
-            const code = errorCode(e);
-            if (attempt >= 2 || !code || !RETRYABLE.has(code)) throw e;
-            await sleep(500 * (attempt + 1));
+            if (attempt >= WAITS_MS.length || !isUnreachable(e)) throw e;
+            await sleep(WAITS_MS[attempt]!);
           }
         }
       },
