@@ -73,12 +73,31 @@ function forgetModel(model: string) {
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/*
+ * A server whose connection to the database got stuck keeps failing with
+ * "Can't reach database server" while the other servers work fine. Retrying
+ * on the same stuck connection doesn't help, so the connection is closed and
+ * opened fresh before the next try (at most once every 5 seconds, so working
+ * queries aren't cut off over and over).
+ */
+let base: PrismaClient | undefined;
+let lastReset = 0;
+async function freshConnection() {
+  if (!base || Date.now() - lastReset < 5_000) return;
+  lastReset = Date.now();
+  try {
+    await base.$disconnect();
+  } catch {
+    // already closed
+  }
+}
+
 const createPrismaClient = () =>
-  new PrismaClient({
+  (base = new PrismaClient({
     datasourceUrl: databaseUrl(),
     log:
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-  }).$extends({
+  })).$extends({
     // A query that failed only because the database was briefly unreachable
     // is tried again (up to 3 times, waiting a little longer each time)
     // instead of failing the page.
@@ -110,6 +129,7 @@ async function runWithRetry(run: () => Promise<unknown>): Promise<unknown> {
       return await run();
     } catch (e) {
       if (attempt >= WAITS_MS.length || !isUnreachable(e)) throw e;
+      await freshConnection();
       await sleep(WAITS_MS[attempt]!);
     }
   }
