@@ -5,6 +5,7 @@ import { Announcements } from "./_components/announcements";
 import { AttendanceCard } from "./_components/attendance-card";
 import { ContinueLesson } from "./_components/continue-lesson";
 import { DueSoon } from "./_components/due-soon";
+import { Leaderboard } from "./_components/leaderboard";
 import { StarPoints } from "./_components/star-points";
 import { Welcome } from "./_components/welcome";
 
@@ -12,7 +13,7 @@ import { Welcome } from "./_components/welcome";
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboard() {
-  const [overview, resume, stars, dueSoon, announcements, sections] =
+  const [overview, resume, stars, dueSoon, announcements, sections, board] =
     await Promise.all([
       getStudentOverview(),
       api.lesson.resumePoint(),
@@ -21,6 +22,7 @@ export default async function StudentDashboard() {
       getDueTwoWeeks(),
       api.announcement.feed({ limit: 3 }),
       api.course.mySections(),
+      api.dashboard.leaderboard({ scope: "all" }),
     ]);
 
   const weekAhead = Date.now() + 7 * 24 * 60 * 60 * 1000;
@@ -42,6 +44,7 @@ export default async function StudentDashboard() {
 
         <div className="min-w-0 space-y-6">
           <DueSoon items={dueThisWeek} />
+          <Leaderboard board={board} compact />
           <Announcements items={announcements.items} />
           <AttendanceCard attendance={overview.attendance} />
         </div>

@@ -77,6 +77,26 @@ export type StarTotal = {
  * their own, in a Live Quiz or in Momo's Quest, each question once — plus one per point of
  * released graded work, plus the best stars of each game level.
  */
+const TOTALS_KEEP_MS = 60_000;
+let savedTotals: { at: number; value: Promise<Map<string, StarTotal>> } | null =
+  null;
+
+/**
+ * starTotals, reused for a minute on each server. Adding up every student's
+ * stars reads every answer ever given, so the leaderboard (shown on every
+ * student's dashboard) uses this copy instead of recounting on each visit.
+ */
+export function starTotalsForBoard(db: Db): Promise<Map<string, StarTotal>> {
+  if (savedTotals && Date.now() - savedTotals.at < TOTALS_KEEP_MS)
+    return savedTotals.value;
+  const value = starTotals(db);
+  savedTotals = { at: Date.now(), value };
+  value.catch(() => {
+    savedTotals = null;
+  });
+  return value;
+}
+
 export async function starTotals(db: Db): Promise<Map<string, StarTotal>> {
   const [answers, grades, games] = await Promise.all([
     db.$queryRaw<Array<{ studentId: string; stars: bigint }>>`

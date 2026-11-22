@@ -15,6 +15,7 @@ import {
   STAR_ASSIGNMENT_TYPES,
   starsFor,
   starTotals,
+  starTotalsForBoard,
 } from "~/server/lib/stars";
 import { assertTeachesSection } from "~/server/lib/permissions";
 import { sectionProgressOf } from "~/server/lib/progress";
@@ -584,7 +585,7 @@ export const dashboardRouter = createTRPCRouter({
             user: { select: { name: true } },
           },
         }),
-        starTotals(ctx.db),
+        starTotalsForBoard(ctx.db),
       ]);
 
       const rows = students

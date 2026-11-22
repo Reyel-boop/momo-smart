@@ -11,8 +11,8 @@ import {
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, CardHeader, EmptyState, Pill } from "~/app/_components/ui";
 import { courseTone } from "~/app/student/_components/format";
+import { Leaderboard } from "~/app/student/_components/leaderboard";
 import { api } from "~/trpc/server";
-import type { RouterOutputs } from "~/trpc/react";
 
 export const metadata: Metadata = { title: "Scores · Momo Smart" };
 export const dynamic = "force-dynamic";
@@ -313,125 +313,5 @@ function Stat({
         {note && <p className="text-muted text-xs">{note}</p>}
       </div>
     </Card>
-  );
-}
-
-type Board = RouterOutputs["dashboard"]["leaderboard"];
-type BoardRow = Board["top"][number];
-
-const MEDALS = ["text-amber-500", "text-slate-400", "text-orange-700"];
-
-/** The star leaderboard, with All students / My grade / My section tabs. */
-function Leaderboard({ board }: { board: Board }) {
-  const tabs = [
-    { scope: "all", label: "All students" },
-    { scope: "grade", label: `Grade ${board.gradeLevel}` },
-    { scope: "section", label: board.section ?? "My section" },
-  ] as const;
-
-  return (
-    <Card className="overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
-            <TrophyIcon className="size-5" />
-          </span>
-          <div>
-            <h2 className="text-ink text-[17px] font-bold">Leaderboard</h2>
-            <p className="text-muted text-xs">
-              1 <StarIcon className="inline size-3.5 text-amber-500" /> for
-              every correct answer
-              {board.myRank &&
-                ` · You are #${board.myRank} of ${board.count} with ${board.myStars.toLocaleString()} stars`}
-            </p>
-          </div>
-        </div>
-        <nav aria-label="Leaderboard" className="flex flex-wrap gap-2">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.scope}
-              href={
-                tab.scope === "all"
-                  ? "/student/scores"
-                  : `/student/scores?board=${tab.scope}`
-              }
-              scroll={false}
-              aria-current={board.scope === tab.scope ? "page" : undefined}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                board.scope === tab.scope
-                  ? "bg-navy text-white"
-                  : "border-line bg-surface text-ink hover:bg-canvas border"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      {board.top.length === 0 ? (
-        <EmptyState>
-          {board.scope === "section" && !board.section
-            ? "You aren't in a section yet."
-            : "No students here yet."}
-        </EmptyState>
-      ) : (
-        <ol className="divide-line mt-4 divide-y">
-          {board.top.map((row) => (
-            <LeaderboardRow key={row.studentId} row={row} />
-          ))}
-          {board.me && (
-            <>
-              <li
-                aria-hidden="true"
-                className="text-muted px-5 py-1 text-center text-xs"
-              >
-                ⋯
-              </li>
-              <LeaderboardRow row={board.me} />
-            </>
-          )}
-        </ol>
-      )}
-    </Card>
-  );
-}
-
-function LeaderboardRow({ row }: { row: BoardRow }) {
-  const medal = row.stars > 0 ? MEDALS[row.rank - 1] : undefined;
-  return (
-    <li
-      className={`flex items-center gap-3 px-5 py-2.5 ${row.isMe ? "bg-brand-soft/60" : ""}`}
-      aria-current={row.isMe ? "true" : undefined}
-    >
-      <span className="flex w-8 shrink-0 justify-center">
-        {medal ? (
-          <TrophyIcon
-            className={`size-5 ${medal}`}
-            aria-label={`#${row.rank}`}
-          />
-        ) : (
-          <span className="text-muted text-sm font-bold tabular-nums">
-            {row.rank}
-          </span>
-        )}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-ink truncate text-sm font-semibold">
-          {row.name}
-          {row.isMe && (
-            <span className="text-brand ml-2 text-xs font-bold">You</span>
-          )}
-        </p>
-        <p className="text-muted truncate text-xs">
-          Grade {row.gradeLevel}
-          {row.section && ` — ${row.section}`}
-        </p>
-      </div>
-      <span className="inline-flex items-center gap-1 text-sm font-extrabold text-amber-600 tabular-nums">
-        {row.stars.toLocaleString()}
-        <StarIcon className="size-4" />
-      </span>
-    </li>
   );
 }
