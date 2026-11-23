@@ -1666,3 +1666,48 @@ model NatResponse {
 
   @@unique([attemptId, questionId])
 }
+
+/// A short educational sponsor message shown to students on the results
+/// screen after they finish Unit Questions (never during questions). Every
+/// card is labeled "Sponsored" and names the sponsor. Managed by the owner.
+model SponsorCard {
+  id        String    @id @default(cuid())
+  /// null = every school
+  schoolId  String?
+  sponsor   String
+  icon      String    @default("💡")
+  heading   String
+  message   String
+  linkUrl   String?
+  linkLabel String?
+  color     String    @default("#f97316")
+  startsOn  DateTime?
+  endsOn    DateTime?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  stats SponsorStat[]
+
+  @@index([active])
+}
+
+/// Views and clicks of a sponsor card per month ("2026-12"), for reports.
+model SponsorStat {
+  id     String @id @default(cuid())
+  cardId String
+  month  String
+  views  Int    @default(0)
+  clicks Int    @default(0)
+
+  card SponsorCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, month])
+}
+
+/// The owner's switch: sponsor cards show only while this is on.
+model SponsorSetting {
+  id        String   @id @default("main")
+  enabled   Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}

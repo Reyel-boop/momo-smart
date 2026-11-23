@@ -6,6 +6,7 @@ import { LogoMark } from "~/app/_components/brand";
 import {
   CapIcon,
   GridIcon,
+  MegaphoneIcon,
   ListIcon,
   SettingsIcon,
   SwitchIcon,
@@ -40,6 +41,7 @@ const ICONS: Record<string, React.ReactNode> = {
   Settings: <SettingsIcon className="size-[18px]" />,
   Schools: <SwitchIcon className="size-[18px]" />,
   "CB-NAT Review": <TimerIcon className="size-[18px]" />,
+  Sponsors: <MegaphoneIcon className="size-[18px]" />,
 };
 
 /** The owner also manages every school. */
@@ -47,6 +49,7 @@ const OWNER_ITEMS: NavItem[] = [
   ...ITEMS,
   { label: "Schools", href: "/admin/schools" },
   { label: "CB-NAT Review", href: "/admin/nat" },
+  { label: "Sponsors", href: "/admin/sponsors" },
 ];
 
 /** The registrar's portal: accounts, classes and enrollment. */

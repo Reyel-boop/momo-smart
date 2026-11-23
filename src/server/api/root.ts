@@ -14,6 +14,7 @@ import { natRouter } from "~/server/api/routers/nat";
 import { liveRouter } from "~/server/api/routers/live";
 import { raceRouter } from "~/server/api/routers/race";
 import { schoolRouter } from "~/server/api/routers/school";
+import { sponsorRouter } from "~/server/api/routers/sponsor";
 import { messageRouter } from "~/server/api/routers/message";
 import { notificationRouter } from "~/server/api/routers/notification";
 import { submissionRouter } from "~/server/api/routers/submission";
@@ -42,10 +43,12 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  *   calendar      agenda, timetable and office hours
  *   admin         registrar: accounts, classes and enrollment
  *   school        owner: schools, their admins, switching schools
+ *   sponsor       labeled educational sponsor cards on the results screen
  */
 export const appRouter = createTRPCRouter({
   admin: adminRouter,
   school: schoolRouter,
+  sponsor: sponsorRouter,
   user: userRouter,
   course: courseRouter,
   lesson: lessonRouter,

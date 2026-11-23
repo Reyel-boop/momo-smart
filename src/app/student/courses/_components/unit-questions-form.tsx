@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 import { Card } from "~/app/_components/ui";
+import { SponsorCard } from "~/app/student/_components/sponsor-card";
 import {
   answerUnitQuestion,
   openNextUnitQuestion,
@@ -661,6 +662,9 @@ function Review({
           </Link>
         </div>
       </Card>
+
+      {/* after the try is finished only: never during questions or the timer */}
+      <SponsorCard />
 
       <ol className="space-y-3">
         {quiz.questions.map((question) => {
