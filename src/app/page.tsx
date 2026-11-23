@@ -14,6 +14,7 @@ import {
   TimerIcon,
 } from "~/app/_components/icons";
 import { logout } from "~/app/login/actions";
+import { env } from "~/env";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
 
@@ -296,7 +297,27 @@ export default async function Home() {
       <footer className="border-line bg-surface border-t">
         <div className="text-muted mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm sm:flex-row">
           <Wordmark href={null} />
-          <p>Momo Smart LMS · S.Y. 2026–2027</p>
+          <p className="max-w-md text-center sm:text-left">
+            Momo Smart is an online learning platform for Philippine junior high
+            schools: lessons, quizzes, games, grades and attendance in one
+            place.
+          </p>
+          <nav aria-label="About Momo" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="#features" className="hover:text-ink font-semibold">
+              About
+            </Link>
+            <Link href="/privacy" className="hover:text-ink font-semibold">
+              Privacy
+            </Link>
+            {env.SUPPORT_EMAIL && (
+              <a
+                href={`mailto:${env.SUPPORT_EMAIL}`}
+                className="hover:text-ink font-semibold"
+              >
+                Contact
+              </a>
+            )}
+          </nav>
         </div>
       </footer>
     </div>

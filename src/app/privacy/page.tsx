@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "What Momo Smart collects, why, and your choices.",
 };
 
-const UPDATED = "October 27, 2026";
+const UPDATED = "November 23, 2026";
 
 function Section({
   title,
@@ -77,8 +77,9 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p>
-            We do not collect your location, contacts, or advertising IDs, and
-            we do not use advertising or tracking cookies.
+            We do not collect your location, contacts, or advertising IDs. Momo
+            itself does not use tracking cookies; see <b>Advertising</b> below
+            for the ads shown after quizzes.
           </p>
         </Section>
 
@@ -87,7 +88,7 @@ export default function PrivacyPage() {
             Only to provide Momo to your school: to show lessons and classes,
             check answers, keep scores and leaderboards, let teachers grade and
             take attendance, and send in-app notices. We never sell personal
-            information, and we don&apos;t use it for advertising.
+            information, and we never use it to choose or target ads.
           </p>
         </Section>
 
@@ -111,11 +112,56 @@ export default function PrivacyPage() {
               (database). Lesson videos are played from YouTube, which has its
               own privacy policy. They process data only to run Momo.
             </li>
+            <li>
+              <b>Google</b>, if Google ads are shown (see Advertising). Momo
+              does not send Google any names, grades or school work.
+            </li>
           </ul>
           <p>
             We may share information if the law requires it, or to protect the
             safety of a student.
           </p>
+        </Section>
+
+        <Section title="Advertising">
+          <p>
+            Ads help keep Momo running. They appear in one place only: the
+            results screen after a student finishes a set of Unit Questions,
+            below the score. Ads never appear during questions, the timer, live
+            games or lessons, and students can close them.
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            <li>
+              <b>Sponsor messages.</b> Short educational messages (for example a
+              study tip or a scholarship notice), labeled &ldquo;Sponsored&rdquo;
+              with the sponsor&apos;s name. We count how many times each message
+              is shown and clicked in total, not who saw or clicked it, and
+              sponsors receive only those totals. Sponsors never receive any
+              student information.
+            </li>
+            <li>
+              <b>Google ads.</b> When no sponsor message is running, Momo may
+              show an ad from Google AdSense in the same place. Because Momo is
+              used by students, including children under 13, ads are requested
+              as child-directed: they are not personalized and are not based on
+              a student&apos;s interests or activity. Google may still use
+              cookies or similar technology to show an ad, limit how often it
+              appears, measure it, and prevent fraud. Learn more in{" "}
+              <a
+                href="https://policies.google.com/technologies/partner-sites"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand font-semibold"
+              >
+                how Google uses information from sites that use its services
+              </a>
+              .
+            </li>
+            <li>
+              We block ads for gambling, dating, alcohol, tobacco, politics and
+              other topics that aren&apos;t suitable for students.
+            </li>
+          </ul>
         </Section>
 
         <Section title="How we protect it">
