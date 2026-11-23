@@ -37,6 +37,15 @@ const HUNT_LOOK = {
   emoji: "🔍",
 };
 
+/** Memory Match looks the same in every subject. */
+const MATCH_LOOK = {
+  href: "/student/games/match",
+  blurb:
+    "Flip the cards and pair each word with its meaning. Remember where you saw them: fewer misses, more stars.",
+  banner: "from-rose-500 to-orange-500",
+  emoji: "🃏",
+};
+
 /** Turbo Takbo looks the same in every subject. */
 const TURBO_LOOK = {
   href: "/student/games/turbo",
@@ -240,6 +249,14 @@ const LOOK = {
   heng: HUNT_LOOK,
   hfil: HUNT_LOOK,
   htle: HUNT_LOOK,
+  pcode: MATCH_LOOK,
+  ptel: MATCH_LOOK,
+  pmath: MATCH_LOOK,
+  psci: MATCH_LOOK,
+  pap: MATCH_LOOK,
+  peng: MATCH_LOOK,
+  pfil: MATCH_LOOK,
+  ptle: MATCH_LOOK,
   tcode: TURBO_LOOK,
   ttel: TURBO_LOOK,
   tmath: TURBO_LOOK,

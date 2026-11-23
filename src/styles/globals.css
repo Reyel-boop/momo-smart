@@ -21,6 +21,17 @@
 
   /* The peeking-dog mascot sliding out from behind a card: sideways past its
      right edge, or up over its top edge. */
+  /* Memory Match: a card turning over (a quick squeeze and back). */
+  --animate-card-flip: card-flip 0.25s ease-out;
+  @keyframes card-flip {
+    from {
+      transform: scaleX(0.05);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   --animate-peek: peek 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
   --animate-peek-up: peek-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 

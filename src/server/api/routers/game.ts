@@ -11,6 +11,7 @@ import {
   GAMES,
   gamesForCourse,
   HUNT_GAMES,
+  MATCH_GAMES,
   RUN_GAMES,
   SCRAMBLE_GAMES,
   STUDIO_GAMES,
@@ -39,6 +40,7 @@ import { SPRINT_LEVELS } from "~/lib/games/tag-sprint";
 import { TICKET_LEVELS } from "~/lib/games/ticket-rush";
 import { TOOL_LEVELS } from "~/lib/games/tool-shed";
 import { scoreTurbo } from "~/lib/games/turbo-takbo";
+import { scoreMatch } from "~/lib/games/memory-match";
 import { scoreHunt } from "~/lib/games/word-hunt";
 import { scoreScramble } from "~/lib/games/word-scramble";
 import { createTRPCRouter, studentProcedure } from "~/server/api/trpc";
@@ -585,6 +587,39 @@ export const gameRouter = createTRPCRouter({
         input.levelId,
         result.stars,
         Math.max(0, 20 - result.hints),
+      );
+      return { ...result, ...saved };
+    }),
+
+  /** Memory Match (any subject): the pairs matched and the misses. */
+  finishMatch: studentProcedure
+    .input(
+      z.object({
+        game: z.enum(MATCH_GAMES),
+        levelId: z.string(),
+        matched: z.array(z.string().max(60)).max(10),
+        misses: z.number().int().min(0).max(200),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertPlayable(ctx.db, ctx.studentId, input.game, input.levelId);
+      const level = GAMES[input.game].levels.find(
+        (l) => l.id === input.levelId,
+      )!;
+      const result = scoreMatch(level, input.matched, input.misses);
+      if (!result) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Match every pair first.",
+        });
+      }
+      const saved = await saveBest(
+        ctx.db,
+        ctx.studentId,
+        input.game,
+        input.levelId,
+        result.stars,
+        Math.max(0, 30 - result.misses),
       );
       return { ...result, ...saved };
     }),

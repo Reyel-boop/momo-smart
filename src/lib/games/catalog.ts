@@ -24,6 +24,7 @@ import { SPRINT_LEVELS } from "./tag-sprint";
 import { TICKET_LEVELS } from "./ticket-rush";
 import { TOOL_LEVELS } from "./tool-shed";
 import { turboLevelsOf } from "./turbo-takbo";
+import { matchLevelsOf } from "./memory-match";
 import { huntLevelsOf } from "./word-hunt";
 import {
   WORDS_AP,
@@ -306,6 +307,55 @@ export const GAMES = {
     forCourse: notYet,
     levels: huntLevelsOf(WORDS_TLE),
   },
+  // Memory Match: flip cards to pair each word with its meaning.
+  pcode: {
+    title: "Memory Match",
+    course: "Computer Programming",
+    forCourse: isCP,
+    levels: matchLevelsOf(WORDS_CP),
+  },
+  ptel: {
+    title: "Memory Match",
+    course: "Telecommunications",
+    forCourse: isTEL,
+    levels: matchLevelsOf(WORDS_TEL),
+  },
+  pmath: {
+    title: "Memory Match",
+    course: "Mathematics",
+    forCourse: isMath,
+    levels: matchLevelsOf(WORDS_MATH),
+  },
+  psci: {
+    title: "Memory Match",
+    course: "Science",
+    forCourse: isSci,
+    levels: matchLevelsOf(WORDS_SCI),
+  },
+  pap: {
+    title: "Memory Match",
+    course: "Araling Panlipunan",
+    forCourse: isAP,
+    levels: matchLevelsOf(WORDS_AP),
+  },
+  peng: {
+    title: "Memory Match",
+    course: "English",
+    forCourse: isEng,
+    levels: matchLevelsOf(WORDS_ENG),
+  },
+  pfil: {
+    title: "Memory Match",
+    course: "Filipino",
+    forCourse: isFil,
+    levels: matchLevelsOf(WORDS_FIL),
+  },
+  ptle: {
+    title: "Memory Match",
+    course: "TLE",
+    forCourse: isOtherTLE,
+    levels: matchLevelsOf(WORDS_TLE),
+  },
   // Turbo Takbo: a tap-for-speed run per subject, on the same words.
   tcode: {
     title: "Turbo Takbo",
@@ -458,6 +508,18 @@ export const HUNT_GAMES = [
   "heng",
   "hfil",
   "htle",
+] as const satisfies readonly GameId[];
+
+/** The Memory Match games, which share one screen and one finish call. */
+export const MATCH_GAMES = [
+  "pcode",
+  "ptel",
+  "pmath",
+  "psci",
+  "pap",
+  "peng",
+  "pfil",
+  "ptle",
 ] as const satisfies readonly GameId[];
 
 /** The Turbo Takbo games, which share one screen and one finish call. */
