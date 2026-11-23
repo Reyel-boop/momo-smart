@@ -22,6 +22,19 @@ const config = {
     "@vercel/oidc",
     "three",
   ],
+  // Momo's own address is www.momo-smart.com: visitors on the old
+  // momo-smart.vercel.app address are sent there (same page). API calls and
+  // /.well-known stay on the old address so nothing in progress breaks.
+  async redirects() {
+    return [
+      {
+        source: "/:path((?!api/|\\.well-known/).*)",
+        has: [{ type: "host", value: "momo-smart.vercel.app" }],
+        destination: "https://www.momo-smart.com/:path",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default config;
