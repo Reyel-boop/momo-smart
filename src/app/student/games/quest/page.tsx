@@ -122,27 +122,34 @@ export default async function QuestPage() {
             {units
               .filter((u) => u.sectionId === boss.sectionId)
               .map((u) => (
-                <Link
-                  key={u.assessmentId}
-                  href={`/student/games/quest/${u.assessmentId}`}
-                  className="border-line bg-surface hover:border-brand group flex items-center gap-3 rounded-2xl border p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-lg font-black text-white shadow">
-                    {u.unit}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="text-ink block truncate text-sm font-bold">
-                      {u.unitTitle}
+                <div key={u.assessmentId} className="space-y-1.5">
+                  <Link
+                    href={`/student/games/quest/${u.assessmentId}`}
+                    className="border-line bg-surface hover:border-brand group flex items-center gap-3 rounded-2xl border p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-lg font-black text-white shadow">
+                      {u.unit}
                     </span>
-                    <span className="text-muted block text-xs">
-                      {u.questions} questions
+                    <span className="min-w-0 flex-1">
+                      <span className="text-ink block truncate text-sm font-bold">
+                        {u.unitTitle}
+                      </span>
+                      <span className="text-muted block text-xs">
+                        {u.questions} questions
+                      </span>
+                      <Stars count={u.stars} className="mt-0.5 size-3.5" />
                     </span>
-                    <Stars count={u.stars} className="mt-0.5 size-3.5" />
-                  </span>
-                  <span className="rounded-lg bg-amber-400 px-2.5 py-1 text-xs font-black text-slate-900 transition group-hover:bg-amber-300">
-                    {u.stars > 0 ? "Replay" : "Play"}
-                  </span>
-                </Link>
+                    <span className="rounded-lg bg-amber-400 px-2.5 py-1 text-xs font-black text-slate-900 transition group-hover:bg-amber-300">
+                      {u.stars > 0 ? "Replay" : "Play"}
+                    </span>
+                  </Link>
+                  <Link
+                    href={`/student/games/quest/3d/${u.assessmentId}`}
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 via-purple-900 to-rose-900 px-3 py-2 text-xs font-black text-white shadow-sm transition hover:brightness-125"
+                  >
+                    🎮 3D Battle: Lumina vs the Skull Warrior
+                  </Link>
+                </div>
               ))}
           </div>
         </div>
