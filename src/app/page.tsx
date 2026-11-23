@@ -294,6 +294,14 @@ export default async function Home() {
         </section>
       </main>
 
+      {/* Google AdSense: on the public home page only (site verification).
+          Never loaded on student or teacher pages, so no automatic ads can
+          appear in lessons or quizzes. React places it in <head>. */}
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6178294686827980"
+        crossOrigin="anonymous"
+      />
       <footer className="border-line bg-surface border-t">
         <div className="text-muted mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm sm:flex-row">
           <Wordmark href={null} />
