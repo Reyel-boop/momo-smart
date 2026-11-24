@@ -219,7 +219,7 @@ function Match({
         <Card className="p-4">
           <div className="mb-3 flex items-center gap-3">
             <div
-              className={`size-16 shrink-0 overflow-hidden rounded-2xl bg-indigo-950 transition-transform duration-300 sm:size-20 ${
+              className={`size-16 shrink-0 overflow-hidden transition-transform duration-300 sm:size-20 ${
                 hop === "yay"
                   ? "motion-safe:-translate-y-2 motion-safe:scale-110"
                   : hop === "aww"
