@@ -12,9 +12,15 @@ const initialState: LoginState = { error: null };
 
 export function LoginForm({
   showDemoAccounts,
+  askReyelUrl,
+  askReyelNotice,
 }: {
   /** Only the public demo offers its shared accounts. */
   showDemoAccounts: boolean;
+  /** Signs in with the AskReyel account (one account for every system). */
+  askReyelUrl: string;
+  /** Why a sign-in from AskReyel didn't work, if it didn't. */
+  askReyelNotice: string | null;
 }) {
   const [state, formAction, pending] = useActionState(login, initialState);
   const [email, setEmail] = useState("");
@@ -33,7 +39,34 @@ export function LoginForm({
         and assessments.
       </p>
 
-      <form action={formAction} className="mt-8 space-y-4">
+      {askReyelNotice && (
+        <p
+          role="alert"
+          className="mt-6 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900"
+        >
+          <AlertIcon className="mt-px size-4 shrink-0" />
+          {askReyelNotice}
+        </p>
+      )}
+
+      <a
+        href={askReyelUrl}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e8c8f] px-4 py-3 text-[15px] font-bold text-white shadow-sm transition hover:brightness-110"
+      >
+        Sign in with AskReyel
+        <ArrowRightIcon className="size-4" />
+      </a>
+      <p className="text-muted mt-2 text-center text-xs">
+        One account for Momo, Tuon, Aral Reading and Aral Math.
+      </p>
+
+      <div className="text-muted mt-6 flex items-center gap-3 text-xs font-semibold">
+        <span className="bg-line h-px flex-1" />
+        or use your Momo password
+        <span className="bg-line h-px flex-1" />
+      </div>
+
+      <form action={formAction} className="mt-4 space-y-4">
         {state.error && (
           <p
             role="alert"

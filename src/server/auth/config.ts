@@ -5,6 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 
 import { db } from "~/server/db";
+import { checkAskReyelPass } from "./askreyel";
 import { accountWhere } from "./identifier";
 import type { UserRole } from "../../../generated/prisma";
 
@@ -210,6 +211,57 @@ export const authConfig = {
           where: { id: user.id },
           data: { lastLoginAt: new Date() },
         });
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          role: user.role,
+          studentId: user.studentProfile?.id ?? null,
+          teacherId: user.teacherProfile?.id ?? null,
+        };
+      },
+    }),
+    // Opened from AskReyel: its sign-in pass stands in for the password.
+    Credentials({
+      id: "askreyel",
+      name: "AskReyel",
+      credentials: { pass: { type: "text" } },
+      authorize: async (raw) => {
+        const pass = typeof raw?.pass === "string" ? raw.pass : "";
+        const who = pass ? await checkAskReyelPass(pass) : null;
+        if (!who?.email) return null;
+
+        const user = await db.user.findFirst({
+          where: { email: { equals: who.email, mode: "insensitive" } },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            isActive: true,
+            mustChangePassword: true,
+            studentProfile: { select: { id: true } },
+            teacherProfile: { select: { id: true } },
+          },
+        });
+        if (!user?.isActive) return null;
+
+        await db.user.update({
+          where: { id: user.id },
+          data: {
+            lastLoginAt: new Date(),
+            // A temporary password from a reset isn't needed any more: AskReyel
+            // is how they sign in. Clear it so it can't be used by anyone else.
+            ...(user.mustChangePassword && {
+              mustChangePassword: false,
+              passwordHash: null,
+            }),
+          },
+        });
+        forgetAccount(user.id);
 
         return {
           id: user.id,

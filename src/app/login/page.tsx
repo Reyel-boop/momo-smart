@@ -6,6 +6,7 @@ import { Wordmark } from "~/app/_components/brand";
 import { CheckIcon } from "~/app/_components/icons";
 import { env } from "~/env";
 import { auth } from "~/server/auth";
+import { ASKREYEL_SIGN_IN } from "~/server/auth/askreyel";
 import { homeForRole } from "~/server/auth/home";
 import { LoginForm } from "./login-form";
 
@@ -20,7 +21,23 @@ const HIGHLIGHTS = [
   "Period attendance and early-intervention alerts",
 ];
 
-export default async function LoginPage() {
+/** Why an arrival from AskReyel didn't sign in (see /sso). */
+const ASKREYEL_NOTICES: Record<string, string> = {
+  expired:
+    "That AskReyel sign-in link expired. Tap “Sign in with AskReyel” to try again.",
+  noemail:
+    "Your AskReyel account has no email yet. Add your email in AskReyel, then try again.",
+  nomatch:
+    "No Momo account uses your AskReyel email yet. Ask your teacher or the school admin to add you to Momo with the same email.",
+  off: "This Momo account is turned off. Please contact the school admin.",
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ askreyel?: string }>;
+}) {
+  const { askreyel } = await searchParams;
   const session = await auth();
   if (session?.user) redirect(homeForRole(session.user.role));
 
@@ -75,7 +92,11 @@ export default async function LoginPage() {
         </div>
 
         <div className="flex flex-1 items-center justify-center py-10">
-          <LoginForm showDemoAccounts={env.DEMO_MODE} />
+          <LoginForm
+            showDemoAccounts={env.DEMO_MODE}
+            askReyelUrl={ASKREYEL_SIGN_IN}
+            askReyelNotice={(askreyel && ASKREYEL_NOTICES[askreyel]) ?? null}
+          />
         </div>
 
         <p className="text-muted text-center text-sm">
