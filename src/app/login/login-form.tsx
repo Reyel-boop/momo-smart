@@ -51,6 +51,8 @@ export function LoginForm({
 
       <a
         href={askReyelUrl}
+        // leave the AskReyel frame: Momo keeps its sign-in only as the main page
+        target="_top"
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e8c8f] px-4 py-3 text-[15px] font-bold text-white shadow-sm transition hover:brightness-110"
       >
         Sign in with AskReyel

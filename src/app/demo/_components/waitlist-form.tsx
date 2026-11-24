@@ -135,6 +135,7 @@ export function WaitlistForm({ source = "demo" }: { source?: string }) {
           </Link>
           <a
             href={ASKREYEL_SIGN_IN}
+            target="_top"
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0e8c8f] px-4 py-3 text-[15px] font-bold text-white transition hover:brightness-110"
           >
             I have an AskReyel account
