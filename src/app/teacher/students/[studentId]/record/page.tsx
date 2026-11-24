@@ -68,7 +68,7 @@ export default async function StudentRecordPage({
 }) {
   const { studentId } = await params;
   const record = await load(studentId);
-  const { student, courses, nat } = record;
+  const { student, courses } = record;
 
   // Group the courses by school year (newest first, as the server sorts).
   const years: { label: string; current: boolean; courses: Course[] }[] = [];
@@ -143,7 +143,6 @@ export default async function StudentRecordPage({
             label="Average quiz score"
             value={overall === null ? "—" : `${overall}%`}
           />
-          <Stat label="CB-NAT tries" value={nat.length} />
         </div>
 
         {years.length === 0 && (
@@ -164,50 +163,6 @@ export default async function StudentRecordPage({
           </section>
         ))}
 
-        {nat.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-ink text-base font-extrabold">
-              CB-NAT Review tries
-            </h2>
-            <Card className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[520px] text-sm">
-                  <thead className="bg-canvas text-muted text-left text-xs font-bold">
-                    <tr>
-                      <th className="px-4 py-2.5">Test</th>
-                      <th className="px-4 py-2.5">Subject</th>
-                      <th className="px-4 py-2.5">Date</th>
-                      <th className="px-4 py-2.5 text-right">Score</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-line divide-y">
-                    {nat.map((n) => (
-                      <tr key={n.id}>
-                        <td className="text-ink px-4 py-2.5 font-semibold">
-                          {n.test}
-                          {n.attempt > 1 && (
-                            <span className="text-muted ml-1.5 text-xs font-normal">
-                              try {n.attempt}
-                            </span>
-                          )}
-                        </td>
-                        <td className="text-muted px-4 py-2.5">
-                          {humanise(n.subject)}
-                        </td>
-                        <td className="text-muted px-4 py-2.5 whitespace-nowrap">
-                          {day(n.date)}
-                        </td>
-                        <td className="px-4 py-2.5 text-right">
-                          <ScoreCell score={n.score} possible={n.possible} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </section>
-        )}
       </div>
     </div>
   );

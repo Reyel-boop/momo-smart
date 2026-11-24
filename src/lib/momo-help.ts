@@ -211,23 +211,6 @@ export const HELP: HelpEntry[] = [
     ],
   },
   {
-    id: "s-nat",
-    roles: S,
-    question: "What is CB-NAT Review?",
-    answer:
-      "CB-NAT Review is practice for the National Achievement Test, for Grade 10 students only. Each question has 2 minutes. Find it in the menu under CB-NAT Review.",
-    link: { label: "Open CB-NAT Review", href: "/student/nat" },
-    keywords: [
-      "nat",
-      "cb-nat",
-      "cbnat",
-      "national achievement",
-      "review",
-      "reviewer",
-      "grade 10",
-    ],
-  },
-  {
     id: "s-stars",
     roles: S,
     question: "What are stars?",
@@ -438,7 +421,7 @@ export const HELP: HelpEntry[] = [
     roles: T,
     question: "Where can I see a student's courses and quizzes?",
     answer:
-      "Open Grades and tap “Record” under the student's name, or open the student from your Roster and tap “Courses & quizzes”. It lists every course the student has taken, by school year, with each quiz: Unit Questions, quiz and exam assignments, Live Quizzes and CB-NAT tries, plus their scores.",
+      "Open Grades and tap “Record” under the student's name, or open the student from your Roster and tap “Courses & quizzes”. It lists every course the student has taken, by school year, with each quiz: Unit Questions, quiz and exam assignments and Live Quizzes, plus their scores.",
     link: { label: "Open Grades", href: "/teacher/grades" },
     keywords: [
       "record",
@@ -502,7 +485,7 @@ export const HELP: HelpEntry[] = [
     roles: T,
     question: "How do Unit Questions work?",
     answer:
-      "Students answer five questions per unit, one at a time, with 30 seconds each (CB-NAT Review stays at 2 minutes). They see the correct answer after each one, get two tries, and the best score counts. On Courses, each unit shows its questions, answer key and each section's results.",
+      "Students answer five questions per unit, one at a time, with 30 seconds each. They see the correct answer after each one, get two tries, and the best score counts. On Courses, each unit shows its questions, answer key and each section's results.",
     link: { label: "Open Courses", href: "/teacher/courses" },
     keywords: [
       "unit questions",
@@ -512,23 +495,6 @@ export const HELP: HelpEntry[] = [
       "results",
       "answer key",
       "tries",
-    ],
-  },
-  {
-    id: "t-nat",
-    roles: T,
-    question: "How does CB-NAT Review work?",
-    answer:
-      "CB-NAT Review is for Grade 10 students only; Grades 7 to 9 don't see it. In the CB-NAT Review tab you can check the tests and answer keys, publish them, and see results. Each question gives students 2 minutes.",
-    link: { label: "Open CB-NAT Review", href: "/teacher/nat" },
-    keywords: [
-      "nat",
-      "cb-nat",
-      "cbnat",
-      "national achievement",
-      "review",
-      "reviewer",
-      "publish test",
     ],
   },
   {

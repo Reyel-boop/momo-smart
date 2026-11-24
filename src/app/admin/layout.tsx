@@ -10,7 +10,6 @@ import {
   ListIcon,
   SettingsIcon,
   SwitchIcon,
-  TimerIcon,
   UsersIcon,
 } from "~/app/_components/icons";
 import { Nav, type NavItem } from "~/app/_components/nav";
@@ -40,7 +39,6 @@ const ICONS: Record<string, React.ReactNode> = {
   Classes: <CapIcon className="size-[18px]" />,
   Settings: <SettingsIcon className="size-[18px]" />,
   Schools: <SwitchIcon className="size-[18px]" />,
-  "CB-NAT Review": <TimerIcon className="size-[18px]" />,
   Sponsors: <MegaphoneIcon className="size-[18px]" />,
 };
 
@@ -48,7 +46,6 @@ const ICONS: Record<string, React.ReactNode> = {
 const OWNER_ITEMS: NavItem[] = [
   ...ITEMS,
   { label: "Schools", href: "/admin/schools" },
-  { label: "CB-NAT Review", href: "/admin/nat" },
   { label: "Sponsors", href: "/admin/sponsors" },
 ];
 
