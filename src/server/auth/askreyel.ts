@@ -7,10 +7,9 @@ import { createPublicKey, verify, type KeyObject } from "node:crypto";
  * checks the signature against AskReyel's public key, so nobody can make a
  * pass without AskReyel.
  */
-export const ASKREYEL_URL =
-  process.env.ASKREYEL_URL ?? "https://school-hub-ten-orcin.vercel.app";
-/** Opens Momo through AskReyel (AskReyel asks them to sign in first if needed). */
-export const ASKREYEL_SIGN_IN = `${ASKREYEL_URL}/api/sso?to=momo`;
+import { ASKREYEL_URL } from "~/lib/askreyel";
+
+export { ASKREYEL_SIGN_IN, ASKREYEL_URL } from "~/lib/askreyel";
 
 export type AskReyelPass = {
   u: string;
@@ -62,8 +61,7 @@ export async function checkAskReyelPass(
     return {
       u: p.u,
       name: typeof p.name === "string" ? p.name : null,
-      email:
-        typeof p.email === "string" ? p.email.trim().toLowerCase() : null,
+      email: typeof p.email === "string" ? p.email.trim().toLowerCase() : null,
       role: typeof p.role === "string" ? p.role : "",
     };
   } catch (e) {
