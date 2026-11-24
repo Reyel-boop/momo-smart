@@ -6,6 +6,7 @@ import { Wordmark } from "~/app/_components/brand";
 import { env } from "~/env";
 import { auth } from "~/server/auth";
 import { homeForRole } from "~/server/auth/home";
+import { db } from "~/server/db";
 import { SignUpForm } from "./signup-form";
 
 export const metadata: Metadata = {
@@ -22,6 +23,13 @@ export default async function SignUpPage({
   if (session?.user) redirect(homeForRole(session.user.role));
   const params = await searchParams;
   const role = params.role === "teacher" ? "TEACHER" : "STUDENT";
+  // Students pick their school (no code needed); hidden when there's only one.
+  const schools = env.DEMO_MODE
+    ? []
+    : await db.school.findMany({
+        select: { id: true, name: true },
+        orderBy: { name: "asc" },
+      });
 
   return (
     <main className="bg-canvas flex min-h-screen flex-col items-center px-6 py-10">
@@ -46,7 +54,11 @@ export default async function SignUpPage({
             </Link>
           </div>
         ) : (
-          <SignUpForm initialRole={role} initialCode={params.code ?? ""} />
+          <SignUpForm
+            initialRole={role}
+            initialCode={params.code ?? ""}
+            schools={schools}
+          />
         )}
       </div>
     </main>

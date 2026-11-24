@@ -28,6 +28,7 @@ const KEPT = [
   "studentNumber",
   "gradeLevel",
   "classCode",
+  "schoolId",
 ];
 
 const common = {
@@ -64,13 +65,24 @@ const schema = z.discriminatedUnion("role", [
       .int()
       .min(7, "Choose your grade level.")
       .max(12),
-    classCode: z
-      .string({ required_error: "Enter a class code from your teacher." })
-      .trim()
-      .min(1, "Enter a class code from your teacher (or your school's code).")
-      .max(20),
+    // From an invite link; otherwise the student picks their school.
+    classCode: z.string().trim().max(20).optional(),
+    schoolId: z.string().trim().max(40).optional(),
   }),
 ]);
+
+/** The school a student picked (or the only school, if there's just one). */
+async function chosenSchool(schoolId: string | undefined) {
+  const school = schoolId
+    ? await db.school.findUnique({
+        where: { id: schoolId },
+        select: { id: true },
+      })
+    : (await db.school.count()) === 1
+      ? await db.school.findFirst({ select: { id: true } })
+      : null;
+  return school ? { schoolId: school.id, isClassCode: false } : null;
+}
 
 const field = (formData: FormData, name: string) => {
   const value = formData.get(name);
@@ -116,6 +128,7 @@ async function createAccount(formData: FormData): Promise<SignUpState> {
     studentNumber: formData.get("studentNumber") ?? undefined,
     gradeLevel: formData.get("gradeLevel") ?? undefined,
     classCode: field(formData, "classCode"),
+    schoolId: field(formData, "schoolId"),
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check your details." };
@@ -126,16 +139,20 @@ async function createAccount(formData: FormData): Promise<SignUpState> {
   }
 
   // The code tells which school the account belongs to.
-  const found = await schoolForCode(
-    db,
-    input.role === "TEACHER" ? input.schoolCode : input.classCode,
-  );
+  const found =
+    input.role === "TEACHER"
+      ? await schoolForCode(db, input.schoolCode)
+      : input.classCode
+        ? await schoolForCode(db, input.classCode)
+        : await chosenSchool(input.schoolId);
   if (!found || (input.role === "TEACHER" && found.isClassCode)) {
     return {
       error:
         input.role === "TEACHER"
           ? "That school code isn't right. Ask your school admin for it."
-          : "That code doesn't match a class or a school. Check it with your teacher.",
+          : input.classCode
+            ? "That invite link's class code isn't right. Check it with your teacher."
+            : "Choose your school.",
     };
   }
 
@@ -206,7 +223,7 @@ async function createAccount(formData: FormData): Promise<SignUpState> {
         },
         select: { studentProfile: { select: { id: true } } },
       });
-      if (found.isClassCode) {
+      if (found.isClassCode && input.classCode) {
         await joinClassByCode(tx, user.studentProfile!.id, input.classCode);
       }
     });

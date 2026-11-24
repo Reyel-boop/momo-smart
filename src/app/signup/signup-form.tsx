@@ -16,9 +16,13 @@ const labelClass = "mb-1.5 block text-sm font-semibold text-ink";
 export function SignUpForm({
   initialRole,
   initialCode,
+  schools,
 }: {
   initialRole: Role;
+  /** From an invite link: joins that class (not shown). */
   initialCode: string;
+  /** Where a student can sign up; the list is hidden when there's one. */
+  schools: { id: string; name: string }[];
 }) {
   const [role, setRole] = useState<Role>(initialRole);
   const [state, formAction, pending] = useActionState(signUp, initialState);
@@ -52,7 +56,7 @@ export function SignUpForm({
       <p className="text-muted mt-2 text-[15px]">
         {role === "TEACHER"
           ? "Ask your school admin for your school's code. You can sign in right away."
-          : "Enter the class code from your teacher. It joins you to the class and your school."}
+          : "Your teacher adds you to classes, or you can join one later from Courses."}
       </p>
 
       <div
@@ -170,24 +174,36 @@ export function SignUpForm({
                 </select>
               </div>
             </div>
-            <div>
-              <label htmlFor={`${id}-code`} className={labelClass}>
-                Class code
-              </label>
-              <input
-                id={`${id}-code`}
-                name="classCode"
-                required
-                maxLength={20}
-                defaultValue={keep("classCode") ?? initialCode}
-                placeholder="e.g. 7F3A2C"
-                autoCapitalize="characters"
-                className={`${input} font-mono uppercase placeholder:font-sans placeholder:normal-case`}
-              />
-              <p className="text-muted mt-1 text-xs">
-                From your teacher. Your school&apos;s code works too.
-              </p>
-            </div>
+            {initialCode && (
+              <input type="hidden" name="classCode" value={initialCode} />
+            )}
+            {schools.length > 1 ? (
+              <div>
+                <label htmlFor={`${id}-schoolId`} className={labelClass}>
+                  School
+                </label>
+                <select
+                  id={`${id}-schoolId`}
+                  name="schoolId"
+                  required={!initialCode}
+                  defaultValue={keep("schoolId") ?? ""}
+                  className={input}
+                >
+                  <option value="" disabled>
+                    Choose your school
+                  </option>
+                  {schools.map((school) => (
+                    <option key={school.id} value={school.id}>
+                      {school.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              schools[0] && (
+                <input type="hidden" name="schoolId" value={schools[0].id} />
+              )
+            )}
           </>
         ) : (
           <>
