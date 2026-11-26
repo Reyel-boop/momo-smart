@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, teacherProcedure } from "~/server/api/trpc";
+import { EXAM_WHERE } from "~/server/lib/exam";
 import { letterFor, refreshEnrollmentGrade, round } from "~/server/lib/grading";
 import {
   LEARNING_AREAS,
@@ -858,7 +859,8 @@ export const gradingRouter = createTRPCRouter({
                   },
                   assessments: {
                     where: {
-                      unitId: { not: null },
+                      // Unit Questions, and the course Exam
+                      OR: [{ unitId: { not: null } }, EXAM_WHERE],
                       assignmentId: null,
                       publishedAt: { not: null },
                     },
@@ -968,7 +970,8 @@ export const gradingRouter = createTRPCRouter({
         // Unit Questions: every unit, checked once answered. The best
         // finished try counts.
         const units = [...section.assessments]
-          .sort((a, b) => (a.unit?.order ?? 0) - (b.unit?.order ?? 0))
+          // the Exam (no unit) after the units
+          .sort((a, b) => (a.unit?.order ?? 999) - (b.unit?.order ?? 999))
           .map((assessment) => {
             const scoreOf = (a: (typeof assessment.attempts)[number]) =>
               a.totalScore ?? a.autoScore ?? 0;

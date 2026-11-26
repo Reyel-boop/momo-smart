@@ -17,7 +17,13 @@ import {
   UNIT_ACTIVITY_POINTS,
   ensureUnitActivity,
 } from "~/server/lib/unit-activity";
-import type { PrismaClient } from "../../../../generated/prisma";
+import {
+  EXAM_SECONDS,
+  EXAM_WHERE,
+  ensureExam,
+  isExamId,
+} from "~/server/lib/exam";
+import type { Prisma, PrismaClient } from "../../../../generated/prisma";
 
 /** Question types the engine can score without a human in the loop. */
 const AUTO_SCORED = [
@@ -862,27 +868,7 @@ export const assessmentRouter = createTRPCRouter({
           attempts: {
             where: { studentId: ctx.studentId },
             orderBy: { attempt: "desc" },
-            select: {
-              id: true,
-              attempt: true,
-              status: true,
-              totalScore: true,
-              submittedAt: true,
-              lastAutosaveAt: true,
-              nextQuestionAt: true,
-              responses: {
-                select: {
-                  questionId: true,
-                  selectedOptionIds: true,
-                  isCorrect: true,
-                },
-              },
-              _count: {
-                select: {
-                  proctorEvents: { where: { type: "TAB_SWITCH" } },
-                },
-              },
-            },
+            select: FOCUS_ATTEMPT_SELECT,
           },
         },
       });
@@ -893,8 +879,6 @@ export const assessmentRouter = createTRPCRouter({
 
       const { attempts, unit, questions, ...rest } = quiz;
       const graded = attempts.filter((a) => a.status === "GRADED");
-      const running = attempts.find((a) => a.status === "IN_PROGRESS") ?? null;
-      const triesLeft = Math.max(0, quiz.maxAttempts - attempts.length);
 
       // Finishing the questions opens the unit's activity.
       const opened =
@@ -930,89 +914,112 @@ export const assessmentRouter = createTRPCRouter({
           }
         : null;
 
-      // The question the running try is on: the first one not yet answered.
-      let current = null;
-      if (running) {
-        const answered = new Set(running.responses.map((r) => r.questionId));
-        const index = questions.findIndex((q) => !answered.has(q.id));
-        const question = questions[index];
-        if (question) {
-          const openedAt = running.lastAutosaveAt;
-          current = {
-            number: index + 1,
-            // Shown only once opened, so the clock is running while it's read.
-            question: openedAt
-              ? {
-                  id: question.id,
-                  prompt: question.prompt,
-                  options: question.options.map(({ isCorrect: _, ...o }) => o),
-                }
-              : null,
-            secondsLeft: openedAt ? secondsLeft(openedAt) : QUESTION_SECONDS,
-          };
-        }
-      }
-
+      const state = focusState(
+        questions,
+        attempts,
+        quiz.maxAttempts,
+        QUESTION_SECONDS,
+      );
       return {
         ...rest,
         unit,
         activity,
-        questionCount: questions.length,
-        questionSeconds: QUESTION_SECONDS,
-        triesLeft,
-        bestScore:
-          graded.length > 0
-            ? Math.max(...graded.map((a) => a.totalScore ?? 0))
-            : null,
-        running: running
-          ? {
-              id: running.id,
-              attempt: running.attempt,
-              answeredCount: running.responses.length,
-              score: running.responses.filter((r) => r.isCorrect).length,
-              focusLosses: running._count.proctorEvents,
-              current,
-              // Seconds until the next question may open (0 when it can).
-              nextOpensIn: running.nextQuestionAt
-                ? Math.max(
-                    0,
-                    Math.ceil(
-                      (running.nextQuestionAt.getTime() - Date.now()) / 1000,
-                    ),
-                  )
-                : 0,
-            }
-          : null,
-        // The finished try under review, with answers and rationales.
-        latest: graded[0]
-          ? {
-              id: graded[0].id,
-              attempt: graded[0].attempt,
-              totalScore: graded[0].totalScore,
-              focusLosses: graded[0]._count.proctorEvents,
-              responses: graded[0].responses,
-              // Stars: one per question answered correctly, each once.
-              newStars: (() => {
-                const before = new Set(
+        ...state,
+        latest:
+          state.latest && graded[0]
+            ? {
+                ...state.latest,
+                // Stars: one per question answered correctly, each once.
+                newStars: (() => {
+                  const before = new Set(
+                    graded
+                      .slice(1)
+                      .flatMap((a) => a.responses)
+                      .filter((r) => r.isCorrect)
+                      .map((r) => r.questionId),
+                  );
+                  return graded[0].responses.filter(
+                    (r) => r.isCorrect && !before.has(r.questionId),
+                  ).length;
+                })(),
+                totalStars: new Set(
                   graded
-                    .slice(1)
                     .flatMap((a) => a.responses)
                     .filter((r) => r.isCorrect)
                     .map((r) => r.questionId),
-                );
-                return graded[0].responses.filter(
-                  (r) => r.isCorrect && !before.has(r.questionId),
-                ).length;
-              })(),
-              totalStars: new Set(
-                graded
-                  .flatMap((a) => a.responses)
-                  .filter((r) => r.isCorrect)
-                  .map((r) => r.questionId),
-              ).size,
-            }
-          : null,
-        questions: graded.length > 0 ? questions : [],
+                ).size,
+              }
+            : null,
+      };
+    }),
+
+  /**
+   * The course Exam of the student's class in a course, made the first time
+   * it is opened. Null when the course has no Exam. Taken like the Unit
+   * Questions: one question at a time, with the answers shown after each.
+   */
+  exam: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const enrollment = await ctx.db.enrollment.findFirst({
+        where: {
+          studentId: ctx.studentId,
+          status: "ACTIVE",
+          section: { courseId: input.courseId },
+        },
+        orderBy: { enrolledAt: "desc" },
+        select: {
+          section: {
+            select: {
+              id: true,
+              course: { select: { id: true, name: true, code: true } },
+            },
+          },
+        },
+      });
+      if (!enrollment) return null;
+      const { section } = enrollment;
+      const examId = await ensureExam(ctx.db, {
+        id: section.id,
+        courseCode: section.course.code,
+      });
+      if (!examId) return null;
+
+      const exam = await ctx.db.assessment.findUniqueOrThrow({
+        where: { id: examId },
+        select: {
+          id: true,
+          title: true,
+          instructions: true,
+          totalPoints: true,
+          maxAttempts: true,
+          questions: {
+            orderBy: { order: "asc" },
+            select: {
+              id: true,
+              order: true,
+              prompt: true,
+              helperText: true,
+              points: true,
+              explanation: true,
+              options: {
+                orderBy: { order: "asc" },
+                select: { id: true, label: true, text: true, isCorrect: true },
+              },
+            },
+          },
+          attempts: {
+            where: { studentId: ctx.studentId },
+            orderBy: { attempt: "desc" },
+            select: FOCUS_ATTEMPT_SELECT,
+          },
+        },
+      });
+      const { questions, attempts, ...rest } = exam;
+      return {
+        ...rest,
+        course: section.course,
+        ...focusState(questions, attempts, exam.maxAttempts, EXAM_SECONDS),
       };
     }),
 
@@ -1026,8 +1033,7 @@ export const assessmentRouter = createTRPCRouter({
       const quiz = await ctx.db.assessment.findFirst({
         where: {
           id: input.assessmentId,
-          unitId: { not: null },
-          assignmentId: null,
+          ...FOCUS_SETS,
           publishedAt: { not: null },
         },
         select: {
@@ -1088,7 +1094,7 @@ export const assessmentRouter = createTRPCRouter({
         if (wait > 1000) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: `The next question opens in ${Math.ceil(wait / 1000)} seconds, when this question's 2 minutes are up.`,
+            message: `The next question opens in ${Math.ceil(wait / 1000)} seconds, when this question's time is up.`,
           });
         }
         await ctx.db.assessmentAttempt.update({
@@ -1138,9 +1144,9 @@ export const assessmentRouter = createTRPCRouter({
       }
 
       const now = new Date();
+      const seconds = secondsFor(attempt.assessment.id);
       const timedOut =
-        now.getTime() - openedAt.getTime() >
-        (QUESTION_SECONDS + GRACE_SECONDS) * 1000;
+        now.getTime() - openedAt.getTime() > (seconds + GRACE_SECONDS) * 1000;
       const option =
         !timedOut && input.optionId
           ? question.options.find((o) => o.id === input.optionId)
@@ -1182,9 +1188,7 @@ export const assessmentRouter = createTRPCRouter({
               }
             : {
                 lastAutosaveAt: null,
-                nextQuestionAt: new Date(
-                  openedAt.getTime() + QUESTION_SECONDS * 1000,
-                ),
+                nextQuestionAt: new Date(openedAt.getTime() + seconds * 1000),
               },
         }),
       ]);
@@ -1648,10 +1652,130 @@ const QUESTION_SECONDS = 30;
 /** Allowance for network delay before a late answer stops counting. */
 const GRACE_SECONDS = 5;
 
-/** Seconds left on a unit question opened at `openedAt`. */
-function secondsLeft(openedAt: Date) {
+/** What a focus-mode screen needs from each of the student's tries. */
+const FOCUS_ATTEMPT_SELECT = {
+  id: true,
+  attempt: true,
+  status: true,
+  totalScore: true,
+  submittedAt: true,
+  lastAutosaveAt: true,
+  nextQuestionAt: true,
+  responses: {
+    select: {
+      questionId: true,
+      selectedOptionIds: true,
+      isCorrect: true,
+    },
+  },
+  _count: {
+    select: {
+      proctorEvents: { where: { type: "TAB_SWITCH" as const } },
+    },
+  },
+} satisfies Prisma.AssessmentAttemptSelect;
+
+type FocusAttempt = Prisma.AssessmentAttemptGetPayload<{
+  select: typeof FOCUS_ATTEMPT_SELECT;
+}>;
+type FocusQuestion = {
+  id: string;
+  prompt: string;
+  options: { id: string; label: string; text: string; isCorrect: boolean }[];
+};
+
+/**
+ * A question set's state for the student (tries newest first): the running
+ * try and its open question (without the answer), or the finished try under
+ * review. All questions, with answers, only once a try is finished.
+ */
+function focusState<Q extends FocusQuestion>(
+  questions: Q[],
+  attempts: FocusAttempt[],
+  maxAttempts: number,
+  seconds: number,
+) {
+  const graded = attempts.filter((a) => a.status === "GRADED");
+  const running = attempts.find((a) => a.status === "IN_PROGRESS") ?? null;
+
+  // The question the running try is on: the first one not yet answered.
+  let current = null;
+  if (running) {
+    const answered = new Set(running.responses.map((r) => r.questionId));
+    const index = questions.findIndex((q) => !answered.has(q.id));
+    const question = questions[index];
+    if (question) {
+      const openedAt = running.lastAutosaveAt;
+      current = {
+        number: index + 1,
+        // Shown only once opened, so the clock is running while it's read.
+        question: openedAt
+          ? {
+              id: question.id,
+              prompt: question.prompt,
+              options: question.options.map(({ isCorrect: _, ...o }) => o),
+            }
+          : null,
+        secondsLeft: openedAt ? secondsLeft(openedAt, seconds) : seconds,
+      };
+    }
+  }
+
+  return {
+    questionCount: questions.length,
+    questionSeconds: seconds,
+    triesLeft: Math.max(0, maxAttempts - attempts.length),
+    bestScore:
+      graded.length > 0
+        ? Math.max(...graded.map((a) => a.totalScore ?? 0))
+        : null,
+    running: running
+      ? {
+          id: running.id,
+          attempt: running.attempt,
+          answeredCount: running.responses.length,
+          score: running.responses.filter((r) => r.isCorrect).length,
+          focusLosses: running._count.proctorEvents,
+          current,
+          // Seconds until the next question may open (0 when it can).
+          nextOpensIn: running.nextQuestionAt
+            ? Math.max(
+                0,
+                Math.ceil(
+                  (running.nextQuestionAt.getTime() - Date.now()) / 1000,
+                ),
+              )
+            : 0,
+        }
+      : null,
+    // The finished try under review, with answers and rationales.
+    latest: graded[0]
+      ? {
+          id: graded[0].id,
+          attempt: graded[0].attempt,
+          totalScore: graded[0].totalScore,
+          focusLosses: graded[0]._count.proctorEvents,
+          responses: graded[0].responses,
+        }
+      : null,
+    questions: graded.length > 0 ? questions : [],
+  };
+}
+
+/** Seconds each question of this assessment gets: Unit Questions or Exam. */
+const secondsFor = (assessmentId: string) =>
+  isExamId(assessmentId) ? EXAM_SECONDS : QUESTION_SECONDS;
+
+/** Unit Questions or a course Exam: the sets taken one question at a time. */
+const FOCUS_SETS = {
+  assignmentId: null,
+  OR: [{ unitId: { not: null } }, EXAM_WHERE],
+};
+
+/** Seconds left on a question opened at `openedAt`. */
+function secondsLeft(openedAt: Date, seconds = QUESTION_SECONDS) {
   const elapsed = Math.floor((Date.now() - openedAt.getTime()) / 1000);
-  return Math.max(0, QUESTION_SECONDS - elapsed);
+  return Math.max(0, seconds - elapsed);
 }
 
 /**
@@ -1668,7 +1792,7 @@ async function runningUnitAttempt(
     where: {
       id: attemptId,
       studentId,
-      assessment: { unitId: { not: null }, assignmentId: null },
+      assessment: FOCUS_SETS,
     },
     select: {
       id: true,
@@ -1678,6 +1802,7 @@ async function runningUnitAttempt(
       responses: { select: { questionId: true, pointsAwarded: true } },
       assessment: {
         select: {
+          id: true,
           totalPoints: true,
           questions: {
             orderBy: { order: "asc" },

@@ -1,4 +1,5 @@
 import { round } from "~/server/lib/grading";
+import { examIdFor } from "~/server/lib/exam";
 import { starTotals } from "~/server/lib/stars";
 import { autoCheckWaitingSubmissions } from "~/server/lib/unit-activity";
 import type { PrismaClient } from "../../../generated/prisma";
@@ -21,8 +22,15 @@ export async function sectionProgressOf(
   });
   const now = new Date();
 
-  const [enrollments, unitCount, assignments, attempts, attendance, totals] =
-    await Promise.all([
+  const [
+    enrollments,
+    unitCount,
+    assignments,
+    attempts,
+    attendance,
+    totals,
+    exam,
+  ] = await Promise.all([
       db.enrollment.findMany({
         where: { sectionId: section.id, status: "ACTIVE" },
         orderBy: { student: { user: { name: "asc" } } },
@@ -76,6 +84,17 @@ export async function sectionProgressOf(
         _count: { _all: true },
       }),
       totalsIn ?? starTotals(db),
+      // The course Exam (Telecommunications, Computer Programming), once made.
+      db.assessment.findUnique({
+        where: { id: examIdFor(section.id) },
+        select: {
+          totalPoints: true,
+          attempts: {
+            where: { status: "GRADED" },
+            select: { studentId: true, totalScore: true },
+          },
+        },
+      }),
     ]);
 
   const unitsDone = new Map<string, Set<string>>();
@@ -96,6 +115,12 @@ export async function sectionProgressOf(
       cur.attended += row._count._all;
     }
     attendanceOf.set(row.studentId, cur);
+  }
+
+  const examScore = new Map<string, number>();
+  for (const a of exam?.attempts ?? []) {
+    const score = a.totalScore ?? 0;
+    examScore.set(a.studentId, Math.max(score, examScore.get(a.studentId) ?? 0));
   }
 
   const HANDED_IN = new Set(["SUBMITTED", "GRADED", "RETURNED"]);
@@ -138,6 +163,7 @@ export async function sectionProgressOf(
       letter: e.currentLetter,
       lessonsPercent: Math.round(e.syllabusPercent ?? 0),
       unitsDone: unitsDone.get(id)?.size ?? 0,
+      examScore: examScore.get(id) ?? null,
       due,
       handedIn,
       missing,
@@ -151,6 +177,7 @@ export async function sectionProgressOf(
   const graded = students.filter((s) => s.grade !== null);
   return {
     unitCount,
+    examPoints: exam?.totalPoints ?? null,
     dueCount: assignments.length,
     students,
     summary: {

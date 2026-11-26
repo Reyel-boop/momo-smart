@@ -200,6 +200,9 @@ export default async function ProgressPage({
                   <th className="px-3 py-2.5 text-right">Grade</th>
                   <th className="px-3 py-2.5">Lessons</th>
                   <th className="px-3 py-2.5 text-center">Unit Questions</th>
+                  {data.examPoints !== null && (
+                    <th className="px-3 py-2.5 text-center">Exam</th>
+                  )}
                   <th className="px-3 py-2.5 text-center">Assignments</th>
                   <th className="px-3 py-2.5 text-right">Attendance</th>
                   <th className="px-3 py-2.5 text-right">Stars</th>
@@ -263,6 +266,25 @@ export default async function ProgressPage({
                         ? `${s.unitsDone} / ${data.unitCount}`
                         : "—"}
                     </td>
+                    {data.examPoints !== null && (
+                      <td className="px-3 py-3 text-center font-semibold tabular-nums">
+                        {s.examScore === null ? (
+                          <span className="text-muted font-normal">
+                            Not taken
+                          </span>
+                        ) : (
+                          <span
+                            className={
+                              s.examScore / data.examPoints >= 0.75
+                                ? "text-emerald-700"
+                                : "text-rose-700"
+                            }
+                          >
+                            {s.examScore} / {data.examPoints}
+                          </span>
+                        )}
+                      </td>
+                    )}
                     <td className="px-3 py-3 text-center tabular-nums">
                       {s.due === 0 ? (
                         <span className="text-muted">None due</span>

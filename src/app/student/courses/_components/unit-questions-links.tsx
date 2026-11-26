@@ -7,6 +7,7 @@ import {
   ListIcon,
 } from "~/app/_components/icons";
 import { Card, CardHeader, Pill } from "~/app/_components/ui";
+import { EXAM_QUESTION_COUNT, examHref } from "~/lib/exam";
 import type { RouterOutputs } from "~/trpc/react";
 
 type UnitQuiz = RouterOutputs["assessment"]["unitQuizzes"][number];
@@ -109,6 +110,30 @@ export function AllUnits({
           );
         })}
       </ol>
+    </Card>
+  );
+}
+
+/** The course Exam (Telecommunications, Computer Programming). */
+export function ExamCard({ courseId }: { courseId: string }) {
+  return (
+    <Card className="overflow-hidden">
+      <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white">
+        <p className="text-xs font-black tracking-wide text-white/80 uppercase">
+          📝 Course Exam
+        </p>
+        <p className="mt-1 text-sm text-white/90">
+          {EXAM_QUESTION_COUNT} easy questions about the whole course, 1 minute
+          each. One try.
+        </p>
+        <Link
+          href={examHref(courseId)}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-black text-indigo-700 shadow hover:bg-white/90"
+        >
+          Take the Exam
+          <ArrowRightIcon className="size-4" />
+        </Link>
+      </div>
     </Card>
   );
 }

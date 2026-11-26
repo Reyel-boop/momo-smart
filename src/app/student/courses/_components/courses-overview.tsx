@@ -9,6 +9,7 @@ import {
 } from "~/app/_components/icons";
 import { Card, EmptyState } from "~/app/_components/ui";
 import { courseTone, teacherFullName } from "~/app/student/_components/format";
+import { EXAM_QUESTION_COUNT, examHref, examKindOf } from "~/lib/exam";
 import { api } from "~/trpc/server";
 import type { RouterOutputs } from "~/trpc/react";
 import { JoinClass } from "./join-class";
@@ -186,6 +187,24 @@ function CourseCard({
               </span>
             </span>
             <ChevronRightIcon className="text-muted size-4 shrink-0" />
+          </Link>
+        )}
+
+        {examKindOf(section.course.code) && (
+          <Link
+            href={examHref(section.course.id)}
+            className="mt-2 flex items-center gap-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-3 text-white transition hover:brightness-110"
+          >
+            <span className="text-lg" aria-hidden="true">
+              📝
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[10px] font-bold tracking-wide text-white/70 uppercase">
+                Course Exam · {EXAM_QUESTION_COUNT} questions
+              </span>
+              <span className="block text-sm font-bold">Take the Exam</span>
+            </span>
+            <ChevronRightIcon className="size-4 shrink-0" />
           </Link>
         )}
       </div>

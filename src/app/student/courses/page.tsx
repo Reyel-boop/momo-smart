@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { ChevronRightIcon } from "~/app/_components/icons";
 import { Card, EmptyState } from "~/app/_components/ui";
 import { teacherFullName } from "~/app/student/_components/format";
+import { examKindOf } from "~/lib/exam";
 import { youTubeId } from "~/lib/video";
 import { api } from "~/trpc/server";
 import type { RouterOutputs } from "~/trpc/react";
@@ -17,6 +18,7 @@ import { LessonHeader, LockedLesson } from "./_components/lesson-header";
 import { UnitPlan } from "./_components/unit-plan";
 import {
   AllUnits,
+  ExamCard,
   UnitQuestionsCallout,
 } from "./_components/unit-questions-links";
 import { YouTubeLecture } from "./_components/youtube-lecture";
@@ -173,6 +175,9 @@ export default async function StudentCourses({
 
         <div className="min-w-0 space-y-6">
           <UnitPlan lesson={lesson} unitWork={unitWork} now={now} />
+          {section && examKindOf(section.course.code) && (
+            <ExamCard courseId={section.course.id} />
+          )}
           <AllUnits
             units={units}
             quizzes={unitQuizzes}

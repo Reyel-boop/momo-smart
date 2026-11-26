@@ -206,8 +206,9 @@ function Rules({ quiz }: { quiz: QuizView }) {
         your teacher can see it.
       </li>
       <li>
-        {quiz.triesLeft} of {quiz.maxAttempts} tries left. Your best score
-        counts.
+        {quiz.maxAttempts === 1
+          ? "You have one try, so take your time and read carefully."
+          : `${quiz.triesLeft} of ${quiz.maxAttempts} tries left. Your best score counts.`}
       </li>
     </ul>
   );
@@ -622,7 +623,9 @@ function Review({
               ? "Perfect! Great job."
               : score / quiz.totalPoints >= 0.6
                 ? "Good work."
-                : "Review the discussion and try again."}
+                : quiz.triesLeft > 0
+                  ? "Review the discussion and try again."
+                  : "Read the answers below to learn from your mistakes."}
           </span>
         </p>
         {latest.newStars !== undefined && (
