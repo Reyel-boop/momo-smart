@@ -35,6 +35,12 @@ export function CourseExam({
           unit&apos;s Unit Questions). One question at a time, 1 minute each,
           one try. The scores show on Class Progress.
         </p>
+        <p className="mt-2 max-w-3xl text-sm text-white/90">
+          🔀 Every student gets their own version: the same {items.length}{" "}
+          topics, but in a different order (still easy to harder), about half
+          asked in other words, and the choices shuffled. Seatmates won&apos;t
+          see the same screen.
+        </p>
         {sections.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {sections.map((section) => (

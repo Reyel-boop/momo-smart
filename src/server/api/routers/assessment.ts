@@ -24,6 +24,7 @@ import {
   courseProgressFor,
   ensureExam,
   isExamId,
+  personalizeExam,
 } from "~/server/lib/exam";
 import type { Prisma, PrismaClient } from "../../../../generated/prisma";
 
@@ -1018,7 +1019,13 @@ export const assessmentRouter = createTRPCRouter({
           },
         },
       });
-      const { questions, attempts, ...rest } = exam;
+      const { questions: canonical, attempts, ...rest } = exam;
+      // Each student's try has its own order, wording and choice order.
+      const tryId = (
+        attempts.find((a) => a.status === "IN_PROGRESS") ??
+        attempts.find((a) => a.status === "GRADED")
+      )?.id;
+      const questions = tryId ? personalizeExam(canonical, tryId) : canonical;
       // Locked until the whole course is done (a try already begun stays open).
       const progress = await courseProgressFor(ctx.db, ctx.studentId, section);
       return {
@@ -1152,7 +1159,10 @@ export const assessmentRouter = createTRPCRouter({
           message: "Open the question before answering it.",
         });
       }
-      const { questions } = attempt.assessment;
+      // An Exam's questions in this student's own order and wording.
+      const questions = isExamId(attempt.assessment.id)
+        ? personalizeExam(attempt.assessment.questions, attempt.id)
+        : attempt.assessment.questions;
       const answered = new Set(attempt.responses.map((r) => r.questionId));
       const index = questions.findIndex((q) => !answered.has(q.id));
       const question = questions[index];
@@ -1828,6 +1838,8 @@ async function runningUnitAttempt(
             orderBy: { order: "asc" },
             select: {
               id: true,
+              prompt: true,
+              helperText: true,
               points: true,
               explanation: true,
               options: {
