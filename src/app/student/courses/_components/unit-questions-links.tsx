@@ -115,22 +115,39 @@ export function AllUnits({
 }
 
 /** The course Exam (Telecommunications, Computer Programming). */
-export function ExamCard({ courseId }: { courseId: string }) {
+export function ExamCard({
+  courseId,
+  units,
+  quizzes,
+}: {
+  courseId: string;
+  units: SyllabusUnit[];
+  quizzes: UnitQuiz[];
+}) {
+  const lessons = units.flatMap((unit) => unit.lessons);
+  const lessonsDone = lessons.filter(
+    (l) => l.myProgress?.status === "COMPLETED",
+  ).length;
+  const unitsDone = quizzes.filter((q) => q.bestScore !== null).length;
+  const open = lessonsDone >= lessons.length && unitsDone >= quizzes.length;
   return (
     <Card className="overflow-hidden">
-      <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-5 py-4 text-white">
+      <div
+        className={`px-5 py-4 text-white ${open ? "bg-gradient-to-r from-violet-600 to-indigo-600" : "bg-slate-500"}`}
+      >
         <p className="text-xs font-black tracking-wide text-white/80 uppercase">
-          📝 Course Exam
+          📝 Course Exam {open ? "" : "· 🔒 Locked"}
         </p>
         <p className="mt-1 text-sm text-white/90">
-          {EXAM_QUESTION_COUNT} easy questions about the whole course, 1 minute
-          each. One try.
+          {open
+            ? `${EXAM_QUESTION_COUNT} easy questions about the whole course, 1 minute each. One try.`
+            : `Opens when you finish the whole course: ${lessonsDone}/${lessons.length} lessons and ${unitsDone}/${quizzes.length} Unit Questions done.`}
         </p>
         <Link
           href={examHref(courseId)}
           className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-black text-indigo-700 shadow hover:bg-white/90"
         >
-          Take the Exam
+          {open ? "Take the Exam" : "See what's left"}
           <ArrowRightIcon className="size-4" />
         </Link>
       </div>

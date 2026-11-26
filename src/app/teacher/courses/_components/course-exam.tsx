@@ -30,8 +30,10 @@ export function CourseExam({
         </p>
         <p className="mt-1 max-w-3xl text-sm text-white/90">
           Your students find it on their <b>Courses</b> page: the purple{" "}
-          <b>Take the Exam</b> button on this course. One question at a time, 1
-          minute each, one try. The scores show on Class Progress.
+          <b>Take the Exam</b> button on this course. It opens only when a
+          student has finished the whole course (every lesson and every
+          unit&apos;s Unit Questions). One question at a time, 1 minute each,
+          one try. The scores show on Class Progress.
         </p>
         {sections.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
@@ -56,7 +58,9 @@ export function CourseExam({
 
       <details className="group">
         <summary className="text-brand hover:bg-canvas flex cursor-pointer list-none items-center gap-1 px-6 py-4 text-sm font-bold [&::-webkit-details-marker]:hidden">
-          <span className="inline-block transition group-open:rotate-90">›</span>
+          <span className="inline-block transition group-open:rotate-90">
+            ›
+          </span>
           See the {items.length} questions and answers
         </summary>
         <div className="space-y-5 px-6 pb-6">

@@ -87,3 +87,54 @@ export async function ensureExam(
   }
   return id;
 }
+
+/**
+ * How far a student is through a course: published lessons completed and
+ * units whose Unit Questions they have finished. The Exam opens once both
+ * are done.
+ */
+export async function courseProgressFor(
+  db: PrismaClient,
+  studentId: string,
+  section: { id: string; courseId: string },
+) {
+  const [lessonsTotal, lessonsDone, quizzes] = await Promise.all([
+    db.lesson.count({
+      where: { isPublished: true, unit: { courseId: section.courseId } },
+    }),
+    db.lessonProgress.count({
+      where: {
+        studentId,
+        status: "COMPLETED",
+        lesson: { isPublished: true, unit: { courseId: section.courseId } },
+      },
+    }),
+    db.assessment.findMany({
+      where: {
+        sectionId: section.id,
+        unitId: { not: null },
+        assignmentId: null,
+        publishedAt: { not: null },
+      },
+      select: {
+        attempts: {
+          where: { studentId, status: "GRADED" },
+          select: { id: true },
+          take: 1,
+        },
+      },
+    }),
+  ]);
+  const unitsTotal = quizzes.length;
+  const unitsDone = quizzes.filter((q) => q.attempts.length > 0).length;
+  return {
+    lessonsDone,
+    lessonsTotal,
+    unitsDone,
+    unitsTotal,
+    finished: lessonsDone >= lessonsTotal && unitsDone >= unitsTotal,
+  };
+}
+
+export const EXAM_LOCKED_MESSAGE =
+  "The Exam opens when you finish the whole course: every lesson and every unit's Unit Questions.";

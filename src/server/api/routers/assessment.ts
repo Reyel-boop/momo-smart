@@ -18,8 +18,10 @@ import {
   ensureUnitActivity,
 } from "~/server/lib/unit-activity";
 import {
+  EXAM_LOCKED_MESSAGE,
   EXAM_SECONDS,
   EXAM_WHERE,
+  courseProgressFor,
   ensureExam,
   isExamId,
 } from "~/server/lib/exam";
@@ -972,6 +974,7 @@ export const assessmentRouter = createTRPCRouter({
           section: {
             select: {
               id: true,
+              courseId: true,
               course: { select: { id: true, name: true, code: true } },
             },
           },
@@ -1016,9 +1019,13 @@ export const assessmentRouter = createTRPCRouter({
         },
       });
       const { questions, attempts, ...rest } = exam;
+      // Locked until the whole course is done (a try already begun stays open).
+      const progress = await courseProgressFor(ctx.db, ctx.studentId, section);
       return {
         ...rest,
         course: section.course,
+        progress,
+        locked: !progress.finished && attempts.length === 0,
         ...focusState(questions, attempts, exam.maxAttempts, EXAM_SECONDS),
       };
     }),
@@ -1040,6 +1047,7 @@ export const assessmentRouter = createTRPCRouter({
           id: true,
           sectionId: true,
           maxAttempts: true,
+          section: { select: { courseId: true } },
           _count: { select: { questions: true } },
           attempts: {
             where: { studentId: ctx.studentId },
@@ -1054,6 +1062,18 @@ export const assessmentRouter = createTRPCRouter({
 
       const running = quiz.attempts.find((a) => a.status === "IN_PROGRESS");
       if (running) return { attemptId: running.id };
+      if (isExamId(quiz.id) && quiz.attempts.length === 0) {
+        const progress = await courseProgressFor(ctx.db, ctx.studentId, {
+          id: quiz.sectionId,
+          courseId: quiz.section.courseId,
+        });
+        if (!progress.finished) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: EXAM_LOCKED_MESSAGE,
+          });
+        }
+      }
       if (quiz.attempts.length >= quiz.maxAttempts) {
         throw new TRPCError({
           code: "FORBIDDEN",

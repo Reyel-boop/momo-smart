@@ -176,7 +176,11 @@ export default async function StudentCourses({
         <div className="min-w-0 space-y-6">
           <UnitPlan lesson={lesson} unitWork={unitWork} now={now} />
           {section && examKindOf(section.course.code) && (
-            <ExamCard courseId={section.course.id} />
+            <ExamCard
+              courseId={section.course.id}
+              units={units}
+              quizzes={unitQuizzes}
+            />
           )}
           <AllUnits
             units={units}

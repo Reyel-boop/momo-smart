@@ -59,10 +59,10 @@ export default async function ExamPage({
             )}
           </div>
           <div className="flex shrink-0 flex-wrap gap-2">
-            <Pill tone="blue">
-              {exam.questionCount} questions · 1 min each
-            </Pill>
-            {exam.bestScore !== null ? (
+            <Pill tone="blue">{exam.questionCount} questions · 1 min each</Pill>
+            {exam.locked ? (
+              <Pill tone="amber">🔒 Locked</Pill>
+            ) : exam.bestScore !== null ? (
               <Pill tone="green">
                 Score: {exam.bestScore}/{exam.totalPoints}
               </Pill>
@@ -83,7 +83,82 @@ export default async function ExamPage({
         </p>
       </Card>
 
-      <UnitQuestionsForm quiz={exam} courseHref={courseHref} />
+      {exam.locked ? (
+        <ExamLocked progress={exam.progress} courseHref={courseHref} />
+      ) : (
+        <UnitQuestionsForm quiz={exam} courseHref={courseHref} />
+      )}
     </div>
+  );
+}
+
+/** Shown until the student has finished every lesson and Unit Questions. */
+function ExamLocked({
+  progress,
+  courseHref,
+}: {
+  progress: {
+    lessonsDone: number;
+    lessonsTotal: number;
+    unitsDone: number;
+    unitsTotal: number;
+  };
+  courseHref: string;
+}) {
+  const rows = [
+    {
+      label: "Lessons completed",
+      done: progress.lessonsDone,
+      total: progress.lessonsTotal,
+    },
+    {
+      label: "Unit Questions answered",
+      done: progress.unitsDone,
+      total: progress.unitsTotal,
+    },
+  ];
+  return (
+    <Card className="p-6">
+      <p className="text-3xl" aria-hidden="true">
+        🔒
+      </p>
+      <h2 className="text-ink mt-2 text-lg font-extrabold">
+        Finish the course first
+      </h2>
+      <p className="text-muted mt-1 text-sm">
+        The Exam opens when you finish <b>every lesson</b> and answer{" "}
+        <b>every unit&apos;s Unit Questions</b>. Keep going, you&apos;re getting
+        there!
+      </p>
+      <div className="mt-5 space-y-4">
+        {rows.map((row) => (
+          <div key={row.label}>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-ink font-semibold">{row.label}</span>
+              <span
+                className={`font-bold tabular-nums ${row.done >= row.total ? "text-emerald-700" : "text-ink"}`}
+              >
+                {row.done >= row.total ? "✓ " : ""}
+                {Math.min(row.done, row.total)} / {row.total}
+              </span>
+            </div>
+            <div className="bg-line mt-1.5 h-2 overflow-hidden rounded-full">
+              <div
+                className={`h-full rounded-full ${row.done >= row.total ? "bg-emerald-500" : "bg-brand"}`}
+                style={{
+                  width: `${row.total ? Math.min(100, Math.round((row.done / row.total) * 100)) : 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <Link
+        href={courseHref}
+        className="bg-brand mt-6 inline-flex rounded-xl px-5 py-3 text-sm font-bold text-white hover:opacity-90"
+      >
+        Continue the course →
+      </Link>
+    </Card>
   );
 }

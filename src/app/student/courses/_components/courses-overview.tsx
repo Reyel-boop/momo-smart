@@ -121,6 +121,9 @@ function CourseCard({
     ? Math.round((done / lessons.length) * 100)
     : 0;
   const grade = section.myGrade?.currentPercent;
+  // The Exam opens once every lesson and every unit's questions are done.
+  const unitsDone = quizzes.filter((q) => q.bestScore !== null).length;
+  const examOpen = done >= lessons.length && unitsDone >= quizzes.length;
 
   return (
     <Card className="flex flex-col overflow-hidden">
@@ -193,7 +196,11 @@ function CourseCard({
         {examKindOf(section.course.code) && (
           <Link
             href={examHref(section.course.id)}
-            className="mt-2 flex items-center gap-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-3 text-white transition hover:brightness-110"
+            className={`mt-2 flex items-center gap-3 rounded-xl px-4 py-3 text-white transition hover:brightness-110 ${
+              examOpen
+                ? "bg-gradient-to-r from-violet-600 to-indigo-600"
+                : "bg-slate-500"
+            }`}
           >
             <span className="text-lg" aria-hidden="true">
               📝
@@ -202,7 +209,11 @@ function CourseCard({
               <span className="block text-[10px] font-bold tracking-wide text-white/70 uppercase">
                 Course Exam · {EXAM_QUESTION_COUNT} questions
               </span>
-              <span className="block text-sm font-bold">Take the Exam</span>
+              <span className="block text-sm font-bold">
+                {examOpen
+                  ? "Take the Exam"
+                  : `🔒 Opens when you finish the course (${done}/${lessons.length} lessons · ${unitsDone}/${quizzes.length} units)`}
+              </span>
             </span>
             <ChevronRightIcon className="size-4 shrink-0" />
           </Link>
