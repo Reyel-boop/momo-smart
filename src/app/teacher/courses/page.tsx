@@ -15,6 +15,7 @@ import { api } from "~/trpc/server";
 import { humanise, longDate } from "~/app/_components/format";
 import { PageHeader } from "~/app/_components/page-header";
 import { Card, EmptyState, Pill } from "~/app/_components/ui";
+import { CourseExam } from "./_components/course-exam";
 import { LectureEditor } from "./_components/lecture-editor";
 import { TeachCourse } from "./_components/teach-course";
 import { UnitStatusSelect } from "./unit-status";
@@ -487,6 +488,11 @@ export default async function CoursesPage({
               ))}
             </div>
           </Card>
+
+          <CourseExam
+            courseCode={active.code}
+            sections={active.sections.map((s) => ({ id: s.id, code: s.code }))}
+          />
         </>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { round } from "~/server/lib/grading";
+import { examForCourse } from "~/server/demo/tle/exams";
 import { examIdFor } from "~/server/lib/exam";
 import { starTotals } from "~/server/lib/stars";
 import { autoCheckWaitingSubmissions } from "~/server/lib/unit-activity";
@@ -30,6 +31,7 @@ export async function sectionProgressOf(
     attendance,
     totals,
     exam,
+    course,
   ] = await Promise.all([
       db.enrollment.findMany({
         where: { sectionId: section.id, status: "ACTIVE" },
@@ -94,6 +96,10 @@ export async function sectionProgressOf(
             select: { studentId: true, totalScore: true },
           },
         },
+      }),
+      db.course.findUnique({
+        where: { id: section.courseId },
+        select: { code: true },
       }),
     ]);
 
@@ -177,7 +183,10 @@ export async function sectionProgressOf(
   const graded = students.filter((s) => s.grade !== null);
   return {
     unitCount,
-    examPoints: exam?.totalPoints ?? null,
+    // Shown before anyone has opened the Exam too.
+    examPoints:
+      exam?.totalPoints ??
+      (course ? (examForCourse(course.code)?.length ?? null) : null),
     dueCount: assignments.length,
     students,
     summary: {
