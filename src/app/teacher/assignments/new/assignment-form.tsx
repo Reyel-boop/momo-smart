@@ -83,7 +83,6 @@ export function AssignmentForm({
   );
   const [points, setPoints] = useState(String(existing?.pointsPossible ?? 20));
   const [dueAt, setDueAt] = useState("");
-  const [allowLate, setAllowLate] = useState(existing?.allowLate ?? true);
   // Set after mounting: the server doesn't know the browser's time zone.
   const existingDue = existing?.dueAt;
   useEffect(() => {
@@ -107,7 +106,8 @@ export function AssignmentForm({
         type,
         pointsPossible: Number(points),
         dueAt: Number.isNaN(due.getTime()) ? "" : due.toISOString(),
-        allowLate,
+        // late work is always accepted
+        allowLate: true,
         publish,
       };
       const result = existing
@@ -278,15 +278,9 @@ export function AssignmentForm({
         </div>
       </div>
 
-      <label className="text-ink flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={allowLate}
-          onChange={(e) => setAllowLate(e.target.checked)}
-          className="accent-brand size-4"
-        />
-        Accept late work
-      </label>
+      <p className="text-muted text-sm">
+        Late work is always accepted. It is marked late and gets 5 points off.
+      </p>
 
       {existing && existing.submitted > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">

@@ -223,21 +223,10 @@ export const submissionRouter = createTRPCRouter({
         });
       }
 
+      // Late work is always accepted: it is marked late (5 points off when
+      // checked), never refused, even past a close date.
       const now = new Date();
-      if (assignment.closesAt && now > assignment.closesAt) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Submissions for this assignment are closed.",
-        });
-      }
-
       const timeliness = timelinessFor(assignment, now);
-      if (timeliness === "LATE" && !assignment.allowLate) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "This assignment does not accept late work.",
-        });
-      }
 
       // Any online hand-in is accepted as a typed answer, a file or a link,
       // whatever format the teacher picked; it just can't be empty.

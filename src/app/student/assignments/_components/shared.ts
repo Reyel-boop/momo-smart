@@ -57,14 +57,9 @@ function instructionsFor(assignment: MyAssignment, now: Date): string[] {
       `Graded against the ${assignment.rubric.title} (${points(assignment.rubric.totalPoints)} pts).`,
     );
   }
-  if (!assignment.allowLate) {
-    lines.push("Late work is not accepted.");
-  } else if (assignment.dueAt < now) {
-    lines.push("It is past the due date, so this will be marked late.");
-  }
-  if (assignment.closesAt) {
+  if (assignment.dueAt < now) {
     lines.push(
-      `Submissions close ${shortDate(assignment.closesAt)} at ${clockOf(assignment.closesAt)}.`,
+      "It is past the due date, but you can still hand it in. It will be marked late (5 points off).",
     );
   }
   return lines;
